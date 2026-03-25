@@ -158,12 +158,12 @@ return {
         },
         level2b = {
             name = {
-                en_us = '',
-                zh_cn = '',
+                en_us = 'test',
+                zh_cn = 'test',
             },
             description = {
-                en_us = '',
-                zh_cn = '',
+                en_us = 'This is a test music.',
+                zh_cn = '这是测试音乐。',
             },
         },
     },

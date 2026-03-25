@@ -106,22 +106,22 @@ function Object:__call(...)
   return obj
 end
 
----@class DynamicObject : Object things need to be updated and drawn like Shape, Bullet, Player, Enemy. Static things like Sprite, AudioSystem are not DynamicObject.
----@field objects DynamicObject[] 
----@field subclasses DynamicObject[] 
+---@class GameObject : Object things need to be updated and drawn like Shape, Bullet, Player, Enemy. Static things like Sprite, AudioSystem are not GameObject.
+---@field objects GameObject[] 
+---@field subclasses GameObject[] 
 ---@field removed boolean|nil Internal flag set when `remove()` is called on an instance.
 ---@field notRespondToDrawAll boolean|nil If true on an instance, it will be skipped by `drawAll`.
-local DynamicObject=Object:extend()
+local GameObject=Object:extend()
 
 --- Marks an instance for removal during the next update cycle.
-function DynamicObject:remove()
+function GameObject:remove()
   self.removed=true
 end
 
---- Removes all instances of this specific DynamicObject class and recursively
+--- Removes all instances of this specific GameObject class and recursively
 --- calls removeAll on its subclasses. Usually used to clear all objects
 --- when entering/leaving a level.
-function DynamicObject:removeAll()
+function GameObject:removeAll()
   for i =#self.objects,1,-1 do
     table.remove(self.objects, i)
   end
@@ -130,10 +130,10 @@ function DynamicObject:removeAll()
   end
 end
 
-function DynamicObject:update(dt)
+function GameObject:update(dt)
 end
 
-function DynamicObject:updateAll(dt) 
+function GameObject:updateAll(dt) 
   -- why Object:updateAll can't update all things
   -- it's because I overrode Shape:updateAll so cls call didn't get to Circle, Player, etc. fixed
   for key, obj in pairs(self.objects) do
@@ -153,10 +153,10 @@ function DynamicObject:updateAll(dt)
   self.objects=nextObjects
 end
 
-function DynamicObject:draw()
+function GameObject:draw()
 end
 
-function DynamicObject:drawAll()
+function GameObject:drawAll()
   for key, obj in pairs(self.objects) do
     if not obj.removed and not obj.notRespondToDrawAll then
       obj:draw()
@@ -168,10 +168,10 @@ function DynamicObject:drawAll()
 end
 
 
-function DynamicObject:drawText()
+function GameObject:drawText()
 end
 
-function DynamicObject:drawTextAll()
+function GameObject:drawTextAll()
   for key, obj in pairs(self.objects) do
     if not obj.removed then
       obj:drawText()
@@ -182,7 +182,4 @@ function DynamicObject:drawTextAll()
   end
 end
 
----@class GameObject : DynamicObject base class for all game objects. game objects are removed when leaving game
-local GameObject=DynamicObject:extend()
-
-return {Object,DynamicObject,GameObject}
+return {Object,GameObject}

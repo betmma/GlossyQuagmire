@@ -64,7 +64,7 @@ function UIText:draw()
     local x,y=self:getXY()
     local colorref={love.graphics.getColor()}
     SetFont(self.fontSize,self.fontName)
-    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*colorref[4]*self.transparency)
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*colorref[4])
     local args={love.graphics.print,self.text,x,y}
     if self.align then
         args[1]=love.graphics.printf
@@ -81,7 +81,7 @@ function UIText:boldWrap(func,text,x,y,...)
     local offset=self.fontSize*self.boldOffset
     local colorref={love.graphics.getColor()}
     if self.isBold then
-        love.graphics.setColor(self.boldColor[1],self.boldColor[2],self.boldColor[3],self.boldColor[4]*colorref[4]*self.transparency)
+        love.graphics.setColor(self.boldColor[1],self.boldColor[2],self.boldColor[3],self.boldColor[4]*colorref[4])
         func(text,x+offset,y,...)
         func(text,x-offset,y,...)
         func(text,x,y+offset,...)

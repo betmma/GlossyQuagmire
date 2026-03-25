@@ -44,7 +44,6 @@ return {
                         if not switcher then
                             return
                         end
-                        switcher.focused=self.focused -- pass focused state from option to switcher
                         local lerpRatio=0.1
                         if self.focused then
                             switcher.previewDecayRadius=math.lerp(switcher.previewDecayRadius,previewDecayRadius,lerpRatio)
@@ -184,8 +183,7 @@ return {
     end,
     update=function(self,dt)
         self.backgroundPattern:update(dt)
-        base:update()
-        UI.Base:updateAll() -- to remove removed elements in class.objects
+        base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
             SFX:play('select')
             self:saveData()
@@ -195,7 +193,7 @@ return {
     draw=function(self)
     end,
     drawText=function(self)
-        base:draw()
+        base:drawHierarchy()
         SetFont(36)
         love.graphics.print("FPS: "..love.timer.getFPS(), 10, 20)
     end

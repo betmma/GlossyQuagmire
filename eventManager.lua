@@ -1,5 +1,8 @@
 local EventManager = {}
 EventManager.EVENTS={
+    SWITCH_STATE='switchState',
+    PLAY_AUDIO='playAudio',
+    -- below are from previous game
     PLAYER_HIT='playerHit',
     PLAYER_GRAZE='playerGraze',
     PLAYER_ACCUMULATE_FLASHBOMB='playerAccumulateFlashbomb',
@@ -11,24 +14,7 @@ EventManager.EVENTS={
     LOSE_LEVEL='loseLevel',
     LEAVE_LEVEL='leaveLevel',
     ENTER_LEVEL='enterLevel',
-    SHOCKWAVE_REMOVE_BULLET='shockwaveRemoveBullet',
-    YINYANG_ORB_REMOVE_BULLET='yinYangOrbRemoveBullet',
-    FLASHBOMB_REMOVE_BULLET='flashbombRemoveBullet',
-    SWITCH_STATE='switchState',
-    SWITCH_HYPERBOLIC_MODEL='switchHyperbolicModel',
-    BUY_UPGRADE='buyUpgrade',
-    POLITE_EXIT_LAST_RUN='politeExitLastRun',
-    SAVE_REPLAY_ACT_SCENE_MATCHES_SLOT='saveReplayActSceneMatchesSlot',
     ENEMY_GRAZED='enemyGrazed',
-    XP_USED_UP='xpUsedUp',
-    PLAYER_REMOVED_BY_DISTANCE='playerRemovedByDistance',
-    PLAYER_SHOOTING_WITHOUT_HITTING_LONG_TIME='playerShootingWithoutHittingLongTime',
-    FLASHBOMB_CREATE='flashbombCreate',
-    FLASHBOMB_REMOVED='flashbombRemoved',
-    LEVEL_5_2_OUTSIDE_RIVER='level5_2OutsideRiver',
-    LEVEL_7_3_FAST_TURN='level7_3FastTurn',
-    HOW_MANY_BULLETS='howManyBullets',
-    PLAY_AUDIO='playAudio'
 }
 EventManager.DELETE_LISTENER='deleteListener'
 

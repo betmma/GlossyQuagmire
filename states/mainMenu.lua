@@ -107,7 +107,7 @@ return {
         end
         self.backgroundPattern:update(dt)
         Asset.titleBatch:clear()
-        base:update()
+        base:updateHierarchy()
     end,
     draw=function(self)
     end,
@@ -115,7 +115,7 @@ return {
         if love.keyboard.isDown('f2') then
             return
         end
-        base:draw()
+        base:drawHierarchy()
         Asset.titleBatch:flush()
         love.graphics.draw(Asset.titleBatch)
     end

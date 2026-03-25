@@ -35,8 +35,6 @@ function UISwitcher:new(args)
     self.currentOptionIndex=args.currentOptionIndex or 1
     self.preview=args.preview or 0
     self.lerpRatio=args.lerpRatio or 0.5
-    self.increaseKey=args.increaseKey or "right"
-    self.decreaseKey=args.decreaseKey or "left"
     self.canHold=args.canHold or false
     if args.container then
         self.container=args.container
@@ -51,10 +49,19 @@ function UISwitcher:new(args)
         self.container=UI.Arranger{arrange=arrangeFuncWrapped}
     end
     self.previewDecayRadius=args.previewDecayRadius
+    self.increaseKey=args.increaseKey
+    self.decreaseKey=args.decreaseKey
+    local x0,y0=self.container:arrange(0)
+    local x1,y1=self.container:arrange(1)
     if not self.previewDecayRadius then
-        local x0,y0=self.container:arrange(0)
-        local x1,y1=self.container:arrange(1)
         self.previewDecayRadius=math.sqrt((x1-x0)^2+(y1-y0)^2)
+    end
+    local dx,dy=x1-x0,y1-y0
+    if not self.increaseKey then
+        self.increaseKey=Dxy2DirectionName(dx,dy)
+    end
+    if not self.decreaseKey then
+        self.decreaseKey=Dxy2DirectionName(-dx,-dy)
     end
     self:child(self.container)
     -- initialize options

@@ -357,6 +357,13 @@ function DirectionName2Dxy(direction)
     error('Invalid direction: '..tostring(direction))
 end
 
+function Dxy2DirectionName(dx,dy)
+    local angle=math.atan2(dy,dx)+math.pi/4
+    local dirIndex=math.ceil(math.modClamp(angle,math.pi)/(math.pi/2))
+    local dirs={'right','down','left','up'}
+    return dirs[dirIndex]
+end
+
 function pprint(t)
     if type(t) ~= "table" then
         return tostring(t)

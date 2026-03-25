@@ -1,7 +1,7 @@
-VERSION="0.0.1"
+VERSION="0.0.2"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 IS_WEB=type(jit)~="table"
--- DEV_MODE=true
+DEV_MODE=true
 if arg[2] == "debug" then
     require("lldebugger").start()
 end
@@ -12,7 +12,7 @@ shove = require "import.shove"
 Input = require "input"
 function love.load()
     shove.setResolution(800, 600, {fitMethod = "aspect", renderMode = "layer"})
-    Object,DynamicObject,GameObject = unpack(require "classic")
+    Object,GameObject = unpack(require "classic")
     UI = require "ui.uiBase"
     -- ExpandingMesh = require "import.expandingMesh"
     ---@type ShaderScan

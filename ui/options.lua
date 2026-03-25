@@ -16,6 +16,9 @@ function UIOptions:new(args)
     self.child=function(self,child)
         error("Childing to UIOptions does not add an option. Use addOption instead.")
     end
+    self.container.canChildHaveFocus=function(container,childIndex)
+        return container.children[childIndex]==self.cursor.parent
+    end
 end
 
 function UIOptions:addOption(option)
@@ -23,13 +26,12 @@ function UIOptions:addOption(option)
     if self.cursor.parent==nil then
         option:child(self.cursor)
         option:emit(UI.EVENTS.FOCUS,{init=true})
-        option.focused=true
     end
 end
 
 function UIOptions:update()
     UIOptions.super.update(self)
-    if self.cursor.parent then
+    if self.cursor.parent and self.focused then
         for i,key in pairs(KEYS.DIRECTIONS) do
             if isPressed(key) then
                 self:switchOptionOnDirection(key)
@@ -79,12 +81,10 @@ function UIOptions:switchOption(option,snap)
     if option.disabled then return end
     if self.cursor.parent then
         self.cursor.parent:emit(UI.EVENTS.UNFOCUS)
-        self.cursor.parent.focused=nil
         self.cursor:unchild()
     end
     option:child(self.cursor)
     option:emit(UI.EVENTS.FOCUS)
-    option.focused=true
     if snap then
         self.cursor:snap()
     end

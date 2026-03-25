@@ -285,6 +285,9 @@ for stateName,state in pairs(G.STATES) do
             end
             self.currentUI.inited=true
         end
+        if self.currentUI.base then
+            self.currentUI.base.focused=true
+        end
         update(self,...)
     end
     def.update=updateWrap
@@ -320,6 +323,7 @@ G.update=function(self,dt)
     end
     self.save.playTimeTable.playTimeOverall=self.save.playTimeTable.playTimeOverall+dt
 
+    UI.Base:cleanObjects() -- to remove removed elements in class.objects
 end
 G.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRotateM.glsl")
 G.draw=function(self)
