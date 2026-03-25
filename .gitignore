@@ -1,0 +1,17 @@
+.vscode
+bin
+make_all.toml
+unusedCode.lua
+profi.lua
+assets/bgm/title_.mp3
+assets/old/*
+old/*
+shaders/hyperbolicRotate.glsl
+shaders/triangleTextureDrawer.glsl
+shaders/triangleTextureDrawerVertex.glsl
+shaders/backgrounds/H3TerrainFailed.glsl
+*.txt
+profi
+*sceneTest.lua
+test.png
+product.env
