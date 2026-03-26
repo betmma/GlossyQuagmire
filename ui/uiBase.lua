@@ -1,5 +1,7 @@
 --- UIBase is the base class for all UI elements, such as textbox, image, option
 
+--- todo: could add keyrepeat for options and switcher, like if holding, after delay time, consider as pressing rapidly.
+
 ---@class UIBase:Object
 ---@field public x number
 ---@field public y number

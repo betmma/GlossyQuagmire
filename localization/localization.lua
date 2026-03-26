@@ -158,12 +158,12 @@ return {
         },
         level2b = {
             name = {
-                en_us = 'test',
-                zh_cn = 'test',
+                en_us = 'Foxtrot Towards the Beyond',
+                zh_cn = '通往远方的狐步舞',
             },
             description = {
-                en_us = 'This is a test music.',
-                zh_cn = '这是测试音乐。',
+                en_us = 'Tooshi Katsuyama\'s theme. (Currently also used as the title screen music)\nA playful and bouncy composition. The whole song keeps using similar rhythm patterns, but the switching of instruments and melodies makes it feel fresh and interesting the whole time. The fox gave herself a stoic name to mislead people (^^;',
+                zh_cn = '堪山远志的主题。 (目前也用作标题屏幕音乐)\n一个有趣且弹跳的曲子。整首歌持续使用相似的节奏模式，但乐器和旋律的切换使曲子新鲜又有趣。狐狸给自己起了一个坚忍的名字来误导人们(^^;',
             },
         },
     },
