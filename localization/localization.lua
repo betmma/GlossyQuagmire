@@ -11,34 +11,164 @@ return {
     levelData = {
     },
     ui = {
-        DISCLAIMER = {
-            en_us = 'Due to limitations of web browser, web version performs worse than downloaded versions. Some spellcards could be very laggy in the web version. Play the downloaded version for the best experience.',
-            zh_cn = '由于网页浏览器的限制，网页版的性能不如下载版。某些符卡在网页版可能会非常卡顿。请下载游戏以获得最佳体验。',
+        MAIN_MENU={
+            DISCLAIMER = {
+                en_us = 'Due to limitations of web browser, web version performs worse than downloaded versions. Some spellcards could be very laggy in the web version. Play the downloaded version for the best experience.',
+                zh_cn = '由于网页浏览器的限制，网页版的性能不如下载版。某些符卡在网页版可能会非常卡顿。请下载游戏以获得最佳体验。',
+            },
+            GAME_START = {
+                en_us = 'Game Start',
+                zh_cn = '开始游戏',
+            },
+            EXTRA_START = {
+                en_us = 'Extra Start',
+                zh_cn = '额外开始',
+            },
+            PRACTICE = {
+                en_us = 'Practice',
+                zh_cn = '练习',
+            },
+            SPELL_PRACTICE = {
+                en_us = 'Spell Practice',
+                zh_cn = '符卡练习',
+            },
+            REPLAY = {
+                en_us = 'Replay',
+                zh_cn = '录像回放',
+            },
+            PLAYER_DATA = {
+                en_us = 'Player Data',
+                zh_cn = '游玩数据',
+            },
+            MUSIC_ROOM = {
+                en_us = 'Music Room',
+                zh_cn = '音乐室',
+            },
+            NICKNAMES = {
+                en_us = 'Nicknames',
+                zh_cn = '称号',
+            },
+            OPTIONS = {
+                en_us = 'Options',
+                zh_cn = '设置',
+            },
+            MANUAL = {
+                en_us = 'Manual',
+                zh_cn = '游戏说明',
+            },
+            EXIT = {
+                en_us = 'Exit',
+                zh_cn = '退出',
+            },
         },
-        START = {
-            en_us = 'Start',
-            zh_cn = '开始游戏',
+        OPTIONS={
+            master_volume = {
+                en_us = 'Master Volume',
+                zh_cn = '主音量',
+            },
+            music_volume = {
+                en_us = 'Music Volume',
+                zh_cn = '音乐音量',
+            },
+            sfx_volume = {
+                en_us = 'SFX Volume',
+                zh_cn = '音效音量',
+            },
+            language = {
+                en_us = 'Language',
+                zh_cn = '语言',
+            },
+            resolution = {
+                en_us = 'Resolution',
+                zh_cn = '分辨率',
+            },
         },
-        REPLAY = {
-            en_us = 'Replay',
-            zh_cn = '录像回放',
+        CHOOSE_DIFFICULTY = {
+            chooseDifficulty = {
+                en_us = 'Choose Difficulty',
+                zh_cn = '选择难度',
+            },
+            ---@class DifficultyDescriptionLocalization
+            ---@field title localizationItem like "Flower Level", obscure first line
+            ---@field plainName localizationItem like "EASY MODE", second line
+            ---@field description localizationItem like "For beginners", third line
+            
+            ---@type table<DIFFICULTY, DifficultyDescriptionLocalization>
+            difficultyDescriptions = {
+                EASY = {
+                    title = {
+                        en_us = 'Lollipop Level',
+                        zh_cn = '棒棒糖级',
+                    },
+                    plainName = {
+                        en_us = 'EASY MODE',
+                        zh_cn = 'EASY MODE',
+                    },
+                    description = {
+                        en_us = 'A kid can lick this difficulty.',
+                        zh_cn = '小孩子都能轻松应对的难度。',
+                    },
+                },
+                NORMAL = {
+                    title = {
+                        en_us = 'Rose Level',
+                        zh_cn = '玫瑰级',
+                    },
+                    plainName = {
+                        en_us = 'NORMAL MODE',
+                        zh_cn = 'NORMAL MODE',
+                    },
+                    description = {
+                        en_us = 'Beautiful and fragrant, but beware the hidden thorns.',
+                        zh_cn = '娇艳欲滴的芬芳，亦是暗藏锋芒的陷阱。',
+                    },
+                },
+                HARD = {
+                    title = {
+                        en_us = 'Firework Level',
+                        zh_cn = '烟花级',
+                    },
+                    plainName = {
+                        en_us = 'HARD MODE',
+                        zh_cn = 'HARD MODE',
+                    },
+                    description = {
+                        en_us = 'A momentary brilliance that dazzles the eyes and burns the skin.',
+                        zh_cn = '瞬息的灿烂不仅夺人眼目，更能灼伤肌肤。',
+                    },
+                },
+                LUNATIC = {
+                    title = {
+                        en_us = 'Rainbow Level',
+                        zh_cn = '彩虹级',
+                    },
+                    plainName = {
+                        en_us = 'LUNATIC MODE',
+                        zh_cn = 'LUNATIC MODE',
+                    },
+                    description = {
+                        en_us = 'You can never reach the end of the rainbow.',
+                        zh_cn = '蝃蝀在东，莫之敢指。',
+                    },
+                },
+                EXTRA = {
+                    title = {
+                        en_us = 'Pearl Level',
+                        zh_cn = '珍珠级',
+                    },
+                    plainName = {
+                        en_us = 'EXTRA MODE',
+                        zh_cn = 'EXTRA MODE',
+                    },
+                    description = {
+                        en_us = 'A dream formed by pain, hidden at the center of the spiral.',
+                        zh_cn = '磨砺痛苦而成的结晶，深藏于螺旋之底的奢华。',
+                    },
+                }
+            }
         },
-        OPTIONS = {
-            en_us = 'Options',
-            zh_cn = '设置',
-        },
-        MUSIC_ROOM = {
-            en_us = 'Music Room',
-            zh_cn = '音乐室',
-        },
-        NICKNAMES = {
-            en_us = 'Nicknames',
-            zh_cn = '称号',
-        },
-        EXIT = {
-            en_us = 'Exit',
-            zh_cn = '退出',
-        },
+
+        -- below are from previous game
         NEXT_SCENE = {
             en_us = 'Next Scene',
             zh_cn = '下一场景',
@@ -54,26 +184,6 @@ return {
         RESUME = {
             en_us = 'Resume',
             zh_cn = '继续',
-        },
-        master_volume = {
-            en_us = 'Master Volume',
-            zh_cn = '主音量',
-        },
-        music_volume = {
-            en_us = 'Music Volume',
-            zh_cn = '音乐音量',
-        },
-        sfx_volume = {
-            en_us = 'SFX Volume',
-            zh_cn = '音效音量',
-        },
-        language = {
-            en_us = 'Language',
-            zh_cn = '语言',
-        },
-        resolution = {
-            en_us = 'Resolution',
-            zh_cn = '分辨率',
         },
         playTimeOverall = {
             en_us = 'Playtime Overall:\n{playtime}',

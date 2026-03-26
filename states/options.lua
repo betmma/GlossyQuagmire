@@ -15,7 +15,7 @@ return {
     init=function(self)
         local titleText=base:child(
             UI.Text{
-                text=Localize{'ui',"OPTIONS"},
+                text=Localize{'ui','MAIN_MENU',"OPTIONS"},
                 fontSize=48,color={1,1,1,1},
                 x=100,y=60,
             }
@@ -97,7 +97,7 @@ return {
                     end
                 }
             }
-            createOption(Localize{'ui',key},switcher)
+            createOption(Localize{'ui','OPTIONS',key},switcher)
         end
         local languageIndex=1
         for i=1,#languageValues do
@@ -106,7 +106,7 @@ return {
                 break
             end
         end
-        local languageOption=createOption(Localize{'ui','language'},UI.Switcher{
+        local languageOption=createOption(Localize{'ui','OPTIONS','language'},UI.Switcher{
             arrange=function(_,index)
                 return 150*index,0
             end,
@@ -144,7 +144,7 @@ return {
                 break
             end
         end
-        createOption(Localize{'ui','resolution'},UI.Switcher{
+        createOption(Localize{'ui','OPTIONS','resolution'},UI.Switcher{
             arrange=function(_,index)
                 return 200*index,0
             end,
@@ -171,7 +171,7 @@ return {
             }
         })
         createOption().disabled=true -- empty option for spacing
-        createOption(Localize{'ui','EXIT'},nil).events[UI.EVENTS.SELECT]=function(_)
+        createOption(Localize{'ui','MAIN_MENU','EXIT'},nil).events[UI.EVENTS.SELECT]=function(_)
             SFX:play('select')
             self:saveData()
             self:switchState(self.STATES.MAIN_MENU)

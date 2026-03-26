@@ -11,7 +11,7 @@ return {
     init=function(self)
         local titleText=base:child(
             UI.Text{
-                text=Localize{'ui',"MUSIC_ROOM"},
+                text=Localize{'ui','MAIN_MENU',"MUSIC_ROOM"},
                 fontSize=48,color={1,1,1,1},
                 x=100,y=30,
             }

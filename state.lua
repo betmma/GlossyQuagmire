@@ -17,7 +17,28 @@ local G={
         VIEW_MODES={NORMAL='NORMAL',FOLLOW='FOLLOW'},
         ---@enum HYPERBOLIC_MODEL
         HYPERBOLIC_MODELS={UHP=0,P_DISK=1,K_DISK=2}, -- use number is because it will be sent to shader
-        HYPERBOLIC_MODELS_COUNT=3
+        HYPERBOLIC_MODELS_COUNT=3,
+        ---@alias colorValue {[1]: number, [2]: number, [3]: number, [4]: number}
+        ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
+        ---@type {DIFFICULTY: {value: string, shortForm: string, color:colorValue}}
+        DIFFICULTIES={
+            EASY={value='EASY',shortForm='E',color={0,0.7,0,1}},
+            NORMAL={value='NORMAL',shortForm='N',color={0.5,0.5,1,1}},
+            HARD={value='HARD',shortForm='H',color={0.25,0.25,1,1}},
+            LUNATIC={value='LUNATIC',shortForm='L',color={0.9,0,0.9,1}},
+            EXTRA={value='EXTRA',shortForm='Ex',color={1,0.1,0.1,1}},
+        },
+        REGULAR_DIFFICULTIES={ -- shown in game start menu
+            'EASY',
+            'NORMAL',
+            'HARD',
+            'LUNATIC',
+        },
+        CHARACTERS={
+            REIMU='REIMU',
+            MARISA='MARISA',
+            KOTOBA='KOTOBA',
+        },
     },
 }
 G={
@@ -86,14 +107,14 @@ G={
     CONSTANTS=G.CONSTANTS,
     STATES={
         MAIN_MENU='MAIN_MENU',
-        OPTIONS='OPTIONS',
+        CHOOSE_DIFFICULTY='CHOOSE_DIFFICULTY',
+        -- CHOOSE_CHARACTER='CHOOSE_CHARACTER',
         MUSIC_ROOM='MUSIC_ROOM',
         -- NICKNAMES='NICKNAMES',
-        -- UPGRADES='UPGRADES',
-        -- CHOOSE_LEVELS='CHOOSE_LEVELS',
+        OPTIONS='OPTIONS',
         -- IN_LEVEL='IN_LEVEL',
         -- PAUSE='PAUSE',
-        -- GAME_END='GAME_END', -- either win or lose a scene
+        -- GAME_END='GAME_END',
         -- SAVE_REPLAY='SAVE_REPLAY',
         -- SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
         -- LOAD_REPLAY='LOAD_REPLAY',
@@ -104,8 +125,8 @@ G={
     STATE=...,
     transitionData={ -- transitionData[STATE1][STATE2] is the transition data from STATE1 to STATE2. like, if transitionData[MAIN_MENU][CHOOSE_LEVELS].slideDirection='up', then when switching from MAIN_MENU to CHOOSE_LEVELS, the texts of both states will slide up.
         MAIN_MENU={
-            CHOOSE_LEVELS={
-                slideDirection='up'
+            CHOOSE_DIFFICULTY={
+                slideDirection='up',
             },
             LOAD_REPLAY={
                 slideDirection='left'
@@ -151,21 +172,10 @@ G={
                 transitionState='TRANSITION_IMAGE'
             }
         },
-        UPGRADES={
-            CHOOSE_LEVELS={
-                slideDirection='down'
-            }
-        },
-        CHOOSE_LEVELS={
-            UPGRADES={
-                slideDirection='up'
-            },
+        CHOOSE_DIFFICULTY={
             MAIN_MENU={
                 slideDirection='down'
             },
-            IN_LEVEL={
-                transitionState='TRANSITION_IMAGE',
-            }
         },
         LOAD_REPLAY={
             MAIN_MENU={
@@ -176,29 +186,12 @@ G={
             }
         },
     },
-    currentLevel={},
-    --- Warning: besides setting max time, do not access it in any level logic (like for random seed). it is 1 frame less in replay (dunno why) so using it will break replays.
-    ---@type integer|nil
-    levelRemainingFrame=nil,
-    ---@type integer|nil
-    levelRemainingFrameMax=nil,
-    ---@type boolean|nil
-    levelIsTimeoutSpellcard=nil,
-    ---@type {level: integer, scene: integer}
-    lastLevel={},
-    mainEnemy=nil,
-    preWin=nil,
+    run={},
     frame=0,
-    sceneTempObjs={},
     ---@type replayData|nil
     replay=nil,
-    ---@type GameObject|nil
-    spellNameText=nil,
     ---@type boolean
     UseHypRotShader=true,
-    ---@type boolean
-    -- to replay dialogue when entering level (spaghetti???)
-    replayDialogue=false,
 
     DISK_RADIUS_BASE={
         [G.CONSTANTS.HYPERBOLIC_MODELS.P_DISK]=1, -- Poincare disk
@@ -285,7 +278,7 @@ for stateName,state in pairs(G.STATES) do
             end
             self.currentUI.inited=true
         end
-        if self.currentUI.base then
+        if self.currentUI.base then -- note that base.updateHierarchy and drawHierarchy should not be added to wrap, since some states may need different order
             self.currentUI.base.focused=true
         end
         update(self,...)

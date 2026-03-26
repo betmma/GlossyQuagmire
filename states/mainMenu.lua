@@ -23,35 +23,32 @@ return {
                 x=200,y=305,
                 container=UI.Arranger{
                     arrange=function(self,index)
-                        return 0,(index-1)*50*(1-math.exp(-base.frame/15))
+                        return 0,(index-1)*25*(1-math.exp(-base.frame/15))
                     end
                 },
             }
         )
         local options={
-                -- 'START',
-                -- 'REPLAY',
-                'OPTIONS',
-                'MUSIC_ROOM',
-                -- 'NICKNAMES',
-                -- 'ENDING', -- test only
-                'EXIT',
+                {value='GAME_START',state='CHOOSE_DIFFICULTY'},
+                {value='EXTRA_START',disabled=true},
+                {value='PRACTICE',disabled=true},
+                {value='SPELL_PRACTICE',disabled=true},
+                {value='REPLAY',disabled=true},
+                {value='PLAYER_DATA',disabled=true},
+                {value='MUSIC_ROOM'},
+                {value='NICKNAMES',disabled=true},
+                {value='OPTIONS'},
+                {value='MANUAL',disabled=true},
+                {value='EXIT'},
             }
-        local option2state={
-            START='CHOOSE_LEVELS',
-            REPLAY='LOAD_REPLAY',
-            OPTIONS='OPTIONS',
-            MUSIC_ROOM='MUSIC_ROOM',
-            NICKNAMES='NICKNAMES',
-            ENDING='ENDING',
-        }
-        for index, value in ipairs(options) do
+        for index, data in ipairs(options) do
+            local value=data.value
             optionsUI:addOption(
                 UI.Text{
-                    text=Localize{'ui',value},
-                    fontSize=36,color={1,1,1,1},
+                    text=Localize{'ui','MAIN_MENU',value},
+                    fontSize=24,color={1,1,1,1},
                     autoSize=true,
-                    align='center',
+                    align='center',transparency=data.disabled and 0.5 or 1,
                     events={
                         [UI.EVENTS.FOCUS]=function(self,args)
                             if args.init then
@@ -60,6 +57,10 @@ return {
                             SFX:play('select')
                         end,
                         [UI.EVENTS.SELECT]=function(_)
+                            if data.disabled then
+                                SFX:play('cancel',true)
+                                return
+                            end
                             SFX:play('select')
                             if value=='EXIT' then
                                 self.save.statistics.politeExit=true
@@ -67,7 +68,7 @@ return {
                                 love.event.quit()
                                 return
                             end
-                            local state=option2state[value]
+                            local state=data.state or value -- need to ensure same as state name
                             if state then
                                 self:switchState(self.STATES[state])
                             end
@@ -86,7 +87,7 @@ return {
         if IS_WEB then
             local disclaimerText=base:child(
                 UI.Text{
-                    text=Localize{'ui','DISCLAIMER'},
+                    text=Localize{'ui','MAIN_MENU','DISCLAIMER'},
                     fontSize=16,color={1,1,1,1},
                     x=620,y=450,
                     width=240,
