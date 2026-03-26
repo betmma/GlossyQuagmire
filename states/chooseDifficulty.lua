@@ -1,5 +1,17 @@
-
 local base=UI.Base()
+local panelShaderCode=[[
+extern vec4 xywh; // x,y,width,height of the panel
+vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
+{
+    vec4 colorBase=Texel(texture, texture_coords)*color;
+    // edge fade effect
+    vec2 coords=vec2(pixel_coords.x-xywh.x, pixel_coords.y-xywh.y)/xywh.zw;
+    float centerness=1.0-abs(coords.x-0.5)*2.0;
+    float alphaMultiplier=smoothstep(0,0.5,centerness);
+    return colorBase*vec4(1.0,1.0,1.0,alphaMultiplier);
+}
+]]
+local panelShader=love.graphics.newShader(panelShaderCode)
 return {
     base=base,
     init=function(self)
@@ -25,11 +37,11 @@ return {
                 local data=G.CONSTANTS.DIFFICULTIES[difficulty]
                 local color=data.color
                 local fillColor={color[1],color[2],color[3],0.2}
-                local box=UI.Panel{width=300,height=200,fillColor=fillColor,edgeColor=data.color}
+                local box=UI.Panel{width=300,height=200,fillColor=fillColor,edgeColor=data.color,shader=panelShader}
                 local title=box:child(UI.Text{
                     text=Localize{'ui','CHOOSE_DIFFICULTY','difficultyDescriptions',difficulty,'title'},
                     fontSize=36,color={1,1,1,1},
-                    x=0,y=0,width=300,align='center',toggleX=false,
+                    x=0,y=10,width=300,align='center',toggleX=false,
                 })
                 local plainName=box:child(UI.Text{
                     text=Localize{'ui','CHOOSE_DIFFICULTY','difficultyDescriptions',difficulty,'plainName'},

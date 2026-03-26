@@ -106,7 +106,7 @@ return {
                     },
                     description = {
                         en_us = 'A kid can lick this difficulty.',
-                        zh_cn = '小孩子都能轻松应对的难度。',
+                        zh_cn = '小孩子都能轻松应对的难度',
                     },
                 },
                 NORMAL = {
@@ -120,7 +120,7 @@ return {
                     },
                     description = {
                         en_us = 'Beautiful and fragrant, but beware the hidden thorns.',
-                        zh_cn = '娇艳欲滴的芬芳，亦是暗藏锋芒的陷阱。',
+                        zh_cn = '娇艳欲滴的芬芳\n亦是暗藏锋芒的陷阱',
                     },
                 },
                 HARD = {
@@ -134,7 +134,7 @@ return {
                     },
                     description = {
                         en_us = 'A momentary brilliance that dazzles the eyes and burns the skin.',
-                        zh_cn = '瞬息的灿烂不仅夺人眼目，更能灼伤肌肤。',
+                        zh_cn = '瞬息的灿烂不仅夺人眼目\n更能灼伤肌肤',
                     },
                 },
                 LUNATIC = {
@@ -148,7 +148,7 @@ return {
                     },
                     description = {
                         en_us = 'You can never reach the end of the rainbow.',
-                        zh_cn = '蝃蝀在东，莫之敢指。',
+                        zh_cn = '蝃蝀在东，莫之敢指',
                     },
                 },
                 EXTRA = {
@@ -162,7 +162,7 @@ return {
                     },
                     description = {
                         en_us = 'A dream formed by pain, hidden at the center of the spiral.',
-                        zh_cn = '磨砺痛苦而成的结晶，深藏于螺旋之底的奢华。',
+                        zh_cn = '磨砺痛苦而成的结晶\n深藏于螺旋之底的奢华',
                     },
                 }
             }
