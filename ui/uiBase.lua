@@ -24,6 +24,7 @@
 ---@field public emit fun(self,eventName:UIEvent,...):nil what this element does when an event is emitted on it. like get focus, lose focus, or confirmed by cursor
 ---@field public events table<UIEvent, fun(self, ...):nil> a table of event handlers. when an event is emitted, if this table has a handler for that event, it will be called.
 ---@field public remove fun(self):nil
+---@field public addLerpConditionUpdate fun(self,valueKey:string,conditionKey:string,trueValue:any,falseValue:any,lerpRatio:number):UIBase add an extra update that lerps self.valueKey to trueValue when self.conditionKey is true, and falseValue when self.conditionKey is false. the lerpRatio controls how fast the value changes. a shorthand for adding common lerp updates, such as fade in/out when focused/unfocused (and it defaults to this effect). it will return self for chaining.
 local UIBase=Object:extend()
 
 function UIBase:new(args)
@@ -89,6 +90,18 @@ function UIBase:update()
     for _, update in ipairs(self.extraUpdates) do
         update(self)
     end
+end
+
+function UIBase:addLerpConditionUpdate(valueKey,conditionKey,trueValue,falseValue,lerpRatio)
+    valueKey=valueKey or 'transparency'
+    conditionKey=conditionKey or 'focused'
+    trueValue=trueValue or 1
+    falseValue=falseValue or 0
+    lerpRatio=lerpRatio or 0.1
+    table.insert(self.extraUpdates,function(self)
+        self[valueKey]=math.lerpCondition(self[valueKey],self[conditionKey],trueValue,falseValue,lerpRatio)
+    end)
+    return self
 end
 
 -- UI system is different from other game objects, as it passes update calls from parent to child, instead of the classes pass updateAll to subclasses. why? since draw order depends on the hierarchy, draw calls cannot come from class passing down to subclasses, instead it has to come from the root of the hierarchy and pass down to children. so update follows the same pattern to keep it consistent. updateAll is only used to clear removed elements.

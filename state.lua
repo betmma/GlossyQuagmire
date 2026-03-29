@@ -21,7 +21,7 @@ local G={
         ---@alias colorValue {[1]: number, [2]: number, [3]: number, [4]: number}
         ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
         ---@type {DIFFICULTY: {value: string, shortForm: string, color:colorValue}}
-        DIFFICULTIES={
+        DIFFICULTIES_DATA={
             EASY={value='EASY',shortForm='E',color={0,0.7,0,1}},
             NORMAL={value='NORMAL',shortForm='N',color={0.5,0.5,1,1}},
             HARD={value='HARD',shortForm='H',color={0.25,0.25,1,1}},
@@ -34,10 +34,19 @@ local G={
             'HARD',
             'LUNATIC',
         },
-        CHARACTERS={
-            REIMU='REIMU',
-            MARISA='MARISA',
-            KOTOBA='KOTOBA',
+        ---@alias PLAYER 'REIMU'|'MARISA'|'KOTOBA'
+        PLAYERS={'REIMU','MARISA','KOTOBA'},
+        PLAYERS_DATA={
+            REIMU={value='REIMU',color={1,0.2,0.2,1}},
+            MARISA={value='MARISA',color={1,1,0.5,1}},
+            KOTOBA={value='KOTOBA',color={1,0.5,1,1}},
+        },
+        ---@alias SHOT_TYPE 'REIMUA'|'REIMUB'|'MARISAA'|'MARISAB'|'KOTOBAA'|'KOTOBAB'
+        SHOT_TYPES={'REIMUA','REIMUB','MARISAA','MARISAB','KOTOBAA','KOTOBAB'},
+        PLAYER_TO_SHOT_TYPES={
+            REIMU={'REIMUA','REIMUB'},
+            MARISA={'MARISAA','MARISAB'},
+            KOTOBA={'KOTOBAA','KOTOBAB'},
         },
     },
 }
@@ -108,7 +117,7 @@ G={
     STATES={
         MAIN_MENU='MAIN_MENU',
         CHOOSE_DIFFICULTY='CHOOSE_DIFFICULTY',
-        -- CHOOSE_CHARACTER='CHOOSE_CHARACTER',
+        CHOOSE_PLAYER='CHOOSE_PLAYER',
         MUSIC_ROOM='MUSIC_ROOM',
         -- NICKNAMES='NICKNAMES',
         OPTIONS='OPTIONS',
@@ -176,6 +185,17 @@ G={
             MAIN_MENU={
                 slideDirection='down'
             },
+            CHOOSE_PLAYER={
+                slideDirection='up'
+            },
+        },
+        CHOOSE_PLAYER={
+            CHOOSE_DIFFICULTY={
+                slideDirection='down'
+            },
+            -- IN_LEVEL={
+            --     transitionState='TRANSITION_IMAGE',
+            -- }
         },
         LOAD_REPLAY={
             MAIN_MENU={
@@ -186,7 +206,12 @@ G={
             }
         },
     },
-    run={},
+    ---@type {difficulty: DIFFICULTY|nil, player: PLAYER|nil, shotType: SHOT_TYPE|nil}
+    runInfo={
+        difficulty=nil,
+        player=nil,
+        shotType=nil
+    },
     frame=0,
     ---@type replayData|nil
     replay=nil,
@@ -333,6 +358,10 @@ G.draw=function(self)
     shove.endLayer()
     shove.beginLayer('text')
     self:drawText()
+    if DEV_MODE then
+        SetFont(36)
+        love.graphics.print("FPS: "..love.timer.getFPS(), 10, 20)
+    end
     shove.endLayer()
 end
 G.drawText=function(self)

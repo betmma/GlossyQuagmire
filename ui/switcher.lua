@@ -7,7 +7,8 @@ local UI=...
 ---@field private firstPreviewOptionIndex integer the option index of the first preview option. (the first option in arranger's children)
 ---@field private lerpingOptionIndexOffset number to achieve transition effect (switching option bumps it by 1; it decays to 0)
 ---@field private preview integer preview how many previous and next options.
----@field private previewDecayRadius number the decay radius for the transparency of preview options. transparency halves every previewDecayRadius distance.
+---@field private previewDecayMode PREVIEW_DECAY_MODE how the transparency of preview options decays. default to INDEX, which means the transparency is based on the index difference to current option. if set to DISTANCE, the transparency is based on the distance to current option.
+---@field private previewDecayRadius number the decay radius for the transparency of preview options. transparency halves every previewDecayRadius distance. if uses INDEX mode, the distance is the index difference.
 ---@field public container UIArranger
 ---@field public lerpRatio number the ratio for lerping the position of options when switching. default to 0.2.
 ---@field public canHold boolean whether holding the switch key will continuously switch options. default to false.
@@ -18,10 +19,17 @@ local UI=...
 ---@field private lerpOffset fun(self,ratio:number|nil):nil a function that lerps the lerpingOptionIndexOffset by the given ratio. if ratio is nil, use self.lerpRatio.
 local UISwitcher=UI.Base:extend()
 
+---@enum PREVIEW_DECAY_MODE
+UISwitcher.PREVIEW_DECAY_MODES={
+    DISTANCE=1,
+    INDEX=2,
+}
+
 ---@class UISwitcherConfig
 ---@field optionConstructor fun(self,optionIndex:integer):UIBase|nil
 ---@field currentOptionIndex integer|nil
 ---@field preview integer|nil
+---@field previewDecayMode PREVIEW_DECAY_MODE|nil
 ---@field previewDecayRadius number|nil the minimum transparency for preview options. the transparency of preview options will be linearly interpolated between 1 for current option and this value for the farthest preview option. default to distance of arrange(0) to arrange(1).
 ---@field container UIArranger|nil
 ---@field arrange nil|fun(self,index:integer):number,number if container is not provided, will use this to construct an arranger. note that, for simplicity, if arrangement is linear, the output can have arbitrary translation, and this class will position the current option at UISwitcher's x and y. if nonlinear like on a circle, index=0 corresponds to current option.
@@ -51,13 +59,19 @@ function UISwitcher:new(args)
         end
         self.container=UI.Arranger{arrange=arrangeFuncWrapped}
     end
+    self.container.canChildHaveFocus=function(container,childIndex) return childIndex+self.firstPreviewOptionIndex-1==self.currentOptionIndex end
+    self.previewDecayMode=args.previewDecayMode or UISwitcher.PREVIEW_DECAY_MODES.INDEX
     self.previewDecayRadius=args.previewDecayRadius
     self.increaseKey=args.increaseKey
     self.decreaseKey=args.decreaseKey
     local x0,y0=self.container:arrange(0)
     local x1,y1=self.container:arrange(1)
     if not self.previewDecayRadius then -- default to distance between current option and next option
-        self.previewDecayRadius=math.sqrt((x1-x0)^2+(y1-y0)^2)
+        if self.previewDecayMode==UISwitcher.PREVIEW_DECAY_MODES.INDEX then
+            self.previewDecayRadius=1
+        else
+            self.previewDecayRadius=math.sqrt((x1-x0)^2+(y1-y0)^2)
+        end
     end
     local dx,dy=x1-x0,y1-y0
     if not self.increaseKey then -- auto set increase and decrease keys based on direction to next option
@@ -78,6 +92,7 @@ function UISwitcher:makeOptions()
     if not currentOption then
         return false
     end
+    local currentOptionReused=false
     local childrenIndexes={} -- store current children with their corresponding option index, so that they can be reused
     for i =#self.container.children,1,-1 do
         childrenIndexes[self.firstPreviewOptionIndex+i-1]=self.container.children[i]
@@ -87,11 +102,12 @@ function UISwitcher:makeOptions()
     for i=-self.preview,self.preview do
         local optionIndex=self.currentOptionIndex+i
         local option
-        if i==0 then -- use the already called optionConstructor result for current option
-            option=currentOption
-        elseif childrenIndexes[optionIndex] then -- if there is already a child for this option index, reuse it
+        if childrenIndexes[optionIndex] then -- if there is already a child for this option index, reuse it
             option=childrenIndexes[optionIndex]
             childrenIndexes[optionIndex]=nil
+        elseif i==0 then -- use the already called optionConstructor result for current option
+            option=currentOption
+            currentOptionReused=true
         else -- otherwise, call optionConstructor to create a new one
             option=self.optionConstructor(self,optionIndex)
         end
@@ -110,6 +126,9 @@ function UISwitcher:makeOptions()
         if option then
             option:remove()
         end
+    end
+    if not currentOptionReused then
+        currentOption:remove()
     end
     return true
 end
@@ -144,10 +163,18 @@ function UISwitcher:update()
     end
     self:lerpOffset()
     local currentOption=self.currentOption
+    if not currentOption then
+        return
+    end
     local x,y=currentOption:getXY()
     for i, option in ipairs(self.container.children) do
         local ox,oy=option:getXY()
-        local distance=math.sqrt((ox-x)^2+(oy-y)^2)
+        local distance
+        if self.previewDecayMode==UISwitcher.PREVIEW_DECAY_MODES.INDEX then
+            distance=math.abs(self.firstPreviewOptionIndex+i-1-self.currentOptionIndex+self.lerpingOptionIndexOffset)
+        else
+            distance=math.sqrt((ox-x)^2+(oy-y)^2)
+        end
         option.transparency=0.5^(distance/math.max(self.previewDecayRadius,0.1))
     end
 end

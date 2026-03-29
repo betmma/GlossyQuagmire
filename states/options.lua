@@ -194,7 +194,5 @@ return {
     end,
     drawText=function(self)
         base:drawHierarchy()
-        SetFont(36)
-        love.graphics.print("FPS: "..love.timer.getFPS(), 10, 20)
     end
 }

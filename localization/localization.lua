@@ -10,6 +10,41 @@
 return {
     levelData = {
     },
+    ---@class CharacterLocalization
+    ---@field name localizationItem like "Reimu Hakurei"
+    ---@field nickname localizationItem like "Shrine Maiden"
+    characters = {
+        REIMU = {
+            name = {
+                en_us = 'Reimu Hakurei',
+                zh_cn = '博丽灵梦',
+            },
+            nickname = {
+                en_us = 'Flying Shrine Maiden',
+                zh_cn = '飞行的巫女',
+            },
+        },
+        MARISA = {
+            name = {
+                en_us = 'Marisa Kirisame',
+                zh_cn = '雾雨魔理沙',
+            },
+            nickname = {
+                en_us = 'Ordinary Magician',
+                zh_cn = '普通的魔法使',
+            },
+        },
+        KOTOBA = {
+            name = {
+                en_us = 'Kotoba Kyokuwa',
+                zh_cn = '曲话言波',
+            },
+            nickname = {
+                en_us = 'Pun Materializer',
+                zh_cn = '双关语具现者',
+            },
+        },
+    },
     ui = {
         MAIN_MENU={
             DISCLAIMER = {
@@ -163,6 +198,69 @@ return {
                     description = {
                         en_us = 'A dream formed by pain, hidden at the center of the spiral.',
                         zh_cn = '磨砺痛苦而成的结晶\n深藏于螺旋之底的奢华',
+                    },
+                }
+            }
+        },
+        CHOOSE_PLAYER = {
+            choosePlayer = {
+                en_us = 'Choose Player',
+                zh_cn = '选择角色',
+            },
+            -- name and nickname are in characters section, so here we only need the descriptions for each player
+            ---@type table<PLAYER, localizationItem>
+            playerDescriptions={
+                REIMU = {
+                    en_us = 'Words say that an obscure beautiful place is accessible from the new travel hub. She raises an eyebrow and decides to investigate.',
+                    zh_cn = '据说新的旅行枢纽通向一个隐蔽美丽的地方。她皱了皱眉，决定去调查一下。',
+                },
+                MARISA = {
+                    en_us = 'She heard the news about the new travel hub and the mysterious place it can lead to. She is eager to check it out and loot some magical items.',
+                    zh_cn = '据说新的旅行枢纽通向一个隐蔽美丽的地方。她很想去看看，顺便搜集一些魔法道具。',
+                },
+                KOTOBA = {
+                    en_us = 'In the last incident, she accidentally created the "Hyperbolic Domain" and twisted the whole Gensokyo. The place becomes a travel hub and Reimu asks her to maintain it as compensation for the trouble. She hopes the rumored place can entertain her during the boring work.',
+                    zh_cn = '在上次事件中，她意外创造的"双曲域"扭曲了整个幻想乡，之后变成一个旅行枢纽，灵梦要求她承担维护工作以补偿造成的麻烦。她希望传闻中的地方能作为无聊工作中的娱乐。',
+                }
+            },
+            unfocusedShot = {
+                en_us = 'Unfocused Shot',
+                zh_cn = '高速射击',
+            },
+            focusedShot = {
+                en_us = 'Focused Shot',
+                zh_cn = '低速射击',
+            },
+            spellCard = {
+                en_us = 'Spell Card',
+                zh_cn = '符卡',
+            },
+            ---@class ShotTypeSubDescriptionLocalization
+            ---@field title localizationItem like "Homing Amulet"
+            ---@field description localizationItem like "A shot that automatically tracks enemies."
+
+            ---@class ShotTypeDescriptionLocalization
+            ---@field title localizationItem like "Homing Type"
+            ---@field unfocusedShot ShotTypeSubDescriptionLocalization
+            ---@field focusedShot ShotTypeSubDescriptionLocalization
+            ---@field spellCard ShotTypeSubDescriptionLocalization
+
+            ---@type table<SHOT_TYPE, ShotTypeDescriptionLocalization>
+            shotTypeDescriptions={
+                __default__ = {
+                    title = {
+                        en_us = 'Placeholder Type',
+                        zh_cn = '占位类型',
+                    },
+                    __default__ = {
+                        title = {
+                            en_us = 'Not Decided Yet',
+                            zh_cn = '尚未决定',
+                        },
+                        description = {
+                            en_us = 'WIP :P',
+                            zh_cn = '开发中 :P',
+                        },
                     },
                 }
             }

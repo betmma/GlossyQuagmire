@@ -30,6 +30,16 @@ end
 
 math.lerp=math.interpolate -- alias
 
+---@param value number the current value
+---@param condition boolean
+---@param trueValue number if condition is true, will approach this value
+---@param falseValue number if condition is false, will approach this value
+---@param ratio number in [0,1], the lerp ratio.
+function math.lerpCondition(value,condition,trueValue,falseValue,ratio)
+    local target=condition and trueValue or falseValue
+    return math.interpolate(value,target,ratio)
+end
+
 ---@param a table
 ---@param b table
 ---@param t number

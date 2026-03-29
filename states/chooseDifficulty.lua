@@ -34,7 +34,7 @@ return {
                 if not difficulty then
                     return nil
                 end
-                local data=G.CONSTANTS.DIFFICULTIES[difficulty]
+                local data=G.CONSTANTS.DIFFICULTIES_DATA[difficulty]
                 local color=data.color
                 local fillColor={color[1],color[2],color[3],0.2}
                 local box=UI.Panel{width=300,height=200,fillColor=fillColor,edgeColor=data.color,shader=panelShader}
@@ -58,7 +58,10 @@ return {
             extraUpdates={
                 function(switcher)
                     if isPressed('z') then
-                        SFX:play('cancel',true)
+                        SFX:play('select',true)
+                        local difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[switcher.currentOptionIndex]
+                        G.runInfo.difficulty=difficulty
+                        self:switchState(self.STATES.CHOOSE_PLAYER)
                         return
                     end
                 end
