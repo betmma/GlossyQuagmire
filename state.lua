@@ -229,6 +229,7 @@ G={
         object=...,
         viewOffset={x=0,y=0}
     },
+    currentUI={},
     UIDEF={
     }
 }
@@ -309,6 +310,9 @@ for stateName,state in pairs(G.STATES) do
         update(self,...)
     end
     def.update=updateWrap
+    if def.base then -- let base fade out when unfocused (during transition. there is code in transitionSlide to call updateHierarchy of lastState's base.) i didnt make all states' base be child of some root since it would update all bases every frame.
+        def.base:addLerpConditionUpdate()
+    end
     G.UIDEF[state]=def
 end
 

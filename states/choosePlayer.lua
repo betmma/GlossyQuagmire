@@ -1,4 +1,4 @@
-local base=UI.Base():addLerpConditionUpdate()
+local base=UI.Base()
 local panelShaderCode=[[
 extern vec4 xywh; // x,y,width,height of the panel
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)

@@ -29,6 +29,9 @@ return {
             args.currentDxy[i]=args.currentDxy[i]*(1-ratio)+args.aimDxy[i]*ratio
         end
         local currentUI=self.currentUI
+        if self.UIDEF[args.lastState].base then -- let last state's ui fade out. 
+            self.UIDEF[args.lastState].base:updateHierarchy()
+        end
         self.STATE=args.nextState
         self.currentUI=self.UIDEF[args.nextState]
         self.currentUI.update(self,dt)
