@@ -1,12 +1,13 @@
-VERSION="0.0.3.1"
+VERSION="0.0.3.2"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
+GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
 DEV_MODE=true
 if arg[2] == "debug" then
     require("lldebugger").start()
 end
 io.stdout:setvbuf("no")
-love.window.setTitle('Glossy Quagmire'..' '..VERSION)
+love.window.setTitle(GAME_NAME..' '..VERSION)
 require'misc'
 shove = require "import.shove"
 Input = require "input"

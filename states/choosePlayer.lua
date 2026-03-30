@@ -29,14 +29,6 @@ return {
                 return index*360,index*290
             end,
             lerpRatio=0.1,
-            -- extraUpdates={
-            --     function(switcher)
-            --         if isPressed('z') then
-            --             SFX:play('cancel',true)
-            --             return
-            --         end
-            --     end
-            -- },
             preview=2,canHold=false,
             optionConstructor=function(_,index)
                 local player=G.CONSTANTS.PLAYERS[index]
@@ -81,6 +73,13 @@ return {
                             self.transparency=math.lerpCondition(self.transparency,self.focused,1,0,lerpRatio)
                             self.x=math.lerpCondition(self.x,self.focused,150,0,lerpRatio)
                             self.y=math.lerp(self.y,(self.currentOptionIndex-1)*optionCollapseYGap+10,lerpRatio)
+                            if self.focused and isPressed('z') then
+                                local selectedShotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player][self.currentOptionIndex]
+                                G.runInfo.player=player
+                                G.runInfo.shotType=selectedShotType
+                                G:switchState(G.STATES.IN_GAME)
+                                SFX:play('select',true)
+                            end
                         end
                     },
                     lerpRatio=lerpRatio,preview=2,canHold=false,

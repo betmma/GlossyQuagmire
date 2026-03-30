@@ -80,8 +80,9 @@ Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yel
 
 local bgImage = love.graphics.newImage( "assets/bg.png" )
 Asset.backgroundImage=bgImage
-Asset.backgroundLeft=love.graphics.newQuad(0,0,150,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
-Asset.backgroundRight=love.graphics.newQuad(650,0,150,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
+Asset.backgroundQuad=love.graphics.newQuad(0,0,bgImage:getWidth(),bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
+-- Asset.backgroundLeft=love.graphics.newQuad(0,0,150,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
+Asset.backgroundRight=love.graphics.newQuad(500,0,300,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
 local titleImage = love.graphics.newImage( "assets/title.png" )
 Asset.title=love.graphics.newQuad(0,0,1280,720,titleImage:getWidth(),titleImage:getHeight())
 
@@ -247,14 +248,28 @@ Asset.Batches={
     Asset.playerFocusBatch,
     -- G.afterExtraDraw here, not an element of batches
     Asset.foregroundBatch,
+    Asset.titleBatch, -- draw the logo at bottom right in game
     Asset.portraitBatch,
     Asset.dialogueBatch,
 }
 --- batch:{before:fun()|nil,after:fun()|nil}
 Asset.batchExtraActions={
+    [Asset.foregroundBatch]={ -- foreground could always draw 800*600 full image and use a shader to make it hollow. currently not implemented
+        before=function()
+            love.graphics.setShader(G.foregroundShaderConfig.shader)
+            for key, value in pairs(G.foregroundShaderConfig.args) do
+                G.foregroundShaderConfig.shader:send(key, value)
+            end
+        end,
+        after=function()
+            love.graphics.setShader()
+        end
+    }
 }
 for i,batch in pairs(Asset.Batches) do
-    Asset.batchExtraActions[batch]={}
+    if not Asset.batchExtraActions[batch] then
+        Asset.batchExtraActions[batch]={}
+    end
 end
 local isHighlightBatch={}
 isHighlightBatch[Asset.playerBulletBatch]=true

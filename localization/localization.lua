@@ -265,6 +265,28 @@ return {
                 }
             }
         },
+        IN_GAME = {
+            hiScore = {
+                en_us = 'Hi-Score',
+                zh_cn = '最高分',
+            },
+            score = {
+                en_us = 'Score',
+                zh_cn = '得分',
+            },
+            lives = {
+                en_us = 'Lives',
+                zh_cn = '残机',
+            },
+            bombs = {
+                en_us = 'Bombs',
+                zh_cn = '符卡',
+            },
+            grazes = {
+                en_us = 'Grazes',
+                zh_cn = '擦弹',
+            }
+        },
 
         -- below are from previous game
         NEXT_SCENE = {

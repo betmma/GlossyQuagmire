@@ -5,19 +5,29 @@ local G={
             Asset:clearBatches()
             local colorRef={love.graphics.getColor()}
             Asset.foregroundBatch:setColor(colorRef[1],colorRef[2],colorRef[3],self.foregroundTransparency)
-            Asset.foregroundBatch:add(Asset.backgroundLeft,0,0,0,1,1,0,0)
-            Asset.foregroundBatch:add(Asset.backgroundRight,650,0,0,1,1,0,0)
+            Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
+            -- Asset.foregroundBatch:add(Asset.backgroundRight,500,0,0,1,1,0,0)
+            Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
             Asset.setHyperbolicRotateShader()
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
             Asset:flushBatches()
             Asset:drawBatches()
             love.graphics.setShader()
         end,
+        --- from previous game vvv
         ---@enum VIEW_MODE
         VIEW_MODES={NORMAL='NORMAL',FOLLOW='FOLLOW'},
         ---@enum HYPERBOLIC_MODEL
         HYPERBOLIC_MODELS={UHP=0,P_DISK=1,K_DISK=2}, -- use number is because it will be sent to shader
         HYPERBOLIC_MODELS_COUNT=3,
+        --- from previous game ^^^
+        FOREGROUND_SHADERS={
+            RECTANGLE=love.graphics.newShader('shaders/foreground/rectangle.glsl'),
+            CIRCLE=love.graphics.newShader('shaders/foreground/circle.glsl'),
+        },
+        -- ---@enum GEOMETRY
+        -- GEOMETRIES={EUCLIDEAN='EUCLIDEAN',HYPERBOLIC='HYPERBOLIC'},
+
         ---@alias colorValue {[1]: number, [2]: number, [3]: number, [4]: number}
         ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
         ---@type {DIFFICULTY: {value: string, shortForm: string, color:colorValue}}
@@ -121,7 +131,7 @@ G={
         MUSIC_ROOM='MUSIC_ROOM',
         -- NICKNAMES='NICKNAMES',
         OPTIONS='OPTIONS',
-        -- IN_LEVEL='IN_LEVEL',
+        IN_GAME='IN_GAME',
         -- PAUSE='PAUSE',
         -- GAME_END='GAME_END',
         -- SAVE_REPLAY='SAVE_REPLAY',
@@ -149,9 +159,6 @@ G={
             NICKNAMES={
                 slideDirection='up'
             },
-            IN_LEVEL={ -- first time playing, skip choose levels menu and directly enter 1-1
-                transitionState='TRANSITION_IMAGE',
-            }
         },
         OPTIONS={
             MAIN_MENU={
@@ -193,24 +200,33 @@ G={
             CHOOSE_DIFFICULTY={
                 slideDirection='down'
             },
-            -- IN_LEVEL={
-            --     transitionState='TRANSITION_IMAGE',
-            -- }
+            IN_GAME={
+                transitionState='TRANSITION_IMAGE',
+            }
         },
         LOAD_REPLAY={
             MAIN_MENU={
                 slideDirection='right'
             },
-            IN_LEVEL={
+            IN_GAME={
                 transitionState='TRANSITION_IMAGE',
             }
         },
     },
-    ---@type {difficulty: DIFFICULTY|nil, player: PLAYER|nil, shotType: SHOT_TYPE|nil}
+    ---@type {difficulty: DIFFICULTY, player: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer}
     runInfo={
-        difficulty=nil,
-        player=nil,
-        shotType=nil
+        difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
+        player=G.CONSTANTS.PLAYERS[1],
+        shotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[G.CONSTANTS.PLAYERS[1]][1],
+        hiScore=0,
+        score=0,
+        lives=3,
+        bombs=3,
+        grazes=0
+    },
+    foregroundShaderConfig={
+        shader=G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE,
+        args={xywh={20,20,480,560}}
     },
     frame=0,
     ---@type replayData|nil
@@ -340,7 +356,7 @@ G.update=function(self,dt)
     end
 
     -- playtime calculation
-    if self.STATE==self.STATES.IN_LEVEL then
+    if self.STATE==self.STATES.IN_GAME then
         self.save.playTimeTable.playTimeInLevel=self.save.playTimeTable.playTimeInLevel+dt
     end
     self.save.playTimeTable.playTimeOverall=self.save.playTimeTable.playTimeOverall+dt
@@ -363,8 +379,8 @@ G.draw=function(self)
     shove.beginLayer('text')
     self:drawText()
     if DEV_MODE then
-        SetFont(36)
-        love.graphics.print("FPS: "..love.timer.getFPS(), 10, 20)
+        SetFont(12)
+        love.graphics.print("FPS: "..love.timer.getFPS(), 20, 20)
     end
     shove.endLayer()
 end

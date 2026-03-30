@@ -12,7 +12,7 @@ return {
         )
         local titleText=leftPart:child(
             UI.Text{
-                text="Glossy Quagmire",
+                text=GAME_NAME,
                 fontSize=36,color={55/255,65/255,81/255,1},
                 x=200,y=250,width=400,
                 align='center',
