@@ -286,37 +286,13 @@ Asset.flushBatches=function(self)
         batch:flush()
     end
 end
-Asset.setHyperbolicRotateShader=function()
-    if not (G.viewMode.mode==G.CONSTANTS.VIEW_MODES.FOLLOW and G.UseHypRotShader) then
-        return
-    end
-    local object=G.viewMode.object
-    object.naturalDirection=object.naturalDirection or 0
-    local shader=G.hyperbolicRotateShader
-    love.graphics.setShader(shader)
-    shader:send("player_pos", {object.x, object.y})
-    shader:send("aim_pos", {WINDOW_WIDTH/2+G.viewMode.viewOffset.x, WINDOW_HEIGHT/2+G.viewMode.viewOffset.y})
-    shader:send("rotation_angle",-object.naturalDirection)
-    shader:send("shape_axis_y", Shape.axisY)
-    shader:send("hyperbolic_model", G.viewMode.hyperbolicModel)
-    shader:send("r_factor", G.DISK_RADIUS_BASE[G.viewMode.hyperbolicModel] or 1)
-end
 Asset.drawBatches=function(self)
     for key, batch in pairs(self.Batches) do
-        -- use hyperbolicRotateShader from first batch to player focus batch (only excluding foreground). Note that some levels have their own shader, levels need to set G.UseHypRotShader to false to prevent being overridden
-        if G.viewMode.mode==G.CONSTANTS.VIEW_MODES.FOLLOW and G.UseHypRotShader then
-            local object=G.viewMode.object
-            local shader=G.hyperbolicRotateShader
-            if batch==Asset.bossMeshes then -- though hypRotShader has been activated in G.CONSTANTS.DRAW before calling GameObject:drawAll, activating again here to make sure
-                Asset.setHyperbolicRotateShader()
-            end
-            -- if batch==Asset.playerFocusBatch or batch==Asset.playerBatch then -- player and focus are not rotated
-            --     shader:send("rotation_angle",0)
-            -- else
-                shader:send("rotation_angle",-object.naturalDirection)
-            -- end
+        -- use hyperbolicRotateShader from first batch to player focus batch (only excluding foreground).
+        if batch==Asset.bossMeshes then
+            G.runInfo.geometry.applyDrawShader({x=0,y=0,viewDirection=0}) -- mock one now. will be G.runInfo.player
         end
-        if G.viewMode.mode==G.CONSTANTS.VIEW_MODES.FOLLOW and batch==Asset.foregroundBatch then
+        if batch==Asset.foregroundBatch then
             love.graphics.push()
             love.graphics.origin()
         end
@@ -335,10 +311,10 @@ Asset.drawBatches=function(self)
             self.batchExtraActions[batch].after()
         end
         love.graphics.setBlendMode('alpha') -- default mode
-        if G.viewMode.mode==G.CONSTANTS.VIEW_MODES.FOLLOW and batch==Asset.playerFocusBatch and G.UseHypRotShader then
+        if batch==Asset.playerFocusBatch then
             love.graphics.setShader()
         end
-        if G.viewMode.mode==G.CONSTANTS.VIEW_MODES.FOLLOW and batch==Asset.foregroundBatch then
+        if batch==Asset.foregroundBatch then
             love.graphics.pop()
         end
     end

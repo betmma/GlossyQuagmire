@@ -8,7 +8,6 @@ local G={
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
             -- Asset.foregroundBatch:add(Asset.backgroundRight,500,0,0,1,1,0,0)
             Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
-            Asset.setHyperbolicRotateShader()
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
             Asset:flushBatches()
             Asset:drawBatches()
@@ -17,9 +16,6 @@ local G={
         --- from previous game vvv
         ---@enum VIEW_MODE
         VIEW_MODES={NORMAL='NORMAL',FOLLOW='FOLLOW'},
-        ---@enum HYPERBOLIC_MODEL
-        HYPERBOLIC_MODELS={UHP=0,P_DISK=1,K_DISK=2}, -- use number is because it will be sent to shader
-        HYPERBOLIC_MODELS_COUNT=3,
         --- from previous game ^^^
         FOREGROUND_SHADERS={
             RECTANGLE=love.graphics.newShader('shaders/foreground/rectangle.glsl'),
@@ -60,6 +56,7 @@ local G={
         },
     },
 }
+local geometries=require"geometries.geometryBase"
 G={
     backgroundPattern=BackgroundPattern.MainMenuTesselation(),
     switchState=function(self,state)
@@ -213,8 +210,9 @@ G={
             }
         },
     },
-    ---@type {difficulty: DIFFICULTY, player: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer}
-    runInfo={
+    geometries=geometries,
+    ---@type {difficulty: DIFFICULTY, player: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer, stage: integer, geometry: GeometryBase}
+    runInfo={ -- things that can be changed and accessed during the run should be put there
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
         player=G.CONSTANTS.PLAYERS[1],
         shotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[G.CONSTANTS.PLAYERS[1]][1],
@@ -222,29 +220,18 @@ G={
         score=0,
         lives=3,
         bombs=3,
-        grazes=0
+        grazes=0,
+        stage=1,
+        geometry=geometries.Euclidean
     },
     foregroundShaderConfig={
         shader=G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE,
-        args={xywh={20,20,480,560}}
+        args={xywh={20,20,480,560}} -- in official games, screen is divided into 40*30 grid. gameplay area is 25*30 with border taking up 1 block on up, left and down sides.
     },
     frame=0,
     ---@type replayData|nil
     replay=nil,
-    ---@type boolean
-    UseHypRotShader=true,
 
-    DISK_RADIUS_BASE={
-        [G.CONSTANTS.HYPERBOLIC_MODELS.P_DISK]=1, -- Poincare disk
-        [G.CONSTANTS.HYPERBOLIC_MODELS.K_DISK]=1, -- Klein disk
-    },
-    ---@type {mode: VIEW_MODE, hyperbolicModel: HYPERBOLIC_MODEL, object: GameObject|nil, viewOffset: pos}
-    viewMode={
-        mode=G.CONSTANTS.VIEW_MODES.NORMAL,
-        hyperbolicModel=G.CONSTANTS.HYPERBOLIC_MODELS.UHP,
-        object=...,
-        viewOffset={x=0,y=0}
-    },
     currentUI={},
     UIDEF={
     }
@@ -363,7 +350,6 @@ G.update=function(self,dt)
 
     UI.Base:cleanObjects() -- to remove removed elements in class.objects
 end
-G.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRotateM.glsl")
 G.draw=function(self)
     shove.beginLayer('main')
     self.currentUI=self.UIDEF[self.STATE]
