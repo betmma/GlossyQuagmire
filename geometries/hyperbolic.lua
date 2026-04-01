@@ -18,24 +18,27 @@ Hyperbolic.HYPERBOLIC_MODELS={UHP=0,P_DISK=1,K_DISK=2} -- use number is because 
 Hyperbolic.HYPERBOLIC_MODELS_COUNT=3
 ---@type HyperbolicViewConfig
 Hyperbolic.viewConfig={
-    following=true,
-    screenCenter={x=WINDOW_WIDTH/2,y=WINDOW_HEIGHT/2},
+    following=false,
+    screenCenter={x=WINDOW_WIDTH/4,y=WINDOW_HEIGHT/2},
     hyperbolicModel=Hyperbolic.HYPERBOLIC_MODELS.UHP,
-    diskRadiusBase={UHP=1,P_DISK=1,K_DISK=1},
+    diskRadiusBase={
+        [Hyperbolic.HYPERBOLIC_MODELS.P_DISK]=1,
+        [Hyperbolic.HYPERBOLIC_MODELS.K_DISK]=1
+    },
 }
 
 ------- internal helper functions
 ---@param x coordinate
 ---@param y coordinate
 ---@param r number
-function Hyperbolic.getCircle(x,y,r)
+function Hyperbolic:getCircle(x,y,r)
     return x, (y-Hyperbolic.axisY)*math.cosh(r/Hyperbolic.curvature)+Hyperbolic.axisY, (y-Hyperbolic.axisY)*math.sinh(r/Hyperbolic.curvature)
 end
 
 -- get X coordinate and radius of center point of line x1,y1 to x2,y2
 ---@return coordinate centerX X coordinate of center point
 ---@return number radius (Euclidean) radius of line
-function Hyperbolic.lineCenter(x1,y1,x2,y2)
+function Hyperbolic:lineCenter(x1,y1,x2,y2)
     local x0=(x1+x2)/2
     local y0=(y1+y2)/2
     if x1==x2 then -- vertical 
@@ -48,14 +51,14 @@ end
 
 
 -- calculate the SIGNED ON-SCREEN distance a point xc,yc to line [x1,y1 to x2,y2] (positive when in/out the semicircle if angle p1 to p2 is negative/positive // left to a vertical line)
-function Hyperbolic.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2)
+function Hyperbolic:onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2)
     if math.abs(x1-x2)<Hyperbolic.EPS then -- vertical
         if y2<y1 then -- the line goes upward
             return x1-xc
         end
         return xc-x1
     end
-    local centerX,radius=Hyperbolic.lineCenter(x1,y1,x2,y2)
+    local centerX,radius=Hyperbolic:lineCenter(x1,y1,x2,y2)
     local theta1=math.atan2(y1-Hyperbolic.axisY,x1-centerX)
     local theta2=math.atan2(y2-Hyperbolic.axisY,x2-centerX)
     if theta1>theta2 then
@@ -72,7 +75,7 @@ end
 ---@param oy coordinate
 ---@return coordinate "x2"
 ---@return coordinate "y2"
-function Hyperbolic.rotateAround(x1, y1, angle, ox, oy)
+function Hyperbolic:rotateAround(x1, y1, angle, ox, oy)
     -- S_d_im: imaginary part of S_d. Real part of S_d is -ox.
     local S_d_im = oy - 2*Hyperbolic.axisY
 
@@ -116,16 +119,25 @@ function Hyperbolic.rotateAround(x1, y1, angle, ox, oy)
 end
 -------
 
-function Hyperbolic.update(state,dt)
+Hyperbolic.sizeFactor=0.5
+
+function Hyperbolic:update(state,dt)
     local metric=(state.y-Hyperbolic.axisY)/Hyperbolic.curvature
     local moveDistance=state.speed*dt*metric
-    state.x=state.x+moveDistance*math.cos(state.direction)
-    state.y=state.y+moveDistance*math.sin(state.direction)
-    local moveRadius=(state.y-Hyperbolic.axisY)/math.cos(state.direction)
-    state.direction=state.direction-moveDistance/moveRadius
+    if state.speed*dt<2 then
+        state.x=state.x+moveDistance*math.cos(state.direction)
+        state.y=state.y+moveDistance*math.sin(state.direction)
+        local moveRadius=(state.y-Hyperbolic.axisY)/math.cos(state.direction)
+        state.direction=state.direction-moveDistance/moveRadius
+    else
+        local newPos,newDir=self:rThetaGo(state,state.speed*dt,state.direction)
+        state.x=newPos.x
+        state.y=newPos.y
+        state.direction=newDir
+    end
 end
 
-function Hyperbolic.rThetaGo(position,length,direction)
+function Hyperbolic:rThetaGo(position,length,direction)
     if length==0 then
         return position,direction
     end
@@ -134,25 +146,25 @@ function Hyperbolic.rThetaGo(position,length,direction)
         length=-length
         direction=direction+math.pi
     end
-    local x2,y2,r2=Hyperbolic.getCircle(position.x,position.y,length)
+    local x2,y2,r2=Hyperbolic:getCircle(position.x,position.y,length)
     local xp,yp=x2,y2+r2 -- theta=pi/2
-    local retX,retY=Hyperbolic.rotateAround(xp,yp,direction-math.pi/2,position.x,position.y)
+    local retX,retY=Hyperbolic:rotateAround(xp,yp,direction-math.pi/2,position.x,position.y)
     local newPos={x=retX,y=retY}
-    return newPos,Hyperbolic.to(newPos,position)+(rLT0 and 0 or math.pi) -- if r>0 add pi
+    return newPos,Hyperbolic:to(newPos,position)+(rLT0 and 0 or math.pi) -- if r>0 add pi
 end
 
-function Hyperbolic.distance(position1,position2)
+function Hyperbolic:distance(position1,position2)
     local x1,y1,x2,y2=position1.x,position1.y,position2.x,position2.y
     local ay=Hyperbolic.axisY
     return 2*Hyperbolic.curvature*math.log((math.distance(x1,y1,x2,y2)+math.distance(x1,y1,x2,2*ay-y2))/(2*((y1-ay)*(y2-ay))^0.5))
 end
 
-function Hyperbolic.to(position,target)
+function Hyperbolic:to(position,target)
     local x1,y1,x2,y2=position.x,position.y,target.x,target.y
     if math.abs(x1-x2)<Hyperbolic.EPS then -- vertical 
         return y1<y2 and math.pi/2 or -math.pi/2
     end
-    local centerX=Hyperbolic.lineCenter(x1,y1,x2,y2)
+    local centerX=Hyperbolic:lineCenter(x1,y1,x2,y2)
     local theta1=math.atan2(y1-Hyperbolic.axisY,x1-centerX)
     local theta2=math.atan2(y2-Hyperbolic.axisY,x2-centerX)
     if theta1<theta2 then
@@ -161,32 +173,52 @@ function Hyperbolic.to(position,target)
     return theta1-math.pi/2
 end
 
-function Hyperbolic.sideToLine(position,linePoint1,linePoint2)
+function Hyperbolic:sideToLine(position,linePoint1,linePoint2)
     local x1,y1=position.x,position.y
     local x2,y2=linePoint1.x,linePoint1.y
     local x3,y3=linePoint2.x,linePoint2.y
-    return Hyperbolic.onscreenDistanceToLineSigned(x1,y1,x2,y2,x3,y3)>0
+    return Hyperbolic:onscreenDistanceToLineSigned(x1,y1,x2,y2,x3,y3)>0
 end
 
-function Hyperbolic.toScreen(position)
-    return position
+function Hyperbolic:toScreen(position)
+    return {position}
 end
 
-function Hyperbolic.canSimpleDraw(position,radius)
+function Hyperbolic:canSimpleDraw(position,radius)
     return radius<20
 end
 
 Hyperbolic.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRotateM.glsl")
 
-function Hyperbolic.applyDrawShader(viewer)
+function Hyperbolic:applyDrawShader(viewer)
     local shader=Hyperbolic.hyperbolicRotateShader
     love.graphics.setShader(shader)
-    shader:send("player_pos", {viewer.x, viewer.y})
-    shader:send("aim_pos", {Hyperbolic.viewConfig.screenCenter.x, Hyperbolic.viewConfig.screenCenter.y})
-    shader:send("rotation_angle",-viewer.viewDirection)
+    local center={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y}
+    if Hyperbolic.viewConfig.following then
+        shader:send("player_pos", {viewer.kinematicState.x, viewer.kinematicState.y})
+        shader:send("rotation_angle",-viewer.viewDirection)
+    else
+        shader:send("player_pos", center)
+        shader:send("rotation_angle",0)
+    end
+    shader:send("aim_pos", center)
     shader:send("shape_axis_y", Hyperbolic.axisY)
     shader:send("hyperbolic_model", Hyperbolic.viewConfig.hyperbolicModel)
     shader:send("r_factor", Hyperbolic.viewConfig.diskRadiusBase[Hyperbolic.viewConfig.hyperbolicModel] or 1)
+end
+
+function Hyperbolic:applyForegroundShader()
+    if Hyperbolic.viewConfig.hyperbolicModel==Hyperbolic.HYPERBOLIC_MODELS.UHP then
+        G.CONSTANTS.USE_FOREGROUND_SHADER('RECTANGLE',{xywh={20,20,480,560}})
+    else
+        local radius=Hyperbolic.viewConfig.diskRadiusBase[Hyperbolic.viewConfig.hyperbolicModel]*WINDOW_HEIGHT*Hyperbolic.sizeFactor
+        G.CONSTANTS.USE_FOREGROUND_SHADER('CIRCLE',{centerXY={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y},radius=radius})
+    end
+
+end
+
+function Hyperbolic:zoomFactorToScreen(position)
+    return {(position.y-Hyperbolic.axisY)/Hyperbolic.curvature}
 end
 
 return Hyperbolic

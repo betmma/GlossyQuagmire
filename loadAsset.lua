@@ -254,12 +254,9 @@ Asset.Batches={
 }
 --- batch:{before:fun()|nil,after:fun()|nil}
 Asset.batchExtraActions={
-    [Asset.foregroundBatch]={ -- foreground could always draw 800*600 full image and use a shader to make it hollow. currently not implemented
+    [Asset.foregroundBatch]={ -- foreground always draw 800*600 full image and use a shader to make it hollow.
         before=function()
-            love.graphics.setShader(G.foregroundShaderConfig.shader)
-            for key, value in pairs(G.foregroundShaderConfig.args) do
-                G.foregroundShaderConfig.shader:send(key, value)
-            end
+            G.runInfo.geometry.applyForegroundShader()
         end,
         after=function()
             love.graphics.setShader()
@@ -290,10 +287,11 @@ Asset.drawBatches=function(self)
     for key, batch in pairs(self.Batches) do
         -- use hyperbolicRotateShader from first batch to player focus batch (only excluding foreground).
         if batch==Asset.bossMeshes then
-            G.runInfo.geometry.applyDrawShader({x=0,y=0,viewDirection=0}) -- mock one now. will be G.runInfo.player
+            if G.runInfo.player then
+                G.runInfo.geometry:applyDrawShader(G.runInfo.player)
+            end
         end
         if batch==Asset.foregroundBatch then
-            love.graphics.push()
             love.graphics.origin()
         end
         if isHighlightBatch[batch] then
@@ -313,9 +311,6 @@ Asset.drawBatches=function(self)
         love.graphics.setBlendMode('alpha') -- default mode
         if batch==Asset.playerFocusBatch then
             love.graphics.setShader()
-        end
-        if batch==Asset.foregroundBatch then
-            love.graphics.pop()
         end
     end
 end

@@ -44,9 +44,18 @@ return {
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
         base.frame=0
+        G.runInfo.player=Player()
     end,
     update=function(self,dt)
         base:updateHierarchy()
+        GameObject:updateAll(dt)
+        if isPressed('c') then
+            if G.runInfo.geometry==G.geometries.Hyperbolic then
+                G.runInfo.geometry=G.geometries.Euclidean
+            else
+                G.runInfo.geometry=G.geometries.Hyperbolic
+            end
+        end
     end,
     draw=G.CONSTANTS.DRAW,
     drawText=function(self)

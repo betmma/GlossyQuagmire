@@ -18,9 +18,17 @@ local G={
         VIEW_MODES={NORMAL='NORMAL',FOLLOW='FOLLOW'},
         --- from previous game ^^^
         FOREGROUND_SHADERS={
+            -- xywh: vec4
             RECTANGLE=love.graphics.newShader('shaders/foreground/rectangle.glsl'),
+            -- centerXY: vec2, radius: number
             CIRCLE=love.graphics.newShader('shaders/foreground/circle.glsl'),
         },
+        USE_FOREGROUND_SHADER=function(key,args)
+            love.graphics.setShader(G.CONSTANTS.FOREGROUND_SHADERS[key])
+            for k,v in pairs(args) do
+                G.CONSTANTS.FOREGROUND_SHADERS[key]:send(k,v)
+            end
+        end,
         -- ---@enum GEOMETRY
         -- GEOMETRIES={EUCLIDEAN='EUCLIDEAN',HYPERBOLIC='HYPERBOLIC'},
 
@@ -211,10 +219,10 @@ G={
         },
     },
     geometries=geometries,
-    ---@type {difficulty: DIFFICULTY, player: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer, stage: integer, geometry: GeometryBase}
+    ---@type {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer, stage: integer, geometry: GeometryBase, player:Player}
     runInfo={ -- things that can be changed and accessed during the run should be put there
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
-        player=G.CONSTANTS.PLAYERS[1],
+        playerType=G.CONSTANTS.PLAYERS[1],
         shotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[G.CONSTANTS.PLAYERS[1]][1],
         hiScore=0,
         score=0,
@@ -222,11 +230,8 @@ G={
         bombs=3,
         grazes=0,
         stage=1,
-        geometry=geometries.Euclidean
-    },
-    foregroundShaderConfig={
-        shader=G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE,
-        args={xywh={20,20,480,560}} -- in official games, screen is divided into 40*30 grid. gameplay area is 25*30 with border taking up 1 block on up, left and down sides.
+        geometry=geometries.Hyperbolic,
+        player=nil,
     },
     frame=0,
     ---@type replayData|nil

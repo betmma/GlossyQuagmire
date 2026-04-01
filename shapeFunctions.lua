@@ -4,64 +4,64 @@
 ---@alias pos {x: coordinate, y: coordinate}
 
 local math=math
-
+ShapeF={axisY=-100,curvature=100,EPS=1e-5}
 -- hyperbolic distance
-function Shape.distance(x1,y1,x2,y2)
-    local ay=Shape.axisY
-    return 2*Shape.curvature*math.log((math.distance(x1,y1,x2,y2)+math.distance(x1,y1,x2,2*ay-y2))/(2*((y1-ay)*(y2-ay))^0.5))
+function ShapeF.distance(x1,y1,x2,y2)
+    local ay=G.geometries.Hyperbolic.axisY
+    return 2*G.geometries.Hyperbolic.curvature*math.log((math.distance(x1,y1,x2,y2)+math.distance(x1,y1,x2,2*ay-y2))/(2*((y1-ay)*(y2-ay))^0.5))
 end
 
 --  get distance between two objects with x,y coordinates
 ---@param obj1 pos
 ---@param obj2 pos
 ---@return number distance (hyperbolic) distance between obj1 and obj2
-function Shape.distanceObj(obj1,obj2)
-    return Shape.distance(obj1.x,obj1.y,obj2.x,obj2.y)
+function ShapeF.distanceObj(obj1,obj2)
+    return ShapeF.distance(obj1.x,obj1.y,obj2.x,obj2.y)
 end
 
 -- get X coordinate and radius of center point of line x1,y1 to x2,y2
 ---@return coordinate centerX X coordinate of center point
 ---@return number radius (Euclidean) radius of line
-function Shape.lineCenter(x1,y1,x2,y2)
+function ShapeF.lineCenter(x1,y1,x2,y2)
     local x0=(x1+x2)/2
     local y0=(y1+y2)/2
     if x1==x2 then -- vertical 
         return 0,1e308
     end
     local k=(y2-y1)/(x2-x1)
-    local centerX=x0+(y0-Shape.axisY)*k
-    return centerX,math.distance(centerX,Shape.axisY,x1,y1)
+    local centerX=x0+(y0-G.geometries.Hyperbolic.axisY)*k
+    return centerX,math.distance(centerX,G.geometries.Hyperbolic.axisY,x1,y1)
 end
 
 -- get Y coordinate of intersection point of line x=xc and line x1,y1 to x2,y2
 -- that is, treat line as a function and get f(xc)
-function Shape.lineX2Y(x1,y1,x2,y2,xc)
-    local centerX,dis=Shape.lineCenter(x1,y1,x2,y2)
+function ShapeF.lineX2Y(x1,y1,x2,y2,xc)
+    local centerX,dis=ShapeF.lineCenter(x1,y1,x2,y2)
     if math.abs(xc-centerX)>dis then
         return 0 -- intersection point doesn't exist
     end
-    return Shape.axisY+dis*math.cos(math.asin((xc-centerX)/dis))
+    return G.geometries.Hyperbolic.axisY+dis*math.cos(math.asin((xc-centerX)/dis))
 end
 
 -- actually this function is never used (^^;
-function Shape.drawLine(x1,y1,x2,y2)
-    if math.abs(x1-x2)<Shape.EPS then -- vertical -> line
+function ShapeF.drawLine(x1,y1,x2,y2)
+    if math.abs(x1-x2)<ShapeF.EPS then -- vertical -> line
         love.graphics.line(x1,y1,x2,y2)
         return
     end
-    local centerX=Shape.lineCenter(x1,y1,x2,y2)
-    love.graphics.circle("line", centerX,Shape.axisY,((centerX-x1)^2+(y1-Shape.axisY)^2)^0.5)
+    local centerX=ShapeF.lineCenter(x1,y1,x2,y2)
+    love.graphics.circle("line", centerX,G.geometries.Hyperbolic.axisY,((centerX-x1)^2+(y1-G.geometries.Hyperbolic.axisY)^2)^0.5)
 end
 
 -- get direction from x1,y1 to x2,y2 (at x1,y1)
 ---@return angle 'direction in [-pi/2,3pi/2]'
-function Shape.to(x1,y1,x2,y2)
-    if math.abs(x1-x2)<Shape.EPS then -- vertical 
+function ShapeF.to(x1,y1,x2,y2)
+    if math.abs(x1-x2)<ShapeF.EPS then -- vertical 
         return y1<y2 and math.pi/2 or -math.pi/2
     end
-    local centerX=Shape.lineCenter(x1,y1,x2,y2)
-    local theta1=math.atan2(y1-Shape.axisY,x1-centerX)
-    local theta2=math.atan2(y2-Shape.axisY,x2-centerX)
+    local centerX=ShapeF.lineCenter(x1,y1,x2,y2)
+    local theta1=math.atan2(y1-G.geometries.Hyperbolic.axisY,x1-centerX)
+    local theta2=math.atan2(y2-G.geometries.Hyperbolic.axisY,x2-centerX)
     if theta1<theta2 then
         return theta1+math.pi/2
     end
@@ -72,67 +72,67 @@ end
 ---@param obj1 table "{x,y}"
 ---@param obj2 table "{x,y}"
 ---@return angle 'direction in [-pi/2,3pi/2]'
-function Shape.toObj(obj1,obj2)
-    return Shape.to(obj1.x,obj1.y,obj2.x,obj2.y)
+function ShapeF.toObj(obj1,obj2)
+    return ShapeF.to(obj1.x,obj1.y,obj2.x,obj2.y)
 end
 
 -- calculate the SIGNED ON-SCREEN distance a point xc,yc to line [x1,y1 to x2,y2] (positive when in/out the semicircle if angle p1 to p2 is negative/positive // left to a vertical line)
-function Shape.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2)
-    if math.abs(x1-x2)<Shape.EPS then -- vertical
+function ShapeF.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2)
+    if math.abs(x1-x2)<ShapeF.EPS then -- vertical
         if y2<y1 then -- the line goes upward
             return x1-xc
         end
         return xc-x1
     end
-    local centerX,radius=Shape.lineCenter(x1,y1,x2,y2)
-    local theta1=math.atan2(y1-Shape.axisY,x1-centerX)
-    local theta2=math.atan2(y2-Shape.axisY,x2-centerX)
+    local centerX,radius=ShapeF.lineCenter(x1,y1,x2,y2)
+    local theta1=math.atan2(y1-G.geometries.Hyperbolic.axisY,x1-centerX)
+    local theta2=math.atan2(y2-G.geometries.Hyperbolic.axisY,x2-centerX)
     if theta1>theta2 then
-        return radius-math.distance(centerX,Shape.axisY,xc,yc)
+        return radius-math.distance(centerX,G.geometries.Hyperbolic.axisY,xc,yc)
     end 
-    return math.distance(centerX,Shape.axisY,xc,yc)-radius
+    return math.distance(centerX,G.geometries.Hyperbolic.axisY,xc,yc)-radius
 end
 
 -- calculate if a point xc,yc is left to line [x1,y1 to x2,y2]. Uses distanceToLineSigned.
-function Shape.leftToLine(xc,yc,x1,y1,x2,y2)
-    return Shape.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2)>0
+function ShapeF.leftToLine(xc,yc,x1,y1,x2,y2)
+    return ShapeF.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2)>0
 end
 
-function Shape.onscreenDistanceToLine(xc,yc,x1,y1,x2,y2)
-    return math.abs(Shape.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2))
+function ShapeF.onscreenDistanceToLine(xc,yc,x1,y1,x2,y2)
+    return math.abs(ShapeF.onscreenDistanceToLineSigned(xc,yc,x1,y1,x2,y2))
 end
 
 -- used to calculate segment (not line) hitbox (note it's approx.)
-function Shape.distanceToSegment(xc,yc,x1,y1,x2,y2)
-    if math.abs(x1-x2)<Shape.EPS then -- vertical
+function ShapeF.distanceToSegment(xc,yc,x1,y1,x2,y2)
+    if math.abs(x1-x2)<ShapeF.EPS then -- vertical
         -- make a perpendicular (hyperbolic) line from (xc,yc) to x=xc, intersects at (xc,yd)
-        local yd=math.distance(xc,yc,x1,Shape.axisY)
+        local yd=math.distance(xc,yc,x1,G.geometries.Hyperbolic.axisY)
         if y2<yd and y1<yd or y2>yd and y1>yd then 
-            return math.min(Shape.distance(x1,y1,xc,yc),Shape.distance(x2,y2,xc,yc))
+            return math.min(ShapeF.distance(x1,y1,xc,yc),ShapeF.distance(x2,y2,xc,yc))
         end
-        return Shape.distance(x1,yd,xc,yc) -- the perpendicular line intersects the segment
+        return ShapeF.distance(x1,yd,xc,yc) -- the perpendicular line intersects the segment
     end
-    local centerX,radius=Shape.lineCenter(x1,y1,x2,y2)
-    local theta1=math.atan2(y1-Shape.axisY,x1-centerX)
-    local theta2=math.atan2(y2-Shape.axisY,x2-centerX)
-    local thetac=math.atan2(yc-Shape.axisY,xc-centerX)
+    local centerX,radius=ShapeF.lineCenter(x1,y1,x2,y2)
+    local theta1=math.atan2(y1-G.geometries.Hyperbolic.axisY,x1-centerX)
+    local theta2=math.atan2(y2-G.geometries.Hyperbolic.axisY,x2-centerX)
+    local thetac=math.atan2(yc-G.geometries.Hyperbolic.axisY,xc-centerX)
     if theta1>thetac and theta2>thetac or theta1<thetac and theta2<thetac then
-        return math.min(Shape.distance(x1,y1,xc,yc),Shape.distance(x2,y2,xc,yc))
+        return math.min(ShapeF.distance(x1,y1,xc,yc),ShapeF.distance(x2,y2,xc,yc))
     end 
-    return Shape.distance(centerX+radius*math.cos(thetac),Shape.axisY+radius*math.sin(thetac),xc,yc) -- this is INCORRECT, just an approximation when distance is small (used in lazer segment hitbox check)
+    return ShapeF.distance(centerX+radius*math.cos(thetac),G.geometries.Hyperbolic.axisY+radius*math.sin(thetac),xc,yc) -- this is INCORRECT, just an approximation when distance is small (used in lazer segment hitbox check)
 end
 
 -- find the nearest point to xc,yc on line [x1,y1 to x2,y2]
 ---@return table "{x,y}"
-function Shape.nearestToLine(xc,yc,x1,y1,x2,y2)
-    if math.abs(x1-x2)<Shape.EPS then -- vertical
-        local r2=(yc-Shape.axisY)^2+(xc-x1)^2
-        return {x1,Shape.axisY+math.sqrt(r2)}
+function ShapeF.nearestToLine(xc,yc,x1,y1,x2,y2)
+    if math.abs(x1-x2)<ShapeF.EPS then -- vertical
+        local r2=(yc-G.geometries.Hyperbolic.axisY)^2+(xc-x1)^2
+        return {x1,G.geometries.Hyperbolic.axisY+math.sqrt(r2)}
     end
-    local centerX,radius=Shape.lineCenter(x1,y1,x2,y2)
-    --[[ let the semicircle from xc,yc to the foot of the perpendicular line intersecting the semicircle of (centerX,radius) be (centerX2, radius2), then radius2 is radius*tan(direction) (this can be negative, but we only use squared value below so doesn't matter), centerX2 is centerX+radius/cos(direction), xc,yc is on it, so (xc-centerX2)^2+(yc-Shape.axisY)^2=radius2^2, which is:
-    (xc-centerX-radius/cos(direction))^2+(yc-Shape.axisY)^2=radius^2*tan(direction)^2
-    let xc-centerX=a, (yc-Shape.axisY)^2=b, radius=R, then we have:
+    local centerX,radius=ShapeF.lineCenter(x1,y1,x2,y2)
+    --[[ let the semicircle from xc,yc to the foot of the perpendicular line intersecting the semicircle of (centerX,radius) be (centerX2, radius2), then radius2 is radius*tan(direction) (this can be negative, but we only use squared value below so doesn't matter), centerX2 is centerX+radius/cos(direction), xc,yc is on it, so (xc-centerX2)^2+(yc-G.geometries.Hyperbolic.axisY)^2=radius2^2, which is:
+    (xc-centerX-radius/cos(direction))^2+(yc-G.geometries.Hyperbolic.axisY)^2=radius^2*tan(direction)^2
+    let xc-centerX=a, (yc-G.geometries.Hyperbolic.axisY)^2=b, radius=R, then we have:
     (a-R/cos(direction))^2+b=R^2*tan(direction)^2
     expand, we get:
     a^2-2aR/cos(direction)+R^2/cos(direction)^2+b=R^2*tan(direction)^2
@@ -143,25 +143,25 @@ function Shape.nearestToLine(xc,yc,x1,y1,x2,y2)
     x=(2aR)/(a^2+b+R^2) (discard x=0 solution)
     ]]
     local a=xc-centerX
-    local b=(yc-Shape.axisY)^2
+    local b=(yc-G.geometries.Hyperbolic.axisY)^2
     local R=radius
     local x=(2*a*R)/(a^2+b+R^2)
     -- direction is limited in (0,pi) so sin(direction) is positive
 
-    return {centerX+radius*x,Shape.axisY+radius*math.sqrt(1-x^2)}
+    return {centerX+radius*x,G.geometries.Hyperbolic.axisY+radius*math.sqrt(1-x^2)}
 end
 
 --- calculate the distance from point xc,yc to line [x1,y1 to x2,y2]. Uses nearestToLine.
-function Shape.distanceToLine(xc,yc,x1,y1,x2,y2)
-    local nearest=Shape.nearestToLine(xc,yc,x1,y1,x2,y2)
-    return Shape.distance(xc,yc,nearest[1],nearest[2])
+function ShapeF.distanceToLine(xc,yc,x1,y1,x2,y2)
+    local nearest=ShapeF.nearestToLine(xc,yc,x1,y1,x2,y2)
+    return ShapeF.distance(xc,yc,nearest[1],nearest[2])
 end
 
 --- calculate the signed distance from point xc,yc to line [x1,y1 to x2,y2]. left to line -> positive. Uses nearestToLine.
-function Shape.distanceToLineSigned(xc,yc,x1,y1,x2,y2)
-    local nearest=Shape.nearestToLine(xc,yc,x1,y1,x2,y2)
-    local d=Shape.distance(xc,yc,nearest[1],nearest[2])
-    if Shape.leftToLine(xc,yc,x1,y1,x2,y2) then
+function ShapeF.distanceToLineSigned(xc,yc,x1,y1,x2,y2)
+    local nearest=ShapeF.nearestToLine(xc,yc,x1,y1,x2,y2)
+    local d=ShapeF.distance(xc,yc,nearest[1],nearest[2])
+    if ShapeF.leftToLine(xc,yc,x1,y1,x2,y2) then
         return d
     end
     return -d
@@ -177,21 +177,21 @@ end
 ---@return coordinate "x of reflected point"
 ---@return coordinate "y of reflected point"
 ---@return angle "delta orientation from reflection"
-function Shape.reflectByLine(xs,ys,x1,y1,x2,y2)
-    local nearest=Shape.nearestToLine(xs,ys,x1,y1,x2,y2)
+function ShapeF.reflectByLine(xs,ys,x1,y1,x2,y2)
+    local nearest=ShapeF.nearestToLine(xs,ys,x1,y1,x2,y2)
     local x3,y3=nearest[1],nearest[2]
-    -- local x3toself=Shape.to(x3,y3,xs,ys)
-    -- local selftox3=Shape.to(xs,ys,x3,y3)
-    local distance=Shape.distance(xs,ys,x3,y3)
-    if distance<Shape.EPS then
-        local tangentAngle=Shape.to(xs,ys,x1,y1)
+    -- local x3toself=ShapeF.to(x3,y3,xs,ys)
+    -- local selftox3=ShapeF.to(xs,ys,x3,y3)
+    local distance=ShapeF.distance(xs,ys,x3,y3)
+    if distance<ShapeF.EPS then
+        local tangentAngle=ShapeF.to(xs,ys,x1,y1)
         return xs,ys,tangentAngle*2+math.pi
     end
-    local centerX,radius=Shape.lineCenter(x1,y1,x2,y2)
-    local xsd,ysd=xs-centerX,ys-Shape.axisY
+    local centerX,radius=ShapeF.lineCenter(x1,y1,x2,y2)
+    local xsd,ysd=xs-centerX,ys-G.geometries.Hyperbolic.axisY
     local disSSquared=xsd*xsd+ysd*ysd
     local ratio=radius*radius/disSSquared
-    local xReflection,yReflection=centerX+xsd*ratio,Shape.axisY+ysd*ratio -- this is the reflection point
+    local xReflection,yReflection=centerX+xsd*ratio,G.geometries.Hyperbolic.axisY+ysd*ratio -- this is the reflection point
     --[[this is complex, lemme explain:
        (xs,ys)\______(x3,y3)______/(xRe,yRe)     (Re is Reflection)
         ↘selftox3  ←x3toself     ↙xRetox3
@@ -201,7 +201,7 @@ function Shape.reflectByLine(xs,ys,x1,y1,x2,y2)
     finally move the reflection to (xRe,yRe). difference is xRetox3-x3toself. so the result, calling it ori3, is xRetox3-x3toself+ori2=xRetox3+selftox3+pi.
     for the initial orientation, it's easy to know the reflection rotates in the opposite direction, so minus initial orientation.
     ]]
-    local deltaOrientation=Shape.to(xReflection,yReflection,xs,ys)+Shape.to(xs,ys,x3,y3)+math.pi
+    local deltaOrientation=ShapeF.to(xReflection,yReflection,xs,ys)+ShapeF.to(xs,ys,x3,y3)+math.pi
     return xReflection,yReflection,deltaOrientation
 end
 
@@ -211,7 +211,7 @@ end
 --- @param step number "step distance"
 --- @param stopAtReach? boolean "if true, won't go past [aimObj] if [step] is larger than distance between them"
 --- @param ratioStep? boolean "if true, [step] is a ratio of distance to [aimObj], otherwise it's a fixed distance"
-function Shape.moveTowards(movingObj,aimObj,step,stopAtReach,ratioStep)
+function ShapeF.moveTowards(movingObj,aimObj,step,stopAtReach,ratioStep)
     local angle,aimX,aimY
     if type(aimObj)=='number' then
         angle=aimObj
@@ -222,13 +222,13 @@ function Shape.moveTowards(movingObj,aimObj,step,stopAtReach,ratioStep)
         if not aimX or not aimY then
             error('aimObj.x or aimObj.y is nil. Got aimObj.x='..tostring(aimObj.x)..' aimObj.y='..tostring(aimObj.y))
         end
-        angle=Shape.to(movingObj.x,movingObj.y,aimX,aimY)
+        angle=ShapeF.to(movingObj.x,movingObj.y,aimX,aimY)
     else
         error('aimObj must be a number or a table with x and y attributes. Got: '..type(aimObj))
     end
     local distance
     if ratioStep or stopAtReach then
-        distance=Shape.distance(movingObj.x,movingObj.y,aimX,aimY)
+        distance=ShapeF.distance(movingObj.x,movingObj.y,aimX,aimY)
     end
     if ratioStep then
         step=step*distance
@@ -236,7 +236,7 @@ function Shape.moveTowards(movingObj,aimObj,step,stopAtReach,ratioStep)
     if stopAtReach then
         step=math.min(step,distance)
     end
-    local x,y=Shape.rThetaPos(movingObj.x,movingObj.y,step,angle)
+    local x,y=ShapeF.rThetaPos(movingObj.x,movingObj.y,step,angle)
     movingObj.x=x
     movingObj.y=y
 end
@@ -246,12 +246,12 @@ end
 --- @param aim {x: number, y:number}
 --- @param frame integer
 --- @return nil
-function Shape.moveToInTime(obj,aim,frame)
-    local step=Shape.distanceObj(obj,aim)/frame
+function ShapeF.moveToInTime(obj,aim,frame)
+    local step=ShapeF.distanceObj(obj,aim)/frame
     Event.LoopEvent{
         obj=obj,period=1,times=frame,
         executeFunc=function()
-            Shape.moveTowards(obj,aim,step,true)
+            ShapeF.moveTowards(obj,aim,step,true)
         end,
         afterFunc=function()
             obj.x=aim.x
@@ -260,15 +260,15 @@ function Shape.moveToInTime(obj,aim,frame)
     }
 end
 
-function Shape.drawSegment(x1,y1,x2,y2,segNum)
-    if math.abs(x1-x2)<Shape.EPS then -- vertical -> line
+function ShapeF.drawSegment(x1,y1,x2,y2,segNum)
+    if math.abs(x1-x2)<ShapeF.EPS then -- vertical -> line
         love.graphics.line(x1,y1,x2,y2)
         return
     end
-    local centerX,r=Shape.lineCenter(x1,y1,x2,y2)
-    local theta1=math.atan2(y1-Shape.axisY,x1-centerX)
-    local theta2=math.atan2(y2-Shape.axisY,x2-centerX)
-    math.drawArc(centerX,Shape.axisY,r,theta1,theta2,segNum or 50)
+    local centerX,r=ShapeF.lineCenter(x1,y1,x2,y2)
+    local theta1=math.atan2(y1-G.geometries.Hyperbolic.axisY,x1-centerX)
+    local theta2=math.atan2(y2-G.geometries.Hyperbolic.axisY,x2-centerX)
+    math.drawArc(centerX,G.geometries.Hyperbolic.axisY,r,theta1,theta2,segNum or 50)
 end
 
 -- draw hyperbolic arc.
@@ -278,16 +278,16 @@ end
 ---@param s_ang angle 'arc start angle'
 ---@param e_ang angle 'arc end angle'
 ---@param numLines any 'how many lines are used'
-function Shape.drawArc(x, y, r, s_ang, e_ang, numLines)
-    local x2,y2,r2=Shape.getCircle(x,y,r)
-    s_ang=Shape.rThetaPosPolarAngle(x,y,r,s_ang)
-    e_ang=Shape.rThetaPosPolarAngle(x,y,r,e_ang)
+function ShapeF.drawArc(x, y, r, s_ang, e_ang, numLines)
+    local x2,y2,r2=ShapeF.getCircle(x,y,r)
+    s_ang=ShapeF.rThetaPosPolarAngle(x,y,r,s_ang)
+    e_ang=ShapeF.rThetaPosPolarAngle(x,y,r,e_ang)
 	math.drawArc(x2,y2,r2,s_ang,e_ang,numLines)
 end
 
--- draw hyperbolic circle with center (x,y) and radius r. using Shape.getCircle
-function Shape.drawCircle(x,y,r,mode)
-    x,y,r=Shape.getCircle(x,y,r)
+-- draw hyperbolic circle with center (x,y) and radius r. using ShapeF.getCircle
+function ShapeF.drawCircle(x,y,r,mode)
+    x,y,r=ShapeF.getCircle(x,y,r)
     local width=love.graphics.getLineWidth()
     love.graphics.setLineWidth(y/300*width)
     love.graphics.circle(mode or "line", x,y,r)
@@ -299,8 +299,8 @@ end
 ---@param x coordinate
 ---@param y coordinate
 ---@param r number
-function Shape.getCircle(x,y,r)
-    return x, (y-Shape.axisY)*math.cosh(r/Shape.curvature)+Shape.axisY, (y-Shape.axisY)*math.sinh(r/Shape.curvature)
+function ShapeF.getCircle(x,y,r)
+    return x, (y-G.geometries.Hyperbolic.axisY)*math.cosh(r/G.geometries.Hyperbolic.curvature)+G.geometries.Hyperbolic.axisY, (y-G.geometries.Hyperbolic.axisY)*math.sinh(r/G.geometries.Hyperbolic.curvature)
 end
 
 
@@ -313,12 +313,12 @@ end
 ---@param theta angle|nil
 ---@param xyindex boolean|nil "if true, return {x=...,y=...} instead of {x,y}"
 ---@return table[] points table of coordinates of the vertices. {{x1,y1},{x2,y2},...}
-function Shape.regularPolygonCoordinates(x,y,r,n,theta,xyindex)
+function ShapeF.regularPolygonCoordinates(x,y,r,n,theta,xyindex)
     theta=theta or 0
     local points={}
     for i=1,n do
         local angle=math.pi*2/n*(i-0.5)+theta
-        local x2,y2=Shape.rThetaPos(x,y,r,angle)
+        local x2,y2=ShapeF.rThetaPos(x,y,r,angle)
         points[i]=xyindex and {x=x2,y=y2} or {x2,y2}
     end
     return points
@@ -334,7 +334,7 @@ end
 ---@param color number[]|nil "color RGBA, each in [0,1]"
 ---@param square boolean|nil "if true, vertices are calculated on a square instead of a circle (for square sprites)"
 ---@return love.Mesh "fan mesh"
-function Shape.fanMesh(posX,posY,posR,orientation,quad,image,n,color,square)
+function ShapeF.fanMesh(posX,posY,posR,orientation,quad,image,n,color,square)
     color=color or {1,1,1,1}
     local x,y,w,h=quad:getViewport() -- like 100, 100, 50, 50 so needs to divide width and height
     local imgW,imgH=image:getDimensions()
@@ -347,7 +347,7 @@ function Shape.fanMesh(posX,posY,posR,orientation,quad,image,n,color,square)
         if square then
             rRatio=1/math.cos((angle+math.pi/4)%(math.pi/2)-math.pi/4)
         end
-        local x2,y2=Shape.rThetaPos(posX,posY,posR*rRatio,angle+orientation)
+        local x2,y2=ShapeF.rThetaPos(posX,posY,posR*rRatio,angle+orientation)
         local u,v=(math.cos(angle)*rRatio+1)/2,(math.sin(angle)*rRatio+1)/2
         vertices[i+2]={x2,y2,x+u*w,y+v*h,color[1],color[2],color[3],color[4]}
     end
@@ -368,7 +368,7 @@ end
 ---@param color number[]|nil "color RGBA, each in [0,1]"
 ---@return love.Mesh "ring mesh"
 ---@return love.Mesh "fan mesh"
-function Shape.ringFanMesh(posX,posY,innerR,outerR,orientation,quad,image,n,color)
+function ShapeF.ringFanMesh(posX,posY,innerR,outerR,orientation,quad,image,n,color)
     color=color or {1,1,1,1}
     local x,y,w,h=quad:getViewport() -- like 100, 100, 50, 50 so needs to divide width and height
     local imgW,imgH=image:getDimensions()
@@ -378,11 +378,11 @@ function Shape.ringFanMesh(posX,posY,innerR,outerR,orientation,quad,image,n,colo
     local fanMeshVertices={{posX,posY,x+w/2,y+h/2,color[1],color[2],color[3],color[4]}}
     for i=0,n do
         local angle=math.pi*2/n*i
-        local x2,y2=Shape.rThetaPos(posX,posY,outerR,angle+orientation)
+        local x2,y2=ShapeF.rThetaPos(posX,posY,outerR,angle+orientation)
         local u,v=(math.cos(angle)+1)/2,(math.sin(angle)+1)/2
         ringMeshVertices[i*2+1]={x2,y2,x+u*w,y+v*h,color[1],color[2],color[3],color[4]}
         fanMeshVertices[i+2]=ringMeshVertices[i*2+1]
-        local x3,y3=Shape.rThetaPos(posX,posY,innerR,angle+orientation)
+        local x3,y3=ShapeF.rThetaPos(posX,posY,innerR,angle+orientation)
         u,v=(math.cos(angle)*ratio+1)/2,(math.sin(angle)*ratio+1)/2
         ringMeshVertices[i*2+2]={x3,y3,x+u*w,y+v*h,color[1],color[2],color[3],color[4]}
     end
@@ -405,7 +405,7 @@ end
 ---@param color number[]|nil "color RGBA, each in [0,1]"
 ---@param loopNum integer|nil "number of loops of texture around the ring"
 ---@return love.Mesh "ring mesh"
-function Shape.ringMesh(posX,posY,innerR,outerR,orientation,quad,image,n,color,loopNum)
+function ShapeF.ringMesh(posX,posY,innerR,outerR,orientation,quad,image,n,color,loopNum)
     loopNum=loopNum or 1
     color=color or {1,1,1,1}
     local x,y,w,h=quad:getViewport()
@@ -417,8 +417,8 @@ function Shape.ringMesh(posX,posY,innerR,outerR,orientation,quad,image,n,color,l
     for i=0,n do
         local angle=math.pi*2/n*i
         local loopRatio=i%oneLoopVertices/oneLoopVertices
-        local x2,y2=Shape.rThetaPos(posX,posY,outerR,angle+orientation)
-        local x3,y3=Shape.rThetaPos(posX,posY,innerR,angle+orientation)
+        local x2,y2=ShapeF.rThetaPos(posX,posY,outerR,angle+orientation)
+        local x3,y3=ShapeF.rThetaPos(posX,posY,innerR,angle+orientation)
         if loopRatio==0 and i>0 then -- loop happens, need to add 2 points with loopRatio=1
             table.insert(ringMeshVertices,{x2,y2,x,y+h*1,color[1],color[2],color[3],color[4]})
             table.insert(ringMeshVertices,{x3,y3,x+w,y+h*1,color[1],color[2],color[3],color[4]})
@@ -439,9 +439,9 @@ end
 ---@param oy coordinate
 ---@return coordinate "x2"
 ---@return coordinate "y2"
-function Shape.rotateAround(x1, y1, angle, ox, oy)
+function ShapeF.rotateAround(x1, y1, angle, ox, oy)
     -- S_d_im: imaginary part of S_d. Real part of S_d is -ox.
-    local S_d_im = oy - 2*Shape.axisY
+    local S_d_im = oy - 2*G.geometries.Hyperbolic.axisY
 
     -- U_a = cos(angle) + i*sin(angle)
     local U_a_re, U_a_im = math.cos(angle), math.sin(angle)
@@ -490,7 +490,7 @@ end
 ---@param theta angle
 ---@return coordinate newX "x of new point"
 ---@return coordinate newY "y of new point"
-function Shape.rThetaPos(x,y,r,theta)
+function ShapeF.rThetaPos(x,y,r,theta)
     if r==0 then
         return x,y
     end
@@ -498,9 +498,9 @@ function Shape.rThetaPos(x,y,r,theta)
         r=-r
         theta=theta+math.pi
     end
-    local x2,y2,r2=Shape.getCircle(x,y,r)
+    local x2,y2,r2=ShapeF.getCircle(x,y,r)
     local xp,yp=x2,y2+r2 -- theta=pi/2
-    local retX,retY=Shape.rotateAround(xp,yp,theta-math.pi/2,x,y)
+    local retX,retY=ShapeF.rotateAround(xp,yp,theta-math.pi/2,x,y)
     return retX,retY
 end
 
@@ -512,7 +512,7 @@ end
 ---@return coordinate newX "x of new point"
 ---@return coordinate newY "y of new point"
 ---@return angle newTheta "after moving the direction you are facing"
-function Shape.rThetaPosT(x,y,r,theta)
+function ShapeF.rThetaPosT(x,y,r,theta)
     if r==0 then
         return x,y,theta
     end
@@ -521,15 +521,15 @@ function Shape.rThetaPosT(x,y,r,theta)
         r=-r
         theta=theta+math.pi
     end
-    local x2,y2,r2=Shape.getCircle(x,y,r)
+    local x2,y2,r2=ShapeF.getCircle(x,y,r)
     local xp,yp=x2,y2+r2 -- theta=pi/2
-    local retX,retY=Shape.rotateAround(xp,yp,theta-math.pi/2,x,y)
-    return retX,retY,Shape.to(retX,retY,x,y)+(rLT0 and 0 or math.pi) -- if r>0 add pi
+    local retX,retY=ShapeF.rotateAround(xp,yp,theta-math.pi/2,x,y)
+    return retX,retY,ShapeF.to(retX,retY,x,y)+(rLT0 and 0 or math.pi) -- if r>0 add pi
 end
 
--- get Euclidean polar angle. It's used in Shape.drawArc and probably nowhere else.
+-- get Euclidean polar angle. It's used in ShapeF.drawArc and probably nowhere else.
 ---@return angle "euclidean polar angle from original point to new point"
-function Shape.rThetaPosPolarAngle(x,y,r,theta)
+function ShapeF.rThetaPosPolarAngle(x,y,r,theta)
     if r==0 then
         return theta
     end
@@ -539,9 +539,9 @@ function Shape.rThetaPosPolarAngle(x,y,r,theta)
     end
     local div=math.floor(theta/(math.pi*2))
     theta=theta%(math.pi*2)
-    local x2,y2,r2=Shape.getCircle(x,y,r)
+    local x2,y2,r2=ShapeF.getCircle(x,y,r)
     local xp,yp=x2,y2+r2 -- theta=pi/2
-    local retX,retY=Shape.rotateAround(xp,yp,theta-math.pi/2,x,y)
+    local retX,retY=ShapeF.rotateAround(xp,yp,theta-math.pi/2,x,y)
     local finaltheta=math.atan2(retY-y2,retX-x2)%(math.pi*2)
     if finaltheta>math.pi*3/2 and theta<math.pi/2 then 
         div=div-1
@@ -550,10 +550,10 @@ function Shape.rThetaPosPolarAngle(x,y,r,theta)
 end
 
 -- linear interpolation (in hyperbolic geometry) from (x1,y1) to (x2,y2) with ratio t in [0,1]
-function Shape.lerp(x1, y1, x2, y2, t)
-    local distance = Shape.distance(x1, y1, x2, y2)
+function ShapeF.lerp(x1, y1, x2, y2, t)
+    local distance = ShapeF.distance(x1, y1, x2, y2)
     distance = distance * t
-    return Shape.rThetaPos(x1, y1, distance, Shape.to(x1, y1, x2, y2))
+    return ShapeF.rThetaPos(x1, y1, distance, ShapeF.to(x1, y1, x2, y2))
 end
 
 
@@ -563,13 +563,13 @@ end
 ---@param q integer Reciprocal of the angle at vertex v1 (angle = pi/q).
 ---@param r integer Reciprocal of the angle at vertex v2 (angle = pi/r).
 ---@param v0_coord table Coordinates of the first vertex, e.g., {x=0, y=1} or {0,1}.
----                     It's assumed y-coordinate is > Shape.axisY.
+---                     It's assumed y-coordinate is > G.geometries.Hyperbolic.axisY.
 ---@param dir_v0v1_angle number Hyperbolic angle (in radians) of the side v0-v1 at v0,
----                             as expected by Shape.rThetaPos.
+---                             as expected by ShapeF.rThetaPos.
 ---@return table v0_out {x, y} coordinates of the first vertex.
 ---@return table v1_out {x, y} coordinates of the second vertex.
 ---@return table v2_out {x, y} coordinates of the third vertex.
-function Shape.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
+function ShapeF.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
     -- 1. Extract v0 coordinates
     local v0x = v0_coord.x or v0_coord[1]
     local v0y = v0_coord.y or v0_coord[2]
@@ -577,8 +577,8 @@ function Shape.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
     if v0x == nil or v0y == nil then
       error("v0_coord must contain recognizable x and y parts (e.g., {x=val, y=val} or {val1,val2}).")
     end
-    if v0y <= Shape.axisY then
-      error(string.format("The y-coordinate of v0_coord (%.2f) must be greater than Shape.axisY (%.2f) in the Upper Half-Plane model.", v0y, Shape.axisY))
+    if v0y <= G.geometries.Hyperbolic.axisY then
+      error(string.format("The y-coordinate of v0_coord (%.2f) must be greater than G.geometries.Hyperbolic.axisY (%.2f) in the Upper Half-Plane model.", v0y, G.geometries.Hyperbolic.axisY))
     end
     
     local v0_out = {v0x, v0y}
@@ -590,7 +590,7 @@ function Shape.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
   
     -- 3. Calculate model-scaled hyperbolic side lengths
     --    The hyperbolic law of cosines gives d_intrinsic = acosh(...).
-    --    The distance used by Shape.rThetaPos should be d_model = Shape.curvature * d_intrinsic.
+    --    The distance used by ShapeF.rThetaPos should be d_model = G.geometries.Hyperbolic.curvature * d_intrinsic.
     local cos_A = math.cos(angle_A)
     local cos_B = math.cos(angle_B)
     local cos_C = math.cos(angle_C)
@@ -605,7 +605,7 @@ function Shape.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
     end
     local cosh_c_val = (cos_A * cos_B + cos_C) / den_c
     local dist_v0v1_intrinsic = math.acosh(cosh_c_val) -- math.acosh is assumed to be defined
-    local dist_v0v1_model = Shape.curvature * dist_v0v1_intrinsic
+    local dist_v0v1_model = G.geometries.Hyperbolic.curvature * dist_v0v1_intrinsic
   
     local den_b = sin_A * sin_C
     if math.abs(den_b) < 1e-9 then
@@ -613,27 +613,27 @@ function Shape.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
     end
     local cosh_b_val = (cos_A * cos_C + cos_B) / den_b
     local dist_v0v2_intrinsic = math.acosh(cosh_b_val)
-    local dist_v0v2_model = Shape.curvature * dist_v0v2_intrinsic
+    local dist_v0v2_model = G.geometries.Hyperbolic.curvature * dist_v0v2_intrinsic
   
-    -- 4. Calculate v1 using Shape.rThetaPos
-    local v1x, v1y = Shape.rThetaPos(v0x, v0y, dist_v0v1_model, dir_v0v1_angle)
+    -- 4. Calculate v1 using ShapeF.rThetaPos
+    local v1x, v1y = ShapeF.rThetaPos(v0x, v0y, dist_v0v1_model, dir_v0v1_angle)
     local v1_out = {v1x, v1y}
   
-    -- 5. Calculate v2 using Shape.rThetaPos
+    -- 5. Calculate v2 using ShapeF.rThetaPos
     --    Angle at v0 is angle_A. For CCW order (v0,v1,v2), turn from v0v1 to v0v2 is -angle_A.
     local dir_v0v2_angle = dir_v0v1_angle - angle_A 
-    local v2x, v2y = Shape.rThetaPos(v0x, v0y, dist_v0v2_model, dir_v0v2_angle)
+    local v2x, v2y = ShapeF.rThetaPos(v0x, v0y, dist_v0v2_model, dir_v0v2_angle)
     local v2_out = {v2x, v2y}
   
     return v0_out, v1_out, v2_out
 end
 
---- return the area of a triangle with vertices (x1,y1), (x2,y2), (x3,y3). not using Shape.curvature, so result is in [0, pi)
+--- return the area of a triangle with vertices (x1,y1), (x2,y2), (x3,y3). not using G.geometries.Hyperbolic.curvature, so result is in [0, pi)
 ---@return number "area of the triangle"
-function Shape.triangleArea(x1,y1,x2,y2,x3,y3)
-    local angleA=math.abs(math.modClamp(Shape.to(x1,y1,x2,y2)-Shape.to(x1,y1,x3,y3)))
-    local angleB=math.abs(math.modClamp(Shape.to(x2,y2,x1,y1)-Shape.to(x2,y2,x3,y3)))
-    local angleC=math.abs(math.modClamp(Shape.to(x3,y3,x1,y1)-Shape.to(x3,y3,x2,y2)))
+function ShapeF.triangleArea(x1,y1,x2,y2,x3,y3)
+    local angleA=math.abs(math.modClamp(ShapeF.to(x1,y1,x2,y2)-ShapeF.to(x1,y1,x3,y3)))
+    local angleB=math.abs(math.modClamp(ShapeF.to(x2,y2,x1,y1)-ShapeF.to(x2,y2,x3,y3)))
+    local angleC=math.abs(math.modClamp(ShapeF.to(x3,y3,x1,y1)-ShapeF.to(x3,y3,x2,y2)))
     return math.pi-angleA-angleB-angleC
 end
 
@@ -641,11 +641,11 @@ end
 ---@return number "barycenter coordinate A"
 ---@return number "barycenter coordinate B"
 ---@return number "barycenter coordinate C"
-function Shape.barycenterCoordinates(x,y,x1,y1,x2,y2,x3,y3)
-    local area=Shape.triangleArea(x1,y1,x2,y2,x3,y3)
-    local areaA=Shape.triangleArea(x,y,x2,y2,x3,y3)
-    local areaB=Shape.triangleArea(x1,y1,x,y,x3,y3)
-    local areaC=Shape.triangleArea(x1,y1,x2,y2,x,y)
+function ShapeF.barycenterCoordinates(x,y,x1,y1,x2,y2,x3,y3)
+    local area=ShapeF.triangleArea(x1,y1,x2,y2,x3,y3)
+    local areaA=ShapeF.triangleArea(x,y,x2,y2,x3,y3)
+    local areaB=ShapeF.triangleArea(x1,y1,x,y,x3,y3)
+    local areaC=ShapeF.triangleArea(x1,y1,x2,y2,x,y)
     return areaA/area, areaB/area, areaC/area
 end
 
@@ -655,14 +655,14 @@ end
 ---@return angle "delta orientation after flipping"
 ---@return number "number of flips" 
 ---@return boolean "after flipLimit loops, true if the point is inside the triangle, false if it is still outside"
-function Shape.flipIntoTriangle(x,y,x1,y1,x2,y2,x3,y3,flipLimit)
+function ShapeF.flipIntoTriangle(x,y,x1,y1,x2,y2,x3,y3,flipLimit)
     --[[
     usage example (due to reflectByLine flip axis thing is kinda spaghetti):
-    v1,v2,v3=Shape.schwarzTriangleVertices(p,q,r,{center.x,center.y},0) -- coords of the triangle vertices
+    v1,v2,v3=ShapeF.schwarzTriangleVertices(p,q,r,{center.x,center.y},0) -- coords of the triangle vertices
     outerx,outery=... before flipping
-    innerx,innery,deltaOrientation,flipCount,inside=Shape.flipIntoTriangle(outerx,outery,v1[1],v1[2],v2[1],v2[2],v3[1],v3[2],20)
+    innerx,innery,deltaOrientation,flipCount,inside=ShapeF.flipIntoTriangle(outerx,outery,v1[1],v1[2],v2[1],v2[2],v3[1],v3[2],20)
     if you want after flip, the direction towards center:
-    innerToCenterDir=Shape.to(innerx,innery,center.x,center.y)
+    innerToCenterDir=ShapeF.to(innerx,innery,center.x,center.y)
     then before flip, the direction is calculated by:
     outerDir=innerToCenterDir-deltaOrientation (this deltaOrientation means afterFlip-beforeFlip, so minus here)
     and, if flipCount is odd, needs an extra flip:
@@ -677,20 +677,20 @@ function Shape.flipIntoTriangle(x,y,x1,y1,x2,y2,x3,y3,flipLimit)
     local dO=0
     while loopCount<flipLimit do
         local inside=true
-        if not Shape.leftToLine(x,y,x1,y1,x2,y2) then
-            x,y,dO=Shape.reflectByLine(x,y,x1,y1,x2,y2)
+        if not ShapeF.leftToLine(x,y,x1,y1,x2,y2) then
+            x,y,dO=ShapeF.reflectByLine(x,y,x1,y1,x2,y2)
             inside=false
             deltaOrientationSum=-deltaOrientationSum+dO
             flipCount=flipCount+1
         end
-        if not Shape.leftToLine(x,y,x2,y2,x3,y3) then
-            x,y,dO=Shape.reflectByLine(x,y,x2,y2,x3,y3)
+        if not ShapeF.leftToLine(x,y,x2,y2,x3,y3) then
+            x,y,dO=ShapeF.reflectByLine(x,y,x2,y2,x3,y3)
             inside=false
             deltaOrientationSum=-deltaOrientationSum+dO
             flipCount=flipCount+1
         end
-        if not Shape.leftToLine(x,y,x3,y3,x1,y1) then
-            x,y,dO=Shape.reflectByLine(x,y,x3,y3,x1,y1)
+        if not ShapeF.leftToLine(x,y,x3,y3,x1,y1) then
+            x,y,dO=ShapeF.reflectByLine(x,y,x3,y3,x1,y1)
             inside=false
             deltaOrientationSum=-deltaOrientationSum+dO
             flipCount=flipCount+1
@@ -711,10 +711,10 @@ end
 ---@param step number
 ---@param maxPoints number
 ---@return table[] points "table of points, each point is a table with x and y attributes"
-function Shape.segmentPoints(x1,y1,x2,y2,step,maxPoints)
+function ShapeF.segmentPoints(x1,y1,x2,y2,step,maxPoints)
     local points={}
-    local distance=Shape.distance(x1,y1,x2,y2)
-    if distance<Shape.EPS then
+    local distance=ShapeF.distance(x1,y1,x2,y2)
+    if distance<ShapeF.EPS then
         return {{x=x1,y=y1},{x=x2,y=y2}} -- if distance is 0, return two points
     end
     local numPoints=math.ceil(distance/step)
@@ -722,9 +722,9 @@ function Shape.segmentPoints(x1,y1,x2,y2,step,maxPoints)
         numPoints=maxPoints
     end
     local stepSize=distance/numPoints
-    local dir=Shape.to(x1,y1,x2,y2)
+    local dir=ShapeF.to(x1,y1,x2,y2)
     for i=0,numPoints do
-        local x,y=Shape.rThetaPos(x1,y1,stepSize*i,dir)
+        local x,y=ShapeF.rThetaPos(x1,y1,stepSize*i,dir)
         points[i+1]={x=x,y=y}
     end
     return points
@@ -736,7 +736,7 @@ end
 ---@param forceModel any|nil "if provided, use this hyperbolic model instead of G.viewMode.hyperbolicModel."
 ---@return coordinate "x of screen position"
 ---@return coordinate "y of screen position"
-function Shape.screenPosition(x,y,forceModel)
+function ShapeF.screenPosition(x,y,forceModel)
     local model=forceModel or G.viewMode.hyperbolicModel
     local object=G.viewMode.object
     if not object or G.viewMode.mode~=G.CONSTANTS.VIEW_MODES.FOLLOW then
@@ -744,10 +744,10 @@ function Shape.screenPosition(x,y,forceModel)
     end
     local xo,yo=object.x,object.y
     local rotateAngle=object.naturalDirection or 0
-    local x1,y1=Shape.rotateAround(x,y,-rotateAngle,xo,yo)
+    local x1,y1=ShapeF.rotateAround(x,y,-rotateAngle,xo,yo)
     local ax,ay=WINDOW_WIDTH/2+G.viewMode.viewOffset.x, WINDOW_HEIGHT/2+G.viewMode.viewOffset.y
     -- move and zoom xo,yo to ax,ay
-    local axisY=Shape.axisY
+    local axisY=G.geometries.Hyperbolic.axisY
     local zoom=(ay-axisY)/(yo-axisY)
     local dx=ax-xo*zoom
     local x2,y2=x1*zoom+dx,(y1-axisY)*zoom+axisY
@@ -772,13 +772,13 @@ function Shape.screenPosition(x,y,forceModel)
     return wx*r+WINDOW_WIDTH/2, wy*r+WINDOW_HEIGHT/2
 end
 
---- inverse of Shape.screenPosition. Given screen position x,y, return the hyperbolic position before hyperbolicRotateShader transforming.
+--- inverse of ShapeF.screenPosition. Given screen position x,y, return the hyperbolic position before hyperbolicRotateShader transforming.
 ---@param x coordinate
 ---@param y coordinate
 ---@param forceModel any|nil "if provided, use this hyperbolic model instead of G.viewMode.hyperbolicModel."
 ---@return coordinate "x of coordinate system position"
 ---@return coordinate "y of coordinate system position"
-function Shape.inverseScreenPosition(x,y,forceModel)
+function ShapeF.inverseScreenPosition(x,y,forceModel)
     local hyperbolicModel=forceModel or G.viewMode.hyperbolicModel
     local object=G.viewMode.object
     if not object or G.viewMode.mode~=G.CONSTANTS.VIEW_MODES.FOLLOW then
@@ -794,22 +794,22 @@ function Shape.inverseScreenPosition(x,y,forceModel)
         end
         wx,wy=wy,-wx
 
-        local z0x,z0y=WINDOW_WIDTH/2,WINDOW_HEIGHT/2-Shape.axisY
+        local z0x,z0y=WINDOW_WIDTH/2,WINDOW_HEIGHT/2-G.geometries.Hyperbolic.axisY
         local z0cx,z0cy=z0x,-z0y
         local numex,numey=-wx*z0cx+wy*z0cy+z0x, -wx*z0cy-wy*z0cx+z0y
         local denox,denoy=1-wx,-wy
         local denosq=denox*denox+denoy*denoy
         local zx,zy=(numex*denox+numey*denoy)/denosq, (numey*denox-numex*denoy)/denosq
-        x,y=zx,zy+Shape.axisY
+        x,y=zx,zy+G.geometries.Hyperbolic.axisY
     end
     local ax,ay=WINDOW_WIDTH/2+G.viewMode.viewOffset.x, WINDOW_HEIGHT/2+G.viewMode.viewOffset.y
     local xo,yo=object.x,object.y
     -- move and zoom ax,ay to xo,yo
-    local axisY=Shape.axisY
+    local axisY=G.geometries.Hyperbolic.axisY
     local zoom=(yo-axisY)/(ay-axisY)
     local dx=xo-ax*zoom
     local x1,y1=x*zoom+dx,(y-axisY)*zoom+axisY
     local rotateAngle=object.naturalDirection or 0
-    local x2,y2=Shape.rotateAround(x1,y1,rotateAngle,xo,yo)
+    local x2,y2=ShapeF.rotateAround(x1,y1,rotateAngle,xo,yo)
     return x2,y2
 end

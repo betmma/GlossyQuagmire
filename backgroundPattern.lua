@@ -25,8 +25,8 @@ local calculateSideLength=function(sideNum,angleNum)
     local x1,y1=centerToVertex,0
     local x2,y2=centerToVertex*math.cos(math.pi*2/sideNum),centerToVertex*math.sin(math.pi*2/sideNum) -- two points on a side, on a poincare disk
     local d=2*math.distance(x1,y1,x2,y2)^2/(1-centerToVertex^2)^2
-    local sideLength= math.acosh(1+d)*Shape.curvature -- distance formula of poincare disk. reference: https://en.wikipedia.org/wiki/Poincar%C3%A9_disk_model
-    local circumcircleRadius=2*math.atanh(centerToVertex)*Shape.curvature -- distance formula when 1 point is at center. 
+    local sideLength= math.acosh(1+d)*ShapeF.curvature -- distance formula of poincare disk. reference: https://en.wikipedia.org/wiki/Poincar%C3%A9_disk_model
+    local circumcircleRadius=2*math.atanh(centerToVertex)*ShapeF.curvature -- distance formula when 1 point is at center. 
     sideLengthCache[sideNum]=sideLengthCache[sideNum] or {}
     sideLengthCache[sideNum][angleNum]={sideLength,circumcircleRadius}
     return sideLength,circumcircleRadius
@@ -34,10 +34,10 @@ end
 BackgroundPattern.calculateSideLength=calculateSideLength
 
 local function getCenterOfPolygonWithSide(x1,y1,x2,y2,sideNum,angleNum)
-    local direction=Shape.to(x2,y2,x1,y1)
+    local direction=ShapeF.to(x2,y2,x1,y1)
     local toCenterDirection=direction+math.pi*2/angleNum/2
     local _,centerRadius=calculateSideLength(sideNum,angleNum)
-    local x,y=Shape.rThetaPos(x2,y2,centerRadius,toCenterDirection)
+    local x,y=ShapeF.rThetaPos(x2,y2,centerRadius,toCenterDirection)
     return x,y
 end
 BackgroundPattern.getCenterOfPolygonWithSide=getCenterOfPolygonWithSide
@@ -45,10 +45,10 @@ BackgroundPattern.getCenterOfPolygonWithSide=getCenterOfPolygonWithSide
 local function drawSideLine(x1,y1,x2,y2,color)
     local colorref={love.graphics.getColor()}
     love.graphics.setColor(color[1],color[2],color[3])
-    local num=math.ceil(math.min(25,Shape.distance(x1,y1,x2,y2)/10))
-    Shape.drawSegment(x1,y1,x2,y2,num)
+    local num=math.ceil(math.min(25,ShapeF.distance(x1,y1,x2,y2)/10))
+    ShapeF.drawSegment(x1,y1,x2,y2,num)
     -- love.graphics.setColor(0.35,0.15,0.8)
-    -- Shape.drawSegment(x1+1,y1+1,x2+1,y2+1,num)
+    -- ShapeF.drawSegment(x1+1,y1+1,x2+1,y2+1,num)
     love.graphics.setColor(colorref[1],colorref[2],colorref[3])
 end
 
@@ -56,22 +56,22 @@ local function getSideFacePolygonVertices(x1,y1,x2,y2,sideNum,angleNum)
     local vertices={}
     -- since love.graphics.polygon draws straight sides, need to insert vertices on each hyperbolic side to smooth the curve
     local function addVerticesOnSide(x1,y1,x2,y2,num)
-        local xCenter,radius=Shape.lineCenter(x1,y1,x2,y2)
-        local theta1,theta2=math.atan2(y1-Shape.axisY,x1-xCenter),math.atan2(y2-Shape.axisY,x2-xCenter)
+        local xCenter,radius=ShapeF.lineCenter(x1,y1,x2,y2)
+        local theta1,theta2=math.atan2(y1-ShapeF.axisY,x1-xCenter),math.atan2(y2-ShapeF.axisY,x2-xCenter)
         for i=1,num do
             local alpha=theta1+(theta2-theta1)*(i-1)/(num)
-            local x,y=xCenter+radius*math.cos(alpha),Shape.axisY+radius*math.sin(alpha)
+            local x,y=xCenter+radius*math.cos(alpha),ShapeF.axisY+radius*math.sin(alpha)
             vertices[#vertices+1]=x
             vertices[#vertices+1]=y
         end
     end
     local sideLength=calculateSideLength(sideNum,angleNum)
     for sideIndex=1,sideNum do
-        local alpha1=math.pi*2/angleNum+Shape.to(x2,y2,x1,y1)
-        local num=math.clamp(Shape.distance(x1,y1,x2,y2)/10,3,15)
+        local alpha1=math.pi*2/angleNum+ShapeF.to(x2,y2,x1,y1)
+        local num=math.clamp(ShapeF.distance(x1,y1,x2,y2)/10,3,15)
         addVerticesOnSide(x1,y1,x2,y2,num)
         x1,y1=x2,y2
-        x2,y2=Shape.rThetaPos(x2,y2,sideLength,alpha1)
+        x2,y2=ShapeF.rThetaPos(x2,y2,sideLength,alpha1)
     end
     return vertices
 end
@@ -123,25 +123,25 @@ local function tesselation(point,angle,sideNum,angleNum,iteCount, centerPoint, t
     sidesTable=sidesTable or {}
 
     drawedPointsNum=drawedPointsNum+1
-    local distance0=Shape.distance(point.x,point.y,centerPoint.x,centerPoint.y)
+    local distance0=ShapeF.distance(point.x,point.y,centerPoint.x,centerPoint.y)
     for i=begin,en do
         if not skipInRangeLimit and not math.inRange(point.x,point.y,-400,1200,-5,4000) then
             break
         end
         local alpha=angle+math.pi*2/angleNum*(i)
-        local ret={Shape.rThetaPos(point.x,point.y,r,alpha)}
+        local ret={ShapeF.rThetaPos(point.x,point.y,r,alpha)}
         local newpoint={x=ret[1],y=ret[2]}
-        local distance=Shape.distance(newpoint.x,newpoint.y,centerPoint.x,centerPoint.y)
+        local distance=ShapeF.distance(newpoint.x,newpoint.y,centerPoint.x,centerPoint.y)
         -- these two ifs fully exclude duplicate sides, but points still can duplicate (two points connect to same further point)
-        local centerAngle=Shape.toObj(centerPoint,newpoint)
-        if distance<distance0-Shape.EPS*10 then
+        local centerAngle=ShapeF.toObj(centerPoint,newpoint)
+        if distance<distance0-ShapeF.EPS*10 then
             goto continue
-        elseif distance<distance0+Shape.EPS*10 then -- same distance on both ends: check angle
-            if Shape.toObj(centerPoint,point)>centerAngle then
+        elseif distance<distance0+ShapeF.EPS*10 then -- same distance on both ends: check angle
+            if ShapeF.toObj(centerPoint,point)>centerAngle then
                 goto continue
             end
         end
-        local centerDistance=Shape.distanceObj(centerPoint,newpoint)
+        local centerDistance=ShapeF.distanceObj(centerPoint,newpoint)
         local key=math.ceil(centerDistance)*1000+math.floor(centerAngle*1000)
         if not visitedPoints[key] then -- skip redundant new point
             adjacentPoints[#adjacentPoints+1]=newpoint
@@ -157,7 +157,7 @@ local function tesselation(point,angle,sideNum,angleNum,iteCount, centerPoint, t
     local angles={}
     for i=1,#adjacentPoints do
         local newpoint=adjacentPoints[i]
-        local newangle=Shape.to(newpoint.x,newpoint.y,point.x,point.y)
+        local newangle=ShapeF.to(newpoint.x,newpoint.y,point.x,point.y)
         table.insert(angles,newangle)
         pointsQueue[#pointsQueue+1]={newpoint,newangle,iteCount}
         -- tesselation(newpoint,newangle,sideNum,angleNum,iteCount,color,i==1,centerPoint)
@@ -227,15 +227,15 @@ end
 -- local testImage = love.graphics.newImage( "assets/test.png" )
 -- testImage:setWrap("repeat", "repeat") -- set texture to repeat so that it can be used in shader
 function MainMenuTesselation:draw()
-    local ay=Shape.axisY
-    Shape.axisY=-2
+    local ay=ShapeF.axisY
+    ShapeF.axisY=-2
     local width=love.graphics.getLineWidth()
     love.graphics.setLineWidth(10)
     love.graphics.setShader(self.shader)
     local uvPoses=self.uvPoses
     local t=self.frame/551
     local x,y=400+50*math.sin(t),300+220*math.cos(t)
-    local V0,V1,V2=Shape.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},self.frame/131)
+    local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},self.frame/131)
     -- local V0 = {400, 300}
     -- local V1 = {500, 300}
     -- local V2 = {400, 400}
@@ -245,7 +245,7 @@ function MainMenuTesselation:draw()
     shader:send("tex_uv_V0", uvPoses[1])
     shader:send("tex_uv_V1", uvPoses[2])
     shader:send("tex_uv_V2", uvPoses[3])
-    shader:send("shape_axis_y", Shape.axisY)
+    shader:send("shape_axis_y", ShapeF.axisY)
     -- love.graphics.draw(testImage, 0,0)
     love.graphics.draw(Asset.backgroundImage, 0,0)
     love.graphics.setShader()
@@ -253,7 +253,7 @@ function MainMenuTesselation:draw()
     -- love.graphics.circle("fill",V1[1],V1[2],25)
     -- love.graphics.circle("fill",V2[1],V2[2],25)
     love.graphics.setLineWidth(width)
-    Shape.axisY=ay
+    ShapeF.axisY=ay
 end
 BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 
@@ -350,8 +350,8 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 --     love.graphics.setColor(1,1,1,1)
 --     local shader=love.graphics.getShader()
 --     Asset.setHyperbolicRotateShader() -- contains G.UseHypRotShader check
---     local ay=Shape.axisY
---     -- Shape.axisY=-10
+--     local ay=ShapeF.axisY
+--     -- ShapeF.axisY=-10
 --     local width=love.graphics.getLineWidth()
 --     love.graphics.setLineWidth(10)
 --     local overallColorScale=self.overallColorScale
@@ -377,7 +377,7 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 --         end
 --     end
 --     love.graphics.setLineWidth(width)
---     Shape.axisY=ay
+--     ShapeF.axisY=ay
 --     love.graphics.setShader(shader)
 -- end
 -- BackgroundPattern.FixedTesselation=FixedTesselation
@@ -426,12 +426,12 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 
 --     local centerPoint=self.centerPoint
 --     local updateRange=self.updateRange
---     local currentDistance=Shape.distance(target.x,target.y,centerPoint.x,centerPoint.y)
+--     local currentDistance=ShapeF.distance(target.x,target.y,centerPoint.x,centerPoint.y)
 --     if currentDistance>updateRange then -- should update the tesselation
 --         local closestPointIndex=1
---         local closestDistance=Shape.distance(target.x,target.y,self.adjacentPoints[1].x,self.adjacentPoints[1].y)
+--         local closestDistance=ShapeF.distance(target.x,target.y,self.adjacentPoints[1].x,self.adjacentPoints[1].y)
 --         for i=2,#self.adjacentPoints do -- first check all adjacentPoints and see if any is closer to the target
---             local distance=Shape.distance(target.x,target.y,self.adjacentPoints[i].x,self.adjacentPoints[i].y)
+--             local distance=ShapeF.distance(target.x,target.y,self.adjacentPoints[i].x,self.adjacentPoints[i].y)
 --             if distance<closestDistance then
 --                 closestDistance=distance
 --                 closestPointIndex=i
@@ -648,20 +648,20 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 --     self.camMoveRange={0.3,0.0}
 --     self.camMoveSpeed=0.2
 --     self.p,self.q,self.r=3,6,6
---     local V0,V1,V2=Shape.schwarzTriangleVertices(self.p,self.q,self.r,{0,Shape.axisY+100-1},0)
---     local length01=Shape.distance(V0[1],V0[2],V1[1],V1[2])
---     local length02=Shape.distance(V0[1],V0[2],V2[1],V2[2])
---     local length12=Shape.distance(V1[1],V1[2],V2[1],V2[2])
+--     local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{0,ShapeF.axisY+100-1},0)
+--     local length01=ShapeF.distance(V0[1],V0[2],V1[1],V1[2])
+--     local length02=ShapeF.distance(V0[1],V0[2],V2[1],V2[2])
+--     local length12=ShapeF.distance(V1[1],V1[2],V2[1],V2[2])
 --     self.tesseLoopLength=length01*2 -- based on pqr, the loop length has many possibilities. other possible values include (L01+L02+L12)*2, (L01+L02)*2
 --     self.tesseDistance=0.01 -- distance of tessellation moved along the path. not camera
 --     self.tesseMoveSpeed=0.3
 --     local autoMove=false
 --     self.paramSendFunction=function(self,shader)
 --         local l=length01-self.tesseDistance
---         local x,y,dir=Shape.rThetaPosT(0,Shape.axisY+1,l,0)
+--         local x,y,dir=ShapeF.rThetaPosT(0,ShapeF.axisY+1,l,0)
 --         -- dir=dir+(l>0 and math.pi or 0)
---         local V0,V1,V2=Shape.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},dir)
---         local axisY=Shape.axisY
+--         local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},dir)
+--         local axisY=ShapeF.axisY
 --         V0[2]=V0[2]-axisY
 --         V1[2]=V1[2]-axisY
 --         V2[2]=V2[2]-axisY
@@ -746,10 +746,10 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 --     self.cam_translation={0.1,0,0.35}
 --     self.cam_pitch=math.pi*-0.2
 --     self.p,self.q,self.r=5,2,4
---     local V0,V1,V2=Shape.schwarzTriangleVertices(self.p,self.q,self.r,{0,-1},0)
---     local length01=Shape.distance(V0[1],V0[2],V1[1],V1[2])
---     local length02=Shape.distance(V0[1],V0[2],V2[1],V2[2])
---     local length12=Shape.distance(V1[1],V1[2],V2[1],V2[2])
+--     local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{0,-1},0)
+--     local length01=ShapeF.distance(V0[1],V0[2],V1[1],V1[2])
+--     local length02=ShapeF.distance(V0[1],V0[2],V2[1],V2[2])
+--     local length12=ShapeF.distance(V1[1],V1[2],V2[1],V2[2])
 --     self.tesseLoopLength=(length01+length02)*2
 --     self.debug=false
 --     if self.debug then -- a debug mode where pattern doesnt move and camera move range is increased
@@ -827,8 +827,8 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 --     self.camMoveSpeed=0.5
 --     self.holeSize = args and args.holeSize or 0.0
 --     self.holeIsHorizon = args and args.holeIsHorizon or false
---     local axisY=Shape.axisY
---     local V0,V1,V2=Shape.schwarzTriangleVertices(self.p,self.q,self.r,{1,axisY+1},0)
+--     local axisY=ShapeF.axisY
+--     local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{1,axisY+1},0)
 --     V0[2]=V0[2]-axisY
 --     V1[2]=V1[2]-axisY
 --     V2[2]=V2[2]-axisY

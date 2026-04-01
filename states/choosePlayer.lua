@@ -75,7 +75,7 @@ return {
                             self.y=math.lerp(self.y,(self.currentOptionIndex-1)*optionCollapseYGap+10,lerpRatio)
                             if self.focused and isPressed('z') then
                                 local selectedShotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player][self.currentOptionIndex]
-                                G.runInfo.player=player
+                                G.runInfo.playerType=player
                                 G.runInfo.shotType=selectedShotType
                                 G:switchState(G.STATES.IN_GAME)
                                 SFX:play('select',true)
