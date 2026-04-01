@@ -7,7 +7,7 @@
 ---@field to fun(self,position:Position,target:Position):number from the [position], the direction facing the [target] (if multiple directions are possible, return the one along which the distance is shortest)
 ---@field sideToLine fun(self,position:Position,linePoint1:Position,linePoint2:Position):boolean returns which side of the line formed by linePoint1 and linePoint2 the position is on. it doesn't important which side is true or false.
 -------- below are related to drawing
----@field toScreen fun(self,position:Position):Position[] convert the position in geometry space to screen space. it's possible to return multiple positions for later shader processing, and the draw function needs to handle that. it could consider the viewConfig (and like following in it).
+---@field toScreen fun(self,position:Position):PossiblePosition[] convert the position in geometry space to screen space. it's possible to return multiple positions for later shader processing, and the draw function needs to handle that. if returns multiple positions (like to two circles), ensure the order (first element goes to the first circle. if does not map to first circle, first element should be Dummy). it could consider the viewConfig (and like following in it).
 ---@field canSimpleDraw fun(self,position:Position,radius:number):boolean returns whether an object at the position with the radius (in geometry space) can be drawn with a simple quad within acceptable distortion. if false, the object should be drawn with a custom mesh.
 ---@field applyDrawShader fun(self,viewer:Viewer):nil apply shader for drawing objects in this geometry if needed. the viewer is usually the player, and the shader will need the viewer's position and direction to do correct projection.
 ---@field applyForegroundShader fun(self):nil apply shader for drawing foreground. like make a rectangle hole to show the gameplay area.
@@ -20,6 +20,10 @@ function GeometryBase:new()
     error("Geometry cannot be instantiated.")
 end
 
+---@class Dummy
+---@field dummy true
+GeometryBase.Dummy={dummy=true} -- for toScreen to return when there is no corresponding screen position
+
 ---@class ViewConfig
 ---@field following boolean whether the view will follow the player.
 ---@field screenCenter Position if following is true, the view will put player at this position on screen.
@@ -27,6 +31,8 @@ end
 ---@class Position
 ---@field x number
 ---@field y number
+
+---@alias PossiblePosition Position|Dummy
 
 ---@class Viewer
 ---@field viewDirection number note that it doesn't need to be the same as the direction of movement.

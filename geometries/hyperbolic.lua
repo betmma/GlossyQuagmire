@@ -18,9 +18,9 @@ Hyperbolic.HYPERBOLIC_MODELS={UHP=0,P_DISK=1,K_DISK=2} -- use number is because 
 Hyperbolic.HYPERBOLIC_MODELS_COUNT=3
 ---@type HyperbolicViewConfig
 Hyperbolic.viewConfig={
-    following=false,
+    following=true,
     screenCenter={x=WINDOW_WIDTH/4,y=WINDOW_HEIGHT/2},
-    hyperbolicModel=Hyperbolic.HYPERBOLIC_MODELS.UHP,
+    hyperbolicModel=Hyperbolic.HYPERBOLIC_MODELS.P_DISK,
     diskRadiusBase={
         [Hyperbolic.HYPERBOLIC_MODELS.P_DISK]=1,
         [Hyperbolic.HYPERBOLIC_MODELS.K_DISK]=1

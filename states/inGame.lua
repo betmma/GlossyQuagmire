@@ -59,6 +59,7 @@ return {
     end,
     draw=G.CONSTANTS.DRAW,
     drawText=function(self)
+        GameObject:drawTextAll()
         if love.keyboard.isDown('f2') then
             return
         end

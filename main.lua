@@ -1,4 +1,4 @@
-VERSION="0.0.3.4"
+VERSION="0.0.3.5"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
@@ -22,7 +22,7 @@ function love.load()
     EM = EventManager
     Shape = require "shape"
     Player = require "player"
-    require "shapeFunctions"
+    -- require "shapeFunctions"
     -- Circle = require "circle"
     -- Laser=require"laser"
     -- PolyLine = require "polyline"

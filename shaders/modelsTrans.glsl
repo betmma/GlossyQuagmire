@@ -100,13 +100,13 @@ vec2 Transform2MakePlayerAtAimPos(vec2 pos, vec2 player_pos, vec2 aim_pos, float
 }
 
 // 3. Convert the position to the other hyperbolic model (UHP, P-Disk, K-Disk)
-vec2 Convert2OtherModel(vec2 pos, float axisY, float rFactor, int hyperbolic_model) {
+vec2 Convert2OtherModel(vec2 pos, vec2 center, float axisY, float rFactor, int hyperbolic_model) {
     if (hyperbolic_model == HYPERBOLIC_MODEL_UHP) {
         return pos; // No conversion needed for UHP
     }
     vec2 screen_size = love_ScreenSize.xy; 
     vec2 z_prime = vec2(pos.x, pos.y - axisY);
-    vec2 z0_prime = vec2(screen_size.x/2.0, screen_size.y/2.0 - axisY);
+    vec2 z0_prime = vec2(center.x, center.y - axisY);
 
     vec2 z0_prime_conj = vec2(z0_prime.x, -z0_prime.y);
     vec2 numerator = z_prime - z0_prime;
@@ -122,19 +122,19 @@ vec2 Convert2OtherModel(vec2 pos, float axisY, float rFactor, int hyperbolic_mod
         w = w * ww;
     }
     float r= 0.5 * min(screen_size.x, screen_size.y) * rFactor;
-    vec2 screen_pos = vec2(screen_size.x / 2.0 + w.x * r, screen_size.y/2.0 + w.y * r);
+    vec2 screen_pos = vec2(center.x + w.x * r, center.y + w.y * r);
     return screen_pos;
 }
 
 
 // anti 3. Convert position in the other hyperbolic model to UHP
-vec2 ConvertFromOtherModel(vec2 pos, float axisY, float rFactor, int hyperbolic_model) {
+vec2 ConvertFromOtherModel(vec2 pos, vec2 center, float axisY, float rFactor, int hyperbolic_model) {
     if (hyperbolic_model == HYPERBOLIC_MODEL_UHP) {
         return pos; // No conversion needed for UHP
     }
     vec2 screen_size = love_ScreenSize.xy; 
     float r= 0.5 * min(screen_size.x, screen_size.y) * rFactor;
-    vec2 w = vec2((pos.x - screen_size.x / 2.0) / r, (pos.y - screen_size.y / 2.0) / r);
+    vec2 w = vec2((pos.x - center.x) / r, (pos.y - center.y) / r);
 
     float ww = dot(w, w);
     if(ww>1.0) {
@@ -146,7 +146,7 @@ vec2 ConvertFromOtherModel(vec2 pos, float axisY, float rFactor, int hyperbolic_
     }
     w=vec2(w.y,-w.x); // i dunno why a 90 degrees rotation is needed
     
-    vec2 z0_prime = vec2(screen_size.x / 2.0, screen_size.y / 2.0 - axisY);
+    vec2 z0_prime = vec2(center.x, center.y - axisY);
     vec2 z0_prime_conj = vec2(z0_prime.x, -z0_prime.y);
 
     // Calculate the numerator: z0_prime - w * z0_prime_conj

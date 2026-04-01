@@ -15,6 +15,79 @@ function Empty:new(args)
 end
 BackgroundPattern.Empty=Empty
 
+local ShapeF=require('geometries.geometryBase').Hyperbolic
+
+--- Calculates the coordinates of the vertices of a Schwarz triangle (p,q,r)
+--- in the Upper Half-Plane model. vertices are ordered in counter-clockwise direction.
+---@param p integer Reciprocal of the angle at vertex v0 (angle = pi/p).
+---@param q integer Reciprocal of the angle at vertex v1 (angle = pi/q).
+---@param r integer Reciprocal of the angle at vertex v2 (angle = pi/r).
+---@param v0_coord table Coordinates of the first vertex, e.g., {x=0, y=1} or {0,1}.
+---                     It's assumed y-coordinate is > ShapeF.axisY.
+---@param dir_v0v1_angle number Hyperbolic angle (in radians) of the side v0-v1 at v0,
+---                             as expected by ShapeF.rThetaGo.
+---@return table v0_out {x, y} coordinates of the first vertex.
+---@return table v1_out {x, y} coordinates of the second vertex.
+---@return table v2_out {x, y} coordinates of the third vertex.
+function ShapeF.schwarzTriangleVertices(p, q, r, v0_coord, dir_v0v1_angle)
+    -- 1. Extract v0 coordinates
+    local v0x = v0_coord.x or v0_coord[1]
+    local v0y = v0_coord.y or v0_coord[2]
+  
+    if v0x == nil or v0y == nil then
+      error("v0_coord must contain recognizable x and y parts (e.g., {x=val, y=val} or {val1,val2}).")
+    end
+    if v0y <= ShapeF.axisY then
+      error(string.format("The y-coordinate of v0_coord (%.2f) must be greater than ShapeF.axisY (%.2f) in the Upper Half-Plane model.", v0y, ShapeF.axisY))
+    end
+    
+    local v0_out = {v0x, v0y}
+  
+    -- 2. Calculate internal angles of the triangle (A at v0, B at v1, C at v2)
+    local angle_A = math.pi / p
+    local angle_B = math.pi / q
+    local angle_C = math.pi / r
+  
+    -- 3. Calculate model-scaled hyperbolic side lengths
+    --    The hyperbolic law of cosines gives d_intrinsic = acosh(...).
+    --    The distance used by ShapeF.rThetaGo should be d_model = ShapeF.curvature * d_intrinsic.
+    local cos_A = math.cos(angle_A)
+    local cos_B = math.cos(angle_B)
+    local cos_C = math.cos(angle_C)
+    local sin_A = math.sin(angle_A)
+    local sin_B = math.sin(angle_B)
+    local sin_C = math.sin(angle_C) -- Used for side b
+  
+    -- Check for valid denominators to prevent division by zero or issues with acosh input
+    local den_c = sin_A * sin_B
+    if math.abs(den_c) < 1e-9 then 
+      error("Degenerate triangle geometry for side c (p or q too large, or invalid). sin(A) or sin(B) is near zero.")
+    end
+    local cosh_c_val = (cos_A * cos_B + cos_C) / den_c
+    local dist_v0v1_intrinsic = math.acosh(cosh_c_val) -- math.acosh is assumed to be defined
+    local dist_v0v1_model = ShapeF.curvature * dist_v0v1_intrinsic
+  
+    local den_b = sin_A * sin_C
+    if math.abs(den_b) < 1e-9 then
+      error("Degenerate triangle geometry for side b (p or r too large, or invalid). sin(A) or sin(C) is near zero.")
+    end
+    local cosh_b_val = (cos_A * cos_C + cos_B) / den_b
+    local dist_v0v2_intrinsic = math.acosh(cosh_b_val)
+    local dist_v0v2_model = ShapeF.curvature * dist_v0v2_intrinsic
+  
+    -- 4. Calculate v1 using ShapeF.rThetaGo
+    local v1 = ShapeF:rThetaGo({x=v0x,y=v0y}, dist_v0v1_model, dir_v0v1_angle)
+    local v1_out = {v1.x, v1.y}
+  
+    -- 5. Calculate v2 using ShapeF.rThetaGo
+    --    Angle at v0 is angle_A. For CCW order (v0,v1,v2), turn from v0v1 to v0v2 is -angle_A.
+    local dir_v0v2_angle = dir_v0v1_angle - angle_A 
+    local v2 = ShapeF:rThetaGo({x=v0x,y=v0y}, dist_v0v2_model, dir_v0v2_angle)
+    local v2_out = {v2.x, v2.y}
+  
+    return v0_out, v1_out, v2_out
+end
+
 local sideLengthCache={}
 -- calculate {the side length} and {radius of circumcircle} of a polygon with [sideNum] sides and each angle 2pi/[angleNum] in hyperbolic geometry. The result is cached.
 local calculateSideLength=function(sideNum,angleNum)
@@ -34,68 +107,13 @@ end
 BackgroundPattern.calculateSideLength=calculateSideLength
 
 local function getCenterOfPolygonWithSide(x1,y1,x2,y2,sideNum,angleNum)
-    local direction=ShapeF.to(x2,y2,x1,y1)
+    local direction=ShapeF:to({x=x2,y=y2}, {x=x1,y=y1})
     local toCenterDirection=direction+math.pi*2/angleNum/2
     local _,centerRadius=calculateSideLength(sideNum,angleNum)
-    local x,y=ShapeF.rThetaPos(x2,y2,centerRadius,toCenterDirection)
+    local x,y=ShapeF:rThetaGo({x=x2,y=y2}, centerRadius, toCenterDirection)
     return x,y
 end
 BackgroundPattern.getCenterOfPolygonWithSide=getCenterOfPolygonWithSide
-
-local function drawSideLine(x1,y1,x2,y2,color)
-    local colorref={love.graphics.getColor()}
-    love.graphics.setColor(color[1],color[2],color[3])
-    local num=math.ceil(math.min(25,ShapeF.distance(x1,y1,x2,y2)/10))
-    ShapeF.drawSegment(x1,y1,x2,y2,num)
-    -- love.graphics.setColor(0.35,0.15,0.8)
-    -- ShapeF.drawSegment(x1+1,y1+1,x2+1,y2+1,num)
-    love.graphics.setColor(colorref[1],colorref[2],colorref[3])
-end
-
-local function getSideFacePolygonVertices(x1,y1,x2,y2,sideNum,angleNum)
-    local vertices={}
-    -- since love.graphics.polygon draws straight sides, need to insert vertices on each hyperbolic side to smooth the curve
-    local function addVerticesOnSide(x1,y1,x2,y2,num)
-        local xCenter,radius=ShapeF.lineCenter(x1,y1,x2,y2)
-        local theta1,theta2=math.atan2(y1-ShapeF.axisY,x1-xCenter),math.atan2(y2-ShapeF.axisY,x2-xCenter)
-        for i=1,num do
-            local alpha=theta1+(theta2-theta1)*(i-1)/(num)
-            local x,y=xCenter+radius*math.cos(alpha),ShapeF.axisY+radius*math.sin(alpha)
-            vertices[#vertices+1]=x
-            vertices[#vertices+1]=y
-        end
-    end
-    local sideLength=calculateSideLength(sideNum,angleNum)
-    for sideIndex=1,sideNum do
-        local alpha1=math.pi*2/angleNum+ShapeF.to(x2,y2,x1,y1)
-        local num=math.clamp(ShapeF.distance(x1,y1,x2,y2)/10,3,15)
-        addVerticesOnSide(x1,y1,x2,y2,num)
-        x1,y1=x2,y2
-        x2,y2=ShapeF.rThetaPos(x2,y2,sideLength,alpha1)
-    end
-    return vertices
-end
-
--- draw a face of a polygon. x1,y1,x2,y2: two points of the side. color: {r,g,b}. sideNum: how many sides do each polygon have. angleNum: how many sides are connected to each point.
--- bad: since a polygon is drawn once for each side, bigger sideNum causes a polygon to be drawn redundant sideNum/2 times. should be fixed with redundant removal in FixedTesselation (but not in MainMenuTesselation yet)
-local function drawSideFace(vertices,color)
-    local colorref={love.graphics.getColor()}
-    love.graphics.setColor(color[1],color[2],color[3])
-    -- without triangulate love.graphics.polygon("fill",vertices) is buggy at some concave part
-    local ok, triangles = pcall(love.math.triangulate,vertices)
-    if not ok then
-        local stringVertices = ""
-        for i = 1, #vertices, 2 do
-            stringVertices = stringVertices .. "(" .. string.format("%.2f", vertices[i]) .. ", " .. string.format("%.2f", vertices[i + 1]) .. ") "
-        end
-        error("Error triangulating vertices: "..stringVertices..'\n'..triangles)
-        return
-    end
-    for i, triangle in ipairs(triangles) do
-        love.graphics.polygon("fill", triangle)
-    end
-    love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
-end
 
 --[[
 params: 
@@ -123,25 +141,25 @@ local function tesselation(point,angle,sideNum,angleNum,iteCount, centerPoint, t
     sidesTable=sidesTable or {}
 
     drawedPointsNum=drawedPointsNum+1
-    local distance0=ShapeF.distance(point.x,point.y,centerPoint.x,centerPoint.y)
+    local distance0=ShapeF:distance(point,centerPoint)
     for i=begin,en do
         if not skipInRangeLimit and not math.inRange(point.x,point.y,-400,1200,-5,4000) then
             break
         end
         local alpha=angle+math.pi*2/angleNum*(i)
-        local ret={ShapeF.rThetaPos(point.x,point.y,r,alpha)}
+        local ret={ShapeF:rThetaGo(point,r,alpha)}
         local newpoint={x=ret[1],y=ret[2]}
-        local distance=ShapeF.distance(newpoint.x,newpoint.y,centerPoint.x,centerPoint.y)
+        local distance=ShapeF:distance(newpoint,centerPoint)
         -- these two ifs fully exclude duplicate sides, but points still can duplicate (two points connect to same further point)
-        local centerAngle=ShapeF.toObj(centerPoint,newpoint)
+        local centerAngle=ShapeF:to(centerPoint,newpoint)
         if distance<distance0-ShapeF.EPS*10 then
             goto continue
         elseif distance<distance0+ShapeF.EPS*10 then -- same distance on both ends: check angle
-            if ShapeF.toObj(centerPoint,point)>centerAngle then
+            if ShapeF:to(centerPoint,point)>centerAngle then
                 goto continue
             end
         end
-        local centerDistance=ShapeF.distanceObj(centerPoint,newpoint)
+        local centerDistance=ShapeF:distance(centerPoint,newpoint)
         local key=math.ceil(centerDistance)*1000+math.floor(centerAngle*1000)
         if not visitedPoints[key] then -- skip redundant new point
             adjacentPoints[#adjacentPoints+1]=newpoint
@@ -157,7 +175,7 @@ local function tesselation(point,angle,sideNum,angleNum,iteCount, centerPoint, t
     local angles={}
     for i=1,#adjacentPoints do
         local newpoint=adjacentPoints[i]
-        local newangle=ShapeF.to(newpoint.x,newpoint.y,point.x,point.y)
+        local newangle=ShapeF:to(newpoint,point)
         table.insert(angles,newangle)
         pointsQueue[#pointsQueue+1]={newpoint,newangle,iteCount}
         -- tesselation(newpoint,newangle,sideNum,angleNum,iteCount,color,i==1,centerPoint)
@@ -172,18 +190,6 @@ local function tesselation(point,angle,sideNum,angleNum,iteCount, centerPoint, t
 end
 
 BackgroundPattern.tesselation=tesselation
-
--- this function isn't used in main menu cuz sometimes random parameters gets laggy
-local function randomSideNumAndAngleNum()
-    math.randomseed(os.time())
-    local sideNum=math.random(3,8)
-    local angleNum=math.random(3,8)
-    local factor=(sideNum-2)*(angleNum-2)
-    if factor<=4 or factor>20 then -- factor must > 4 to become a hyperbolic tesselation. the 20 limit is to prevent too scattered tesselation
-        return randomSideNumAndAngleNum()
-    end
-    return sideNum,angleNum
-end
 
 local shader=ShaderScan:load_shader('shaders/flipTessellation.glsl')
 
@@ -257,269 +263,6 @@ function MainMenuTesselation:draw()
 end
 BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 
--- local Square=BackgroundPattern:extend()
--- function Square:new(args)
---     Square.super.new(self,args)
---     args=args or {}
---     self.radius=args.radius or 10
---     self.radiusMax=args.radiusMax or 70
---     self.angle=args.angle or math.pi/3
---     self.speed=args.speed or 0.3
--- end
-
--- function Square:update(dt)
---     self.radius=(self.radius+self.speed)%self.radiusMax
---     self.angle=self.angle+self.speed/20
--- end
-
--- function Square:drawOne(r,angle)
---     local xc,yc=400,300
---     local r2=math.cosh(r/10)
---     local points={}
---     for i=1,4 do
---         local alpha=angle+math.pi*2/4*(i-1)
---         local ret={xc+r2*math.cos(alpha),yc+r2*math.sin(alpha)}
---         local newpoint={x=ret[1],y=ret[2]}
---         points[#points+1]=newpoint
---     end
---     local ratio=r/self.radiusMax
---     love.graphics.setColor(0.5,0.7,0.9,ratio*0.3)
---     for i=1,#points do
---         local newpoint=points[i]
---         love.graphics.line(newpoint.x,newpoint.y,points[i%#points+1].x,points[i%#points+1].y)
---     end
--- end
-
--- function Square:draw()
---     local colorref={love.graphics.getColor()}
---     love.graphics.setColor(0,0,0)
---     -- love.graphics.rectangle('fill',0,0,800,600)
---     local width=love.graphics.getLineWidth()
---     love.graphics.setLineWidth(10)
---     self:drawOne(self.radius,self.angle)
---     self:drawOne((self.radius+35)%self.radiusMax,self.angle)
---     love.graphics.setLineWidth(width)
---     love.graphics.setColor(colorref[1],colorref[2],colorref[3])
--- end
-
--- BackgroundPattern.Square=Square
-
-
--- local FixedTesselation=BackgroundPattern:extend()
--- -- FixedTesselation is a tesselation that calculate all sides upon new() and doesn't update. Used in normal levels.
--- function FixedTesselation:new(args)
---     FixedTesselation.super.new(self,args)
---     args=args or {}
---     self.sideNum=args.sideNum or 4
---     self.angleNum=args.angleNum or 5
---     self.centerPoint=args.centerPoint or {x=400,y=300}
---     self.faceColor=args.faceColor or {0.1,0.1,0.1}
---     self.sideColor=args.sideColor or {0.15,0.1,0.2}
---     self.overallColorScale=args.overallColorScale or 1
---     self.toDrawNum=args.toDrawNum or 40
---     self.angle=args.angle or 0
---     self.adjacentPoints,self.angles,self.sidesTable=tesselation(self.centerPoint,self.angle,self.sideNum,self.angleNum,0,nil,self.toDrawNum,nil,true) -- self.adjacentPoints and self.angles are not used in FixedTesselation but in FollowingTesselation so don't remove them
---     self.hashSet={}
---     self.redundantCount=0
---     for i=1,#self.sidesTable do
---         local centerPos={getCenterOfPolygonWithSide(self.sidesTable[i][1].x,self.sidesTable[i][1].y,self.sidesTable[i][2].x,self.sidesTable[i][2].y,self.sideNum,self.angleNum)}
---         local hashValue=Hash64(''..(math.floor(centerPos[1])*8)..(math.floor(centerPos[2])*8).."loool")
---         local color={hashValue[3]/256,hashValue[1]/256,hashValue[2]/256}
---         local hashValueInt=hashValue[1]+hashValue[2]*256+hashValue[3]*256*256+hashValue[4]*256*256*256
---         -- print(i,centerPos[1],centerPos[2],hashValueInt)
---         if self.hashSet[hashValueInt] then
---             self.sidesTable[i].redundantFace=true
---             self.redundantCount=self.redundantCount+1
---         end
---         self.hashSet[hashValueInt]=true
---         self.sidesTable[i].color=color
---         self.sidesTable[i][1]=copy_table(self.sidesTable[i][1]) -- without copying player's hyperbolic rotate can't retrieve the original position (i forgor why tho) and will crash after few frames
---         self.sidesTable[i][2]=copy_table(self.sidesTable[i][2])
---     end
---     -- print(self.redundantCount..' sides: '..#self.sidesTable)
---     self.sideLength=calculateSideLength(self.sideNum,self.angleNum)
--- end
-
--- function FixedTesselation:update(dt)
---     -- fixed tesselation doesn't need to update
--- end
-
--- function FixedTesselation:draw()
---     love.graphics.setColor(0,0,0,1)
---     love.graphics.rectangle('fill',0,0,800,600)
---     love.graphics.setColor(1,1,1,1)
---     local shader=love.graphics.getShader()
---     Asset.setHyperbolicRotateShader() -- contains G.UseHypRotShader check
---     local ay=ShapeF.axisY
---     -- ShapeF.axisY=-10
---     local width=love.graphics.getLineWidth()
---     love.graphics.setLineWidth(10)
---     local overallColorScale=self.overallColorScale
---     local faceColorCoeff=self.faceColor
---     if not self.dontDrawFaces then
---         for i=1,#self.sidesTable do
---             if self.sidesTable[i].redundantFace then
---                 goto continue
---             end
---             local color=self.sidesTable[i].color
---             color={color[1]*faceColorCoeff[1],color[2]*faceColorCoeff[2],color[3]*faceColorCoeff[3]}
---             color={color[1]*overallColorScale,color[2]*overallColorScale,color[3]*overallColorScale}
---             local vertices=getSideFacePolygonVertices(self.sidesTable[i][1].x,self.sidesTable[i][1].y,self.sidesTable[i][2].x,self.sidesTable[i][2].y,self.sideNum,self.angleNum)
---             drawSideFace(vertices,color)
---             ::continue::
---         end
---     end
---     local color=self.sideColor
---     color={color[1]*overallColorScale,color[2]*overallColorScale,color[3]*overallColorScale}
---     if not self.dontDrawSides then
---         for i=1,#self.sidesTable do
---             drawSideLine(self.sidesTable[i][1].x,self.sidesTable[i][1].y,self.sidesTable[i][2].x,self.sidesTable[i][2].y,color)
---         end
---     end
---     love.graphics.setLineWidth(width)
---     ShapeF.axisY=ay
---     love.graphics.setShader(shader)
--- end
--- BackgroundPattern.FixedTesselation=FixedTesselation
-
--- local FollowingTesselation=BackgroundPattern:extend()
--- -- FollowingTesselation is a seemingly fixed tesselation that changes its center point to follow a target object (usually player), so that not need to draw many sides, but still filling the screen in player's view.
--- -- use FixedTesselation to generate the initial tesselation, and whenever the center point leaves the range, calculate the new center point and use a new FixedTesselation to update the sides.
--- function FollowingTesselation:new(args)
---     FollowingTesselation.super.new(self,args)
---     args=args or {}
---     args.sideNum=args.sideNum or 4
---     args.angleNum=args.angleNum or 5
---     args.faceColor=args.faceColor or {0.1,0.1,0.1}
---     args.sideColor=args.sideColor or {0.15,0.1,0.2}
---     args.overallColorScale=args.overallColorScale or 1
---     args.toDrawNum=args.toDrawNum or 40
---     args.centerPoint=args.centerPoint or {x=400,y=300}
---     args.target=args.target or Player.objects[1]
---     args.updateRange=args.updateRange or 50
---     for key, value in pairs(args) do
---         self[key]=value
---     end
---     self.sidesTable=nil
---     self:updateSides()
--- end
-
--- function FollowingTesselation:updateSides()
---     local initialTesselation=FixedTesselation(self)
---     self.adjacentPoints,self.angles,self.sidesTable=initialTesselation.adjacentPoints,initialTesselation.angles,initialTesselation.sidesTable
---     initialTesselation:remove()
--- end
-
--- -- update the tesselation when the target is out of range
--- function FollowingTesselation:update(dt)
---     local target=self.target
---     if not target or target.removed or target:is(Player) and target~=Player.objects[1] then
---         -- look i really dont understand why after pressing r to restart or restart in game end screen, there is only one object in Player.objects, but the target is still the old one, and target.removed is nil. so i have to check if target is Player.objects[1]
---         if Player.objects[1] then
---             self.target=Player.objects[1]
---             target=Player.objects[1]
---         else
---             return
---         end
---     end
---     -- print(self.target.x..', '..self.target.y..', '..(#Player.objects)..', '..(self.target==Player.objects[1]and 't' or 'f'),400,300)
-
---     local centerPoint=self.centerPoint
---     local updateRange=self.updateRange
---     local currentDistance=ShapeF.distance(target.x,target.y,centerPoint.x,centerPoint.y)
---     if currentDistance>updateRange then -- should update the tesselation
---         local closestPointIndex=1
---         local closestDistance=ShapeF.distance(target.x,target.y,self.adjacentPoints[1].x,self.adjacentPoints[1].y)
---         for i=2,#self.adjacentPoints do -- first check all adjacentPoints and see if any is closer to the target
---             local distance=ShapeF.distance(target.x,target.y,self.adjacentPoints[i].x,self.adjacentPoints[i].y)
---             if distance<closestDistance then
---                 closestDistance=distance
---                 closestPointIndex=i
---             end
---         end
---         if closestDistance>currentDistance then -- if the closest point is still farther than the center point, don't update
---             return
---         end
---         local newCenterPoint=self.adjacentPoints[closestPointIndex]
---         local newAngle=self.angles[closestPointIndex]
---         self.centerPoint=newCenterPoint
---         self.angle=newAngle
---         self:updateSides()
-        
---     end
--- end
-
--- function FollowingTesselation:draw()
---     FixedTesselation.draw(self)
--- end
-
--- BackgroundPattern.FollowingTesselation=FollowingTesselation
-
--- local Pendulum=BackgroundPattern:extend()
--- -- euclid pendulum clock (for scene 6-3)
--- function Pendulum:new(args)
---     Pendulum.super.new(self,args)
---     args=args or {}
---     self.radius=args.radius or 500
---     self.amplitude=args.amplitude or 0.1
---     self.period=args.period or 240
---     self.centerPoint=args.centerPoint or {x=400,y=-200}
---     self.point={x=self.centerPoint.x,y=self.centerPoint.y}
---     self.colorRatio=args.colorRatio or 0 -- gradually increase this parameter to make pendulum looks like gradually appear
---     self.frame=0
---     self.noZoom=true
--- end
-
--- function Pendulum:update(dt)
---     self.angle=math.sin(self.frame/self.period*math.pi*2)*self.amplitude+math.pi/2
---     local x,y=math.rThetaPos(self.centerPoint.x,self.centerPoint.y,self.radius,self.angle)
---     self.point={x=x,y=y}
---     self.frame=self.frame+1
--- end
-
--- local clockImage = love.graphics.newImage( "assets/pics/clock.png" )
--- local clockWidth, clockHeight = clockImage:getDimensions()
--- local clockQuad = love.graphics.newQuad(0, 0, clockWidth, clockHeight, clockWidth, clockHeight)
-
--- function Pendulum:draw() -- ugh direct drawing looks kinda cringe. maybe find an image for this later. (done but this is still kept)
---     local colorref={love.graphics.getColor()}
---     local width=love.graphics.getLineWidth()
---     love.graphics.setLineWidth(10)
---     local x1,y1=self.centerPoint.x,self.centerPoint.y
---     local x2,y2=self.point.x,self.point.y
---     local function colorMult(colorTable)
---         return {colorTable[1]*self.colorRatio,colorTable[2]*self.colorRatio,colorTable[3]*self.colorRatio}
---     end
---     -- the background
---     love.graphics.setColor(0,0,0,1)
---     love.graphics.rectangle('fill',0,0,800,600) -- black background, without it part of border won't display due to background has alpha=0, and "add" blend mode doesn't change alpha
-
---     local outerBGColor=colorMult{0.25,0.10,0.04}
---     love.graphics.setColor(outerBGColor)
---     love.graphics.rectangle('fill',250,0,300,400) -- outer rectangle
---     love.graphics.rectangle('fill',230,400,340,30) -- base of clock
---     love.graphics.setColor(colorMult{0.15,0.07,0.02})
---     love.graphics.rectangle('fill',300,100,200,250) -- inner rectangle
---     love.graphics.setColor(colorMult{0.10,0.05,0.02})
---     love.graphics.rectangle('line',300,100,200,250) -- darker sides of inner rectangle
---     love.graphics.rectangle('fill',250,390,300,10) -- shadow of base
---     love.graphics.rectangle('fill',230,430,340,10) -- shadow of base
---     -- the pendulum
---     love.graphics.setColor(colorMult{0.45,0.45,0.38})
---     love.graphics.line(x1,y1,x2,y2)
---     love.graphics.setColor(colorMult{0.25,0.25,0.08})
---     love.graphics.circle("fill",x2,y2,40)
---     -- the upper part of background should block the view of the pendulum
---     love.graphics.setColor(outerBGColor)
---     love.graphics.rectangle('fill',250,0,300,95)
---     love.graphics.setColor(colorMult{0.5,.5,.5})
---     love.graphics.draw(clockImage, clockQuad, 150,0,0,1,1)
---     love.graphics.setLineWidth(width)
---     love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
--- end
-
--- BackgroundPattern.Pendulum=Pendulum
-
 -- -- love2d draws a white rectangle then shader draws pattern.
 -- local Shader=BackgroundPattern:extend()
 -- ---@class ShaderBackground
@@ -565,73 +308,6 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 
 -- BackgroundPattern.Shader=Shader
 
--- local plasmaGlobe=Shader:extend()
--- function plasmaGlobe:new(args)
---     plasmaGlobe.super.new(self,args)
---     args=args or {}
---     self.shader=love.graphics.newShader('shaders/backgrounds/plasmaGlobe.glsl')
---     -- Create iChannel0 (noise texture)
---     local noiseSize = 256
---     local imageData = love.image.newImageData(noiseSize, noiseSize)
-
---     -- The shader samples .x and .yx from iChannel0, so we need at least two noise channels (R and G)
---     imageData:mapPixel(function(x, y, r, g, b, a)
---         local val1 = math.random() -- For .x component
---         local val2 = math.random() -- For .y component (used in .yx)
---         return val1, val2, 0, 1 -- Store in R and G channels
---     end)
---     local iChannel0 = love.graphics.newImage(imageData)
---     iChannel0:setFilter("linear", "linear") -- ShaderToy textures usually have linear filtering
---     iChannel0:setWrap("repeat", "repeat")   -- Important for noise sampling
---     self.cameraAngleX = math.pi/4 -- Corresponds to yaw (left/right)
---     self.cameraAngleY = 0.0 -- Corresponds to pitch (up/down)
---     self.rotationSpeed = math.pi / 1.5 -- Radians per second, adjust for sensitivity
---     self.paramSendFunction=function(self,shader)
---         shader:send("iTime", love.timer.getTime())
---         shader:send("iResolution", {WINDOW_WIDTH, WINDOW_HEIGHT})
-        
---         shader:send("u_camAngleX", self.cameraAngleX)
---         shader:send("u_camAngleY", self.cameraAngleY)
-
---         shader:send("iChannel0", iChannel0)
---     end
--- end
--- plasmaGlobe.update=function(self,dt)
---     -- dt=0.005
---     self.frame=self.frame+1
---     -- if isDown("left") then
---     --     self.cameraAngleX = self.cameraAngleX - self.rotationSpeed * dt
---     -- end
---     -- if isDown("right") then
---     --     self.cameraAngleX = self.cameraAngleX + self.rotationSpeed * dt
---     -- end
---     -- if isDown("up") then
---     --     self.cameraAngleY = self.cameraAngleY + self.rotationSpeed * dt
---     -- end
---     -- if isDown("down") then
---     --     self.cameraAngleY = self.cameraAngleY - self.rotationSpeed * dt
---     -- end
--- end
--- -- testShader.draw=function(self)
--- --     Shader.draw(self)
--- --     love.graphics.print(''..self.cameraAngleX..', '..self.cameraAngleY, 310, 100)
--- -- end
--- BackgroundPattern.PlasmaGlobe=plasmaGlobe
-
--- local fractalShader=love.graphics.newShader('shaders/backgrounds/fractal.glsl')
--- local Fractal=Shader:extend()
--- function Fractal:new(args)
---     Fractal.super.new(self,args)
---     args=args or {}
---     self.shader=fractalShader
---     local randomOffset=math.random(0,1000)
---     self.paramSendFunction=function(self,shader)
---         shader:send("iTime", love.timer.getTime()/3+randomOffset)
---         shader:send("iResolution", {WINDOW_WIDTH, WINDOW_HEIGHT})
---     end
--- end
--- BackgroundPattern.Fractal=Fractal
-
 -- local build_lorentz_mat4=require('import.H3math').build_lorentz_mat4
 -- -- tessellation on H^2 is calculated similar to main menu tessellation: calculate schwarz triangle vertices and send this fundamental triangle to shader. after flip, flip count and barycenter coordinates are used to calculate color and height.
 -- -- due to high computation cost, this could only fit ending / credits
@@ -658,7 +334,7 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 --     local autoMove=false
 --     self.paramSendFunction=function(self,shader)
 --         local l=length01-self.tesseDistance
---         local x,y,dir=ShapeF.rThetaPosT(0,ShapeF.axisY+1,l,0)
+--         local x,y,dir=ShapeF.rThetaGoT(0,ShapeF.axisY+1,l,0)
 --         -- dir=dir+(l>0 and math.pi or 0)
 --         local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},dir)
 --         local axisY=ShapeF.axisY
@@ -738,28 +414,6 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 -- BackgroundPattern.H3Terrain=H3Terrain
 
 
--- local dreamWorldShader=ShaderScan:load_shader('shaders/backgrounds/dreamWorld.glsl')
--- local DreamWorld=H3Terrain:extend()
--- function DreamWorld:new(args)
---     DreamWorld.super.new(self,args)
---     self.shader=dreamWorldShader
---     self.cam_translation={0.1,0,0.35}
---     self.cam_pitch=math.pi*-0.2
---     self.p,self.q,self.r=5,2,4
---     local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{0,-1},0)
---     local length01=ShapeF.distance(V0[1],V0[2],V1[1],V1[2])
---     local length02=ShapeF.distance(V0[1],V0[2],V2[1],V2[2])
---     local length12=ShapeF.distance(V1[1],V1[2],V2[1],V2[2])
---     self.tesseLoopLength=(length01+length02)*2
---     self.debug=false
---     if self.debug then -- a debug mode where pattern doesnt move and camera move range is increased
---         self.camMoveRange={-1,1}
---         self.camMoveSpeed=0.5
---         self.tesseMoveSpeed=0
---     end
--- end
--- BackgroundPattern.DreamWorld=DreamWorld
-
 -- local honeycombShader=ShaderScan:load_shader('shaders/backgrounds/honeycomb.glsl')
 -- local Honeycomb=H3Terrain:extend()
 -- function Honeycomb:new(args)
@@ -815,55 +469,4 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 
 -- BackgroundPattern.Honeycomb=Honeycomb
 
--- local stageShader=ShaderScan:load_shader('shaders/backgrounds/stage.glsl')
--- local Stage=H3Terrain:extend()
--- function Stage:new(args)
---     Stage.super.new(self,args)
---     self.cam_translation={0,1.2,0.8}
---     self.shader=stageShader
---     self.p,self.q,self.r=4,4,4
---     self.cam_pitch=-0.9
---     self.camMoveRange={0.5,0.2}
---     self.camMoveSpeed=0.5
---     self.holeSize = args and args.holeSize or 0.0
---     self.holeIsHorizon = args and args.holeIsHorizon or false
---     local axisY=ShapeF.axisY
---     local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{1,axisY+1},0)
---     V0[2]=V0[2]-axisY
---     V1[2]=V1[2]-axisY
---     V2[2]=V2[2]-axisY
---     -- print('triangle: '..V0[1]..','..V0[2]..' ; '..V1[1]..','..V1[2]..' ; '..V2[1]..','..V2[2])
---     self.paramSendFunction=function(self,shader)
---         shader:send("time", self.frame/60)
---         local trans=self.cam_translation
---         local pitch,yaw,roll=self.cam_pitch,self.cam_yaw,self.cam_roll
---         local mat4=build_lorentz_mat4(pitch, yaw, roll, trans)
---         shader:send("cam_mat4", mat4)
---         shader:send("V0", V0)
---         shader:send("V1", V1)
---         shader:send("V2", V2)
---         -- levelData create this pattern should set holeSize as integer from 1 to 4. ending screen uses 4. coefficient is set here.
---         shader:send("holeSize", self.holeSize*0.3)
---         shader:send("holeIsHorizon", self.holeIsHorizon)
---     end
--- end
--- BackgroundPattern.Stage=Stage
-
--- local youkaiMountainShader=ShaderScan:load_shader('shaders/backgrounds/youkaiMountain.glsl')
--- local YoukaiMountain=H3Terrain:extend()
--- function YoukaiMountain:new(args)
---     YoukaiMountain.super.new(self,args)
---     self.cam_translation={0,0,0.4}
---     self.camMoveRange={0.6,0.8}
---     self.cam_pitch=-0.9
---     self.shader=youkaiMountainShader
---     self.paramSendFunction=function(self,shader)
---         shader:send("time", self.frame/60)
---         local trans=self.cam_translation
---         local pitch,yaw,roll=self.cam_pitch,self.cam_yaw,self.cam_roll
---         local mat4=build_lorentz_mat4(pitch, yaw, roll, trans)
---         shader:send("cam_mat4", mat4)
---     end
--- end
--- BackgroundPattern.YoukaiMountain=YoukaiMountain
 return BackgroundPattern

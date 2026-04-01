@@ -5,10 +5,6 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-#ifndef HYPERBOLIC_EPS
-#define HYPERBOLIC_EPS 1e-5f // A small epsilon for float comparisons
-#endif
-
 // Uniforms that will be used by the new 'position' function:
 uniform vec2 player_pos;       // Center of rotation
 uniform vec2 aim_pos;         // Aim position for the player
@@ -38,7 +34,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_pos) {
 
     rotated_pos_euclidean=Transform2MakePlayerAtAimPos(rotated_pos_euclidean, player_pos,aim_pos, shape_axis_y);
 
-    vec2 screen_pos= Convert2OtherModel(rotated_pos_euclidean, shape_axis_y, r_factor, hyperbolic_model);
+    vec2 screen_pos= Convert2OtherModel(rotated_pos_euclidean, aim_pos, shape_axis_y, r_factor, hyperbolic_model);
 
     return transform_projection * vec4(screen_pos, 0.0, 1.0);
 }

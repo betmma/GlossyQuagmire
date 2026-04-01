@@ -118,8 +118,8 @@ function Player:getKeyboardMoveSpeed()
     local rightx,righty=math.rTheta2xy(1,rightDirOffset)
     local downx,downy=math.rTheta2xy(1,downDirOffset+math.pi/2)
 
-    local rightAmount=self:isDownInt("right")-self:isDownInt("left")
-    local downAmount=self:isDownInt("down")-self:isDownInt("up")
+    local rightAmount=self:isDownInt(KEYS.DIRECTIONS.RIGHT)-self:isDownInt(KEYS.DIRECTIONS.LEFT)
+    local downAmount=self:isDownInt(KEYS.DIRECTIONS.DOWN)-self:isDownInt(KEYS.DIRECTIONS.UP)
 
     local vxunit,vyunit=rightx*rightAmount+downx*downAmount, righty*rightAmount+downy*downAmount
     local vlen,dir=math.xy2rTheta(vxunit,vyunit)
@@ -165,7 +165,7 @@ function Player:calculateMovingTransitionSprite()
     end
     local lingerFrame={normal=8,moveTransition=2,moving=8}
     local tiltMax=#Asset.player.moveTransition.left*lingerFrame.moveTransition
-    local right=self:isDownInt("right")-self:isDownInt("left")
+    local right=self:isDownInt(KEYS.DIRECTIONS.RIGHT)-self:isDownInt(KEYS.DIRECTIONS.LEFT)
     local tilt=self.tilt or 0
     local keptFrame=self.keptFrame or 0 -- how long player has been keeping unmove or moving at the same direction (after transition of tiltMax frames)
     if tilt==0 then
@@ -219,10 +219,11 @@ function Player:draw()
     local focusOrientation=self.time*4+orientation
     local drawColor={1,1,1,(self.focusPointTransparency or 1)*color[4]}
     local focalSizeFactor=1
-    self:drawQuad(BulletSprites.playerFocus.quad,Asset.bulletImage,focusOrientation,focalSizeFactor,Asset.playerFocusBatch,Asset.playerFocusMeshes,drawColor)
+    self:drawQuad{quad=BulletSprites.playerFocus.quad,image=Asset.bulletImage,rotation=focusOrientation,zoom=focalSizeFactor,meshBatch=Asset.playerFocusMeshes,color=drawColor
+        ,normalBatch=nil} -- force mesh
     local sizeFactor=1
     if self.sprite then
-        self:drawQuad(self.sprite,nil,orientation,sizeFactor,Asset.playerBatch,nil,color)
+        self:drawQuad{quad=self.sprite,image=nil,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=color}
     end
 end
 
@@ -232,7 +233,7 @@ end
 Shift Z X C   L D R 
 ]]
 function Player:displayKeysPressed()
-    local x0,y0=520,400
+    local x0,y0=520,320
     local gridSize=15
     local keysPoses={up={6,0},down={6,1},left={5,1},right={7,1},lshift={0,1},z={1,1},x={2,1},c={3,1}}
     local keysText={up={text='↑',offset={0,0}},down={text='↓',offset={0,0}},left={text='←',offset={0,1}},right={text='→',offset={0,1}},lshift={text='⇧',offset={-0.5,0}},z={text='Z',offset={1,0}},x={text='X',offset={1,0}},c={text='C',offset={1,0}}}
@@ -254,6 +255,9 @@ end
 
 function Player:drawText()
     self:displayKeysPressed()
+    if DEV_MODE then 
+        love.graphics.print('X='..string.format("%.2f", self.kinematicState.x)..'\nY='..string.format("%.2f", self.kinematicState.y),30,140)
+    end
 end
 
 return Player
