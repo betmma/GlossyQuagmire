@@ -50,7 +50,7 @@ GeometryBase.viewConfig={
 GeometryBase.sizeFactor=1
 
 function GeometryBase:init()
-    return {x=200,y=500,speed=0,direction=0}
+    return {x=250,y=500,speed=0,direction=0}
 end
 
 function GeometryBase:update(state,dt)

@@ -19,15 +19,17 @@ Hyperbolic.HYPERBOLIC_MODELS_COUNT=3
 ---@type HyperbolicViewConfig
 Hyperbolic.viewConfig={
     following=true,
-    screenCenter={x=WINDOW_WIDTH/4,y=WINDOW_HEIGHT/2},
+    screenCenter={x=WINDOW_HEIGHT/2-WINDOW_WIDTH/40,y=WINDOW_HEIGHT/2},
     hyperbolicModel=Hyperbolic.HYPERBOLIC_MODELS.P_DISK,
     diskRadiusBase={
-        [Hyperbolic.HYPERBOLIC_MODELS.P_DISK]=1,
-        [Hyperbolic.HYPERBOLIC_MODELS.K_DISK]=1
+        [Hyperbolic.HYPERBOLIC_MODELS.P_DISK]=14/15,
+        [Hyperbolic.HYPERBOLIC_MODELS.K_DISK]=14/15
     },
 }
 
 ------- internal helper functions
+---@alias coordinate number
+---@alias angle number
 ---@param x coordinate
 ---@param y coordinate
 ---@param r number

@@ -1,7 +1,19 @@
 ---@class Player:Shape
+---@field viewDirection number in natural move mode, the direction of the right-hand-side.
+---@field moveSpeed number
+---@field diagonalSpeedAddition boolean if true, when moving diagonally, the speed is the addition of 2 vectors of U/D and L/R.
+---@field focusFactor number speed factor when holding focus key
+---@field focusPointTransparency number between 0 and 1, the transparency of the focus point
+---@field orientation number extra rotation of player sprite and focus sprite
+---@field border any not implemented now
+---@field hitInvincibleFrame number how many frames player will be invincible after hit
+---@field invincibleFrame number how many frames player is still invincible
+---@field grazeRadiusFactor number the factor multiplied to radius to get graze radius
+---@field moveMode PlayerMoveMode
+---@field dieShockwaveRadius number radius of shockwave when player dies. shockwave is not implemented yet.
 local Player = Shape:extend()
 
-
+---@enum PlayerMoveMode
 Player.moveModes={
     Euclid='Euclid',
     Natural='Natural'
@@ -11,23 +23,21 @@ Player.moveModes={
 function Player:new(args)
     args=args or {}
     Player.super.new(self, args)
-    self.direction=0
     -- in natural move mode, the direction of the right-hand-side. initially it's 0, means without moving, the right to player is the same as the right to the screen. (it's not the "up" direction where player's sprite faces.)
     self.viewDirection=0
     self.lifeFrame=9999999
-    self.speed=0
     self.moveSpeed=args.moveSpeed or 240
-    self.diagonalSpeedAddition=false -- if false, speed is always moveSpeed. if true, speed is the addition of 2 vectors of U/D and L/R. (Vanilla game is false but dunno why I implemented true from very beginning (^^;))
+    self.diagonalSpeedAddition=false -- if false, speed is always moveSpeed. if true, speed is the addition of 2 vectors of U/D and L/R.
     self.focusFactor=0.4444
     self.focusPointTransparency=0
-    self.radius = 0.5
-    -- orientation determines extra rotation of player sprite and focus sprite. since player sprite faces up, orientation is normally 0. It's not 0 in rare cases, like when calculating mirrored player sprite in 7-4.
+    self.radius = 3.0 -- hitbox
+    -- orientation determines extra rotation of player sprite and focus sprite. since player sprite faces up, orientation is normally 0.
     self.orientation=0
 
     if args.noBorder then
         self.border=nil
     else
-        -- rectangle border, only used in level 1 and 2. very spaghetti i know
+        -- rectangle border. border is not implemented
         self.border=args.border or {
             inside=function(_,x,y)
                 return x>=150 and x<=650 and y>=0 and y<=600
@@ -38,12 +48,13 @@ function Player:new(args)
     end
 
     self.hitInvincibleFrame=300
-    self.invincibleTime=0
-    self.grazeRadiusFactor=15
+    self.invincibleFrame=0
+    self.grazeRadiusFactor=3
 
     self.moveMode=args.moveMode or Player.moveModes.Natural
     self.dieShockwaveRadius=2
 
+    -- for replay system. could be moved elsewhere
     self.keyRecord={}
     self.replaying=args.replaying or false
     if self.replaying then
@@ -92,9 +103,9 @@ function Player:update(dt)
     self:moveUpdate(dt)
 
     -- handle invincible time from hit
-    self.invincibleTime=self.invincibleTime-dt
-    if self.invincibleTime<=0 then
-        self.invincibleTime=0
+    self.invincibleFrame=self.invincibleFrame-1
+    if self.invincibleFrame<=0 then
+        self.invincibleFrame=0
     end
 
     self:calculateMovingTransitionSprite()
@@ -259,5 +270,31 @@ function Player:drawText()
         love.graphics.print('X='..string.format("%.2f", self.kinematicState.x)..'\nY='..string.format("%.2f", self.kinematicState.y),30,140)
     end
 end
+
+-- spawn a white dot to show the graze effect. 
+function Player:grazeEffect(amount)
+    amount=amount or 1
+    SFX:play('graze')
+    G.runInfo.grazes=G.runInfo.grazes+amount
+    -- non-random graze effect
+    -- Effect.Larger{x=self.x,y=self.y,speed=50+30*math.sin(self.x*51323.35131+self.y*46513.1333+self.frame*653.13),direction=9999*math.sin(self.x*513.35131+self.y*413.1333+self.frame*6553.13),sprite=Asset.shards.dot,radius=1.25,growSpeed=1,animationFrame=20}
+end
+EventManager.listenTo(EventManager.EVENTS.PLAYER_GRAZE,Player.grazeEffect)
+
+function Player:hitEffect(damage)
+    if self.invincibleFrame>0 then
+        return
+    end
+    damage=damage or 1
+    self.hitFrame=self.frame
+    G.runInfo.lives=G.runInfo.lives-damage
+    if G.runInfo.lives<0 then
+        -- G:lose()
+    end
+    self.invincibleFrame=self.invincibleFrame+self.hitInvincibleFrame
+    -- Effect.Shockwave{x=self.x,y=self.y,radius=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30}
+    SFX:play('playerHit',true)
+end
+EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
 
 return Player

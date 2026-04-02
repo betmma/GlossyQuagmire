@@ -183,6 +183,6 @@ end
 ---@field frame number number of frames since the object was created. It's just an incrementer, so you can modify it freely.
 ---@field time number time in seconds since the object was created, affected by Shape.timeSpeed.
 ---@field kinematicState KinematicState
----@field drawQuad fun(self:Shape,args:DrawQuadArgs) general function to draw a quad. geometry could decide it to drawn as a quad or a mesh (with more vertices), and it's possible to force either mode by not providing the corresponding batch. image is only used for mesh drawing.
+---@field drawQuad fun(self:Shape,args:DrawQuadArgs):nil general function to draw a quad. geometry could decide it to drawn as a quad or a mesh (with more vertices), and it's possible to force either mode by not providing the corresponding batch. image is only used for mesh drawing.
 -- -@field removeDistance number distance from the screen after which the object will be removed (roughly)
 return Shape

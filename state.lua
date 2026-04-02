@@ -24,6 +24,7 @@ local G={
             CIRCLE=love.graphics.newShader('shaders/foreground/circle.glsl'),
         },
         USE_FOREGROUND_SHADER=function(key,args)
+            G.foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS[key],args=args}
             love.graphics.setShader(G.CONSTANTS.FOREGROUND_SHADERS[key])
             for k,v in pairs(args) do
                 G.CONSTANTS.FOREGROUND_SHADERS[key]:send(k,v)
@@ -233,6 +234,7 @@ G={
         geometry=geometries.Hyperbolic,
         player=nil,
     },
+    foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
     frame=0,
     ---@type replayData|nil
     replay=nil,

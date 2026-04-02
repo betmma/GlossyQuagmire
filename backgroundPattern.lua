@@ -240,8 +240,8 @@ function MainMenuTesselation:draw()
     love.graphics.setShader(self.shader)
     local uvPoses=self.uvPoses
     local t=self.frame/551
-    local x,y=400+50*math.sin(t),300+220*math.cos(t)
-    local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},self.frame/131)
+    local x,y=WINDOW_WIDTH/2+50*math.sin(t),WINDOW_HEIGHT/2+220*math.cos(t)
+    local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},self.frame/331)
     -- local V0 = {400, 300}
     -- local V1 = {500, 300}
     -- local V2 = {400, 400}
