@@ -54,7 +54,6 @@ end
 
 function Shockwave:update(dt)
     Shockwave.super.update(self,dt)
-
 end
 
 -- generating black smoke, boding a huge attack

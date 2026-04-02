@@ -7,7 +7,8 @@
 ---@field sideToLine fun(self,position:Position,linePoint1:Position,linePoint2:Position):boolean returns which side of the line formed by linePoint1 and linePoint2 the position is on. it doesn't important which side is true or false.
 -------- below are related to drawing
 ---@field toScreen fun(self,position:Position):PossiblePosition[] convert the position in geometry space to screen space. it's possible to return multiple positions for later shader processing, and the draw function needs to handle that. if returns multiple positions (like to two circles), ensure the order (first element goes to the first circle. if does not map to first circle, first element should be Dummy). it could consider the viewConfig (and like following in it).
----@field canSimpleDraw fun(self,position:Position,radius:number):boolean returns whether an object at the position with the radius (in geometry space) can be drawn with a simple quad within acceptable distortion. if false, the object should be drawn with a custom mesh.
+---@field canSimpleDraw fun(self,position:Position,radius:number):boolean,integer returns whether an object at the position with the radius (in geometry space) can be drawn with a simple quad within acceptable distortion. if false, the object should be drawn with a custom mesh and second return value indicates the suggested number of sides in the mesh. second value is meaningless if first value is true.
+---@field MESH_MAX_SIDES integer the maximum number of sides that the geometry will suggest for canSimpleDraw, can control performance. note that, even if not reaching MESH_MAX_SIDES, the geometry can still adjust the number of sides based on this (like math.floor(MESH_MAX_SIDES*0.5))
 ---@field applyDrawShader fun(self,viewer:Viewer):nil apply shader for drawing objects in this geometry if needed. the viewer is usually the player, and the shader will need the viewer's position and direction to do correct projection.
 ---@field applyForegroundShader fun(self):nil apply shader for drawing foreground. like make a rectangle hole to show the gameplay area.
 ---@field public viewConfig ViewConfig
@@ -87,8 +88,10 @@ function GeometryBase:toScreen(position)
 end
 
 function GeometryBase:canSimpleDraw(position,radius)
-    return true
+    return true,0
 end
+
+GeometryBase.MESH_MAX_SIDES=64
 
 function GeometryBase:applyDrawShader(viewer)
     -- needs translation if viewConfig.following is true.

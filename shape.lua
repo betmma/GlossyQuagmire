@@ -51,7 +51,7 @@ function Shape:drawQuad(args)
     local quadX,quadY,w,h=quad:getViewport()
     local sizeRatio=zoom
     local radius=math.max(w,h)/2*sizeRatio
-    local canSimpleDraw=geometry:canSimpleDraw(kinematicState,radius)
+    local canSimpleDraw,suggestedSideNum=geometry:canSimpleDraw(kinematicState,radius)
     local screenPositions=geometry:toScreen(kinematicState)
     local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState)
     if (canSimpleDraw or not meshBatch) and normalBatch then
@@ -63,7 +63,7 @@ function Shape:drawQuad(args)
             end
         end
     else
-        self:meshDrawQuad(kinematicState,radius,rotation,quad,image,color,meshBatch)
+        self:meshDrawQuad(kinematicState,radius,rotation,quad,image,color,meshBatch,suggestedSideNum)
     end
 end
 
@@ -84,8 +84,10 @@ end
 ---@param quad love.Quad
 ---@param image love.Image
 ---@param color number[]|nil
-function Shape:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch)
-    local meshes=self:fanMesh(pos,radius,rotation,quad,image,16,color)
+---@param meshBatch love.SpriteBatch
+---@param sideNum integer
+function Shape:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,sideNum)
+    local meshes=self:fanMesh(pos,radius,rotation,quad,image,sideNum,color)
     for _,mesh in ipairs(meshes) do
         meshBatch:add(mesh)
     end

@@ -186,7 +186,12 @@ function Hyperbolic:toScreen(position)
 end
 
 function Hyperbolic:canSimpleDraw(position,radius)
-    return radius<Hyperbolic.curvature*0.1
+    local ratio=radius/Hyperbolic.curvature
+    if ratio<0.1 then
+        return true,0
+    end
+    local sides=math.clamp(math.ceil(ratio*GeometryBase.MESH_MAX_SIDES),8,GeometryBase.MESH_MAX_SIDES)
+    return false,sides
 end
 
 Hyperbolic.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRotateM.glsl")

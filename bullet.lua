@@ -120,9 +120,9 @@ end
 ---@param quad love.Quad
 ---@param image love.Image
 ---@param color number[]|nil
-function Bullet:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch)
+function Bullet:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,sideNum)
     -- inner radius is hitbox radius
-    local ringMeshes,fanMeshes=Shape:ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,image,16,color)
+    local ringMeshes,fanMeshes=Shape:ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,image,sideNum,color)
     for _,mesh in ipairs(ringMeshes) do
         meshBatch:add(mesh)
     end
