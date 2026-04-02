@@ -99,7 +99,7 @@ EaseEvent.easeMode={
 function EaseEvent:new(args)
     local duration = args.duration or 60
     local aims = args.aims or {}
-    local easeObj = args.easeObj or self.obj
+    local easeObj = args.easeObj or args.obj
     local progressFunc = args.progressFunc or function(x) return x end
     local easeMode = args.easeMode or EaseEvent.easeMode.soft
 
@@ -109,16 +109,18 @@ function EaseEvent:new(args)
     end
 
     args.action = function(_self)
+        local lastProgress = progressFunc(0)
         for frame = 1, duration do
             wait(1)
             local progress = progressFunc(frame / duration)
             for key, target in pairs(aims) do
                 if easeMode == EaseEvent.easeMode.soft then
-                    easeObj[key] = easeObj[key] + (target - initialValues[key]) * progress
+                    easeObj[key] = easeObj[key] + (target - initialValues[key]) * (progress-lastProgress)
                 elseif easeMode == EaseEvent.easeMode.hard then
                     easeObj[key] = initialValues[key] + (target - initialValues[key]) * progress
                 end
             end
+            lastProgress = progress
         end
     end
 

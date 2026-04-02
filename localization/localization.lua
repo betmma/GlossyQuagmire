@@ -47,6 +47,10 @@ return {
     },
     ui = {
         MAIN_MENU={
+            FANGAME = {
+                en_us = 'This is a Touhou fan game with no affiliation with ZUN or Team Shanghai Alice.',
+                zh_cn = '这是一款东方Project同人游戏，与ZUN或上海爱丽丝幻乐团没有任何关系。',
+            },
             DISCLAIMER = {
                 en_us = 'Due to limitations of web browser, web version performs worse than downloaded versions. Some spellcards could be very laggy in the web version. Play the downloaded version for the best experience.',
                 zh_cn = '由于网页浏览器的限制，网页版的性能不如下载版。某些符卡在网页版可能会非常卡顿。请下载游戏以获得最佳体验。',

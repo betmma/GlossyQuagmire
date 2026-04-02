@@ -1,5 +1,4 @@
 ---@class GeometryBase:Object base class for all geometries. is actually euclidean geometry as an example (and also because lua annotation doesnt support abstract classes). should not be instantiated as only its methods are used.
----@field public sizeFactor number object's size is based on this scale.
 ---@field init fun(self):KinematicState returns a default kinematic state. objects in game will have kinematic states.
 ---@field update fun(self,state:KinematicState,dt:number):nil updates the kinematic state. Note that, this may choose not to use the precise rThetaGo. from previous experience, approximation is good enough.
 ---@field rThetaGo fun(self,position:Position,length:number,direction:number):Position,number from the [position], facing the [direction] and go [length] units forward, return the new position and the new direction facing.
@@ -47,13 +46,12 @@ GeometryBase.viewConfig={
     screenCenter={x=WINDOW_WIDTH/2,y=WINDOW_HEIGHT/2},
 }
 
-GeometryBase.sizeFactor=1
-
 function GeometryBase:init()
     return {x=250,y=500,speed=0,direction=0}
 end
 
 function GeometryBase:update(state,dt)
+    dt=dt or (1/60)
     state.x=state.x+state.speed*math.cos(state.direction)*dt
     state.y=state.y+state.speed*math.sin(state.direction)*dt
 end

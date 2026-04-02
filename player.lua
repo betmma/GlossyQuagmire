@@ -29,6 +29,7 @@ function Player:new(args)
     self.moveSpeed=args.moveSpeed or 240
     self.diagonalSpeedAddition=false -- if false, speed is always moveSpeed. if true, speed is the addition of 2 vectors of U/D and L/R.
     self.focusFactor=0.4444
+    self.transparency=1
     self.focusPointTransparency=0
     self.radius = 3.0 -- hitbox
     -- orientation determines extra rotation of player sprite and focus sprite. since player sprite faces up, orientation is normally 0.
@@ -49,6 +50,8 @@ function Player:new(args)
 
     self.hitInvincibleFrame=300
     self.invincibleFrame=0
+    self.hitImmobileFrame=120
+    self.immobileFrame=0
     self.grazeRadiusFactor=3
 
     self.moveMode=args.moveMode or Player.moveModes.Natural
@@ -100,7 +103,11 @@ function Player:update(dt)
     end
     self:calculateShoot()
 
-    self:moveUpdate(dt)
+    self.immobileFrame=self.immobileFrame-1
+    if self.immobileFrame<=0 then
+        self.immobileFrame=0
+        self:moveUpdate(dt)
+    end
 
     -- handle invincible time from hit
     self.invincibleFrame=self.invincibleFrame-1
@@ -226,15 +233,15 @@ end
 function Player:draw()
     local color={love.graphics.getColor()}
     local orientation=(self.orientation or 0)+(G.UseHypRotShader and self.viewDirection or 0)
-    
     local focusOrientation=self.time*4+orientation
-    local drawColor={1,1,1,(self.focusPointTransparency or 1)*color[4]}
+    local drawColor={1,1,1,self.transparency*color[4]}
+    local drawFocusColor={1,1,1,self.transparency*self.focusPointTransparency*color[4]}
     local focalSizeFactor=1
-    self:drawQuad{quad=BulletSprites.playerFocus.quad,image=Asset.bulletImage,rotation=focusOrientation,zoom=focalSizeFactor,meshBatch=Asset.playerFocusMeshes,color=drawColor
+    self:drawQuad{quad=BulletSprites.playerFocus.quad,image=Asset.bulletImage,rotation=focusOrientation,zoom=focalSizeFactor,meshBatch=Asset.playerFocusMeshes,color=drawFocusColor
         ,normalBatch=nil} -- force mesh
     local sizeFactor=1
     if self.sprite then
-        self:drawQuad{quad=self.sprite,image=nil,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=color}
+        self:drawQuad{quad=self.sprite,image=nil,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=drawColor}
     end
 end
 
@@ -244,7 +251,7 @@ end
 Shift Z X C   L D R 
 ]]
 function Player:displayKeysPressed()
-    local x0,y0=520,320
+    local x0,y0=540,320
     local gridSize=15
     local keysPoses={up={6,0},down={6,1},left={5,1},right={7,1},lshift={0,1},z={1,1},x={2,1},c={3,1}}
     local keysText={up={text='↑',offset={0,0}},down={text='↓',offset={0,0}},left={text='←',offset={0,1}},right={text='→',offset={0,1}},lshift={text='⇧',offset={-0.5,0}},z={text='Z',offset={1,0}},x={text='X',offset={1,0}},c={text='C',offset={1,0}}}
@@ -292,8 +299,17 @@ function Player:hitEffect(damage)
         -- G:lose()
     end
     self.invincibleFrame=self.invincibleFrame+self.hitInvincibleFrame
-    -- Effect.Shockwave{x=self.x,y=self.y,radius=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30}
+    self.immobileFrame=self.immobileFrame+self.hitImmobileFrame
+    Effect.Shockwave{kinematicState={x=self.kinematicState.x,y=self.kinematicState.y,speed=0,direction=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8}
     SFX:play('playerHit',true)
+    Event.EaseEvent{
+        obj=self,duration=self.hitInvincibleFrame,aims={transparency=0},progressFunc=function(x)
+            if x==0 then return 0 end
+            local flash=math.abs(math.cos(x*math.pi*30))
+            local maxTransparency=math.clamp(x*3-1,0,1) -- oscillate range: 0 to maxTransparency (invisible first, then maximum value increases to 1 and keeps 1)
+            return 1-flash*maxTransparency -- note that transparency=1-returned value
+        end
+    }
 end
 EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
 

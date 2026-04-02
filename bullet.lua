@@ -87,7 +87,7 @@ function Bullet:new(args)
     end
 end
 
-function Bullet:getRadius()
+function Bullet:getHitboxRadius()
     if self.sprite and self.sprite.data and self.sprite.data.hitRadius then
         return self.sprite.data.hitRadius * self.size
     end
@@ -98,6 +98,11 @@ function Bullet:draw()
     if not self.sprite then
         return
     end
+    local color={1,1,1,1}
+    if self.spriteColor then
+        color=self.spriteColor
+    end
+    color[4]=color[4]*self.spriteTransparency
     self:drawQuad{
         quad=self.sprite.quad,
         image=Asset.bulletImage,
@@ -105,10 +110,26 @@ function Bullet:draw()
         zoom=self.size,
         normalBatch=self.batch,
         meshBatch=Asset.bigBulletMeshes,
-        color=self.spriteColor,
+        color=color,
     }
 end
 
+---@param pos Position
+---@param radius number
+---@param rotation number
+---@param quad love.Quad
+---@param image love.Image
+---@param color number[]|nil
+function Bullet:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch)
+    -- inner radius is hitbox radius
+    local ringMeshes,fanMeshes=Shape:ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,image,16,color)
+    for _,mesh in ipairs(ringMeshes) do
+        meshBatch:add(mesh)
+    end
+    for _,mesh in ipairs(fanMeshes) do
+        meshBatch:add(mesh)
+    end
+end
 
 function Bullet:update(dt)
     if self.removed then
@@ -119,7 +140,7 @@ function Bullet:update(dt)
     end
     Shape.update(self,dt)
     if not self.safe then
-        -- if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
+        if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
         -- if #Effect.FlashBomb.objects>0 then self:checkFlashBombRemove() end
     end
     self:checkHitPlayer()
@@ -132,16 +153,16 @@ function Bullet:update(dt)
     end
 end
 
--- function Bullet:checkShockwaveRemove()
---     local selfRadius=self:getRadius()
---     for k,shockwave in pairs(Effect.Shockwave.objects) do
---         if shockwave.canRemove.bullet==true and(self.invincible==false or shockwave.canRemove.invincible==true)and(self.safe==false or shockwave.canRemove.safe==true) and Shape.distance(shockwave.x,shockwave.y,self.x,self.y)<shockwave.radius+selfRadius then
---             EventManager.post(EventManager.EVENTS.SHOCKWAVE_REMOVE_BULLET,self,shockwave)
---             self:remove()
---             self:removeEffect()
---         end
---     end
--- end
+function Bullet:checkShockwaveRemove()
+    local selfRadius=self:getHitboxRadius()
+    for k,shockwave in pairs(Effect.Shockwave.objects) do
+        if shockwave.canRemove.bullet==true and(self.invincible==false or shockwave.canRemove.invincible==true)and(self.safe==false or shockwave.canRemove.safe==true) and G.runInfo.geometry:distance(shockwave.kinematicState,self.kinematicState)<shockwave:getHitboxRadius()+selfRadius then
+            EventManager.post(EventManager.EVENTS.SHOCKWAVE_REMOVE_BULLET,self,shockwave)
+            self:remove()
+            self:removeEffect()
+        end
+    end
+end
 -- function Bullet:checkFlashBombRemove()
 --     for k,flashBomb in pairs(Effect.FlashBomb.objects) do
 --         if flashBomb.canRemove.bullet==true and(self.invincible==false or flashBomb.canRemove.invincible==true) and flashBomb:inside(self.x,self.y) then
@@ -154,7 +175,7 @@ end
 
 function Bullet:checkHitPlayer()
     if not self.safe then
-        local selfRadius=self:getRadius()
+        local selfRadius=self:getHitboxRadius()
         for key, player in pairs(Player.objects) do
             ---@cast player Player
             local dis=G.runInfo.geometry:distance(player.kinematicState,self.kinematicState)
@@ -178,7 +199,7 @@ function Bullet:grazeValue()
 end
 
 function Bullet:removeEffect()
-    -- Effect.Larger{x=self.x,y=self.y,sprite=Asset.shards.dot,radius=1,growSpeed=1.05,animationFrame=20}
+    Effect.Larger{kinematicState=copy_table(self.kinematicState),sprite=Asset.shards.dot,radius=1,growSpeed=0.1,animationFrame=20}
 end
 
 function Bullet:changeSpriteColor(color)

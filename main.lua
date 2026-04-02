@@ -1,4 +1,4 @@
-VERSION="0.0.4"
+VERSION="0.0.4.1"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
@@ -32,7 +32,7 @@ function love.load()
     BulletSprites,BulletBatch,SpriteData=Asset.bulletSprites,Asset.bulletBatch,Asset.SpriteData
     Audio=require"audio"
     SFX=Audio.sfx;BGM=Audio.bgm
-    -- Effect=require"effect"
+    Effect=require"effect"
     -- ---@type AssetBulletSpritesCollection
     -- LevelData = require "levelData"
     -- DialogueController=require"localization.dialogue"

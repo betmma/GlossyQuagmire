@@ -61,7 +61,8 @@ return {
         end
         -- for test
         G.runInfo.player=Player()
-        BulletSpawner{
+        -- Bullet{kinematicState={x=250,y=400,speed=0,direction=math.pi/2},lifeFrame=9999,sprite=BulletSprites.round.blue}
+        local spawner=BulletSpawner{
             kinematicState={x=250,y=200,speed=0,direction=0},period=60,firstPeriod=30,lifeFrame=9999,bulletNumber=80,bulletSpeed=40,angle='player',range=math.pi*8,bulletSprite=BulletSprites.round.blue,bulletLifeFrame=600,bulletEvents={
                 function(cir,args)
                     local index=args.index
@@ -76,6 +77,7 @@ return {
                 end
             }
         }
+        Effect.Charge{obj=spawner}
     end,
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
@@ -90,6 +92,10 @@ return {
             else
                 G.runInfo.geometry=G.geometries.Hyperbolic
             end
+        end
+        if isPressed('r') then
+            GameObject:removeAll()
+            G:reloadUI()
         end
     end,
     draw=G.CONSTANTS.DRAW,

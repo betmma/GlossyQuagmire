@@ -2,6 +2,13 @@ local base=UI.Base()
 return {
     base=base,
     init=function(self)
+        local fangameText=base:child(
+            UI.Text{
+                text=Localize{'ui','MAIN_MENU','FANGAME'},
+                fontSize=16,color={1,1,1,1},
+                x=20,y=WINDOW_HEIGHT-20,
+            }
+        )
         local leftPart=base:child(UI.Base{width=100,height=0})
         local titleImage=leftPart:child(
             UI.Image{
@@ -81,7 +88,7 @@ return {
             UI.Text{
                 text=VERSION,
                 fontSize=24,color={1,1,1,1},
-                x=WINDOW_WIDTH-80,y=WINDOW_HEIGHT-30,
+                x=WINDOW_WIDTH-85,y=WINDOW_HEIGHT-30,
             }
         )
         if IS_WEB then

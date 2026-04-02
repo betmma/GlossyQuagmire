@@ -10,7 +10,7 @@ local GeometryBase=...
 ---@field axisY number
 ---@field EPS number
 local Hyperbolic=GeometryBase:extend()
-Hyperbolic.curvature=100
+Hyperbolic.curvature=200
 Hyperbolic.axisY=0
 Hyperbolic.EPS=1e-8
 ---@enum HYPERBOLIC_MODEL
@@ -121,9 +121,8 @@ function Hyperbolic:rotateAround(x1, y1, angle, ox, oy)
 end
 -------
 
-Hyperbolic.sizeFactor=0.5
-
 function Hyperbolic:update(state,dt)
+    dt=dt or (1/60)
     local metric=(state.y-Hyperbolic.axisY)/Hyperbolic.curvature
     local moveDistance=state.speed*dt*metric
     if state.speed*dt<2 then
@@ -187,7 +186,7 @@ function Hyperbolic:toScreen(position)
 end
 
 function Hyperbolic:canSimpleDraw(position,radius)
-    return radius<20
+    return radius<Hyperbolic.curvature*0.1
 end
 
 Hyperbolic.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRotateM.glsl")
@@ -213,7 +212,7 @@ function Hyperbolic:applyForegroundShader()
     if Hyperbolic.viewConfig.hyperbolicModel==Hyperbolic.HYPERBOLIC_MODELS.UHP then
         G.CONSTANTS.USE_FOREGROUND_SHADER('RECTANGLE',{xywh={20,20,480,560}})
     else
-        local radius=Hyperbolic.viewConfig.diskRadiusBase[Hyperbolic.viewConfig.hyperbolicModel]*WINDOW_HEIGHT*Hyperbolic.sizeFactor
+        local radius=Hyperbolic.viewConfig.diskRadiusBase[Hyperbolic.viewConfig.hyperbolicModel]*WINDOW_HEIGHT*0.5
         G.CONSTANTS.USE_FOREGROUND_SHADER('CIRCLE',{centerXY={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y},radius=radius})
     end
 

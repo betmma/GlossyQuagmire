@@ -34,6 +34,7 @@ end
 ---@field normalBatch love.SpriteBatch|nil
 ---@field meshBatch love.SpriteBatch|nil
 ---@field color number[]|nil
+---@field kinematicState KinematicState|nil if provided, will be used to determine the position and whether to draw as quad or mesh. if not provided, use self.kinematicState.
 
 ---@param args DrawQuadArgs
 function Shape:drawQuad(args)
@@ -45,13 +46,14 @@ function Shape:drawQuad(args)
     local normalBatch = args.normalBatch
     local meshBatch   = args.meshBatch
     local color       = args.color or {1, 1, 1, 1}
+    local kinematicState = args.kinematicState or self.kinematicState
     local geometry=G.runInfo.geometry
     local quadX,quadY,w,h=quad:getViewport()
-    local sizeRatio=zoom*geometry.sizeFactor
+    local sizeRatio=zoom
     local radius=math.max(w,h)/2*sizeRatio
-    local canSimpleDraw=geometry:canSimpleDraw(self.kinematicState,radius)
-    local screenPositions=geometry:toScreen(self.kinematicState)
-    local zoomFactorToScreen=geometry:zoomFactorToScreen(self.kinematicState)
+    local canSimpleDraw=geometry:canSimpleDraw(kinematicState,radius)
+    local screenPositions=geometry:toScreen(kinematicState)
+    local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState)
     if (canSimpleDraw or not meshBatch) and normalBatch then
         normalBatch:setColor(color)
         for i,screenPos in ipairs(screenPositions) do
@@ -61,7 +63,7 @@ function Shape:drawQuad(args)
             end
         end
     else
-        self:meshDrawQuad(self.kinematicState,radius,rotation,quad,image,color,meshBatch)
+        self:meshDrawQuad(kinematicState,radius,rotation,quad,image,color,meshBatch)
     end
 end
 
@@ -142,41 +144,99 @@ function Shape:fanMesh(position,posR,orientation,quad,image,n,color,square)
 end
 
 
--- -- calculate double layered ring+fan mesh for drawing large sprite to reduce distortion
--- ---@param position Position position of the center of the sprite in geometry space
--- ---@param innerR number "inner radius of ring"
--- ---@param outerR number "outer radius of ring"
--- ---@param orientation angle "orientation of object"
--- ---@param quad love.Quad "quad of sprite"
--- ---@param image love.Image "image of sprite"
--- ---@param n integer "number of vertices on the circle"
--- ---@param color number[]|nil "color RGBA, each in [0,1]"
--- ---@return love.Mesh "ring mesh"
--- ---@return love.Mesh "fan mesh"
--- function Shape:ringFanMesh(position,innerR,outerR,orientation,quad,image,n,color)
---     color=color or {1,1,1,1}
---     local x,y,w,h=quad:getViewport() -- like 100, 100, 50, 50 so needs to divide width and height
---     local imgW,imgH=image:getDimensions()
---     x,y,w,h=x/imgW,y/imgH,w/imgW,h/imgH
---     local ratio=innerR/outerR
---     local ringMeshVertices={}
---     local fanMeshVertices={{position.x,position.y,x+w/2,y+h/2,color[1],color[2],color[3],color[4]}}
---     for i=0,n do
---         local angle=math.pi*2/n*i
---         local x2,y2=G.runInfo.geometry:rThetaGo(position, outerR, angle+orientation)
---         local u,v=(math.cos(angle)+1)/2,(math.sin(angle)+1)/2
---         ringMeshVertices[i*2+1]={x2,y2,x+u*w,y+v*h,color[1],color[2],color[3],color[4]}
---         fanMeshVertices[i+2]=ringMeshVertices[i*2+1]
---         local x3,y3=G.runInfo.geometry:rThetaGo(position, innerR, angle+orientation)
---         u,v=(math.cos(angle)*ratio+1)/2,(math.sin(angle)*ratio+1)/2
---         ringMeshVertices[i*2+2]={x3,y3,x+u*w,y+v*h,color[1],color[2],color[3],color[4]}
---     end
---     local ringMesh=love.graphics.newMesh(ringMeshVertices,'strip')
---     ringMesh:setTexture(image)
---     local fanMesh=love.graphics.newMesh(fanMeshVertices,'fan')
---     fanMesh:setTexture(image)
---     return ringMesh,fanMesh
--- end
+-- calculate double layered ring+fan mesh for drawing large sprite to reduce distortion. generally, innerR is hitbox radius and outerR is sprite radius, to ensure that hitbox size and overall size are all accurate.
+---@param position Position position of the center of the sprite in geometry space
+---@param innerR number "inner radius of ring"
+---@param outerR number "outer radius of ring"
+---@param orientation angle "orientation of object"
+---@param quad love.Quad "quad of sprite"
+---@param image love.Image "image of sprite"
+---@param n integer "number of vertices on the circle"
+---@param color number[]|nil "color RGBA, each in [0,1]"
+---@return love.Mesh "ring mesh"
+---@return love.Mesh "fan mesh"
+function Shape:ringFanMesh(position,innerR,outerR,orientation,quad,image,n,color)
+    color = color or {1, 1, 1, 1}
+    local x, y, w, h = quad:getViewport()
+    local imgW, imgH = image:getDimensions()
+    x, y, w, h = x/imgW, y/imgH, w/imgW, h/imgH
+    
+    local ratio = innerR / outerR
+    local ringVertices = {} -- Table of vertex arrays for 'strip' meshes
+    local fanVertices = {}  -- Table of vertex arrays for 'fan' meshes
+    
+    -- 1. Get Screen positions for the center (for the Fan meshes)
+    local coreScreenPoses = G.runInfo.geometry:toScreen(position)
+    for si, coreScreenPos in ipairs(coreScreenPoses) do
+        if not coreScreenPos.dummy then
+            fanVertices[si] = {
+                {coreScreenPos.x, coreScreenPos.y, x + w/2, y + h/2, color[1], color[2], color[3], color[4]}
+            }
+            ringVertices[si] = {}
+        end
+    end
+
+    -- 2. Calculate vertices for the circles
+    for i = 0, n do
+        local angle = math.pi * 2 / n * i
+        local cosA, sinA = math.cos(angle), math.sin(angle)
+        
+        -- Geometric positions
+        local posOuter = G.runInfo.geometry:rThetaGo(position, outerR, angle + orientation)
+        local posInner = G.runInfo.geometry:rThetaGo(position, innerR, angle + orientation)
+        
+        -- Screen positions
+        local outerScreens = G.runInfo.geometry:toScreen(posOuter)
+        local innerScreens = G.runInfo.geometry:toScreen(posInner)
+        
+        -- UV coordinates
+        -- Outer: radius 1.0 (relative to outerR)
+        local uO, vO = (cosA + 1) / 2, (sinA + 1) / 2
+        -- Inner: radius = ratio
+        local uI, vI = (cosA * ratio + 1) / 2, (sinA * ratio + 1) / 2
+
+        for si = 1, #coreScreenPoses do
+            if fanVertices[si] then -- only process if this screen instance is valid
+                local pO = outerScreens[si]
+                local pI = innerScreens[si]
+                
+                if pO and not pO.dummy and pI and not pI.dummy then
+                    ---@cast pO Position
+                    ---@cast pI Position
+                    
+                    -- Add to Ring (Strip) - Order: Outer, Inner, Outer, Inner...
+                    table.insert(ringVertices[si], {pO.x, pO.y, x + uO*w, y + vO*h, color[1], color[2], color[3], color[4]})
+                    table.insert(ringVertices[si], {pI.x, pI.y, x + uI*w, y + vI*h, color[1], color[2], color[3], color[4]})
+                    
+                    -- Add to Fan - Extends from center to Inner Radius
+                    table.insert(fanVertices[si], {pI.x, pI.y, x + uI*w, y + vI*h, color[1], color[2], color[3], color[4]})
+                end
+            end
+        end
+    end
+
+    -- 3. Create the Mesh objects
+    local ringMeshes = {}
+    local fanMeshes = {}
+
+    for si, v in pairs(ringVertices) do
+        if #v >= 4 then -- Minimum 2 pairs for a strip
+            local mesh = love.graphics.newMesh(v, 'strip')
+            mesh:setTexture(image)
+            table.insert(ringMeshes, mesh)
+        end
+    end
+
+    for si, v in pairs(fanVertices) do
+        if #v >= 3 then -- Center + 2 points for a fan
+            local mesh = love.graphics.newMesh(v, 'fan')
+            mesh:setTexture(image)
+            table.insert(fanMeshes, mesh)
+        end
+    end
+
+    return ringMeshes, fanMeshes
+end
 
 ---@class Shape:GameObject
 ---@field lifeFrame number after which the object will be removed
