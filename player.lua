@@ -156,7 +156,7 @@ end
 
 
 function Player:moveUpdate(dt)
-    self.kinematicState.speed, self.kinematicState.direction=self:getKeyboardMoveSpeed()
+    self.kinematicState.speed, self.kinematicState.dir=self:getKeyboardMoveSpeed()
     local kinematicStateRef=copy_table(self.kinematicState)
 
     self.super.update(self,dt) -- actually move
@@ -165,7 +165,7 @@ function Player:moveUpdate(dt)
     self:limitInBorder()
 
     if self.moveMode==Player.moveModes.Natural then
-        local dtheta=self.kinematicState.direction-kinematicStateRef.direction
+        local dtheta=self.kinematicState.dir-kinematicStateRef.dir
         if DEV_MODE and love.keyboard.isDown('[') then --debug use
             self.viewDirection=self.viewDirection-0.03
         elseif DEV_MODE and love.keyboard.isDown(']') then
@@ -274,7 +274,7 @@ end
 function Player:drawText()
     self:displayKeysPressed()
     if DEV_MODE then 
-        love.graphics.print('X='..string.format("%.2f", self.kinematicState.x)..'\nY='..string.format("%.2f", self.kinematicState.y),30,140)
+        love.graphics.print('X='..string.format("%.2f", self.kinematicState.pos.x)..'\nY='..string.format("%.2f", self.kinematicState.pos.y),30,140)
     end
 end
 
@@ -300,7 +300,7 @@ function Player:hitEffect(damage)
     end
     self.invincibleFrame=self.invincibleFrame+self.hitInvincibleFrame
     self.immobileFrame=self.immobileFrame+self.hitImmobileFrame
-    Effect.Shockwave{kinematicState={x=self.kinematicState.x,y=self.kinematicState.y,speed=0,direction=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
+    Effect.Shockwave{kinematicState={pos=self.kinematicState.pos,speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
     SFX:play('playerHit',true)
     Event.EaseEvent{
         obj=self,duration=self.hitInvincibleFrame,aims={transparency=0},progressFunc=function(x)

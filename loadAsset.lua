@@ -256,7 +256,7 @@ Asset.Batches={
 Asset.batchExtraActions={
     [Asset.foregroundBatch]={ -- foreground always draw 800*600 full image and use a shader to make it hollow.
         before=function()
-            G.runInfo.geometry.applyForegroundShader()
+            G.runInfo.geometry:applyForegroundShader()
         end,
         after=function()
             love.graphics.setShader()

@@ -106,7 +106,7 @@ function Bullet:draw()
     self:drawQuad{
         quad=self.sprite.quad,
         image=Asset.bulletImage,
-        rotation=self.kinematicState.direction+math.pi/2+(self.spriteExtraDirection or 0),
+        rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),
         zoom=self.size,
         normalBatch=self.batch,
         meshBatch=Asset.bigBulletMeshes,
@@ -141,7 +141,6 @@ function Bullet:update(dt)
     Shape.update(self,dt)
     if not self.safe then
         if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
-        -- if #Effect.FlashBomb.objects>0 then self:checkFlashBombRemove() end
     end
     self:checkHitPlayer()
     self.spriteExtraDirection=self.spriteExtraDirection+self.spriteRotationSpeed*Shape.timeSpeed
@@ -156,29 +155,21 @@ end
 function Bullet:checkShockwaveRemove()
     local selfRadius=self:getHitboxRadius()
     for k,shockwave in pairs(Effect.Shockwave.objects) do
-        if shockwave.canRemove.bullet==true and(self.invincible==false or shockwave.canRemove.invincible==true)and(self.safe==false or shockwave.canRemove.safe==true) and G.runInfo.geometry:distance(shockwave.kinematicState,self.kinematicState)<shockwave:getHitboxRadius()+selfRadius then
+        ---@cast shockwave Shockwave
+        if shockwave.canRemove.bullet==true and(self.invincible==false or shockwave.canRemove.invincible==true)and(self.safe==false or shockwave.canRemove.safe==true) and G.runInfo.geometry:distance(shockwave.kinematicState.pos,self.kinematicState.pos)<shockwave:getHitboxRadius()+selfRadius then
             EventManager.post(EventManager.EVENTS.SHOCKWAVE_REMOVE_BULLET,self,shockwave)
             self:remove()
             self:removeEffect()
         end
     end
 end
--- function Bullet:checkFlashBombRemove()
---     for k,flashBomb in pairs(Effect.FlashBomb.objects) do
---         if flashBomb.canRemove.bullet==true and(self.invincible==false or flashBomb.canRemove.invincible==true) and flashBomb:inside(self.x,self.y) then
---             EventManager.post(EventManager.EVENTS.FLASHBOMB_REMOVE_BULLET,self,flashBomb)
---             self:remove()
---             self:removeEffect()
---         end
---     end
--- end
 
 function Bullet:checkHitPlayer()
     if not self.safe then
         local selfRadius=self:getHitboxRadius()
         for key, player in pairs(Player.objects) do
             ---@cast player Player
-            local dis=G.runInfo.geometry:distance(player.kinematicState,self.kinematicState)
+            local dis=G.runInfo.geometry:distance(player.kinematicState.pos,self.kinematicState.pos)
             local radi=player.radius+selfRadius
             if dis<radi+player.radius*player.grazeRadiusFactor and not self.grazed then
                 EventManager.post(EventManager.EVENTS.PLAYER_GRAZE,player,self:grazeValue())

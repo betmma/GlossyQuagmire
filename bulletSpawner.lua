@@ -1,4 +1,4 @@
-
+---@class BulletSpawner:Shape
 local BulletSpawner=Shape:extend()
 
 -- a spawner spawns [bulletNumber] or bullets with size=[bulletSize], speed=[bulletSpeed] from angle=[angle] to [angle+range] every [period] frames.
@@ -40,18 +40,18 @@ function BulletSpawner:new(args)
         if not _args.sprite then
             _args.sprite=self.bulletSprite
         end
-        _args.direction=math.eval(_args.direction)
-        _args.speed=math.eval(_args.speed)
+        _args.kinematicState.dir=math.eval(_args.kinematicState.dir)
+        _args.kinematicState.speed=math.eval(_args.kinematicState.speed)
         _args.invincible=_args.invincible or args.invincible or false
-        if _args.sprite.data.isLaser then
-            _args.laserEvents=args.laserEvents or {}
-            _args.bulletEvents=self.bulletEvents
-            _args.warningFrame=args.warningFrame or 0
-            _args.fadingFrame=args.fadingFrame or 0
-            _args.frequency=args.frequency
-            local cir=Laser(_args)
-            return
-        end
+        -- if _args.sprite.data.isLaser then
+        --     _args.laserEvents=args.laserEvents or {}
+        --     _args.bulletEvents=self.bulletEvents
+        --     _args.warningFrame=args.warningFrame or 0
+        --     _args.fadingFrame=args.fadingFrame or 0
+        --     _args.frequency=args.frequency
+        --     local cir=Laser(_args)
+        --     return
+        -- end
         _args.extraUpdate=self.bulletExtraUpdate or {}
         local cir=Bullet(_args)
         -- table.insert(ret,cir)
@@ -69,10 +69,11 @@ function BulletSpawner:new(args)
         end
     end
     self.spawnBatchFunc=args.spawnBatchFunc or function(self)
+        ---@cast self BulletSpawner
         SFX:play('enemyShot',true,self.spawnSFXVolume)
         local num=math.eval(self.bulletNumber)
         local range=math.eval(self.range)
-        local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState,G.runInfo.player.kinematicState) or math.eval(self.angle)
+        local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos) or math.eval(self.angle)
         local spawnCircleAngle=math.eval(self.spawnCircleAngle)
         local spawnCircleRange=math.eval(self.spawnCircleRange)
         local spawnCircleRadius=math.eval(self.spawnCircleRadius)
@@ -80,11 +81,11 @@ function BulletSpawner:new(args)
         local size=math.eval(self.bulletSize)
         for i = 1, num, 1 do
             local direction=range*(i-0.5-num/2)/num+angle
-            local pos=G.runInfo.geometry:rThetaGo(self.kinematicState,spawnCircleRadius,spawnCircleRange*(i-0.5-num/2)/num+spawnCircleAngle)
+            local pos=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,spawnCircleRadius,spawnCircleRange*(i-0.5-num/2)/num+spawnCircleAngle)
             if spawnCircleRadius~=0 then
-                direction=G.runInfo.geometry:to(pos,self.kinematicState)+math.pi+angle
+                direction=G.runInfo.geometry:to(pos,self.kinematicState.pos)+math.pi+angle
             end
-            local kinematicState={x=pos.x,y=pos.y,direction=direction,speed=speed}
+            local kinematicState={pos=pos,dir=direction,speed=speed}
             self:spawnBulletFunc{kinematicState=kinematicState,size=size,index=i,batch=self.bulletBatch,fogTime=self.fogTime,sprite=self.bulletSprite}
         end
     end
@@ -117,8 +118,7 @@ end
 ---@field fogTime number frames before fog disappears and calls func
 ---@field sprite Sprite
 ---@field color string|nil defaults to args.sprite.data.color
----@field x number 
----@field y number 
+---@field kinematicState KinematicState
 ---@field fogSize number|nil defaults to 1
 ---@field fogTransparency number|nil transparency of fog, defaults to 1
 
@@ -131,10 +131,9 @@ function BulletSpawner.wrapFogEffect(args, func, wrapping)
     end
     local color=args.color or (args.sprite and args.sprite.data.color) or 'red'
     local fogTime=args.fogTime or 60
-    local x=args.x
-    local y=args.y
+    local pos=args.kinematicState.pos
     local size=args.fogSize or 1
-    local fog=Bullet({kinematicState={x=x,y=y,speed=0,direction=0}, size=size, lifeFrame=fogTime, sprite=Asset.bulletSprites.fog[color],safe=true,spriteTransparency=args.fogTransparency or 1})
+    local fog=Bullet({kinematicState={pos=pos,speed=0,dir=0}, size=size, lifeFrame=fogTime, sprite=Asset.bulletSprites.fog[color],safe=true,spriteTransparency=args.fogTransparency or 1})
     local easeFunc=func
     if wrapping then
         easeFunc=function()func(args)end

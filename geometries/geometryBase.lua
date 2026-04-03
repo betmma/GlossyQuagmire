@@ -1,20 +1,4 @@
----@class GeometryBase:Object base class for all geometries. is actually euclidean geometry as an example (and also because lua annotation doesnt support abstract classes). should not be instantiated as only its methods are used.
----@field init fun(self):KinematicState returns a default kinematic state. objects in game will have kinematic states.
----@field update fun(self,state:KinematicState,dt:number):nil updates the kinematic state. Note that, this may choose not to use the precise rThetaGo. from previous experience, approximation is good enough.
----@field rThetaGo fun(self,position:Position,length:number,direction:number):Position,number from the [position], facing the [direction] and go [length] units forward, return the new position and the new direction facing.
----@field distance fun(self,position1:Position,position2:Position):number returns the distance between two positions.
----@field to fun(self,position:Position,target:Position):number from the [position], the direction facing the [target] (if multiple directions are possible, return the one along which the distance is shortest)
----@field sideToLine fun(self,position:Position,linePoint1:Position,linePoint2:Position):boolean returns which side of the line formed by linePoint1 and linePoint2 the position is on. it doesn't important which side is true or false.
--------- below are related to drawing
----@field toScreen fun(self,position:Position):PossiblePosition[] convert the position in geometry space to screen space. it's possible to return multiple positions for later shader processing, and the draw function needs to handle that. if returns multiple positions (like to two circles), ensure the order (first element goes to the first circle. if does not map to first circle, first element should be Dummy). it could consider the viewConfig (and like following in it).
----@field canSimpleDraw fun(self,position:Position,radius:number):boolean,integer returns whether an object at the position with the radius (in geometry space) can be drawn with a simple quad within acceptable distortion. if false, the object should be drawn with a custom mesh and second return value indicates the suggested number of sides in the mesh. second value is meaningless if first value is true.
----@field MESH_MAX_SIDES integer the maximum number of sides that the geometry will suggest for canSimpleDraw, can control performance. note that, even if not reaching MESH_MAX_SIDES, the geometry can still adjust the number of sides based on this (like math.floor(MESH_MAX_SIDES*0.5))
----@field applyDrawShader fun(self,viewer:Viewer):nil apply shader for drawing objects in this geometry if needed. the viewer is usually the player, and the shader will need the viewer's position and direction to do correct projection.
----@field applyForegroundShader fun(self):nil apply shader for drawing foreground. like make a rectangle hole to show the gameplay area.
----@field public viewConfig ViewConfig
---------below are methods defaulted to be composed by using the above methods, but you can override them for better performance if you want.
----@field rThetaTo fun(self,position:Position,target:Position):number,number from the [position], the distance to the target and the direction facing the [target] (if multiple values are possible, return the shortest distance and the corresponding direction)
----@field zoomFactorToScreen fun(self,position:Position):number[] returns the zoom factors at the screen space of the position (one for each toScreen results). it's used to draw quads (only a square) where distortion is negligible (and with prerequisite that the geometry is conformal). the default implementation calls toScreen on position and position+small value to estimate.
+---@class GeometryBase
 local GeometryBase=Object:extend()
 function GeometryBase:new()
     error("Geometry cannot be instantiated.")
@@ -24,37 +8,19 @@ end
 ---@field dummy true
 GeometryBase.Dummy={dummy=true} -- for toScreen to return when there is no corresponding screen position
 
----@class ViewConfig
----@field following boolean whether the view will follow the player.
----@field screenCenter Position if following is true, the view will put player at this position on screen.
-
----@class Position
----@field x number
----@field y number
-
----@alias PossiblePosition Position|Dummy
-
----@class Viewer
----@field viewDirection number note that it doesn't need to be the same as the direction of movement.
----@field kinematicState KinematicState
-
----@class KinematicState:Position
----@field speed number
----@field direction number
-
 GeometryBase.viewConfig={
     following=false,
     screenCenter={x=WINDOW_WIDTH/2,y=WINDOW_HEIGHT/2},
 }
 
 function GeometryBase:init()
-    return {x=250,y=500,speed=0,direction=0}
+    return {pos={x=250,y=500},speed=0,dir=0}
 end
 
 function GeometryBase:update(state,dt)
     dt=dt or (1/60)
-    state.x=state.x+state.speed*math.cos(state.direction)*dt
-    state.y=state.y+state.speed*math.sin(state.direction)*dt
+    state.pos.x=state.pos.x+state.speed*math.cos(state.dir)*dt
+    state.pos.y=state.pos.y+state.speed*math.sin(state.dir)*dt
 end
 
 function GeometryBase:rThetaGo(position,length,direction)
@@ -88,7 +54,7 @@ function GeometryBase:toScreen(position)
 end
 
 function GeometryBase:canSimpleDraw(position,radius)
-    return true,0
+    return true,8
 end
 
 GeometryBase.MESH_MAX_SIDES=64
@@ -96,7 +62,7 @@ GeometryBase.MESH_MAX_SIDES=64
 function GeometryBase:applyDrawShader(viewer)
     -- needs translation if viewConfig.following is true.
     if GeometryBase.viewConfig.following then
-        love.graphics.translate(GeometryBase.viewConfig.screenCenter.x-viewer.kinematicState.x,GeometryBase.viewConfig.screenCenter.y-viewer.kinematicState.y)
+        love.graphics.translate(GeometryBase.viewConfig.screenCenter.x-viewer.kinematicState.pos.x,GeometryBase.viewConfig.screenCenter.y-viewer.kinematicState.pos.y)
     end
 end
 
@@ -112,9 +78,9 @@ end
 
 function GeometryBase:zoomFactorToScreen(position)
     local screenPos=self:toScreen(position)
-    local kinematicState={x=position.x,y=position.y,speed=60,direction=0}
+    local kinematicState={pos=copy_table(position),speed=60,dir=0}
     self:update(kinematicState,1/60) -- use update to move a small step in geometry space (1 unit)
-    local screenPos2=self:toScreen({x=kinematicState.x,y=kinematicState.y})
+    local screenPos2=self:toScreen(kinematicState.pos)
     local screenDistance={}
     for i=1,#screenPos do
         screenDistance[i]=math.distance(screenPos[i].x,screenPos[i].y,screenPos2[i].x,screenPos2[i].y)

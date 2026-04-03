@@ -43,6 +43,7 @@ function Larger:draw()
 end
 
 -- A growing shockwave, that removes touched bullets and activate their :removeEffect
+---@class Shockwave:Larger
 local Shockwave=Larger:extend()
 Effect.Shockwave=Shockwave
 function Shockwave:new(args)
@@ -57,6 +58,8 @@ function Shockwave:update(dt)
 end
 
 -- generating black smoke, boding a huge attack
+---@class Charge:Effect
+---@field obj Shape
 local Charge=Effect:extend()
 Effect.Charge=Charge
 function Charge:new(args)
@@ -77,8 +80,8 @@ function Charge:update(dt)
     self.frame=self.frame+1
     local direction=math.eval(0,999)
     if self.frame+self.particleFrame<self.animationFrame then
-        local pos,dir2=G.runInfo.geometry:rThetaGo(self.obj.kinematicState,100,direction)
-        table.insert(self.particles,{frame=0,kinematicState={x=pos.x,y=pos.y,direction=dir2+math.pi,speed=self.particleSpeed}})
+        local pos,dir2=G.runInfo.geometry:rThetaGo(self.obj.kinematicState.pos,100,direction)
+        table.insert(self.particles,{frame=0,kinematicState={pos=pos,dir=dir2+math.pi,speed=self.particleSpeed}})
     end
     for k,particle in pairs(self.particles) do
         particle.frame=particle.frame+1
@@ -103,7 +106,7 @@ function Charge:draw(dt)
             kinematicState=particle.kinematicState,
             quad=self.sprite.quad,
             image=self.sprite.image,
-            rotation=particle.kinematicState.direction,zoom=self.size,
+            rotation=particle.kinematicState.dir,zoom=self.size,
             normalBatch=Asset.effectBatch,meshBatch=Asset.bigBulletMeshes,
             color={self.color[1],self.color[2],self.color[3],1-0.3*particle.frame/self.particleFrame}
         }

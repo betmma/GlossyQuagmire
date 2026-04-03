@@ -61,16 +61,16 @@ return {
         end
         -- for test
         G.runInfo.player=Player()
-        -- Bullet{kinematicState={x=250,y=400,speed=0,direction=math.pi/2},lifeFrame=9999,sprite=BulletSprites.round.blue}
+        -- Bullet{kinematicState={pos={x=250,y=400},speed=0,dir=math.pi/2},lifeFrame=9999,sprite=BulletSprites.round.blue}
         local spawner=BulletSpawner{
-            kinematicState={x=250,y=200,speed=0,direction=0},period=60,firstPeriod=30,lifeFrame=9999,bulletNumber=80,bulletSpeed=40,angle='player',range=math.pi*8,bulletSprite=BulletSprites.round.blue,bulletLifeFrame=600,bulletEvents={
+            kinematicState={pos={x=250,y=200},speed=0,dir=0},period=60,firstPeriod=30,lifeFrame=9999,bulletNumber=80,bulletSpeed=40,angle='player',range=math.pi*8,bulletSprite=BulletSprites.round.blue,bulletLifeFrame=600,bulletEvents={
                 function(cir,args)
                     local index=args.index
                     cir.kinematicState.speed=40+math.ceil(index/20)*10
                     Event.Event{
                         obj=cir,action=function()
                             wait(60)
-                            cir.kinematicState.direction=cir.kinematicState.direction+math.mod2Sign(index)*math.pi/2
+                            cir.kinematicState.dir=cir.kinematicState.dir+math.mod2Sign(index)*math.pi/2
                             cir:changeSpriteColor(index%2==0 and 'red' or 'green')
                         end
                     }

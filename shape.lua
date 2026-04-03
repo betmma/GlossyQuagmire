@@ -6,7 +6,21 @@ Shape.timeSpeed=1
 function Shape:new(args)
     args=args or {}
     self.args=args
-    self.kinematicState=args.kinematicState or G.runInfo.geometry.init()
+    if args.kinematicState then
+        if not args.kinematicState.pos then
+            args.kinematicState.pos=args.kinematicState.position
+        end
+        if not args.kinematicState.pos then
+            error('Shape:new: kinematicState must have pos')
+        end
+        if not args.kinematicState.speed then
+            args.kinematicState.speed=0
+        end
+        if not args.kinematicState.dir then
+            args.kinematicState.dir=args.kinematicState.direction or 0
+        end
+    end
+    self.kinematicState=args.kinematicState or G.runInfo.geometry:init()
     self.lifeFrame=args.lifeFrame or 1000
     self.time=0
     self.frame=0
@@ -51,26 +65,32 @@ function Shape:drawQuad(args)
     local quadX,quadY,w,h=quad:getViewport()
     local sizeRatio=zoom
     local radius=math.max(w,h)/2*sizeRatio
-    local canSimpleDraw,suggestedSideNum=geometry:canSimpleDraw(kinematicState,radius)
-    local screenPositions=geometry:toScreen(kinematicState)
-    local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState)
+    local canSimpleDraw,suggestedSideNum=geometry:canSimpleDraw(kinematicState.pos,radius)
+    local screenPositions=geometry:toScreen(kinematicState.pos)
+    local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState.pos)
     if (canSimpleDraw or not meshBatch) and normalBatch then
-        normalBatch:setColor(color)
+        normalBatch:setColor(color[1],color[2],color[3],color[4])
         for i,screenPos in ipairs(screenPositions) do
             if not screenPos.dummy then
-                ---@cast screenPos Position
+                ---@cast screenPos ScreenPosition
                 self:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeRatio*zoomFactorToScreen[i],normalBatch)
             end
         end
     else
-        self:meshDrawQuad(kinematicState,radius,rotation,quad,image,color,meshBatch,suggestedSideNum)
+        if not image then
+            error('Shape:drawQuad: tries to mesh draw with image = nil')
+        end
+        if not meshBatch then
+            error('Shape:drawQuad: tries to mesh draw with meshBatch = nil')
+        end
+        self:meshDrawQuad(kinematicState.pos,radius,rotation,quad,image,color,meshBatch,suggestedSideNum)
     end
 end
 
 ---@param quad love.Quad
 ---@param w number
 ---@param h number
----@param screenPos Position
+---@param screenPos ScreenPosition
 ---@param rotation number
 ---@param sizeRatio number
 ---@param normalBatch love.SpriteBatch
@@ -103,7 +123,6 @@ end
 ---@param square boolean|nil "if true, vertices are calculated on a square instead of a circle (for square sprites)"
 ---@return love.Mesh[] "fan mesh"
 function Shape:fanMesh(position,posR,orientation,quad,image,n,color,square)
-    local posX,posY=position.x,position.y
     color=color or {1,1,1,1}
     local x,y,w,h=quad:getViewport() -- like 100, 100, 50, 50 so needs to divide width and height
     local imgW,imgH=image:getDimensions()
@@ -112,7 +131,7 @@ function Shape:fanMesh(position,posR,orientation,quad,image,n,color,square)
     local coreScreenPoses=G.runInfo.geometry:toScreen(position)
     for si,coreScreenPos in ipairs(coreScreenPoses) do
         if not coreScreenPos.dummy then -- if center is dummy, this fan mesh cannot be formed
-            ---@cast coreScreenPos Position
+            ---@cast coreScreenPos ScreenPosition
             vertices[si]={{coreScreenPos.x,coreScreenPos.y,x+w/2,y+h/2,color[1],color[2],color[3],color[4]}}
         end
     end
@@ -125,7 +144,7 @@ function Shape:fanMesh(position,posR,orientation,quad,image,n,color,square)
         local poses=G.runInfo.geometry:toScreen(G.runInfo.geometry:rThetaGo(position,posR*rRatio,angle+orientation))
         for si,screenPos in ipairs(poses) do
             if not screenPos.dummy then
-                ---@cast screenPos Position
+                ---@cast screenPos ScreenPosition
                 local x2,y2=screenPos.x,screenPos.y
                 local u,v=(math.cos(angle)*rRatio+1)/2,(math.sin(angle)*rRatio+1)/2
                 if vertices[si] then
@@ -203,8 +222,8 @@ function Shape:ringFanMesh(position,innerR,outerR,orientation,quad,image,n,color
                 local pI = innerScreens[si]
                 
                 if pO and not pO.dummy and pI and not pI.dummy then
-                    ---@cast pO Position
-                    ---@cast pI Position
+                    ---@cast pO ScreenPosition
+                    ---@cast pI ScreenPosition
                     
                     -- Add to Ring (Strip) - Order: Outer, Inner, Outer, Inner...
                     table.insert(ringVertices[si], {pO.x, pO.y, x + uO*w, y + vO*h, color[1], color[2], color[3], color[4]})

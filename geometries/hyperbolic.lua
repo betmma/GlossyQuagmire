@@ -1,21 +1,23 @@
+---@type GeometryBase
 local GeometryBase=...
-
 
 ---@class HyperbolicViewConfig:ViewConfig
 ---@field hyperbolicModel HYPERBOLIC_MODEL which hyperbolic model to use
 ---@field diskRadiusBase table<HYPERBOLIC_MODEL,number> size of disks (window height is 1). value for UHP is ignored.
 
----@class Hyperbolic:GeometryBase
----@field curvature number
----@field axisY number
----@field EPS number
+---@enum HYPERBOLIC_MODEL
+local HYPERBOLIC_MODEL={ -- use number is because it will be sent to shader
+    UHP=0,
+    P_DISK=1,
+    K_DISK=2
+}
+
+---@class Hyperbolic
 local Hyperbolic=GeometryBase:extend()
 Hyperbolic.curvature=200
 Hyperbolic.axisY=0
 Hyperbolic.EPS=1e-8
----@enum HYPERBOLIC_MODEL
-Hyperbolic.HYPERBOLIC_MODELS={UHP=0,P_DISK=1,K_DISK=2} -- use number is because it will be sent to shader
-Hyperbolic.HYPERBOLIC_MODELS_COUNT=3
+Hyperbolic.HYPERBOLIC_MODELS=HYPERBOLIC_MODEL
 ---@type HyperbolicViewConfig
 Hyperbolic.viewConfig={
     following=true,
@@ -123,24 +125,24 @@ end
 
 function Hyperbolic:update(state,dt)
     dt=dt or (1/60)
-    local metric=(state.y-Hyperbolic.axisY)/Hyperbolic.curvature
+    local metric=(state.pos.y-Hyperbolic.axisY)/Hyperbolic.curvature
     local moveDistance=state.speed*dt*metric
     if state.speed*dt<2 then
-        state.x=state.x+moveDistance*math.cos(state.direction)
-        state.y=state.y+moveDistance*math.sin(state.direction)
-        local moveRadius=(state.y-Hyperbolic.axisY)/math.cos(state.direction)
-        state.direction=state.direction-moveDistance/moveRadius
+        state.pos.x=state.pos.x+moveDistance*math.cos(state.dir)
+        state.pos.y=state.pos.y+moveDistance*math.sin(state.dir)
+        local moveRadius=(state.pos.y-Hyperbolic.axisY)/math.cos(state.dir)
+        state.dir=state.dir-moveDistance/moveRadius
     else
-        local newPos,newDir=self:rThetaGo(state,state.speed*dt,state.direction)
-        state.x=newPos.x
-        state.y=newPos.y
-        state.direction=newDir
+        local newPos,newDir=self:rThetaGo(state.pos,state.speed*dt,state.dir)
+        state.pos.x=newPos.x
+        state.pos.y=newPos.y
+        state.dir=newDir
     end
 end
 
 function Hyperbolic:rThetaGo(position,length,direction)
     if length==0 then
-        return position,direction
+        return copy_table(position),direction
     end
     local rLT0=length<0
     if rLT0 then
@@ -188,7 +190,7 @@ end
 function Hyperbolic:canSimpleDraw(position,radius)
     local ratio=radius/Hyperbolic.curvature
     if ratio<0.1 then
-        return true,0
+        return true,8
     end
     local sides=math.clamp(math.ceil(ratio*GeometryBase.MESH_MAX_SIDES),8,GeometryBase.MESH_MAX_SIDES)
     return false,sides
@@ -201,7 +203,7 @@ function Hyperbolic:applyDrawShader(viewer)
     love.graphics.setShader(shader)
     local center={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y}
     if Hyperbolic.viewConfig.following then
-        shader:send("player_pos", {viewer.kinematicState.x, viewer.kinematicState.y})
+        shader:send("player_pos", {viewer.kinematicState.pos.x, viewer.kinematicState.pos.y})
         shader:send("rotation_angle",-viewer.viewDirection)
     else
         shader:send("player_pos", center)
