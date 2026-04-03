@@ -390,6 +390,16 @@ return {
                 zh_cn = '你还没有遇到这首音乐。',
             },
         },
+        title = {
+            name = {
+                en_us = 'Legend of Tokoyo',
+                zh_cn = '常世国传说',
+            },
+            description = {
+                en_us = 'The title screen theme. The atmosphere is quite similar to Legend of Hourai: soft and nostalgic, like a storyteller begins to tell a tale of the past. The ending is already known, but they are still touched by the MC\'s resolution.',
+                zh_cn = '标题画面音乐。氛围与《蓬莱传说》相似：柔和而怀旧，就像说书人开始讲一个过去的故事。结局已经为人所知，却仍被主角的愿望所感动。',
+            },
+        },
         level2b = {
             name = {
                 en_us = 'Foxtrot Towards the Beyond',
