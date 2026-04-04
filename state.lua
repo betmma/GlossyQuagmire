@@ -22,6 +22,8 @@ local G={
             RECTANGLE=love.graphics.newShader('shaders/foreground/rectangle.glsl'),
             -- centerXY: vec2, radius: number
             CIRCLE=love.graphics.newShader('shaders/foreground/circle.glsl'),
+            -- centerXY: vec2, radius: number, centerXY2: vec2, radius2: number
+            TWO_CIRCLES=love.graphics.newShader('shaders/foreground/twoCircles.glsl'),
         },
         USE_FOREGROUND_SHADER=function(key,args)
             G.foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS[key],args=args}
@@ -220,7 +222,7 @@ G={
         },
     },
     geometries=geometries,
-    ---@type {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer, stage: integer, geometry: GeometryBase, player:Player}
+    ---@type {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil}
     runInfo={ -- things that can be changed and accessed during the run should be put there
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
         playerType=G.CONSTANTS.PLAYERS[1],
@@ -231,7 +233,7 @@ G={
         bombs=3,
         grazes=0,
         stage=1,
-        geometry=geometries.Hyperbolic,
+        geometry=geometries.Spherical,
         player=nil,
     },
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position

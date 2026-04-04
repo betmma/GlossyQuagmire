@@ -93,5 +93,7 @@ local geometries={
     Euclidean=GeometryBase,
 ---@type Hyperbolic
     Hyperbolic=love.filesystem.load("geometries/hyperbolic.lua")(GeometryBase),
+---@type Spherical
+    Spherical=love.filesystem.load("geometries/spherical.lua")(GeometryBase),
 }
 return geometries

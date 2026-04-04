@@ -300,7 +300,7 @@ function Player:hitEffect(damage)
     end
     self.invincibleFrame=self.invincibleFrame+self.hitInvincibleFrame
     self.immobileFrame=self.immobileFrame+self.hitImmobileFrame
-    Effect.Shockwave{kinematicState={pos=self.kinematicState.pos,speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
+    Effect.Shockwave{kinematicState={pos=copy_table(self.kinematicState.pos),speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
     SFX:play('playerHit',true)
     Event.EaseEvent{
         obj=self,duration=self.hitInvincibleFrame,aims={transparency=0},progressFunc=function(x)

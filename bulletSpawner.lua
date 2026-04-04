@@ -131,7 +131,7 @@ function BulletSpawner.wrapFogEffect(args, func, wrapping)
     end
     local color=args.color or (args.sprite and args.sprite.data.color) or 'red'
     local fogTime=args.fogTime or 60
-    local pos=args.kinematicState.pos
+    local pos=copy_table(args.kinematicState.pos)
     local size=args.fogSize or 1
     local fog=Bullet({kinematicState={pos=pos,speed=0,dir=0}, size=size, lifeFrame=fogTime, sprite=Asset.bulletSprites.fog[color],safe=true,spriteTransparency=args.fogTransparency or 1})
     local easeFunc=func

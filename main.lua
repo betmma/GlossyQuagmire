@@ -1,4 +1,4 @@
-VERSION="0.0.4.4"
+VERSION="0.0.4.5"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
@@ -13,7 +13,8 @@ shove = require "import.shove"
 Input = require "input"
 function love.load()
     shove.setResolution(800, 600, {fitMethod = "aspect", renderMode = "layer"})
-    Object,GameObject = unpack(require "classic")
+    Object = require "classic"
+    GameObject=Object.GameObject
     UI = require "ui.uiBase"
     -- ExpandingMesh = require "import.expandingMesh"
     ---@type ShaderScan

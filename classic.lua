@@ -181,5 +181,5 @@ function GameObject:drawTextAll()
       cls:drawTextAll()
   end
 end
-
-return {Object,GameObject}
+Object.GameObject=GameObject
+return Object

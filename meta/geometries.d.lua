@@ -86,3 +86,18 @@
 ---@field applyForegroundShader def.GeometryBase.applyForegroundShader
 ---@field rThetaTo def.GeometryBase.rThetaTo
 ---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen
+
+
+---@class Spherical:GeometryBase
+---@field init def.GeometryBase.init
+---@field update def.GeometryBase.update
+---@field rThetaGo def.GeometryBase.rThetaGo
+---@field distance def.GeometryBase.distance
+---@field to def.GeometryBase.to
+---@field sideToLine def.GeometryBase.sideToLine
+---@field toScreen def.GeometryBase.toScreen
+---@field canSimpleDraw def.GeometryBase.canSimpleDraw
+---@field applyDrawShader def.GeometryBase.applyDrawShader
+---@field applyForegroundShader def.GeometryBase.applyForegroundShader
+---@field rThetaTo def.GeometryBase.rThetaTo
+---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen

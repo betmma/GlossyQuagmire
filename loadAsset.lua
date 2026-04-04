@@ -40,8 +40,13 @@ end
 local GIFSprite=Sprite:extend()
 Asset.GIFSprite=GIFSprite
 
+---@class GIFSpriteData:spriteData
+---@field frameCount number
+---@field frameTime number
+---@field currentFrame integer|nil
+---@field isGIF true
 --- @param quads love.Quad[] array of quads, each quad is a frame of the gif
---- @param data spriteData
+--- @param data GIFSpriteData
 function GIFSprite:new(quads,data)
     data.isGIF=true
     self.currentFrame=data.currentFrame or 1
@@ -178,6 +183,13 @@ UI (left half and right half foreground)
 Dialogue 
 Dialogue Characters 
 ]]
+---@class SpecialBatch:Object
+---@field type string 'mesh' or 'function' or other types if needed
+---@field contents table
+---@field add fun(self, item) add item to batch
+---@field clear fun(self) clear batch contents
+---@field flush fun(self) for batches that need to be flushed before drawing, like sprite batches
+---@field draw fun(self) draw the batch, for function batch, call all functions in contents
 local SpecialBatch=Object:extend()
 function SpecialBatch:new(type)
     self.type=type
