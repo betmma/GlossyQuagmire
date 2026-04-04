@@ -77,7 +77,13 @@ function Shape:drawQuad(args)
                 if screenPos.flip then
                     rotationWithScreen=rotationWithScreen*-1
                 end
-                self:simpleDrawQuad(quad,w,h,screenPos,rotationWithScreen,sizeRatio*zoomFactorToScreen[i],normalBatch)
+                local sizeRatioWithScreen=sizeRatio*zoomFactorToScreen[i]
+                local sizeX=sizeRatioWithScreen
+                local sizeY=sizeRatioWithScreen
+                if screenPos.flip then
+                    sizeX=sizeX*-1
+                end
+                self:simpleDrawQuad(quad,w,h,screenPos,rotationWithScreen,sizeX,sizeY,normalBatch)
             end
         end
     else
@@ -96,10 +102,11 @@ end
 ---@param h number
 ---@param screenPos ScreenPosition
 ---@param rotation number
----@param sizeRatio number
+---@param sizeX number
+---@param sizeY number
 ---@param normalBatch love.SpriteBatch
-function Shape:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeRatio,normalBatch)
-    normalBatch:add(quad,screenPos.x,screenPos.y,rotation,sizeRatio,sizeRatio,w/2,h/2)
+function Shape:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeX,sizeY,normalBatch)
+    normalBatch:add(quad,screenPos.x,screenPos.y,rotation,sizeX,sizeY,w/2,h/2)
 end
 
 ---@param pos Position

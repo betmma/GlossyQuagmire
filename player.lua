@@ -165,7 +165,7 @@ function Player:moveUpdate(dt)
     self:limitInBorder()
 
     if self.moveMode==Player.moveModes.Natural then
-        local dtheta=self.kinematicState.dir-kinematicStateRef.dir
+        local dtheta=math.modClamp(self.kinematicState.dir-kinematicStateRef.dir)
         if DEV_MODE and love.keyboard.isDown('[') then --debug use
             self.viewDirection=self.viewDirection-0.03
         elseif DEV_MODE and love.keyboard.isDown(']') then
@@ -232,7 +232,7 @@ end
 
 function Player:draw()
     local color={love.graphics.getColor()}
-    local orientation=(self.orientation or 0)+(G.UseHypRotShader and self.viewDirection or 0)
+    local orientation=(self.orientation or 0)+self.viewDirection
     local focusOrientation=self.time*4+orientation
     local drawColor={1,1,1,self.transparency*color[4]}
     local drawFocusColor={1,1,1,self.transparency*self.focusPointTransparency*color[4]}
@@ -274,7 +274,7 @@ end
 function Player:drawText()
     self:displayKeysPressed()
     if DEV_MODE then 
-        love.graphics.print('X='..string.format("%.2f", self.kinematicState.pos.x)..'\nY='..string.format("%.2f", self.kinematicState.pos.y),30,140)
+        love.graphics.print('X='..string.format("%.2f", self.kinematicState.pos.x)..'\nY='..string.format("%.2f", self.kinematicState.pos.y)..'\nView Direction='..string.format("%.2f", self.viewDirection),30,140)
     end
 end
 

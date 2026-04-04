@@ -73,11 +73,11 @@ return {
                             wait(60)
                             cir.kinematicState.dir=cir.kinematicState.dir+math.mod2Sign(index)*math.pi/2
                             cir:changeSpriteColor(index%2==0 and 'red' or 'green')
-                            wait(120)
-                            for i=1,120 do
-                                cir.kinematicState.dir=cir.kinematicState.dir+math.pi/360
-                                wait(1)
-                            end
+                            -- wait(120)
+                            -- for i=1,120 do
+                            --     cir.kinematicState.dir=cir.kinematicState.dir+math.pi/360
+                            --     wait(1)
+                            -- end
                         end
                     }
                 end

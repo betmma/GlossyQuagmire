@@ -299,12 +299,14 @@ function Spherical:applyPixelShader(viewer)
     shader:send("canvas_size",{CANVAS_WIDTH,CANVAS_HEIGHT})
 
     local viewerLat, viewerLon = 0.0, 0.0
-
+    local viewDirection = 0.0
     if Spherical.viewConfig.following then
         local u = to_unit(viewer.kinematicState.pos)
         viewerLat = math.asin(math.clamp(u.z, -1, 1))
         viewerLon = math.atan2(u.y, u.x)
+        viewDirection = viewer.viewDirection
     end
+    shader:send("viewer_view_direction", viewDirection)
     shader:send("viewer_lat_lon", { viewerLat, viewerLon })
 end
 

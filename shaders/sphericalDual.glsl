@@ -15,6 +15,7 @@ extern float mini_radius;
 
 extern float cutoff_z;        // shaderCutoffZ: rim latitude control for output mapping
 extern vec2 viewer_lat_lon;   // viewer orientation encoded as latitude/longitude
+extern float viewer_view_direction;
 
 extern vec2 canvas_size; // cannot use love_ScreenSize as canvas size is not same as window size (the size drawn to)
 
@@ -59,8 +60,10 @@ vec3 rotateLocalToWorld(vec3 u_local) {
 
     vec3 forward = unitFromLatLon(lat, lon);
     vec3 upRef = (abs(forward.z) < 0.999) ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
-    vec3 east = normalize(cross(upRef, forward));
-    vec3 north = normalize(cross(forward, east));
+    vec3 east0 = normalize(cross(upRef, forward));
+    vec3 north0 = normalize(cross(forward, east0));
+    vec3 east = east0 * cos(viewer_view_direction) + north0 * sin(viewer_view_direction);
+    vec3 north = cross(forward, east);
 
     return normalize(east * u_local.x + north * u_local.y + forward * u_local.z);
 }
@@ -96,20 +99,18 @@ vec2 sourceUvFromWorld(vec3 uWorld) {
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
     float keepR = keptProjectionRadiusNorm();
-    // screen_coords = screen_coords * 0.7777;
+    vec3 uWorld = vec3(0.0);
     vec2 dMain = screen_coords - main_center;
+    vec2 dMini = screen_coords - mini_center;
+
     if (length(dMain) <= main_radius) {
         vec2 local = dMain / max(main_radius, 1e-6);
-        vec3 uWorld = worldFromOutputLocal(local, 0.0, keepR);
-        return Texel(tex, sourceUvFromWorld(uWorld)) * color;
-    }
-
-    vec2 dMini = screen_coords - mini_center;
-    if (length(dMini) <= mini_radius) {
+        uWorld = worldFromOutputLocal(local, 0.0, keepR);
+    }else if (length(dMini) <= mini_radius) {
         vec2 local = dMini / max(mini_radius, 1e-6);
-        vec3 uWorld = worldFromOutputLocal(local, 1.0, keepR);
-        return Texel(tex, sourceUvFromWorld(uWorld)) * color;
+        uWorld = worldFromOutputLocal(local, 1.0, keepR);
+    }else{
+        return vec4(0.0);
     }
-
-    return vec4(0.0);
+    return Texel(tex, sourceUvFromWorld(uWorld)) * color;
 }
