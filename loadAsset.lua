@@ -295,10 +295,16 @@ Asset.flushBatches=function(self)
         batch:flush()
     end
 end
+local activeCanvas
 Asset.drawBatches=function(self)
     for key, batch in pairs(self.Batches) do
         -- use hyperbolicRotateShader from first batch to player focus batch (only excluding foreground).
         if batch==Asset.bossMeshes then
+            if G:useCanvas() then
+                activeCanvas=love.graphics.getCanvas() -- shove is lying. it does not preserve canvas so must save and call setCanvas(activeCanvas) later
+                love.graphics.setCanvas(G.mainCanvas)
+                love.graphics.clear()
+            end
             if G.runInfo.player then
                 G.runInfo.geometry:applyVertexShader(G.runInfo.player)
             end
@@ -322,12 +328,15 @@ Asset.drawBatches=function(self)
         end
         love.graphics.setBlendMode('alpha') -- default mode
         if batch==Asset.playerFocusBatch then -- end of 'main' layer
-            -- love.graphics.setShader()
-            -- if G.runInfo.player then
-            --     G.runInfo.geometry:applyPixelShader(G.runInfo.player)
-            -- end
-            -- love.graphics.setCanvas()
-            -- love.graphics.draw(G.mainCanvas)
+            -- love.graphics.origin()
+            if G:useCanvas() then
+                love.graphics.setShader()
+                if G.runInfo.player then
+                    G.runInfo.geometry:applyPixelShader(G.runInfo.player)
+                end
+                love.graphics.setCanvas(activeCanvas)
+                love.graphics.draw(G.mainCanvas)
+            end
             love.graphics.setShader()
             shove.endLayer()
             shove.beginLayer('UIBatches')

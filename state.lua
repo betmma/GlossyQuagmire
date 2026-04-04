@@ -352,7 +352,6 @@ G.update=function(self,dt)
 
     UI.Base:cleanObjects() -- to remove removed elements in class.objects
 end
-CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 G.mainCanvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 G.draw=function(self)
     shove.beginLayer('main')
@@ -385,9 +384,10 @@ G._drawBatches=function(self)
     if not self.backgroundPattern.noZoom or G.viewMode.mode==G.CONSTANTS.VIEW_MODES.NORMAL then
         self.backgroundPattern:draw()
     end
-    -- love.graphics.setCanvas(G.mainCanvas)
-    -- love.graphics.clear()
     self.currentUI.draw(self)
+end
+G.useCanvas=function(self)
+    return self.STATE==self.STATES.IN_GAME and self.runInfo.geometry.hasPixelShader
 end
 -- remove all objects in the scene
 G.removeAll=function(self)

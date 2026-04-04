@@ -20,16 +20,16 @@ local Spherical = GeometryBase:extend()
 Spherical.radius = 220
 Spherical.EPS = 1e-8
 local CUTOFF_Z = math.sqrt(0.5) -- 45 deg latitude on a unit sphere.
-
+local sourceR=CANVAS_WIDTH/4
 ---@type SphericalViewConfig
 Spherical.viewConfig = {
     following = true,
     screenCenter = { x = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 40, y = WINDOW_HEIGHT / 2 },
-    sourceCircleRadius = WINDOW_WIDTH * 0.16,
+    sourceCircleRadius = sourceR,
     sourceCutoffZ = CUTOFF_Z,
     shaderCutoffZ = 0,
-    sourcePrimaryCenter = { x = WINDOW_WIDTH * 0.33, y = WINDOW_HEIGHT * 0.50 },
-    sourceSecondaryCenter = { x = WINDOW_WIDTH * 0.67, y = WINDOW_HEIGHT * 0.50 },
+    sourcePrimaryCenter = { x = sourceR, y = sourceR },
+    sourceSecondaryCenter = { x = sourceR * 3, y = sourceR },
     primaryCircle = {
         center = { x = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 40, y = WINDOW_HEIGHT / 2 },
         radius = WINDOW_HEIGHT * 7/15,
@@ -39,16 +39,6 @@ Spherical.viewConfig = {
         radius = WINDOW_HEIGHT * 0.16,
     },
 }
-
-local function clamp(value, low, high)
-    if value < low then
-        return low
-    end
-    if value > high then
-        return high
-    end
-    return value
-end
 
 local function vec3(x, y, z)
     return { x = x, y = y, z = z }
@@ -118,7 +108,7 @@ local function projection_limit_radius(c)
 end
 
 local function source_projection_limit_radius()
-    local c = clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
+    local c = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
     return projection_limit_radius(c)
 end
 
@@ -206,7 +196,7 @@ end
 function Spherical:distance(position1, position2)
     local u = to_unit(position1)
     local v = to_unit(position2)
-    local c = clamp(dot(u, v), -1, 1)
+    local c = math.clamp(dot(u, v), -1, 1)
     return Spherical.radius * math.acos(c)
 end
 
@@ -244,7 +234,7 @@ function Spherical:toScreen(position)
     local u = to_unit(position)
     ---@type (Dummy|ScreenPosition)[]
     local ret = { GeometryBase.Dummy, GeometryBase.Dummy }
-    local sourceCutoff = clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
+    local sourceCutoff = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
 
     -- Primary map: project from viewer (north pole), cover 45N to 90S.
     if u.z <= sourceCutoff then
@@ -279,12 +269,11 @@ end
 
 Spherical.sphericalShader = ShaderScan:load_shader("shaders/sphericalDual.glsl")
 
-function Spherical:applyVertexShader(viewer)
-    local shader = Spherical.sphericalShader
+Spherical.hasPixelShader = true
 
-    shove.clearEffects('main')
-    shove.addEffect('main',shader)
-    -- love.graphics.setShader(shader)
+function Spherical:applyPixelShader(viewer)
+    local shader = Spherical.sphericalShader
+    love.graphics.setShader(shader)
 
     shader:send("source_primary_center", {
         Spherical.viewConfig.sourcePrimaryCenter.x,
@@ -306,13 +295,14 @@ function Spherical:applyVertexShader(viewer)
         Spherical.viewConfig.secondaryCircle.center.y,
     })
     shader:send("mini_radius", Spherical.viewConfig.secondaryCircle.radius)
-    shader:send("cutoff_z", clamp(Spherical.viewConfig.shaderCutoffZ, 0, 0.999999))
+    shader:send("cutoff_z", math.clamp(Spherical.viewConfig.shaderCutoffZ, 0, 0.999999))
+    shader:send("canvas_size",{CANVAS_WIDTH,CANVAS_HEIGHT})
 
     local viewerLat, viewerLon = 0.0, 0.0
 
     if Spherical.viewConfig.following then
         local u = to_unit(viewer.kinematicState.pos)
-        viewerLat = math.asin(clamp(u.z, -1, 1))
+        viewerLat = math.asin(math.clamp(u.z, -1, 1))
         viewerLon = math.atan2(u.y, u.x)
     end
     shader:send("viewer_lat_lon", { viewerLat, viewerLon })

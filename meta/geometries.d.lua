@@ -65,6 +65,7 @@
 ---@field canSimpleDraw def.GeometryBase.canSimpleDraw
 ---@field MESH_MAX_SIDES integer the maximum number of sides that the geometry will suggest for canSimpleDraw, can control performance. note that, even if not reaching MESH_MAX_SIDES, the geometry can still adjust the number of sides based on this (like math.floor(MESH_MAX_SIDES*0.5))
 ---@field applyVertexShader def.GeometryBase.applyVertexShader
+---@field hasPixelShader boolean whether this geometry has pixel shader. if not, doesn't switch canvas (its different size will change love_ScreenSize and cause problems)
 ---@field applyPixelShader def.GeometryBase.applyPixelShader
 ---@field applyForegroundShader def.GeometryBase.applyForegroundShader
 ---@field public viewConfig ViewConfig

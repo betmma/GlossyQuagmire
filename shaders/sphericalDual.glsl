@@ -16,6 +16,8 @@ extern float mini_radius;
 extern float cutoff_z;        // shaderCutoffZ: rim latitude control for output mapping
 extern vec2 viewer_lat_lon;   // viewer orientation encoded as latitude/longitude
 
+extern vec2 canvas_size; // cannot use love_ScreenSize as canvas size is not same as window size (the size drawn to)
+
 float clampf(float x, float a, float b) {
     return min(max(x, a), b);
 }
@@ -73,7 +75,7 @@ float keptProjectionRadiusNorm() {
 
 vec2 sourceUv(vec2 srcCenter, vec2 srcProjNorm) {
     vec2 srcPixel = srcCenter + srcProjNorm * source_hemisphere_radius;
-    return srcPixel / love_ScreenSize.xy;
+    return srcPixel / canvas_size;
 }
 
 vec3 worldFromOutputLocal(vec2 local, float useNorthModel, float keepR) {
@@ -94,7 +96,7 @@ vec2 sourceUvFromWorld(vec3 uWorld) {
 
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
     float keepR = keptProjectionRadiusNorm();
-
+    // screen_coords = screen_coords * 0.7777;
     vec2 dMain = screen_coords - main_center;
     if (length(dMain) <= main_radius) {
         vec2 local = dMain / max(main_radius, 1e-6);
