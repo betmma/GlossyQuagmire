@@ -6,7 +6,7 @@ local G={
             local colorRef={love.graphics.getColor()}
             Asset.foregroundBatch:setColor(colorRef[1],colorRef[2],colorRef[3],self.foregroundTransparency)
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
-            if self.runInfo.geometry~=self.geometries.Spherical then
+            if G.foregroundShaderData.shader~=G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
                 Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
             end
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.

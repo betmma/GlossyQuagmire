@@ -17,10 +17,14 @@ return {
             fontSize=28,color={55/255,65/255,81/255,1},
             x=0,y=520,width=300,
             align='center',toggleX=false,
+            extraUpdates={function(self)
+                local shader=G.foregroundShaderData.shader
+                self.transparency=math.lerpCondition(self.transparency,shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES,0,1,0.1)
+            end}
         })
         local getForegroundBaseX=function(y)
             local shader=G.foregroundShaderData.shader
-            if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE then
+            if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
                 local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
                 local dy=y-centerXY[2]
                 if math.abs(dy)>=radius then
@@ -64,18 +68,26 @@ return {
         -- Bullet{kinematicState={pos={x=250,y=400},speed=0,dir=math.pi/2},lifeFrame=9999,sprite=BulletSprites.round.blue}
         local spawnerPos=G.runInfo.geometry:rThetaGo(G.runInfo.player.kinematicState.pos,100,-math.pi/2)
         local spawner=BulletSpawner{
-            kinematicState={pos=spawnerPos,speed=0,dir=0},period=60,firstPeriod=30,lifeFrame=9999,bulletNumber=80,bulletSpeed=50,angle='player',range=math.pi*8,bulletSprite=BulletSprites.arrow.blue,bulletLifeFrame=600,bulletEvents={
-                function(cir,args)
+            kinematicState={pos=spawnerPos,speed=0,dir=0},period=6,firstPeriod=3,lifeFrame=9999,bulletNumber=8,bulletSpeed=50,angle=0,range=math.pi*4,bulletSprite=BulletSprites.arrow.blue,bulletLifeFrame=600,bulletEvents={
+                function(cir,args,self)
+                    if args.index==1 then
+                        self.angle=self.angle+math.pi/48
+                    end
                     local index=args.index
-                    cir.kinematicState.speed=40+math.ceil(index/20)*10
+                    cir.kinematicState.speed=140+math.ceil(index/20)*10
                     Event.Event{
                         obj=cir,action=function()
                             wait(60)
-                            cir.kinematicState.dir=cir.kinematicState.dir+math.mod2Sign(index)*math.pi/2
-                            cir:changeSpriteColor(index%2==0 and 'red' or 'green')
+                            local sign=math.mod2Sign(math.ceil(index/4))
+                            -- cir.kinematicState.dir=cir.kinematicState.dir+sign*math.pi/3
+                            local scale=math.clamp(self.frame/600,0.1,1.2)
+                            cir.kinematicState.dir=cir.kinematicState.dir+sign*math.eval(scale,scale-0.1)
+                            cir:changeSpriteColor(sign>0 and 'red' or 'green')
                             -- wait(120)
+                            -- cir.kinematicState.dir=cir.kinematicState.dir-sign*math.pi/3
+                            -- cir:changeSpriteColor('blue')
                             -- for i=1,120 do
-                            --     cir.kinematicState.dir=cir.kinematicState.dir+math.pi/360
+                            --     cir.kinematicState.dir=cir.kinematicState.dir-math.pi/720*sign
                             --     wait(1)
                             -- end
                         end

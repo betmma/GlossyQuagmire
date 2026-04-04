@@ -68,7 +68,7 @@ function Shape:drawQuad(args)
     local canSimpleDraw,suggestedSideNum=geometry:canSimpleDraw(kinematicState.pos,radius)
     local screenPositions=geometry:toScreen(kinematicState.pos)
     local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState.pos)
-    if (canSimpleDraw or not meshBatch) and normalBatch then
+    if (canSimpleDraw or not meshBatch or not image) and normalBatch then
         normalBatch:setColor(color[1],color[2],color[3],color[4])
         for i,screenPos in ipairs(screenPositions) do
             if not screenPos.dummy then

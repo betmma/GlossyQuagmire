@@ -303,7 +303,7 @@ Asset.drawBatches=function(self)
             if G:useCanvas() then
                 activeCanvas=love.graphics.getCanvas() -- shove is lying. it does not preserve canvas so must save and call setCanvas(activeCanvas) later
                 love.graphics.setCanvas(G.mainCanvas)
-                love.graphics.clear()
+                love.graphics.clear({0,0,0,1})
             end
             if G.runInfo.player then
                 G.runInfo.geometry:applyVertexShader(G.runInfo.player)

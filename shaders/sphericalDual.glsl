@@ -59,7 +59,7 @@ vec3 rotateLocalToWorld(vec3 u_local) {
     float lon = viewer_lat_lon.y;
 
     vec3 forward = unitFromLatLon(lat, lon);
-    vec3 upRef = (abs(forward.z) < 0.999) ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
+    vec3 upRef = vec3(0.0, 0.0, 1.0);
     vec3 east0 = normalize(cross(upRef, forward));
     vec3 north0 = normalize(cross(forward, east0));
     vec3 east = east0 * cos(viewer_view_direction) + north0 * sin(viewer_view_direction);
