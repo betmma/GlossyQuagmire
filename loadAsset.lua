@@ -300,7 +300,7 @@ Asset.drawBatches=function(self)
         -- use hyperbolicRotateShader from first batch to player focus batch (only excluding foreground).
         if batch==Asset.bossMeshes then
             if G.runInfo.player then
-                G.runInfo.geometry:applyDrawShader(G.runInfo.player)
+                G.runInfo.geometry:applyVertexShader(G.runInfo.player)
             end
         end
         if batch==Asset.foregroundBatch then
@@ -321,8 +321,16 @@ Asset.drawBatches=function(self)
             self.batchExtraActions[batch].after()
         end
         love.graphics.setBlendMode('alpha') -- default mode
-        if batch==Asset.playerFocusBatch then
+        if batch==Asset.playerFocusBatch then -- end of 'main' layer
+            -- love.graphics.setShader()
+            -- if G.runInfo.player then
+            --     G.runInfo.geometry:applyPixelShader(G.runInfo.player)
+            -- end
+            -- love.graphics.setCanvas()
+            -- love.graphics.draw(G.mainCanvas)
             love.graphics.setShader()
+            shove.endLayer()
+            shove.beginLayer('UIBatches')
         end
     end
 end

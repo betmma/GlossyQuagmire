@@ -6,8 +6,9 @@ local G={
             local colorRef={love.graphics.getColor()}
             Asset.foregroundBatch:setColor(colorRef[1],colorRef[2],colorRef[3],self.foregroundTransparency)
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
-            -- Asset.foregroundBatch:add(Asset.backgroundRight,500,0,0,1,1,0,0)
-            Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
+            if self.runInfo.geometry~=self.geometries.Spherical then
+                Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
+            end
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
             Asset:flushBatches()
             Asset:drawBatches()
@@ -82,14 +83,6 @@ G={
         end
 
         local lastState=self.STATE
-        
-        if lastState==self.STATES.MAIN_MENU and state==self.STATES.CHOOSE_LEVELS and self.save.extraUnlock.firstStart then -- skip choose levels menu if first start
-            self.save.extraUnlock.firstStart = false
-            self.UIDEF.CHOOSE_LEVELS.chosenLevel=1
-            self.UIDEF.CHOOSE_LEVELS.chosenScene=1
-            self:enterLevel(1,1)
-            return
-        end
         EventManager.post(EventManager.EVENTS.SWITCH_STATE,self.STATE,state)
 
         -- check if there is transition data between current state and the state to switch to
@@ -359,6 +352,8 @@ G.update=function(self,dt)
 
     UI.Base:cleanObjects() -- to remove removed elements in class.objects
 end
+CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
+G.mainCanvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 G.draw=function(self)
     shove.beginLayer('main')
     self.currentUI=self.UIDEF[self.STATE]
@@ -390,6 +385,8 @@ G._drawBatches=function(self)
     if not self.backgroundPattern.noZoom or G.viewMode.mode==G.CONSTANTS.VIEW_MODES.NORMAL then
         self.backgroundPattern:draw()
     end
+    -- love.graphics.setCanvas(G.mainCanvas)
+    -- love.graphics.clear()
     self.currentUI.draw(self)
 end
 -- remove all objects in the scene

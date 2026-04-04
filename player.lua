@@ -311,6 +311,6 @@ function Player:hitEffect(damage)
         end
     }
 end
-EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
+-- EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
 
 return Player

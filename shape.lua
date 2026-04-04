@@ -73,7 +73,11 @@ function Shape:drawQuad(args)
         for i,screenPos in ipairs(screenPositions) do
             if not screenPos.dummy then
                 ---@cast screenPos ScreenPosition
-                self:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeRatio*zoomFactorToScreen[i],normalBatch)
+                local rotationWithScreen=rotation+(screenPos.rotation or 0)
+                if screenPos.flip then
+                    rotationWithScreen=rotationWithScreen*-1
+                end
+                self:simpleDrawQuad(quad,w,h,screenPos,rotationWithScreen,sizeRatio*zoomFactorToScreen[i],normalBatch)
             end
         end
     else

@@ -6,6 +6,11 @@ local GeometryBase = ...
 ---@field radius number
 
 ---@class SphericalViewConfig:ViewConfig
+---@field sourceCircleRadius number projection radius used by toScreen, independent from final display circles.
+---@field sourceCutoffZ number cutoff for toScreen/source projection generation.
+---@field shaderCutoffZ number cutoff passed to shader for final keep/remap. 0 means each circle contains a hemisphere. larger value means more overlap.
+---@field sourcePrimaryCenter ScreenPosition
+---@field sourceSecondaryCenter ScreenPosition
 ---@field primaryCircle SphericalCircleConfig
 ---@field secondaryCircle SphericalCircleConfig
 
@@ -14,12 +19,17 @@ local Spherical = GeometryBase:extend()
 
 Spherical.radius = 220
 Spherical.EPS = 1e-8
-Spherical.CUTOFF_Z = math.sqrt(0.5) -- 45 deg latitude on a unit sphere.
+local CUTOFF_Z = math.sqrt(0.5) -- 45 deg latitude on a unit sphere.
 
 ---@type SphericalViewConfig
 Spherical.viewConfig = {
-    following = false,
+    following = true,
     screenCenter = { x = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 40, y = WINDOW_HEIGHT / 2 },
+    sourceCircleRadius = WINDOW_WIDTH * 0.16,
+    sourceCutoffZ = CUTOFF_Z,
+    shaderCutoffZ = 0,
+    sourcePrimaryCenter = { x = WINDOW_WIDTH * 0.33, y = WINDOW_HEIGHT * 0.50 },
+    sourceSecondaryCenter = { x = WINDOW_WIDTH * 0.67, y = WINDOW_HEIGHT * 0.50 },
     primaryCircle = {
         center = { x = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 40, y = WINDOW_HEIGHT / 2 },
         radius = WINDOW_HEIGHT * 7/15,
@@ -103,12 +113,20 @@ local function from_unit(unitPos)
     return scale(unitPos, Spherical.radius)
 end
 
-local function projection_limit_radius()
-    local c = Spherical.CUTOFF_Z
+local function projection_limit_radius(c)
     return (2 * Spherical.radius * math.sqrt(1 - c * c)) / (1 - c)
 end
 
-Spherical.PROJECTION_LIMIT_RADIUS = projection_limit_radius()
+local function source_projection_limit_radius()
+    local c = clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
+    return projection_limit_radius(c)
+end
+
+local function source_hemisphere_radius_pixels()
+    local sourceLimit = source_projection_limit_radius()
+    local hemisphereLimit = projection_limit_radius(0)
+    return Spherical.viewConfig.sourceCircleRadius * hemisphereLimit / sourceLimit
+end
 
 local function project_from_north(unitPos)
     local denom = 1 - unitPos.z
@@ -128,12 +146,13 @@ local function project_from_south(unitPos)
     return { x = k * unitPos.x, y = k * unitPos.y }
 end
 
-local function map_to_circle(proj, circle)
-    local normalizedX = proj.x / Spherical.PROJECTION_LIMIT_RADIUS
-    local normalizedY = proj.y / Spherical.PROJECTION_LIMIT_RADIUS
+local function map_to_source_circle(proj, center)
+    local limitR = source_projection_limit_radius()
+    local normalizedX = proj.x / limitR
+    local normalizedY = proj.y / limitR
     return {
-        x = circle.center.x + normalizedX * circle.radius,
-        y = circle.center.y + normalizedY * circle.radius,
+        x = center.x + normalizedX * Spherical.viewConfig.sourceCircleRadius,
+        y = center.y + normalizedY * Spherical.viewConfig.sourceCircleRadius,
     }
 end
 
@@ -223,21 +242,26 @@ end
 
 function Spherical:toScreen(position)
     local u = to_unit(position)
+    ---@type (Dummy|ScreenPosition)[]
     local ret = { GeometryBase.Dummy, GeometryBase.Dummy }
+    local sourceCutoff = clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
 
     -- Primary map: project from viewer (north pole), cover 45N to 90S.
-    if u.z <= Spherical.CUTOFF_Z then
+    if u.z <= sourceCutoff then
         local p = project_from_north(u)
         if p then
-            ret[1] = map_to_circle(p, Spherical.viewConfig.primaryCircle)
+            ret[1] = map_to_source_circle(p, Spherical.viewConfig.sourcePrimaryCenter)
+            ret[1].rotation = -math.atan2(p.y,p.x)+math.pi/2
+            ret[1].flip = true
         end
     end
 
     -- Secondary map: project from south pole, cover 90N to 45S.
-    if u.z >= -Spherical.CUTOFF_Z then
+    if u.z >= -sourceCutoff then
         local p = project_from_south(u)
         if p then
-            ret[2] = map_to_circle(p, Spherical.viewConfig.secondaryCircle)
+            ret[2] = map_to_source_circle(p, Spherical.viewConfig.sourceSecondaryCenter)
+            ret[2].rotation = math.atan2(p.y,p.x)+math.pi/2
         end
     end
 
@@ -253,24 +277,25 @@ function Spherical:canSimpleDraw(position, radius)
     return false, sides
 end
 
-local sphericalShader = nil
-if ShaderScan and ShaderScan.load_shader then
-    local ok, shaderOrErr = pcall(function()
-        return ShaderScan:load_shader("shaders/sphericalDual.glsl")
-    end)
-    if ok then
-        sphericalShader = shaderOrErr
-    end
-end
-Spherical.sphericalShader = sphericalShader
+Spherical.sphericalShader = ShaderScan:load_shader("shaders/sphericalDual.glsl")
 
-function Spherical:applyDrawShader(viewer)
+function Spherical:applyVertexShader(viewer)
     local shader = Spherical.sphericalShader
-    if not shader then
-        return
-    end
 
-    love.graphics.setShader(shader)
+    shove.clearEffects('main')
+    shove.addEffect('main',shader)
+    -- love.graphics.setShader(shader)
+
+    shader:send("source_primary_center", {
+        Spherical.viewConfig.sourcePrimaryCenter.x,
+        Spherical.viewConfig.sourcePrimaryCenter.y,
+    })
+    shader:send("source_secondary_center", {
+        Spherical.viewConfig.sourceSecondaryCenter.x,
+        Spherical.viewConfig.sourceSecondaryCenter.y,
+    })
+    shader:send("source_hemisphere_radius", source_hemisphere_radius_pixels())
+
     shader:send("main_center", {
         Spherical.viewConfig.primaryCircle.center.x,
         Spherical.viewConfig.primaryCircle.center.y,
@@ -281,11 +306,16 @@ function Spherical:applyDrawShader(viewer)
         Spherical.viewConfig.secondaryCircle.center.y,
     })
     shader:send("mini_radius", Spherical.viewConfig.secondaryCircle.radius)
+    shader:send("cutoff_z", clamp(Spherical.viewConfig.shaderCutoffZ, 0, 0.999999))
 
-    if viewer and viewer.kinematicState and viewer.kinematicState.pos then
+    local viewerLat, viewerLon = 0.0, 0.0
+
+    if Spherical.viewConfig.following then
         local u = to_unit(viewer.kinematicState.pos)
-        shader:send("viewer_unit_pos", { u.x, u.y, u.z })
+        viewerLat = math.asin(clamp(u.z, -1, 1))
+        viewerLon = math.atan2(u.y, u.x)
     end
+    shader:send("viewer_lat_lon", { viewerLat, viewerLon })
 end
 
 function Spherical:applyForegroundShader()
@@ -295,17 +325,19 @@ end
 function Spherical:zoomFactorToScreen(position)
     local u = to_unit(position)
     local factors = { 0, 0 }
+    local sourceCutoff = Spherical.viewConfig.sourceCutoffZ
+    local sourceLimitR = source_projection_limit_radius()
 
-    if u.z <= Spherical.CUTOFF_Z then
+    if u.z <= sourceCutoff then
         local denom = 1 - u.z
         local stereoScale = (2 * Spherical.radius) / denom
-        factors[1] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.primaryCircle.radius / Spherical.PROJECTION_LIMIT_RADIUS)
+        factors[1] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.sourceCircleRadius / sourceLimitR)
     end
 
-    if u.z >= -Spherical.CUTOFF_Z then
+    if u.z >= -sourceCutoff then
         local denom = 1 + u.z
         local stereoScale = (2 * Spherical.radius) / denom
-        factors[2] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.secondaryCircle.radius / Spherical.PROJECTION_LIMIT_RADIUS)
+        factors[2] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.sourceCircleRadius / sourceLimitR)
     end
 
     return factors

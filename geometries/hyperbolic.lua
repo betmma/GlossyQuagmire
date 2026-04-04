@@ -198,7 +198,7 @@ end
 
 Hyperbolic.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRotateM.glsl")
 
-function Hyperbolic:applyDrawShader(viewer)
+function Hyperbolic:applyVertexShader(viewer)
     local shader=Hyperbolic.hyperbolicRotateShader
     love.graphics.setShader(shader)
     local center={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y}

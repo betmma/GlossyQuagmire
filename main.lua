@@ -1,4 +1,4 @@
-VERSION="0.0.4.5"
+VERSION="0.0.4.6"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
@@ -50,6 +50,7 @@ function love.load()
 
     shove.setWindowMode(G.save.options.resolution.width,G.save.options.resolution.height, {resizable = true})
     shove.createLayer("main",{stencil=true})
+    shove.createLayer("UIBatches")
     -- shove.addEffect('main',Player.invertShader)
 end
 function love.keypressed(key, scancode, isrepeat)

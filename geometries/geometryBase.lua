@@ -59,11 +59,15 @@ end
 
 GeometryBase.MESH_MAX_SIDES=64
 
-function GeometryBase:applyDrawShader(viewer)
+function GeometryBase:applyVertexShader(viewer)
     -- needs translation if viewConfig.following is true.
     if GeometryBase.viewConfig.following then
         love.graphics.translate(GeometryBase.viewConfig.screenCenter.x-viewer.kinematicState.pos.x,GeometryBase.viewConfig.screenCenter.y-viewer.kinematicState.pos.y)
     end
+end
+
+function GeometryBase:applyPixelShader(viewer)
+    -- default does nothing
 end
 
 function GeometryBase:applyForegroundShader()
