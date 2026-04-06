@@ -93,7 +93,7 @@ function GeometryBase:zoomFactorToScreen(position)
 end
 
 local geometries={
-    GeometryBase=GeometryBase,
+    -- GeometryBase=GeometryBase,
     Euclidean=GeometryBase,
 ---@type Hyperbolic
     Hyperbolic=love.filesystem.load("geometries/hyperbolic.lua")(GeometryBase),

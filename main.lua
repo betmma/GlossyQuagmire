@@ -1,4 +1,4 @@
-VERSION="0.0.5"
+VERSION="0.0.6"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"
@@ -22,24 +22,27 @@ function love.load()
     ShaderScan = (require 'import.shaderScan')()
     EventManager = require "eventManager"
     EM = EventManager
+    MeshFuncs = require "meshFuncs"
     Shape = require "shape"
     Player = require "player"
     Bullet = require "bullet"
+    ---@class PlayerShot:Bullet
+    PlayerShot=Bullet:extend()
     -- Laser=require"laser"
     -- PolyLine = require "polyline"
     Event= require "event"
     BulletSpawner=require"bulletSpawner"
-    -- Enemy=require"enemy"
+    Enemy=require"enemy"
+    Boss=Enemy.Boss
     Asset=require"loadAsset"
+    ---@type AssetBulletSpritesCollection
     BulletSprites,BulletBatch,SpriteData=Asset.bulletSprites,Asset.bulletBatch,Asset.SpriteData
     Audio=require"audio"
     SFX=Audio.sfx;BGM=Audio.bgm
     Effect=require"effect"
-    -- ---@type AssetBulletSpritesCollection
     -- LevelData = require "levelData"
     -- DialogueController=require"localization.dialogue"
     -- Upgrades = require "upgrades"
-    UIHelper = require "uiHelper"
     G=require"state"
     ---@type NoticeManager
     NoticeManager=require"notice"

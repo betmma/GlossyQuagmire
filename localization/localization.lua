@@ -396,8 +396,8 @@ return {
                 zh_cn = '常世国传说',
             },
             description = {
-                en_us = 'The title screen theme. The atmosphere is quite similar to Legend of Hourai: soft and nostalgic, like a storyteller begins to tell a tale of the past. The ending is already known, but they are still touched by the MC\'s resolution.',
-                zh_cn = '标题画面音乐。氛围与《蓬莱传说》相似：柔和而怀旧，就像说书人开始讲一个过去的故事。结局已经为人所知，却仍被主角的愿望所感动。',
+                en_us = 'The title screen theme.\nThe atmosphere is quite similar to Legend of Hourai: soft and nostalgic, like a storyteller begins to tell a tale of the past. The ending is already known, but they are still touched by the MC\'s resolution.',
+                zh_cn = '标题画面的主题曲。\n氛围与《蓬莱传说》相似：柔和而怀旧，就像说书人开始讲一个过去的故事。结局已经为人所知，却仍被主角的愿望所感动。',
             },
         },
         level2b = {
@@ -407,9 +407,19 @@ return {
             },
             description = {
                 en_us = 'Tooshi Katsuyama\'s theme. (Currently also used as the title screen music)\nA playful and bouncy composition. The whole song keeps using similar rhythm patterns, but the switching of instruments and melodies makes it feel fresh and interesting the whole time. The fox gave herself a stoic name to mislead people (^^;',
-                zh_cn = '堪山远志的主题。 (目前也用作标题屏幕音乐)\n一个有趣且弹跳的曲子。整首歌持续使用相似的节奏模式，但乐器和旋律的切换使曲子新鲜又有趣。狐狸给自己起了一个坚忍的名字来误导人们(^^;',
+                zh_cn = '堪山远志的主题曲。 (目前也用作标题画面的主题曲)\n一个有趣且弹跳的曲子。整首歌持续使用相似的节奏模式，但乐器和旋律的切换使曲子新鲜又有趣。狐狸给自己起了一个坚忍的名字来误导人们(^^;',
             },
         },
+        level5 = {
+            name = {
+                en_us = 'Radio Signal Across the Ether',
+                zh_cn = '穿越苍天的电波',
+            },
+            description = {
+                en_us = 'Stage 5\'s theme.\nThe intro is repeated call and response, like sending and receiving radio signals. The title seems not related to the story? Just regard the flying protagonist as a radio signal (^^;',
+                zh_cn = '5面的主题曲。\n前奏是重复的对唱，就像发送和接收无线电信号一样。这个曲名似乎与故事无关？就把飞行的主角当作无线电信号吧(^^;',
+            }
+        }
     },
     ---@type table<string, NicknameLocalization>
     nickname = {},

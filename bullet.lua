@@ -87,13 +87,6 @@ function Bullet:new(args)
     end
 end
 
-function Bullet:getHitboxRadius()
-    if self.sprite and self.sprite.data and self.sprite.data.hitRadius then
-        return self.sprite.data.hitRadius * self.size
-    end
-    return self.size
-end
-
 function Bullet:draw()
     if not self.sprite then
         return
@@ -122,7 +115,7 @@ end
 ---@param color number[]|nil
 function Bullet:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,sideNum)
     -- inner radius is hitbox radius
-    local ringMeshes,fanMeshes=Shape:ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,image,sideNum,color)
+    local ringMeshes,fanMeshes=MeshFuncs.ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,image,sideNum,color)
     for _,mesh in ipairs(ringMeshes) do
         meshBatch:add(mesh)
     end
@@ -165,19 +158,20 @@ function Bullet:checkShockwaveRemove()
 end
 
 function Bullet:checkHitPlayer()
-    if not self.safe then
-        local selfRadius=self:getHitboxRadius()
-        for key, player in pairs(Player.objects) do
-            ---@cast player Player
-            local dis=G.runInfo.geometry:distance(player.kinematicState.pos,self.kinematicState.pos)
-            local radi=player.radius+selfRadius
-            if dis<radi+player.radius*player.grazeRadiusFactor and not self.grazed then
-                EventManager.post(EventManager.EVENTS.PLAYER_GRAZE,player,self:grazeValue())
-                self.grazed=true
-            end
-            if player.invincibleFrame<=0 and dis<radi then
-                EventManager.post(EventManager.EVENTS.PLAYER_HIT,player,self.damage or 1)
-            end
+    if self.safe then
+        return
+    end
+    local selfRadius=self:getHitboxRadius()
+    for key, player in pairs(Player.objects) do
+        ---@cast player Player
+        local dis=G.runInfo.geometry:distance(player.kinematicState.pos,self.kinematicState.pos)
+        local radi=player.radius+selfRadius
+        if dis<radi+player.radius*player.grazeRadiusFactor and not self.grazed and self.grazeValue then
+            EventManager.post(EventManager.EVENTS.PLAYER_GRAZE,player,self:grazeValue())
+            self.grazed=true
+        end
+        if player.invincibleFrame<=0 and dis<radi then
+            EventManager.post(EventManager.EVENTS.PLAYER_HIT,player,self.damage or 1)
         end
     end
 end
