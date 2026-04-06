@@ -277,7 +277,7 @@ function Boss:drawCircleHPBar()
     else
         self.circleHPBarMesh:setVertices(vertices)
     end
-    Asset.laserMeshes:add(self.circleHPBarMesh)
+    Asset.bossEffectMeshes:add(self.circleHPBarMesh)
     -- love.graphics.setColor(1,0.3,0.3,self.hpBarTransparency)
     for i,ratio in pairs(self.hpSegments) do
         local rin,rout=29.5,33.5
@@ -329,10 +329,7 @@ function Boss:drawHexagram()
         {hexagramPoints[2],hexagramPoints[4],hexagramPoints[6],hexagramPoints[2]}
     }
     for _,triangle in ipairs(triangles) do
-        local meshes=MeshFuncs.polylineMesh(triangle,width,BulletSprites.laser.red.quad,Asset.bulletImage,{1,0.5,0.5,0.8},nil,10)
-        for _,mesh in ipairs(meshes) do
-            Asset.bossMeshes:add(mesh)
-        end
+        MeshFuncs.polylineMesh(triangle,width,BulletSprites.laser.red.quad,{1,0.5,0.5,0.8},nil,10,Asset.bossEffectMeshes)
     end
 
     -- local color={love.graphics.getColor()}

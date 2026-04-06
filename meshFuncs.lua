@@ -3,14 +3,14 @@ local MeshFuncs={}
 ---@param poses Position[]
 ---@param width number
 ---@param quad love.Quad "quad of sprite"
----@param image love.Image "image of sprite"
 ---@param color number[]|nil
 ---@param gap number|nil the gap of interpolated points between two positions
 ---@param maxMiddlePoints number|nil the max number of interpolated points between two positions, to prevent too many points when the distance is long
----@return love.Mesh[] "polyline meshes"
-function MeshFuncs.polylineMesh(poses,width,quad,image,color,gap,maxMiddlePoints)
+---@param meshBatch MeshBatch adds the generated meshes to this batch
+---@return nil
+function MeshFuncs.polylineMesh(poses,width,quad,color,gap,maxMiddlePoints,meshBatch)
     local x,y,w,h=quad:getViewport()
-    local imgW,imgH=image:getDimensions()
+    local imgW,imgH=meshBatch.image:getDimensions()
     x,y,w,h=x/imgW,y/imgH,w/imgW,h/imgH
     color=color or {1,1,1,1}
     gap=gap or 10
@@ -48,15 +48,11 @@ function MeshFuncs.polylineMesh(poses,width,quad,image,color,gap,maxMiddlePoints
             end
         end
     end
-    local meshes={}
     for si,v in pairs(vertices) do
         if v and #v>=3 then
-            local mesh=love.graphics.newMesh(v,'strip')
-            mesh:setTexture(image)
-            table.insert(meshes,mesh)
+            meshBatch:add(v,'strip')
         end
     end
-    return meshes
 end
 
 
@@ -64,15 +60,14 @@ end
 ---@param position Position position of the center of the sprite in geometry space
 ---@param posR number "radius of object"
 ---@param quad love.Quad "quad of sprite"
----@param image love.Image "image of sprite"
 ---@param n integer "number of vertices on the circle"
 ---@param color number[]|nil "color RGBA, each in [0,1]"
 ---@param square boolean|nil "if true, vertices are calculated on a square instead of a circle (for square sprites)"
----@return love.Mesh[] "fan mesh"
-function MeshFuncs.fanMesh(position,posR,orientation,quad,image,n,color,square)
+---@param meshBatch MeshBatch adds the generated meshes to this batch
+function MeshFuncs.fanMesh(position,posR,orientation,quad,n,color,square,meshBatch)
     color=color or {1,1,1,1}
     local x,y,w,h=quad:getViewport() -- like 100, 100, 50, 50 so needs to divide width and height
-    local imgW,imgH=image:getDimensions()
+    local imgW,imgH=meshBatch.image:getDimensions()
     x,y,w,h=x/imgW,y/imgH,w/imgW,h/imgH
     local vertices={} -- multiple possible meshes
     local coreScreenPoses=G.runInfo.geometry:toScreen(position)
@@ -100,15 +95,11 @@ function MeshFuncs.fanMesh(position,posR,orientation,quad,image,n,color,square)
             end
         end
     end
-    local meshes={}
     for si,v in pairs(vertices) do
         if v and #v>=3 then
-            local mesh=love.graphics.newMesh(v,'fan')
-            mesh:setTexture(image)
-            table.insert(meshes,mesh)
+            meshBatch:add(v,'fan')
         end
     end
-    return meshes
 end
 
 
@@ -118,15 +109,13 @@ end
 ---@param outerR number "outer radius of ring"
 ---@param orientation angle "orientation of object"
 ---@param quad love.Quad "quad of sprite"
----@param image love.Image "image of sprite"
 ---@param n integer "number of vertices on the circle"
 ---@param color number[]|nil "color RGBA, each in [0,1]"
----@return love.Mesh[] "ring meshes"
----@return love.Mesh[] "fan meshes"
-function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,image,n,color)
+---@param meshBatch MeshBatch adds the generated meshes to this batch
+function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,meshBatch)
     color = color or {1, 1, 1, 1}
     local x, y, w, h = quad:getViewport()
-    local imgW, imgH = image:getDimensions()
+    local imgW, imgH = meshBatch.image:getDimensions()
     x, y, w, h = x/imgW, y/imgH, w/imgW, h/imgH
     
     local ratio = innerR / outerR
@@ -183,27 +172,19 @@ function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,image,n,c
         end
     end
 
-    -- 3. Create the Mesh objects
-    local ringMeshes = {}
-    local fanMeshes = {}
+    -- 3. Add Mesh objects
 
     for si, v in pairs(ringVertices) do
         if #v >= 4 then -- Minimum 2 pairs for a strip
-            local mesh = love.graphics.newMesh(v, 'strip')
-            mesh:setTexture(image)
-            table.insert(ringMeshes, mesh)
+            meshBatch:add(v, 'strip')
         end
     end
 
     for si, v in pairs(fanVertices) do
         if #v >= 3 then -- Center + 2 points for a fan
-            local mesh = love.graphics.newMesh(v, 'fan')
-            mesh:setTexture(image)
-            table.insert(fanMeshes, mesh)
+            meshBatch:add(v, 'fan')
         end
     end
-
-    return ringMeshes, fanMeshes
 end
 
 return MeshFuncs

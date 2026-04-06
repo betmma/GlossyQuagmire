@@ -55,7 +55,7 @@ end
 ---@field rotation number
 ---@field zoom number
 ---@field normalBatch love.SpriteBatch|nil
----@field meshBatch SpecialBatch|nil
+---@field meshBatch MeshBatch|nil
 ---@field color number[]|nil
 ---@field kinematicState KinematicState|nil if provided, will be used to determine the position and whether to draw as quad or mesh. if not provided, use self.kinematicState.
 
@@ -124,13 +124,10 @@ end
 ---@param quad love.Quad
 ---@param image love.Image
 ---@param color number[]|nil
----@param meshBatch SpecialBatch
+---@param meshBatch MeshBatch
 ---@param sideNum integer
 function Shape:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,sideNum)
-    local meshes=MeshFuncs.fanMesh(pos,radius,rotation,quad,image,sideNum,color)
-    for _,mesh in ipairs(meshes) do
-        meshBatch:add(mesh)
-    end
+    MeshFuncs.fanMesh(pos,radius,rotation,quad,sideNum,color,false,meshBatch)
 end
 
 ---@class Shape:GameObject

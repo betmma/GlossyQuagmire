@@ -208,17 +208,91 @@ end
 function SpecialBatch:draw()
 end
 
+---@alias MeshVertices {[1]:number,[2]:number,[3]:number,[4]:number,[5]:number,[6]:number,[7]:number,[8]:number}[]
+
+---@class MeshBatch:SpecialBatch Used for drawing shapes with mesh for better quality. It maintains one mesh and adds vertices on :add() for higher performance. it can only draw from one image.
+---@field image love.Image
+---@field mesh love.Mesh
+---@field capacity integer maximum number of vertices the mesh can hold. can auto grow
+---@field vertexCount integer current number of vertices in the mesh
+---@field vertices MeshVertices
+---@overload fun(image:love.Image,initialCapacity:integer):MeshBatch
 local MeshBatch=SpecialBatch:extend()
-function MeshBatch:new()
+function MeshBatch:new(image,initialCapacity)
     MeshBatch.super.new(self,'mesh')
+    initialCapacity=initialCapacity or 1000
+    self.image=image
+    self.capacity=initialCapacity
+    self.vertexCount=0
+    self.vertices={}
+    self.mesh= love.graphics.newMesh(initialCapacity, "triangles", "dynamic")
+    self.mesh:setTexture(self.image)
 end
+
+---@param vertices MeshVertices array of vertices, each vertex is {x,y,u,v,r,g,b,a}
+---@param mode "triangles"|"fan"|"strip" the mesh uses triangles and will auto convert vertices from given mode to triangles
+function MeshBatch:add(vertices,mode)
+    local vertexCount=#vertices
+    local neededVertexCount=vertexCount
+    if mode=='fan' then
+        neededVertexCount=(vertexCount-2)*3
+    elseif mode=='strip' then
+        neededVertexCount=(vertexCount-2)*3
+    end
+    local neededCapacity=self.vertexCount+neededVertexCount
+    if neededCapacity>self.capacity then
+        -- doubles
+        self.capacity=math.max(neededCapacity,self.capacity*2)
+        local newMesh=love.graphics.newMesh(self.capacity, "triangles", "dynamic")
+        newMesh:setTexture(self.image)
+        self.mesh=newMesh
+    end
+    if mode=="triangles" then
+        for i,vertex in pairs(vertices) do
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertex
+        end
+    elseif mode=="fan" then
+        for i=2,vertexCount-1 do
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertices[1]
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertices[i]
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertices[i+1]
+        end
+    elseif mode=="strip" then
+        for i=1,vertexCount-2 do
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertices[i]
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertices[i+1]
+            self.vertexCount=self.vertexCount+1
+            self.vertices[self.vertexCount]=vertices[i+2]
+        end
+    end
+end
+
+function MeshBatch:clear()
+    self.vertexCount=0
+end
+
+function MeshBatch:flush()
+    if self.vertexCount > 0 then
+        self.mesh:setVertices(self.vertices, 1, self.vertexCount)
+        self.mesh:setDrawRange(1, self.vertexCount)
+    end
+end
+
 function MeshBatch:draw()
-    for i, mesh in pairs(self.contents) do
-        love.graphics.draw(mesh)
+    if self.vertexCount > 0 then
+        love.graphics.draw(self.mesh)
     end
 end
 
 --- for love.graphics function calls
+--- @class FunctionBatch:SpecialBatch
+---@overload fun(self):FunctionBatch
 local FunctionBatch=SpecialBatch:extend()
 function FunctionBatch:new()
     FunctionBatch.super.new(self,'function')
@@ -230,40 +304,51 @@ function FunctionBatch:draw()
 end
 
 Asset.titleBatch=love.graphics.newSpriteBatch(titleImage,1,'stream') -- title screen
-
-Asset.bossMeshes=MeshBatch()
+-- for boss effects like hexagon and hp bar
+Asset.bossEffectMeshes=MeshBatch(Asset.bulletImage,500)
+Asset.bossMeshes=MeshBatch(Asset.bossImage,5)
 Asset.fairyBatch=love.graphics.newSpriteBatch(fairyImage,100,'stream')
 Asset.playerBatch=love.graphics.newSpriteBatch(playerImage, 5,'stream')
 Asset.playerBulletBatch=love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
-Asset.bigBulletMeshes=MeshBatch()
+Asset.bigBulletMeshes=MeshBatch(Asset.bulletImage,1000)
 Asset.bulletHighlightBatch = love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
-Asset.laserMeshes=MeshBatch()
+Asset.laserMeshes=MeshBatch(Asset.bulletImage,1000)
 Asset.bulletBatch = love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
 Asset.effectBatch=love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
-Asset.playerFocusMeshes=MeshBatch()
+Asset.playerFocusMeshes=MeshBatch(Asset.bulletImage,5)
 -- deprecated, use meshes for higher quality. maybe useful if a level has thousands of focus points and lags for meshes
 Asset.playerFocusBatch=love.graphics.newSpriteBatch(bulletImage, 5,'stream')
 Asset.foregroundBatch=love.graphics.newSpriteBatch(bgImage,5,'stream')
 Asset.portraitBatch=love.graphics.newSpriteBatch(portraitsImage,2)
 Asset.dialogueBatch=FunctionBatch()
 Asset.Batches={
-    Asset.bossMeshes,
-    Asset.fairyBatch,
-    Asset.playerBatch,
-    Asset.playerBulletBatch,
-    Asset.bigBulletMeshes,
-    Asset.bulletHighlightBatch,
-    Asset.laserMeshes,
-    Asset.bulletBatch,
-    Asset.effectBatch,
-    Asset.playerFocusMeshes,
-    Asset.playerFocusBatch,
-    -- G.afterExtraDraw here, not an element of batches
-    Asset.foregroundBatch,
-    Asset.titleBatch, -- draw the logo at bottom right in game
-    Asset.portraitBatch,
-    Asset.dialogueBatch,
+    MAIN={
+        Asset.bossEffectMeshes,
+        Asset.bossMeshes,
+        Asset.playerBatch,
+        Asset.playerBulletBatch,
+        Asset.fairyBatch,
+        Asset.bigBulletMeshes,
+        Asset.bulletHighlightBatch,
+        Asset.laserMeshes,
+        Asset.bulletBatch,
+        Asset.effectBatch,
+        Asset.playerFocusMeshes,
+        Asset.playerFocusBatch,
+    },
+    UI={
+        Asset.foregroundBatch,
+        Asset.titleBatch, -- draw the logo at bottom right in game
+        Asset.portraitBatch,
+        Asset.dialogueBatch,
+    }
 }
+Asset.BatchesList={}
+for layer, batches in pairs(Asset.Batches) do
+    for key, batch in pairs(batches) do
+        table.insert(Asset.BatchesList,batch)
+    end
+end
 --- batch:{before:fun()|nil,after:fun()|nil}
 Asset.batchExtraActions={
     [Asset.foregroundBatch]={ -- foreground always draw 800*600 full image and use a shader to make it hollow.
@@ -275,7 +360,7 @@ Asset.batchExtraActions={
         end
     }
 }
-for i,batch in pairs(Asset.Batches) do
+for i,batch in pairs(Asset.BatchesList) do
     if not Asset.batchExtraActions[batch] then
         Asset.batchExtraActions[batch]={}
     end
@@ -286,49 +371,46 @@ isHighlightBatch[Asset.bigBulletMeshes]=true
 isHighlightBatch[Asset.bulletHighlightBatch]=true
 isHighlightBatch[Asset.laserMeshes]=true
 Asset.clearBatches=function(self)
-    for key, batch in pairs(self.Batches) do
+    for key, batch in pairs(self.BatchesList) do
         batch:clear()
     end
 end
 Asset.flushBatches=function(self)
-    for key, batch in pairs(self.Batches) do
+    for key, batch in pairs(self.BatchesList) do
         batch:flush()
     end
 end
 local activeCanvas
 Asset.drawBatches=function(self)
-    for key, batch in pairs(self.Batches) do
-        -- use hyperbolicRotateShader from first batch to player focus batch (only excluding foreground).
-        if batch==Asset.bossMeshes then
-            if G:useCanvas() then
-                activeCanvas=love.graphics.getCanvas() -- shove is lying. it does not preserve canvas so must save and call setCanvas(activeCanvas) later
-                love.graphics.setCanvas(G.mainCanvas)
-                love.graphics.clear({0,0,0,1})
+    if G:useCanvas() then
+        activeCanvas=love.graphics.getCanvas() -- shove is lying. it does not preserve canvas so must save and call setCanvas(activeCanvas) later
+        love.graphics.setCanvas(G.mainCanvas)
+        love.graphics.clear({0,0,0,1})
+    end
+    if G.runInfo.player then
+        G.runInfo.geometry:applyVertexShader(G.runInfo.player)
+    end
+    for layer, batches in pairs(self.Batches) do
+        for key, batch in pairs(batches) do
+            if isHighlightBatch[batch] then
+                love.graphics.setBlendMode("add")
             end
-            if G.runInfo.player then
-                G.runInfo.geometry:applyVertexShader(G.runInfo.player)
+            if self.batchExtraActions[batch] and self.batchExtraActions[batch].before then
+                self.batchExtraActions[batch].before()
             end
+            if batch.draw then -- special batch
+                ---@cast batch FunctionBatch|MeshBatch
+                batch:draw()
+            else
+                ---@cast batch love.SpriteBatch
+                love.graphics.draw(batch)
+            end
+            if self.batchExtraActions[batch] and self.batchExtraActions[batch].after then
+                self.batchExtraActions[batch].after()
+            end
+            love.graphics.setBlendMode('alpha') -- default mode
         end
-        if batch==Asset.foregroundBatch then
-            love.graphics.origin()
-        end
-        if isHighlightBatch[batch] then
-            love.graphics.setBlendMode("add")
-        end
-        if self.batchExtraActions[batch] and self.batchExtraActions[batch].before then
-            self.batchExtraActions[batch].before()
-        end
-        if batch.draw then -- special batch
-            batch:draw()
-        else
-            love.graphics.draw(batch)
-        end
-        if self.batchExtraActions[batch] and self.batchExtraActions[batch].after then
-            self.batchExtraActions[batch].after()
-        end
-        love.graphics.setBlendMode('alpha') -- default mode
-        if batch==Asset.playerFocusBatch then -- end of 'main' layer
-            -- love.graphics.origin()
+        if layer=='MAIN' then
             if G:useCanvas() then
                 love.graphics.setShader()
                 if G.runInfo.player then
@@ -340,6 +422,7 @@ Asset.drawBatches=function(self)
             love.graphics.setShader()
             shove.endLayer()
             shove.beginLayer('UIBatches')
+            love.graphics.origin()
         end
     end
 end

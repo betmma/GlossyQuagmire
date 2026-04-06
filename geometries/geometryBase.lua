@@ -1,3 +1,5 @@
+--- method annotations are in meta/geometries.d.lua.
+
 ---@class GeometryBase
 local GeometryBase=Object:extend()
 function GeometryBase:new()
