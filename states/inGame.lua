@@ -68,7 +68,7 @@ return {
         -- Bullet{kinematicState={pos={x=250,y=400},speed=0,dir=math.pi/2},lifeFrame=9999,sprite=BulletSprites.round.blue}
         local spawnerPos=G.runInfo.geometry:rThetaGo(G.runInfo.player.kinematicState.pos,100,-math.pi/2)
         local spawner=BulletSpawner{
-            kinematicState={pos=spawnerPos,speed=0,dir=0},period=16,firstPeriod=3,lifeFrame=9999,bulletNumber=8,bulletSpeed=50,angle=0,range=math.pi*4,bulletSprite=BulletSprites.arrow.blue,bulletLifeFrame=600,bulletEvents={
+            kinematicState={pos=spawnerPos,speed=0,dir=0},period=916,firstPeriod=3,lifeFrame=9999,bulletNumber=8,bulletSpeed=50,angle=0,range=math.pi*4,bulletSprite=BulletSprites.arrow.blue,bulletLifeFrame=600,bulletEvents={
                 function(cir,args,self)
                     if args.index==1 then
                         self.angle=self.angle+math.pi/48

@@ -322,30 +322,36 @@ Asset.foregroundBatch=love.graphics.newSpriteBatch(bgImage,5,'stream')
 Asset.portraitBatch=love.graphics.newSpriteBatch(portraitsImage,2)
 Asset.dialogueBatch=FunctionBatch()
 Asset.Batches={
-    MAIN={
-        Asset.bossEffectMeshes,
-        Asset.bossMeshes,
-        Asset.playerBatch,
-        Asset.playerBulletBatch,
-        Asset.fairyBatch,
-        Asset.bigBulletMeshes,
-        Asset.bulletHighlightBatch,
-        Asset.laserMeshes,
-        Asset.bulletBatch,
-        Asset.effectBatch,
-        Asset.playerFocusMeshes,
-        Asset.playerFocusBatch,
+    {
+        name='MAIN',
+        batches={
+            Asset.bossEffectMeshes,
+            Asset.bossMeshes,
+            Asset.playerBatch,
+            Asset.playerBulletBatch,
+            Asset.fairyBatch,
+            Asset.bigBulletMeshes,
+            Asset.bulletHighlightBatch,
+            Asset.laserMeshes,
+            Asset.bulletBatch,
+            Asset.effectBatch,
+            Asset.playerFocusMeshes,
+            Asset.playerFocusBatch,
+        }
     },
-    UI={
-        Asset.foregroundBatch,
-        Asset.titleBatch, -- draw the logo at bottom right in game
-        Asset.portraitBatch,
-        Asset.dialogueBatch,
+    {
+        name='UI',
+        batches={
+            Asset.foregroundBatch,
+            Asset.titleBatch, -- draw the logo at bottom right in game
+            Asset.portraitBatch,
+            Asset.dialogueBatch,
+        }
     }
 }
 Asset.BatchesList={}
 for layer, batches in pairs(Asset.Batches) do
-    for key, batch in pairs(batches) do
+    for key, batch in pairs(batches.batches) do
         table.insert(Asset.BatchesList,batch)
     end
 end
@@ -390,8 +396,9 @@ Asset.drawBatches=function(self)
     if G.runInfo.player then
         G.runInfo.geometry:applyVertexShader(G.runInfo.player)
     end
-    for layer, batches in pairs(self.Batches) do
-        for key, batch in pairs(batches) do
+    for i, batches in pairs(self.Batches) do
+        local layer=batches.name
+        for key, batch in ipairs(batches.batches) do
             if isHighlightBatch[batch] then
                 love.graphics.setBlendMode("add")
             end

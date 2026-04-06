@@ -102,6 +102,62 @@ function MeshFuncs.fanMesh(position,posR,orientation,quad,n,color,square,meshBat
     end
 end
 
+-- this function isn't for large circle sprite, but for ring shape. The difference is, the texture is stretched and loops around the ring, instead of the ring part in a circle sprite like in ringFanMesh. 
+---@param position Position position of the center of the sprite in geometry space
+---@param innerR number "inner radius of ring"
+---@param outerR number "outer radius of ring"
+---@param orientation angle "orientation of object"
+---@param quad love.Quad "quad of sprite"
+---@param n integer "number of vertices on the circle"
+---@param color number[]|nil "color RGBA, each in [0,1]"
+---@param loopNum integer|nil "number of times the texture loops around the ring, default 1"
+---@param meshBatch MeshBatch adds the generated meshes to this batch
+function MeshFuncs.ringMesh(position,innerR,outerR,orientation,quad,n,color,loopNum,meshBatch)
+    color = color or {1, 1, 1, 1}
+    local x, y, w, h = quad:getViewport()
+    local imgW, imgH = meshBatch.image:getDimensions()
+    x, y, w, h = x/imgW, y/imgH, w/imgW, h/imgH
+    local ringMeshVertices={}
+    loopNum=loopNum or 2
+    local oneLoopVertices=math.floor(n/loopNum)
+    n=n-n%loopNum -- make sure it's multiple of loopNum, or can't loop properly
+    
+    for i = 0, n do
+        local angle = math.pi * 2 / n * i
+        local loopRatio=i%oneLoopVertices/oneLoopVertices
+        local loopHappens=loopRatio==0 and i>0
+        -- Geometric positions
+        local posOuter = G.runInfo.geometry:rThetaGo(position, outerR, angle + orientation)
+        local posInner = G.runInfo.geometry:rThetaGo(position, innerR, angle + orientation)
+        -- Screen positions
+        local outerScreens = G.runInfo.geometry:toScreen(posOuter)
+        local innerScreens = G.runInfo.geometry:toScreen(posInner)
+        for si = 1, #outerScreens do
+            if not ringMeshVertices[si] then
+                ringMeshVertices[si]={}
+            end
+            local currentVertices=ringMeshVertices[si]
+            local pO = outerScreens[si]
+            local pI = innerScreens[si]
+            if not pO.dummy and not pI.dummy then
+                ---@cast pO ScreenPosition
+                ---@cast pI ScreenPosition
+                if loopHappens then -- add 2 points with loopRatio=1. boss hexagram uses laserDark.red, if loopRatio=1 this causes strange fade at the loop point. it looks like the sprite below is leaking but it should not happen
+                    table.insert(currentVertices,{pO.x,pO.y,x,y+h*0.95,color[1],color[2],color[3],color[4]})
+                    table.insert(currentVertices,{pI.x,pI.y,x+w,y+h*0.95,color[1],color[2],color[3],color[4]})
+                end
+                table.insert(currentVertices,{pO.x,pO.y,x,y+h*loopRatio,color[1],color[2],color[3],color[4]})
+                table.insert(currentVertices,{pI.x,pI.y,x+w,y+h*loopRatio,color[1],color[2],color[3],color[4]})
+            end
+        end
+    end
+
+    for si, v in pairs(ringMeshVertices) do
+        if #v >= 4 then -- Minimum 2 pairs for a strip
+            meshBatch:add(v, 'strip')
+        end
+    end
+end
 
 -- calculate double layered ring+fan mesh for drawing large sprite to reduce distortion. generally, innerR is hitbox radius and outerR is sprite radius, to ensure that hitbox size and overall size are all accurate.
 ---@param position Position position of the center of the sprite in geometry space
@@ -137,15 +193,12 @@ function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,m
     for i = 0, n do
         local angle = math.pi * 2 / n * i
         local cosA, sinA = math.cos(angle), math.sin(angle)
-        
         -- Geometric positions
         local posOuter = G.runInfo.geometry:rThetaGo(position, outerR, angle + orientation)
         local posInner = G.runInfo.geometry:rThetaGo(position, innerR, angle + orientation)
-        
         -- Screen positions
         local outerScreens = G.runInfo.geometry:toScreen(posOuter)
         local innerScreens = G.runInfo.geometry:toScreen(posInner)
-        
         -- UV coordinates
         -- Outer: radius 1.0 (relative to outerR)
         local uO, vO = (cosA + 1) / 2, (sinA + 1) / 2
@@ -156,15 +209,12 @@ function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,m
             if fanVertices[si] then -- only process if this screen instance is valid
                 local pO = outerScreens[si]
                 local pI = innerScreens[si]
-                
                 if pO and not pO.dummy and pI and not pI.dummy then
                     ---@cast pO ScreenPosition
                     ---@cast pI ScreenPosition
-                    
                     -- Add to Ring (Strip) - Order: Outer, Inner, Outer, Inner...
                     table.insert(ringVertices[si], {pO.x, pO.y, x + uO*w, y + vO*h, color[1], color[2], color[3], color[4]})
                     table.insert(ringVertices[si], {pI.x, pI.y, x + uI*w, y + vI*h, color[1], color[2], color[3], color[4]})
-                    
                     -- Add to Fan - Extends from center to Inner Radius
                     table.insert(fanVertices[si], {pI.x, pI.y, x + uI*w, y + vI*h, color[1], color[2], color[3], color[4]})
                 end
@@ -173,13 +223,11 @@ function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,m
     end
 
     -- 3. Add Mesh objects
-
     for si, v in pairs(ringVertices) do
         if #v >= 4 then -- Minimum 2 pairs for a strip
             meshBatch:add(v, 'strip')
         end
     end
-
     for si, v in pairs(fanVertices) do
         if #v >= 3 then -- Center + 2 points for a fan
             meshBatch:add(v, 'fan')

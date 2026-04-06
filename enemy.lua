@@ -331,41 +331,8 @@ function Boss:drawHexagram()
     for _,triangle in ipairs(triangles) do
         MeshFuncs.polylineMesh(triangle,width,BulletSprites.laser.red.quad,{1,0.5,0.5,0.8},nil,10,Asset.bossEffectMeshes)
     end
-
-    -- local color={love.graphics.getColor()}
-    -- love.graphics.setColor(0.5,0.1,0.1)
-    -- local width=love.graphics.getLineWidth()
-    -- love.graphics.setLineWidth(2)
-    -- local points={}
-    -- local theta=self.time*3/5
-    -- local rIN=40
-    -- local rOUT=45
-    -- for i=1,6 do
-    --     local alpha=theta+math.pi*2/6*(i-1)
-    --     local nx,ny=Shape.rThetaPos(self.x,self.y,rIN,alpha)
-    --     local newpoint={nx,ny}
-    --     points[#points+1]=newpoint
-    -- end
-    -- for i=1,#points do
-    --     Shape.drawSegment(points[i][1],points[i][2],points[(i+1)%#points+1][1],points[(i+1)%#points+1][2],10)
-    -- end
-    -- Shape.drawCircle(self.x,self.y,rIN)
-    -- Shape.drawCircle(self.x,self.y,rOUT)
-
-    -- -- draw miniatures between the two circles
-    -- local rM=(rIN+rOUT)/2
-    -- local dM=(rM-rIN)/2
-    -- local dtheta=0.03
-    -- for i=1,12 do
-    --     local alpha=theta+math.pi*2/12*(i-0.5)
-    --     local x1,y1=Shape.rThetaPos(self.x,self.y,rM+dM*math.sin(theta*2.167+i*3.16),alpha+dtheta*math.sin(theta*1.943+5632+i*63.3))
-    --     local x2,y2=Shape.rThetaPos(self.x,self.y,rM+dM*math.sin(theta*1.469+i*9.4),alpha+dtheta*(math.sin(theta*2.136+562+i*7.74))+0.03)
-    --     local x3,y3=Shape.rThetaPos(self.x,self.y,rM+dM*math.sin(theta*2.463+i*13.3),alpha+dtheta*(math.sin(theta*1.796+1592+i*29.1))+0.06)
-    --     Shape.drawSegment(x1,y1,x2,y2,1)
-    --     Shape.drawSegment(x3,y3,x2,y2,1)
-    -- end
-    -- love.graphics.setLineWidth(width)
-    -- love.graphics.setColor(color[1],color[2],color[3])
+    local ringWidth=30
+    MeshFuncs.ringMesh(selfPos,hexagramSize,hexagramSize+ringWidth,self.time*6/5,BulletSprites.laserDark.red.quad,48,{1,0.5,0.5,0.8},nil,Asset.bossEffectMeshes)
 end
 Enemy.Boss=Boss
 return Enemy
