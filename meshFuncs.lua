@@ -26,24 +26,24 @@ function MeshFuncs.polylineMesh(poses,width,quad,color,gap,maxMiddlePoints,meshB
             local middlePos,middleDir=G.runInfo.geometry:rThetaGo(pos1,middleDistance,direction)
             local side1Pos=G.runInfo.geometry:rThetaGo(middlePos,width/2,middleDir+math.pi/2)
             local side1ScreenPoses=G.runInfo.geometry:toScreen(side1Pos)
-            for k,side1ScreenPos in ipairs(side1ScreenPoses) do
-                if not side1ScreenPos.dummy then
-                    if not vertices[k] then
-                        vertices[k]={}
-                    end
-                    ---@cast side1ScreenPos ScreenPosition
-                    table.insert(vertices[k],{side1ScreenPos.x,side1ScreenPos.y,x,y,color[1],color[2],color[3],color[4]})
-                end
-            end
             local side2Pos=G.runInfo.geometry:rThetaGo(middlePos,width/2,middleDir-math.pi/2)
             local side2ScreenPoses=G.runInfo.geometry:toScreen(side2Pos)
-            for k,side2ScreenPos in ipairs(side2ScreenPoses) do
-                if not side2ScreenPos.dummy then
-                    if not vertices[k] then
-                        vertices[k]={}
-                    end
+            for si=1,#side1ScreenPoses do
+                if not vertices[si] then
+                    vertices[si]={}
+                end
+                local side1ScreenPos=side1ScreenPoses[si]
+                local side2ScreenPos=side2ScreenPoses[si]
+                if not side1ScreenPos.dummy and not side2ScreenPos.dummy then
+                    ---@cast side1ScreenPos ScreenPosition
                     ---@cast side2ScreenPos ScreenPosition
-                    table.insert(vertices[k],{side2ScreenPos.x,side2ScreenPos.y,x+w,y+h,color[1],color[2],color[3],color[4]})
+                    table.insert(vertices[si],{side1ScreenPos.x,side1ScreenPos.y,x,y,color[1],color[2],color[3],color[4]})
+                    table.insert(vertices[si],{side2ScreenPos.x,side2ScreenPos.y,x+w,y+h,color[1],color[2],color[3],color[4]})
+                else
+                    if #vertices[si]>=3 then -- dummy points mean current mesh is broken, need to add the mesh and start a new one
+                        meshBatch:add(vertices[si],'strip')
+                    end
+                    vertices[si]={}
                 end
             end
         end
@@ -91,6 +91,11 @@ function MeshFuncs.fanMesh(position,posR,orientation,quad,n,color,square,meshBat
                 local u,v=(math.cos(angle)*rRatio+1)/2,(math.sin(angle)*rRatio+1)/2
                 if vertices[si] then
                     table.insert(vertices[si], {x2,y2,x+u*w,y+v*h,color[1],color[2],color[3],color[4]})
+                end
+            else
+                if vertices[si] and #vertices[si]>=3 then -- dummy points mean current mesh is broken, need to add the mesh and start a new one
+                    meshBatch:add(vertices[si],'fan')
+                    vertices[si]={vertices[si][1]} -- keep the center point for next mesh
                 end
             end
         end
@@ -148,12 +153,17 @@ function MeshFuncs.ringMesh(position,innerR,outerR,orientation,quad,n,color,loop
                 end
                 table.insert(currentVertices,{pO.x,pO.y,x,y+h*loopRatio,color[1],color[2],color[3],color[4]})
                 table.insert(currentVertices,{pI.x,pI.y,x+w,y+h*loopRatio,color[1],color[2],color[3],color[4]})
+            else
+                if #currentVertices>=3 then -- dummy points mean current mesh is broken, need to add the mesh and start a new one
+                    meshBatch:add(currentVertices,'strip')
+                end
+                ringMeshVertices[si]={}
             end
         end
     end
 
     for si, v in pairs(ringMeshVertices) do
-        if #v >= 4 then -- Minimum 2 pairs for a strip
+        if #v >= 3 then
             meshBatch:add(v, 'strip')
         end
     end
@@ -217,6 +227,15 @@ function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,m
                     table.insert(ringVertices[si], {pI.x, pI.y, x + uI*w, y + vI*h, color[1], color[2], color[3], color[4]})
                     -- Add to Fan - Extends from center to Inner Radius
                     table.insert(fanVertices[si], {pI.x, pI.y, x + uI*w, y + vI*h, color[1], color[2], color[3], color[4]})
+                else
+                    if #ringVertices[si] >= 3 then -- dummy points mean current mesh is broken, need to add the mesh and start a new one.
+                        meshBatch:add(ringVertices[si], 'strip')
+                    end
+                    ringVertices[si] = {}
+                    if #fanVertices[si] >= 3 then
+                        meshBatch:add(fanVertices[si], 'fan')
+                    end
+                    fanVertices[si] = {fanVertices[si][1]} -- keep the center point for next mesh
                 end
             end
         end
@@ -224,7 +243,7 @@ function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,m
 
     -- 3. Add Mesh objects
     for si, v in pairs(ringVertices) do
-        if #v >= 4 then -- Minimum 2 pairs for a strip
+        if #v >= 3 then -- Minimum 3 points for a strip
             meshBatch:add(v, 'strip')
         end
     end
