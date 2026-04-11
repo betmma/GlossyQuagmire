@@ -139,15 +139,16 @@ function Bullet:draw()
 end
 
 ---@param pos Position
----@param radius number
+---@param w number
+---@param h number
 ---@param rotation number
 ---@param quad love.Quad
 ---@param color number[]|nil
 ---@param meshBatch MeshBatch
 ---@param sideNum integer
-function Bullet:meshDrawQuad(pos,radius,rotation,quad,color,meshBatch,sideNum)
+function Bullet:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum)
     -- inner radius is hitbox radius
-    MeshFuncs.ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,sideNum,color,meshBatch)
+    MeshFuncs.ringFanMesh(pos,self:getHitboxRadius(),w,h,rotation,quad,sideNum,color,meshBatch)
 end
 
 function Bullet:update(dt)

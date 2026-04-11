@@ -103,15 +103,16 @@ function MeshFuncs.polylineMesh(poses,width,quad,color,gap,maxMiddlePoints,meshB
 end
 
 
--- calculate fan mesh for drawing large sprite to reduce distortion
+-- calculate fan mesh for drawing large sprite to reduce distortion. note that, since sprite is always in euclidean geometry, there is still distortion. this function ensures the rim of circle (or oval, square, rectangle) is accurate to preserve the shape, but the inner part is still distorted. this is achieved by calculating the polar position of vertices in euclidean geometry, then use geometry:rThetaGo to find the actual position in current geometry.
 ---@param position Position position of the center of the sprite in geometry space
----@param posR number "radius of object"
+---@param objW number "width of object"
+---@param objH number height of object
 ---@param quad love.Quad "quad of sprite"
 ---@param n integer "number of vertices on the circle"
 ---@param color number[]|nil "color RGBA, each in [0,1]"
 ---@param square boolean|nil "if true, vertices are calculated on a square instead of a circle (for square sprites)"
 ---@param meshBatch MeshBatch adds the generated meshes to this batch
-function MeshFuncs.fanMesh(position,posR,orientation,quad,n,color,square,meshBatch)
+function MeshFuncs.fanMesh(position,objW,objH,orientation,quad,n,color,square,meshBatch)
     local x, y, w, h, c = MeshHelper.getUVsAndColor(quad, meshBatch, color)
     local acc = MeshHelper.newAccumulator(meshBatch, 'fan')
     -- Setup Center point (Prefix)
@@ -125,7 +126,19 @@ function MeshFuncs.fanMesh(position,posR,orientation,quad,n,color,square,meshBat
     for i = 0, n do
         local angle = math.pi * 2 / n * i
         local rRatio = square and (1 / math.cos((angle + math.pi/4) % (math.pi/2) - math.pi/4)) or 1
-        local poses = G.runInfo.geometry:toScreen(G.runInfo.geometry:rThetaGo(position, posR * rRatio, angle + orientation))
+        -- 1. Calculate the local X and Y relative to the center before rotation
+        -- We apply rRatio here so that if 'square' is true, it becomes a rectangle
+        local localX = (objW / 2) * math.cos(angle) * rRatio
+        local localY = (objH / 2) * math.sin(angle) * rRatio
+        
+        -- 2. Calculate the distance (radius) from center to this specific point
+        local dist = math.sqrt(localX^2 + localY^2)
+        
+        -- 3. Calculate the actual angle of this point relative to the local center
+        local angleOffset = math.atan2(localY, localX)
+        
+        -- 4. Use rThetaGo with the calculated distance and the combined angle
+        local poses = G.runInfo.geometry:toScreen(G.runInfo.geometry:rThetaGo(position, dist, angleOffset + orientation))
         for si, screenPos in ipairs(poses) do
             if not screenPos.dummy then
                 local u, v = (math.cos(angle)*rRatio + 1)/2, (math.sin(angle)*rRatio + 1)/2
@@ -190,38 +203,54 @@ function MeshFuncs.ringMesh(position,innerR,outerR,orientation,quad,n,color,loop
     acc:flushAll()
 end
 
--- calculate double layered ring+fan mesh for drawing large sprite to reduce distortion. generally, innerR is hitbox radius and outerR is sprite radius, to ensure that hitbox size and overall size are all accurate.
+-- calculate double layered ring+fan mesh for drawing large sprite to reduce distortion. generally, innerR is hitbox radius and outer W and H are sprite size, to ensure that hitbox size and overall size are all accurate.
 ---@param position Position position of the center of the sprite in geometry space
----@param innerR number "inner radius of ring"
----@param outerR number "outer radius of ring"
+---@param innerR number "inner radius of ring (hitbox circle)"
+---@param outerWidth number "outer width of ring (sprite width)"
+---@param outerHeight number "outer height of ring (sprite height)"
 ---@param orientation angle "orientation of object"
 ---@param quad love.Quad "quad of sprite"
 ---@param n integer "number of vertices on the circle"
 ---@param color number[]|nil "color RGBA, each in [0,1]"
 ---@param meshBatch MeshBatch adds the generated meshes to this batch
-function MeshFuncs.ringFanMesh(position,innerR,outerR,orientation,quad,n,color,meshBatch)
+function MeshFuncs.ringFanMesh(position,innerR,outerWidth,outerHeight,orientation,quad,n,color,meshBatch)
     local x, y, w, h, c = MeshHelper.getUVsAndColor(quad, meshBatch, color)
-    local ratio = innerR / outerR
-    -- We can use TWO accumulators side-by-side perfectly!
+    
     local ringAcc = MeshHelper.newAccumulator(meshBatch, 'strip')
     local fanAcc = MeshHelper.newAccumulator(meshBatch, 'fan')
     local coreScreenPoses = G.runInfo.geometry:toScreen(position)
+    
+    -- Half dimensions for ellipse calculations
+    local hw, hh = outerWidth / 2, outerHeight / 2
+
     for si, corePos in ipairs(coreScreenPoses) do
         if not corePos.dummy then
             fanAcc:setPrefix(si, {corePos.x, corePos.y, x+w/2, y+h/2, c[1], c[2], c[3], c[4]})
-            -- Ring doesn't need a prefix
         end
     end
 
     for i = 0, n do
         local angle = math.pi * 2 / n * i
         local cosA, sinA = math.cos(angle), math.sin(angle)
-        local posOuter = G.runInfo.geometry:rThetaGo(position, outerR, angle + orientation)
-        local posInner = G.runInfo.geometry:rThetaGo(position, innerR, angle + orientation)
+
+        -- 1. Calculate Outer Position (Ellipse)
+        local localOuterX = hw * cosA
+        local localOuterY = hh * sinA
+        local distOuter = math.sqrt(localOuterX^2 + localOuterY^2)
+        local angleOuter = math.atan2(localOuterY, localOuterX)
+        
+        local posOuter = G.runInfo.geometry:rThetaGo(position, distOuter, angleOuter + orientation)
         local outerScreens = G.runInfo.geometry:toScreen(posOuter)
+
+        -- 2. Calculate Inner Position (Perfect Circle)
+        local posInner = G.runInfo.geometry:rThetaGo(position, innerR, angle + orientation)
         local innerScreens = G.runInfo.geometry:toScreen(posInner)
+
+        -- 3. UV Mapping
+        -- Outer UVs are simple normalized cos/sin
         local uO, vO = (cosA + 1)/2, (sinA + 1)/2
-        local uI, vI = (cosA * ratio + 1)/2, (sinA * ratio + 1)/2
+        -- Inner UVs must be scaled based on how innerR relates to the outer dimensions
+        local uI, vI = ( (innerR * cosA) / hw + 1 ) / 2, ( (innerR * sinA) / hh + 1 ) / 2
 
         for si = 1, #coreScreenPoses do
             local pO, pI = outerScreens[si], innerScreens[si]

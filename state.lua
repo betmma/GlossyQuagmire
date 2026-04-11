@@ -229,7 +229,7 @@ G={
         power=180,
         grazes=0,
         stage=1,
-        geometry=geometries.Spherical,
+        geometry=geometries.Hyperbolic,
         player=nil,
     },
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position

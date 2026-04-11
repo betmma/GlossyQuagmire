@@ -75,15 +75,20 @@ function Shape:drawQuad(args)
     local canSimpleDraw,suggestedSideNum=geometry:canSimpleDraw(kinematicState.pos,radius)
     local screenPositions=geometry:toScreen(kinematicState.pos)
     local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState.pos)
-    local useDrawQuad=(canSimpleDraw or not meshBatch) and normalBatch
     if DEV_MODE then
-        if love.keyboard.isDown('f2') then
-            useDrawQuad=true
-        elseif love.keyboard.isDown('f3') then
-            useDrawQuad=false
+        if love.keyboard.isDown('f6') then
+            canSimpleDraw=true
+        elseif love.keyboard.isDown('f7') then
+            canSimpleDraw=false
         end
     end
-    if useDrawQuad then
+    if not meshBatch then
+        canSimpleDraw=true
+    end
+    if not normalBatch then
+        canSimpleDraw=false
+    end
+    if canSimpleDraw then
         ---@cast normalBatch love.SpriteBatch
         normalBatch:setColor(color[1],color[2],color[3],color[4])
         for i,screenPos in ipairs(screenPositions) do
@@ -106,7 +111,7 @@ function Shape:drawQuad(args)
         if not meshBatch then
             error('Shape:drawQuad: tries to mesh draw with meshBatch = nil')
         end
-        self:meshDrawQuad(kinematicState.pos,radius,rotation,quad,color,meshBatch,suggestedSideNum)
+        self:meshDrawQuad(kinematicState.pos,w*sizeRatio,h*sizeRatio,rotation,quad,color,meshBatch,suggestedSideNum)
     end
 end
 
@@ -124,13 +129,14 @@ end
 
 ---@param pos Position
 ---@param radius number
----@param rotation number
+---@param w number
+---@param h number
 ---@param quad love.Quad
 ---@param color number[]|nil
 ---@param meshBatch MeshBatch
 ---@param sideNum integer
-function Shape:meshDrawQuad(pos,radius,rotation,quad,color,meshBatch,sideNum)
-    MeshFuncs.fanMesh(pos,radius,rotation,quad,sideNum,color,false,meshBatch)
+function Shape:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum)
+    MeshFuncs.fanMesh(pos,w,h,rotation,quad,sideNum,color,false,meshBatch)
 end
 
 ---@class Shape:GameObject
