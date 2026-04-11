@@ -36,7 +36,7 @@ return {
                 return 0
             end
         end
-        local items={'hiScore','score','empty','lives','bombs','grazes'}
+        local items={'hiScore','score','empty','lives','bombs','power','grazes'}
         for i,key in ipairs(items) do
             local y=i*30+30
             if key~='empty' then
@@ -64,7 +64,7 @@ return {
             end
         end
         -- for test
-        G.runInfo.player=Player()
+        G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
         -- Bullet{kinematicState={pos={x=250,y=400},speed=0,dir=math.pi/2},lifeFrame=9999,sprite=BulletSprites.round.blue}
         local spawnerPos=G.runInfo.geometry:rThetaGo(G.runInfo.player.kinematicState.pos,100,-math.pi/2)
         local spawner=BulletSpawner{

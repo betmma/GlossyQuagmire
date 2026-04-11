@@ -1,4 +1,4 @@
-VERSION="0.0.6.4"
+VERSION="0.0.7"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"
@@ -26,8 +26,6 @@ function love.load()
     Shape = require "shape"
     Player = require "player"
     Bullet = require "bullet"
-    ---@class PlayerShot:Bullet
-    PlayerShot=Bullet:extend()
     -- Laser=require"laser"
     -- PolyLine = require "polyline"
     Event= require "event"
@@ -37,6 +35,7 @@ function love.load()
     Asset=require"loadAsset"
     ---@type AssetBulletSpritesCollection
     BulletSprites,BulletBatch,SpriteData=Asset.bulletSprites,Asset.bulletBatch,Asset.SpriteData
+    ShotTypes= require "shotTypes.shotTypeBase"
     Audio=require"audio"
     SFX=Audio.sfx;BGM=Audio.bgm
     Effect=require"effect"

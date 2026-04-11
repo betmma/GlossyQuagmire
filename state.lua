@@ -61,6 +61,7 @@ local G={
         },
         ---@alias SHOT_TYPE 'REIMUA'|'REIMUB'|'MARISAA'|'MARISAB'|'KOTOBAA'|'KOTOBAB'
         SHOT_TYPES={'REIMUA','REIMUB','MARISAA','MARISAB','KOTOBAA','KOTOBAB'},
+        ---@type table<PLAYER, SHOT_TYPE[]>
         PLAYER_TO_SHOT_TYPES={
             REIMU={'REIMUA','REIMUB'},
             MARISA={'MARISAA','MARISAB'},
@@ -215,7 +216,8 @@ G={
         },
     },
     geometries=geometries,
-    ---@type {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil}
+    ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
+    ---@type {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil}
     runInfo={ -- things that can be changed and accessed during the run should be put there
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
         playerType=G.CONSTANTS.PLAYERS[1],
@@ -224,6 +226,7 @@ G={
         score=0,
         lives=3,
         bombs=3,
+        power=180,
         grazes=0,
         stage=1,
         geometry=geometries.Spherical,

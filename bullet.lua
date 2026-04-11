@@ -2,34 +2,64 @@
 ---@class Bullet:Shape
 local Bullet = Shape:extend()
 
-Bullet.FadeOut=function(self)
-    local fadeFrame=self.fadeFrame or 30
+---@class Action
+---@field isAction true
+---@field params table<string, any>
+---@field func fun(self:Bullet, params:table<string, any>):nil
+
+
+local fadeOut=function(self,params)
+    local fadeFrame=params.fadeFrame or 30
     if self.frame+fadeFrame>=self.lifeFrame then
-        self.safe=true
+        if params.setSafe then
+            self.safe=true
+        end
         self.spriteTransparency=(self.lifeFrame - self.frame)/fadeFrame
     end
 end
 
-Bullet.FadeIn=function(self)
-    local fadeFrame=self.fadeFrame or 30
+---@param fadeFrame integer number of frames for the fade out animation, default 30
+---@param setSafe boolean whether to set the bullet safe when start fading out, default false
+--- @return Action
+Bullet.FadeOut=function(fadeFrame,setSafe)
+    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe},func=fadeOut}
+end
+
+local fadeIn=function(self,params)
+    local fadeFrame=params.fadeFrame or 30
     if self.frame<=fadeFrame then
-        self.safe=true
+        if params.setSafe then
+            self.safe=true
+        end
         self.spriteTransparency=self.frame/fadeFrame
     elseif self.frame==fadeFrame+1 then
-        self.safe=false
+        if params.setSafe then
+            self.safe=false
+        end
+    end
+end
+
+---@param fadeFrame integer number of frames for the fade in animation, default 30
+---@param setSafe boolean whether to set the bullet safe when start fading in, default false
+--- @return Action
+Bullet.FadeIn=function(fadeFrame,setSafe)
+    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe},func=fadeIn}
+end
+
+local zoomIn=function(self,params)
+    local zoomFrame=params.zoomFrame or 30
+    local targetSize=params.targetSize or self.size
+    if self.frame<=zoomFrame then
+        self.size=targetSize*self.frame/zoomFrame
     end
 end
 
 -- bullet size grows from 0 to [self.targetSize] in [self.zoomFrame] frames.
-Bullet.ZoomIn=function(self)
-    local zoomFrame=self.zoomFrame or 30
-    local targetSize=self.targetSize or self.size
-    if not self.targetSize then
-        self.targetSize=self.size
-    end
-    if self.frame<=zoomFrame then
-        self.size=targetSize*self.frame/zoomFrame
-    end
+--- @param zoomFrame integer number of frames for the zoom animation, default 30
+--- @param targetSize number target size for the zoom animation, default self.size
+--- @return Action
+Bullet.ZoomIn=function(zoomFrame,targetSize)
+    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize},func=zoomIn}
 end
 
 function Bullet:new(args)
@@ -43,6 +73,7 @@ function Bullet:new(args)
             error('Bullet:new: self.sprite.data is nil')
         end
         if data.isGIF then
+            ---@type GIFSprite
             self.sprite=copy_table(self.sprite)
             self.sprite:randomizeCurrentFrame()
         end
@@ -64,7 +95,9 @@ function Bullet:new(args)
     self.grazed=args.grazed or false
     self.baseGrazeValue=args.baseGrazeValue or 1
 
+    self.image=args.image or Asset.bulletImage
     self.batch=args.batch or (args.highlight and Asset.bulletHighlightBatch or BulletBatch)
+    self.meshBatch=args.meshBatch or Asset.bigBulletMeshes
     self.spriteTransparency=args.spriteTransparency or 1
 
     self.spriteExtraDirection=0
@@ -98,11 +131,11 @@ function Bullet:draw()
     color[4]=color[4]*self.spriteTransparency
     self:drawQuad{
         quad=self.sprite.quad,
-        image=Asset.bulletImage,
+        image=self.image,
         rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),
         zoom=self.size,
         normalBatch=self.batch,
-        meshBatch=Asset.bigBulletMeshes,
+        meshBatch=self.meshBatch,
         color=color,
     }
 end
@@ -121,23 +154,25 @@ function Bullet:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,side
 end
 
 function Bullet:update(dt)
-    if self.removed then
-        return
-    end
     for k, func in pairs(self.extraUpdate or {}) do
-        func(self,dt)
+        if type(func)=='function' then
+            func(self,dt)
+        elseif type(func)=='table' and func.isAction then
+            func.func(self,func.params)
+        end
     end
     Shape.update(self,dt)
     if not self.safe then
         if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
     end
     self:checkHitPlayer()
+    self:updateSprite()
+end
+
+function Bullet:updateSprite()
     self.spriteExtraDirection=self.spriteExtraDirection+self.spriteRotationSpeed*Shape.timeSpeed
-    if self.sprite then
-        local data=self.sprite.data
-        if data.isGIF then
-            self.sprite:countDown()
-        end
+    if self.sprite and self.sprite.data and self.sprite.data.isGIF then
+        self.sprite:countDown()
     end
 end
 
@@ -204,6 +239,12 @@ function Bullet:changeSprite(sprite)
         self.sprite=copy_table(self.sprite)
         self.sprite:randomizeCurrentFrame()
     end
+        if not self.sprite then
+            error('PlayerShot:hitEffect: no fade sprite for color ')
+        end
+        if not self.sprite.quad then
+            error('PlayerShot:hitEffect: fade sprite quad is nil for color ')
+        end
 end
 
 return Bullet

@@ -37,11 +37,13 @@ local Asset=...
 ---moon: Sprite, anchor: Sprite, playerFocus: Sprite, \
 ---nuke: Sprite}
 
+local loaders=Asset.bulletSpriteLoaders
+local switchTargets,single,gifSingle,spectrum,matrix,simpleOffsetFunc,setCenterPosition=loaders.switchTargets,loaders.single,loaders.gifSingle,loaders.spectrum,loaders.matrix,loaders.simpleOffsetFunc,loaders.setCenterPosition
+
 ---@type AssetBulletSpritesCollection
 Asset.bulletSprites={}
+switchTargets(Asset.bulletImage, Asset.bulletSprites)
 
-local loaders=Asset.bulletSpriteLoaders
-local single,gifSingle,spectrum,matrix,simpleOffsetFunc,setCenterPosition=loaders.single,loaders.gifSingle,loaders.spectrum,loaders.matrix,loaders.simpleOffsetFunc,loaders.setCenterPosition
 local names16x16={'laser','round','rim','rice','bill','kunai','scale','bullet','bulletFog','crystal','star','rain','coin','cross','crossDark','crossRim','crossDarkRim'}
 local colors={'white','gray','red','orange','yellow','green','teal','cyan','blue','purple','magenta','black'}
 Asset.colors=colors
@@ -147,9 +149,103 @@ single{
     sizeX=64,sizeY=64,name='playerFocus',
     baseX=0,baseY=496,
 }:addToAsset()
-
 -- some old names mapping
 Asset.shards={dot=Asset.bulletSprites.dot.white,round=Asset.bulletSprites.fog.white}
--- Asset.bulletSprites.nuke=Asset.bulletSprites.moon
+---@class BlPuRe
+---@field blue Sprite
+---@field purple Sprite
+---@field red Sprite
 
--- still need: nuke, vortex. shockwave and misc.smallShockwave should be remapped to shockwave
+---@class GrCyPu
+---@field green Sprite
+---@field cyan Sprite
+---@field purple Sprite
+
+---@class BlGr
+---@field blue Sprite
+---@field green Sprite
+
+---@class ReOrPu
+---@field red Sprite
+---@field orange Sprite
+---@field purple Sprite
+
+---@alias AssetPlayerShotSpritesCollection { \
+---amuletMid:BlPuRe, amuletWide:BlPuRe, amuletNarrow:BlPuRe, poker:BlPuRe, \
+---amuletFade:BlPuRe, pokerFade:BlPuRe, \
+---yinyangOrb:BlPuRe, ball:BlPuRe, burst:ReOrPu, hakkero:GrCyPu, laser:Sprite, explosive:BlGr, amuletHuge:Sprite}
+
+---@type AssetPlayerShotSpritesCollection
+Asset.playerShotSprites={}
+
+switchTargets(Asset.playerImage, Asset.playerShotSprites)
+
+local baseY=16*9
+
+local BlPuReColors={'blue','purple','red'}
+spectrum{
+    unit=single{sizeX=16,sizeY=48,name='amuletMid'},
+    colors=BlPuReColors,
+    offsetFunc=simpleOffsetFunc(16,0),
+    baseX=0,baseY=baseY,
+}:addToAsset()
+setCenterPosition('amuletMid',8,8)
+matrix{
+    unit=single{sizeX=16,sizeY=48},
+    names={'poker','amuletNarrow'},
+    colors=BlPuReColors,
+    nameOffsetFunc=simpleOffsetFunc(48,0),
+    colorOffsetFunc=simpleOffsetFunc(16,0),
+    baseX=0,baseY=baseY+64,
+}:addToAsset()
+setCenterPosition('poker',8,8)
+setCenterPosition('amuletNarrow',8,8)
+matrix{
+    unit=single{sizeX=16,sizeY=16},
+    names={'yinyangOrb','ball'},
+    colors=BlPuReColors,
+    nameOffsetFunc=simpleOffsetFunc(48,0),
+    colorOffsetFunc=simpleOffsetFunc(16,0),
+    baseX=0,baseY=baseY+64+48,
+}:addToAsset()
+matrix{
+    unit=gifSingle{sizeX=16,sizeY=16,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(0,16)},
+    names={'amuletFade','pokerFade'},
+    colors=BlPuReColors,
+    nameOffsetFunc=simpleOffsetFunc(48,0),
+    colorOffsetFunc=simpleOffsetFunc(16,0),
+    baseX=0+16*3,baseY=baseY,
+}:addToAsset()
+spectrum{
+    unit=single{sizeX=16,sizeY=48,name='burst'},
+    colors={'red','orange','purple'},
+    offsetFunc=simpleOffsetFunc(16,0),
+    baseX=0+16*9,baseY=baseY,
+}:addToAsset()
+setCenterPosition('burst',8,16)
+spectrum{
+    unit=single{sizeX=16,sizeY=48,name='amuletWide'},
+    colors=BlPuReColors,
+    offsetFunc=simpleOffsetFunc(16,0),
+    baseX=0+16*12,baseY=baseY,
+}:addToAsset()
+setCenterPosition('amuletWide',8,8)
+spectrum{
+    unit=single{sizeX=16,sizeY=16,name='hakkero'},
+    colors={'green','cyan','purple'},
+    offsetFunc=simpleOffsetFunc(16,0),
+    baseX=0+16*15,baseY=baseY,
+}:addToAsset()
+single{
+    sizeX=16,sizeY=32,name='laser',
+    baseX=0+16*18,baseY=baseY+16,
+}:addToAsset()
+gifSingle{
+    sizeX=64,sizeY=64,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(64,0),name='amuletHuge',baseX=16*6,baseY=baseY+64,
+}:addToAsset()
+spectrum{
+    unit=gifSingle{sizeX=16,sizeY=32,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(0,-32),name='explosive'},
+    colors={'blue','green'},
+    offsetFunc=simpleOffsetFunc(16,0),
+    baseX=0+16*22,baseY=baseY+64+48,
+}:addToAsset()

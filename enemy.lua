@@ -8,6 +8,7 @@ function Enemy:new(args)
     self.maxhp=args.maxhp or args.hp or 1000
     self.hp=args.hp or self.maxhp
     self.size=1
+    self.hitboxRadius=32
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.sprite=args.sprite
@@ -56,9 +57,9 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     for key, circ in pairs(PlayerShot.objects) do
         ---@cast circ PlayerShot
         local radius=selfRadius+circ:getHitboxRadius()
-        if G.runInfo.geometry:distance(circ.kinematicState.pos,self.kinematicState.pos)<radius then
+        if not circ.safe and G.runInfo.geometry:distance(circ.kinematicState.pos,self.kinematicState.pos)<radius then
             damageSum=damageSum+(circ.damage or 1)
-            circ:remove()
+            circ:hitEffect(self)
             -- hit visual effect. at bullet position. pseudo random
             local rand1=math.pseudoRandom(circ.kinematicState.pos,1)
             local speed=5+10*rand1

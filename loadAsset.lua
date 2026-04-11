@@ -37,11 +37,11 @@ end
 ---@field private currentFrame number
 ---@field private frameTime number 
 ---@field private switchCountin number 
+---@field randomizeCurrentFrame fun(self):nil randomize the current frame, called when creating a new bullet with the sprite, so that not all bullets with the same sprite are in sync
 local GIFSprite=Sprite:extend()
 Asset.GIFSprite=GIFSprite
 
 ---@class GIFSpriteData:spriteData
----@field frameCount number
 ---@field frameTime number
 ---@field currentFrame integer|nil
 ---@field isGIF true
@@ -52,6 +52,9 @@ function GIFSprite:new(quads,data)
     self.currentFrame=data.currentFrame or 1
     GIFSprite.super.new(self,quads[self.currentFrame],data)
     self.quads=quads
+    if #quads==0 then
+        error('GIFSprite:new: quads array is empty')
+    end
     self.frameTime=data.frameTime or 1
     self.switchCounting=0
 end
@@ -73,6 +76,17 @@ function GIFSprite:randomizeCurrentFrame()
     self.quad=self.quads[self.currentFrame]
 end
 
+function GIFSprite:reset()
+    self.currentFrame=1
+    self.quad=self.quads[self.currentFrame]
+end
+
+function GIFSprite:getDuration()
+    return self.frameTime*#self.quads
+end
+
+local playerImage = love.graphics.newImage( "assets/player.png" )
+Asset.playerImage=playerImage
 
 local bulletImage = love.graphics.newImage( "assets/bullets.png" )
 Asset.bulletImage=bulletImage
@@ -81,6 +95,8 @@ bulletImage:setFilter("nearest", "linear") -- this "linear filter" removes some 
 local hitRadius={laser=4,scale=2.4,rim=2.4,round=4,rice=2.4,kunai=2.4,crystal=2.4,bill=2.8,bullet=2.4,blackrice=2.4,star=4,darkdot=2.4,dot=2.4,bigStar=7,bigRound=8.5,butterfly=7,knife=6,ellipse=7,fog=8.5,heart=10,giant=14,lightRound=14,hollow=2.4,flame=6,orb=6,moon=60,nuke=96,explosion=38,snake=2.4}
 Asset.hitRadius=hitRadius
 love.filesystem.load('loadBulletSprites.lua')(Asset)
+---@type AssetPlayerShotSpritesCollection
+Asset.playerShotSprites=Asset.playerShotSprites
 Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yellow='yellow',green='green',teal='green',cyan='blue',blue='blue',purple='purple',magenta='purple',black='gray'}
 
 local bgImage = love.graphics.newImage( "assets/bg.png" )
@@ -92,7 +108,6 @@ local titleImage = love.graphics.newImage( "assets/title.png" )
 Asset.title=love.graphics.newQuad(0,0,1280,720,titleImage:getWidth(),titleImage:getHeight())
 
 -- load player sprite
-local playerImage = love.graphics.newImage( "assets/player.png" )
 Asset.player={
     normal={},
     moveTransition={left={},right={}},
@@ -309,7 +324,8 @@ Asset.bossEffectMeshes=MeshBatch(Asset.bulletImage,500)
 Asset.bossMeshes=MeshBatch(Asset.bossImage,5)
 Asset.fairyBatch=love.graphics.newSpriteBatch(fairyImage,100,'stream')
 Asset.playerBatch=love.graphics.newSpriteBatch(playerImage, 5,'stream')
-Asset.playerBulletBatch=love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
+Asset.playerBulletMeshes=MeshBatch(playerImage,200)
+Asset.playerBulletBatch=love.graphics.newSpriteBatch(playerImage, 2000,'stream')
 Asset.bigBulletMeshes=MeshBatch(Asset.bulletImage,1000)
 Asset.bulletHighlightBatch = love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
 Asset.laserMeshes=MeshBatch(Asset.bulletImage,1000)
@@ -328,6 +344,7 @@ Asset.Batches={
             Asset.bossEffectMeshes,
             Asset.bossMeshes,
             Asset.playerBatch,
+            Asset.playerBulletMeshes,
             Asset.playerBulletBatch,
             Asset.fairyBatch,
             Asset.bigBulletMeshes,

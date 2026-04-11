@@ -1,5 +1,13 @@
 local Asset=...
-local bulletImage = Asset.bulletImage
+local bulletImage
+local bulletSprites
+
+--- change the image and sprites table for bullets. used for changing sprite sheet (bullets.png and player.png) in bulletSpritesDefinition.lua
+local function switchTargets(newImage, newSpritesTable)
+    bulletImage = newImage
+    bulletSprites = newSpritesTable
+end
+
 local function quad(x,y,width,height)
     local ret= love.graphics.newQuad(x,y,width,height,bulletImage:getWidth(),bulletImage:getHeight())
     return ret
@@ -18,8 +26,8 @@ end
 ---@field sizeY number
 ---@field baseX number
 ---@field baseY number
----@field getSprite fun(self):Sprite return a Sprite object based on self's data that will be added to Asset.bulletSprites. 
----@field addToAsset fun(self):nil add the sprite to Asset.bulletSprites
+---@field getSprite fun(self):Sprite return a Sprite object based on self's data that will be added to bulletSprites. 
+---@field addToAsset fun(self):nil add the sprite to bulletSprites
 local BulletSpriteSingle=Object:extend()
 function BulletSpriteSingle:new(args)
     self.name=args.name
@@ -32,11 +40,11 @@ function BulletSpriteSingle:getSprite()
     local name=self.name
     local spriteData={sizeX=self.sizeX,sizeY=self.sizeY,hitRadius=getHitRadius(name,self.sizeX),key=name,isLaser=name=='laser'or name=='laserDark'}
     return Asset.Sprite(quad(self.baseX,self.baseY,self.sizeX,self.sizeY),spriteData)
-    -- Asset.SpriteData[Asset.bulletSprites[name]]=spriteData
+    -- Asset.SpriteData[bulletSprites[name]]=spriteData
 end
 function BulletSpriteSingle:addToAsset()
     local name=self.name
-    Asset.bulletSprites[name]=self:getSprite()
+    bulletSprites[name]=self:getSprite()
 end
 
 ---@class BulletSpriteGIFSingle:BulletSpriteSingle
@@ -64,7 +72,7 @@ function BulletSpriteGIFSingle:getSprite()
 end
 function BulletSpriteGIFSingle:addToAsset()
     local name=self.name
-    Asset.bulletSprites[name]=self:getSprite()
+    bulletSprites[name]=self:getSprite()
 end
 
 ---@class BulletSpriteSpectrum information of a spectrum (different colors of same shape) of bullets
@@ -74,7 +82,7 @@ end
 ---@field baseX number
 ---@field baseY number
 ---@field getSprite fun(self):table<string,Sprite> return color:Sprite table of the group
----@field addToAsset fun(self):nil create a spectrum of assets and add it to Asset.bulletSprites.
+---@field addToAsset fun(self):nil create a spectrum of assets and add it to bulletSprites.
 local BulletSpriteSpectrum=Object:extend()
 function BulletSpriteSpectrum:new(args)
     self.unit=args.unit
@@ -89,7 +97,6 @@ function BulletSpriteSpectrum:getSprite()
     local colors=self.colors
     local offsetFunc=self.offsetFunc
     local sprites={}
-    --Asset.bulletSprites[name]=Asset.bulletSprites[name] or {}
     for i,color in ipairs(colors) do
         local x,y=offsetFunc(i).x,offsetFunc(i).y
         unit.baseX=self.baseX+x
@@ -97,7 +104,6 @@ function BulletSpriteSpectrum:getSprite()
         local sprite=unit:getSprite()
         sprite.data.color=color
         sprite.data.possibleColors=colors
-        --Asset.bulletSprites[name][color]=sprite
         sprites[color]=sprite
     end
     return sprites
@@ -107,7 +113,7 @@ function BulletSpriteSpectrum:addToAsset()
     local name=unit.name
     local colors=self.colors
     local sprites=self:getSprite()
-    Asset.bulletSprites[name]=sprites
+    bulletSprites[name]=sprites
 end
 
 ---@class BulletSpriteMatrix many spectrums (many types of many colors of bullets)
@@ -140,7 +146,7 @@ function BulletSpriteMatrix:addToAsset()
     for i,name in ipairs(names) do
         local nameOffset=nameOffsetFunc(i)
         local x,y=nameOffset.x,nameOffset.y
-        Asset.bulletSprites[name]=Asset.bulletSprites[name] or {}
+        bulletSprites[name]=bulletSprites[name] or {}
         for j,color in ipairs(colors) do
             local colorOffset=colorOffsetFunc(j)
             local x2,y2=colorOffset.x,colorOffset.y
@@ -150,7 +156,7 @@ function BulletSpriteMatrix:addToAsset()
             local sprite=unit:getSprite()
             sprite.data.color=color
             sprite.data.possibleColors=colors
-            Asset.bulletSprites[name][color]=sprite
+            bulletSprites[name][color]=sprite
         end
     end
 end
@@ -169,7 +175,7 @@ end
 --- @param centerY number y of the center position
 --- @return nil
 local function setCenterPosition(name,centerX,centerY)
-    local sprite=Asset.bulletSprites[name]
+    local sprite=bulletSprites[name]
     if not sprite then 
         error('setCenterPosition: no sprite found for name '..name)
     end
@@ -185,6 +191,7 @@ local function setCenterPosition(name,centerX,centerY)
 end
 
 Asset.bulletSpriteLoaders={
+    switchTargets=switchTargets,
     single=BulletSpriteSingle,
     gifSingle=BulletSpriteGIFSingle,
     spectrum=BulletSpriteSpectrum,

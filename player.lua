@@ -10,7 +10,9 @@
 ---@field invincibleFrame number how many frames player is still invincible
 ---@field grazeRadiusFactor number the factor multiplied to radius to get graze radius
 ---@field moveMode PlayerMoveMode
----@field dieShockwaveRadius number radius of shockwave when player dies. shockwave is not implemented yet.
+---@field dieShockwaveRadius number
+---@field shotType ShotType
+---@field options Bullet[]
 local Player = Shape:extend()
 
 ---@enum PlayerMoveMode
@@ -56,6 +58,9 @@ function Player:new(args)
 
     self.moveMode=args.moveMode or Player.moveModes.Natural
     self.dieShockwaveRadius=2
+
+    self.shotType=args.shotType
+    self.options={}
 
     -- for replay system. could be moved elsewhere
     self.keyRecord={}
@@ -120,7 +125,20 @@ function Player:update(dt)
 end
 
 
-function Player:calculateShoot()
+function Player:calculateShoot(dt)
+    if DEV_MODE then
+        if love.keyboard.isDown(',') then
+            G.runInfo.power=G.runInfo.power-1
+        elseif love.keyboard.isDown('.') then
+            G.runInfo.power=G.runInfo.power+1
+        end
+    end
+    if not self.shotType then
+        return
+    end
+    local powerLevel=math.floor(G.runInfo.power/100)
+    local kinematicState={pos=self.kinematicState.pos,dir=self.viewDirection-math.pi/2, speed=0} -- note that the dir must not be self.kinematicState.dir, because that value is the moving direction, not the shooting (facing) direction. viewDirection is the right hand side direction, so shooting direction is viewDirection-math.pi/2
+    self.shotType:update(kinematicState, self.keyIsDown('lshift'), self.keyIsDown('z'), powerLevel, self.frame, dt, self.options)
 end
 
 

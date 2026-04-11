@@ -56,7 +56,7 @@ function math.interpolateTable(a,b,t)
     return result
 end
 
--- returns random number in [0,1). sometimes (especially particle system) random numbers are needed each frame. The bad part of using math.random is it easily break every replay on slightest change of a particle. So use this function instead. seeds can be (obj, seed2) which expands to (obj.x, seed2, obj.y, obj.frame). seed2 is to generate different numbers for same obj at same frame.
+-- returns random number in (0,1). sometimes (especially particle system) random numbers are needed each frame. The bad part of using math.random is it easily break every replay on slightest change of a particle. So use this function instead. seeds can be (obj, seed2) which expands to (obj.x, seed2, obj.y, obj.frame). seed2 is to generate different numbers for same obj at same frame.
 function math.pseudoRandom(seed1,seed2,seed3,seed4)
     if type(seed1)=='table' then
         seed3=seed1.y
@@ -73,7 +73,11 @@ function math.pseudoRandom(seed1,seed2,seed3,seed4)
     h = h - seed1^2*135431 - seed2^2*976320 - seed3^2*463409 - seed4^2*123469
     
     local value=math.sin(h)*1000
-    return value - math.floor(value)
+    value = value - math.floor(value)
+    if value==0 then -- avoid returning 0, which can cause some bugs (for example, if using table[math.ceil(pseudoRandom()*#table)] to get random element from table, 0 will cause index to be 0 and return nil)
+        value=0.5
+    end
+    return value
 end
 
 -- return 1 if x is even, -1 if x is odd

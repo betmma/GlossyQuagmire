@@ -286,6 +286,10 @@ return {
                 en_us = 'Bombs',
                 zh_cn = '符卡',
             },
+            power = {
+                en_us = 'Power',
+                zh_cn = '火力',
+            },
             grazes = {
                 en_us = 'Grazes',
                 zh_cn = '擦弹',

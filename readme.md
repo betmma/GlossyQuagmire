@@ -1,6 +1,21 @@
 This game is a touhou fan-game.
 It's in very early stage now.
 
+### Todo
+#### Bug
+CenterX and CenterY in spriteData are not used in Shape.drawQuad and every draw function.
+
+#### Code
+Shot type system
+Level control logic
+Boss progress logic
+Border class
+
+#### Resource
+life, bomb, power sprites
+player and player shot sprites
+enemy sprites
+
 
 ### Acknowledgements
 
