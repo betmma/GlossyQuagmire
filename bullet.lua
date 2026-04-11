@@ -95,7 +95,6 @@ function Bullet:new(args)
     self.grazed=args.grazed or false
     self.baseGrazeValue=args.baseGrazeValue or 1
 
-    self.image=args.image or Asset.bulletImage
     self.batch=args.batch or (args.highlight and Asset.bulletHighlightBatch or BulletBatch)
     self.meshBatch=args.meshBatch or Asset.bigBulletMeshes
     self.spriteTransparency=args.spriteTransparency or 1
@@ -131,7 +130,6 @@ function Bullet:draw()
     color[4]=color[4]*self.spriteTransparency
     self:drawQuad{
         quad=self.sprite.quad,
-        image=self.image,
         rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),
         zoom=self.size,
         normalBatch=self.batch,
@@ -144,11 +142,10 @@ end
 ---@param radius number
 ---@param rotation number
 ---@param quad love.Quad
----@param image love.Image
 ---@param color number[]|nil
 ---@param meshBatch MeshBatch
 ---@param sideNum integer
-function Bullet:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,sideNum)
+function Bullet:meshDrawQuad(pos,radius,rotation,quad,color,meshBatch,sideNum)
     -- inner radius is hitbox radius
     MeshFuncs.ringFanMesh(pos,self:getHitboxRadius(),radius,rotation,quad,sideNum,color,meshBatch)
 end

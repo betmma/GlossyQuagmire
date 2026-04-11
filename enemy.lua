@@ -181,7 +181,6 @@ function Enemy:drawSprite()
     if sprite.key=='fairy' then
         self:drawQuad{
             quad=self.currentSprite,
-            image=Asset.fairyImage,
             rotation=0,
             zoom=self.size,
             normalBatch=Asset.fairyBatch,
@@ -195,7 +194,6 @@ function Enemy:drawSprite()
         self:drawQuad{
             kinematicState={pos=pos,dir=direction,speed=kinematicState.speed},
             quad=self.currentSprite,
-            image=Asset.bossImage,
             rotation=0,
             zoom=self.size,
             normalBatch=Asset.bossBatch,

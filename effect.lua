@@ -24,7 +24,6 @@ function Larger:new(args)
     self.growSpeed=args.growSpeed or 1.2
     self.animationFrame=args.animationFrame or 30
     self.spriteTransparency=args.spriteTransparency or 1
-    self.image=Asset.bulletImage
     self.batch=Asset.effectBatch
 end
 
@@ -106,7 +105,6 @@ function Charge:draw(dt)
         self:drawQuad{
             kinematicState=particle.kinematicState,
             quad=self.sprite.quad,
-            image=self.sprite.image,
             rotation=particle.kinematicState.dir,zoom=self.size,
             normalBatch=Asset.effectBatch,meshBatch=Asset.bigBulletMeshes,
             color={self.color[1],self.color[2],self.color[3],1-0.3*particle.frame/self.particleFrame}

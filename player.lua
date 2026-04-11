@@ -255,11 +255,11 @@ function Player:draw()
     local drawColor={1,1,1,self.transparency*color[4]}
     local drawFocusColor={1,1,1,self.transparency*self.focusPointTransparency*color[4]}
     local focalSizeFactor=1
-    self:drawQuad{quad=BulletSprites.playerFocus.quad,image=Asset.bulletImage,rotation=focusOrientation,zoom=focalSizeFactor,meshBatch=Asset.playerFocusMeshes,color=drawFocusColor
+    self:drawQuad{quad=BulletSprites.playerFocus.quad,rotation=focusOrientation,zoom=focalSizeFactor,meshBatch=Asset.playerFocusMeshes,color=drawFocusColor
         ,normalBatch=nil} -- force mesh
     local sizeFactor=1
     if self.sprite then
-        self:drawQuad{quad=self.sprite,image=nil,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=drawColor}
+        self:drawQuad{quad=self.sprite,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=drawColor}
     end
 end
 

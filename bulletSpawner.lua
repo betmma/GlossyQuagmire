@@ -152,7 +152,6 @@ function BulletSpawner:drawSprite()
     end
     self:drawQuad{
         quad=self.sprite.quad,
-        image=Asset.bulletImage,
         rotation=self.time,
         zoom=self.size,
         normalBatch=self.batch,

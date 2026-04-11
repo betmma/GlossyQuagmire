@@ -214,7 +214,7 @@ function ShootingPattern:shoot(shooter, powerLevel)
     local shootState=self:transformShootState(shooter)
     local direction=shootState.dir
     direction=direction+math.eval(self.angle)
-    local bullet=PlayerShot{kinematicState={pos=copy_table(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,image=Asset.playerImage,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Bullet.FadeIn(1,false)}}
+    local bullet=PlayerShot{kinematicState={pos=copy_table(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Bullet.FadeIn(1,false)}}
     if self.isHoming then
         addHoming(bullet, self.homingMode, self.homingArg)
     end
@@ -264,7 +264,7 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
         end
     elseif existingOptions<powerLevel then
         for i=existingOptions,powerLevel do
-            local newOption=Bullet{kinematicState={pos=playerState.pos,dir=0,speed=0},sprite=self.optionSprite,lifeFrame=99999,safe=true,invincible=true,image=Asset.playerImage,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes}
+            local newOption=Bullet{kinematicState={pos=playerState.pos,dir=0,speed=0},sprite=self.optionSprite,lifeFrame=99999,safe=true,invincible=true,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes}
             table.insert(options, newOption)
         end
     end

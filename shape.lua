@@ -51,7 +51,6 @@ end
 
 ---@class DrawQuadArgs
 ---@field quad love.Quad
----@field image love.Image|nil
 ---@field rotation number
 ---@field zoom number
 ---@field normalBatch love.SpriteBatch|nil
@@ -63,7 +62,6 @@ end
 function Shape:drawQuad(args)
     -- Destructure arguments for easier access
     local quad        = args.quad
-    local image       = args.image
     local rotation    = args.rotation
     local zoom        = args.zoom
     local normalBatch = args.normalBatch
@@ -77,7 +75,14 @@ function Shape:drawQuad(args)
     local canSimpleDraw,suggestedSideNum=geometry:canSimpleDraw(kinematicState.pos,radius)
     local screenPositions=geometry:toScreen(kinematicState.pos)
     local zoomFactorToScreen=geometry:zoomFactorToScreen(kinematicState.pos)
-    local useDrawQuad=(canSimpleDraw or not meshBatch or not image) and normalBatch
+    local useDrawQuad=(canSimpleDraw or not meshBatch) and normalBatch
+    if DEV_MODE then
+        if love.keyboard.isDown('f2') then
+            useDrawQuad=true
+        elseif love.keyboard.isDown('f3') then
+            useDrawQuad=false
+        end
+    end
     if useDrawQuad then
         ---@cast normalBatch love.SpriteBatch
         normalBatch:setColor(color[1],color[2],color[3],color[4])
@@ -98,13 +103,10 @@ function Shape:drawQuad(args)
             end
         end
     else
-        if not image then
-            error('Shape:drawQuad: tries to mesh draw with image = nil')
-        end
         if not meshBatch then
             error('Shape:drawQuad: tries to mesh draw with meshBatch = nil')
         end
-        self:meshDrawQuad(kinematicState.pos,radius,rotation,quad,image,color,meshBatch,suggestedSideNum)
+        self:meshDrawQuad(kinematicState.pos,radius,rotation,quad,color,meshBatch,suggestedSideNum)
     end
 end
 
@@ -124,11 +126,10 @@ end
 ---@param radius number
 ---@param rotation number
 ---@param quad love.Quad
----@param image love.Image
 ---@param color number[]|nil
 ---@param meshBatch MeshBatch
 ---@param sideNum integer
-function Shape:meshDrawQuad(pos,radius,rotation,quad,image,color,meshBatch,sideNum)
+function Shape:meshDrawQuad(pos,radius,rotation,quad,color,meshBatch,sideNum)
     MeshFuncs.fanMesh(pos,radius,rotation,quad,sideNum,color,false,meshBatch)
 end
 
