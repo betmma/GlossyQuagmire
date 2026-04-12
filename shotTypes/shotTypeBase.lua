@@ -71,6 +71,10 @@ function PlayerShot:new(args)
     end
 end
 
+-- doesn't hit player
+function PlayerShot:checkHitPlayer()
+end
+
 function PlayerShot:hitEffect(enemy)
     self.safe=true
     self.hasHitEnemy=true
@@ -228,7 +232,7 @@ end
 ---@field optionArrangement OptionArrangement
 ---@field optionShot {focused: ShootingPattern[], unfocused: ShootingPattern[]}
 ---@field spellcard any -- to be designed
----@field update fun(self: ShotType, playerState: KinematicState, isFocused: boolean, isShooting: boolean, powerLevel: integer, frame: integer, dt: number, options: Bullet[]): nil update options position and shoot with optionShot
+---@field update fun(self: ShotType, playerState: KinematicState, isFocused: boolean, isShooting: boolean, powerLevel: integer, frame: integer, dt: number, options: Bullet[], optionTransparency: number): nil update options position and shoot with optionShot
 ---@overload fun(args: ShotTypeArgs): ShotType
 local ShotType=Object:extend()
 
@@ -246,7 +250,7 @@ function ShotType:new(args)
     self.spellcard=args.spellcard
 end
 
-function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, dt, options)
+function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, dt, options, optionTransparency)
     -- main shot
     if isShooting then
         for _, pattern in pairs(self.mainShot) do
@@ -271,6 +275,9 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
     -- update options position and shoot with optionShot
     if powerLevel==0 then
         return
+    end
+    for i, option in pairs(options) do
+        option.spriteTransparency=optionTransparency
     end
     local optionStates=self.optionArrangement(powerLevel, isFocused, playerState, frame)
     for i, optionState in pairs(optionStates) do
@@ -297,10 +304,10 @@ end
 local function mainShotTransform(isLeft)
     ---@type fun(self: ShootingPattern, shooter: KinematicState): KinematicState
     return function(self, shooter)
-        local forwardPos,forwardDir=G.runInfo.geometry:rThetaGo(shooter.pos, 10, shooter.dir)
+        local forwardPos,forwardDir=G.runInfo.geometry:rThetaGo(shooter.pos, -10, shooter.dir)
         local deltaDir=math.pi/2*(isLeft and -1 or 1)
         local turnDir=forwardDir+deltaDir
-        local sidePos,sideDir=G.runInfo.geometry:rThetaGo(forwardPos, 5, turnDir)
+        local sidePos,sideDir=G.runInfo.geometry:rThetaGo(forwardPos, 8, turnDir)
         return {pos=sidePos,dir=sideDir-deltaDir,speed=0}
     end
 end
@@ -361,6 +368,8 @@ local ShotTypes={
             damage=function(self, powerLevel) return 3 end,
             angle=0,
             isHoming=true,
+            homingMode=HOMING_MODE.PORTION,
+            homingArg=0.2,
         }}, unfocused={ShootingPattern{
             sprite=Asset.playerShotSprites.burst.orange,
             frequency=5,

@@ -13,6 +13,7 @@
 ---@field dieShockwaveRadius number
 ---@field shotType ShotType
 ---@field options Bullet[]
+---@field duringDeath boolean whether player is in death animation.
 local Player = Shape:extend()
 
 ---@enum PlayerMoveMode
@@ -138,7 +139,7 @@ function Player:calculateShoot(dt)
     end
     local powerLevel=math.floor(G.runInfo.power/100)
     local kinematicState={pos=self.kinematicState.pos,dir=self.viewDirection-math.pi/2, speed=0} -- note that the dir must not be self.kinematicState.dir, because that value is the moving direction, not the shooting (facing) direction. viewDirection is the right hand side direction, so shooting direction is viewDirection-math.pi/2
-    self.shotType:update(kinematicState, self.keyIsDown('lshift'), self.keyIsDown('z'), powerLevel, self.frame, dt, self.options)
+    self.shotType:update(kinematicState, self.keyIsDown('lshift'), self.keyIsDown('z') and not self.duringDeath, powerLevel, self.frame, dt, self.options, self.transparency)
 end
 
 
@@ -320,15 +321,18 @@ function Player:hitEffect(damage)
     self.immobileFrame=self.immobileFrame+self.hitImmobileFrame
     Effect.Shockwave{kinematicState={pos=copy_table(self.kinematicState.pos),speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
     SFX:play('playerHit',true)
+    self.duringDeath=true
     Event.EaseEvent{
         obj=self,duration=self.hitInvincibleFrame,aims={transparency=0},progressFunc=function(x)
             if x==0 then return 0 end
             local flash=math.abs(math.cos(x*math.pi*30))
             local maxTransparency=math.clamp(x*3-1,0,1) -- oscillate range: 0 to maxTransparency (invisible first, then maximum value increases to 1 and keeps 1)
             return 1-flash*maxTransparency -- note that transparency=1-returned value
+        end,afterFunc=function()
+            self.duringDeath=false
         end
     }
 end
--- EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
+EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
 
 return Player

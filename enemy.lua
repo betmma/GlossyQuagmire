@@ -8,7 +8,7 @@ function Enemy:new(args)
     self.maxhp=args.maxhp or args.hp or 1000
     self.hp=args.hp or self.maxhp
     self.size=1
-    self.hitboxRadius=32
+    self.hitboxRadius=16
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.sprite=args.sprite
@@ -53,7 +53,7 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     objToReduceHp=objToReduceHp or self
     damageFactor=damageFactor or 1
     local damageSum=0
-    local selfRadius=self:getHitboxRadius()
+    local selfRadius=self:getHitboxRadius()*2 -- easier to hit. doesn't directly increase hitbox so player can stand above enemy to hit without being hit.
     for key, circ in pairs(PlayerShot.objects) do
         ---@cast circ PlayerShot
         local radius=selfRadius+circ:getHitboxRadius()
@@ -86,6 +86,7 @@ end
 
 function Enemy:dieEffect()
     SFX:play('kill',true)
+    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave.gray,size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
     self:remove()
 end
 
@@ -101,6 +102,7 @@ function Boss:new(args)
     args.lifeFrame=99999999
     Boss.super.new(self, args)
     self.size=2
+    self.hitboxRadius=32
     self.mainEnemy=true--args.mainEnemy
     self.showCircleHPBar=self.mainEnemy
     self.showHexagram=self.mainEnemy

@@ -226,10 +226,10 @@ G={
         score=0,
         lives=3,
         bombs=3,
-        power=180,
+        power=280,
         grazes=0,
         stage=1,
-        geometry=geometries.Hyperbolic,
+        geometry=geometries.Spherical,
         player=nil,
     },
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
