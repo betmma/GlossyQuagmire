@@ -243,6 +243,7 @@ single{
 gifSingle{
     sizeX=64,sizeY=64,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(64,0),name='amuletHuge',baseX=16*6,baseY=baseY+64,
 }:addToAsset()
+Asset.playerShotSprites.amuletHuge.data.isSquare=true
 spectrum{
     unit=gifSingle{sizeX=16,sizeY=32,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(0,-32),name='explosive'},
     colors={'blue','green'},

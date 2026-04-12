@@ -31,7 +31,7 @@ local fadeIn=function(self,params)
         if params.setSafe then
             self.safe=true
         end
-        self.spriteTransparency=self.frame/fadeFrame
+        self.spriteTransparency=(params.fadeTransparency or 1) * self.frame/fadeFrame
     elseif self.frame==fadeFrame+1 then
         if params.setSafe then
             self.safe=false
@@ -41,9 +41,10 @@ end
 
 ---@param fadeFrame integer number of frames for the fade in animation, default 30
 ---@param setSafe boolean whether to set the bullet safe when start fading in, default false
+---@param fadeTransparency number|nil if you want to set a specific transparency instead of 0-1, default nil
 --- @return Action
-Bullet.FadeIn=function(fadeFrame,setSafe)
-    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe},func=fadeIn}
+Bullet.FadeIn=function(fadeFrame,setSafe,fadeTransparency)
+    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe,fadeTransparency=fadeTransparency},func=fadeIn}
 end
 
 local zoomIn=function(self,params)
@@ -97,6 +98,8 @@ function Bullet:new(args)
 
     self.batch=args.batch or (args.highlight and Asset.bulletHighlightBatch or BulletBatch)
     self.meshBatch=args.meshBatch or Asset.bigBulletMeshes
+    self.forceQuad=args.forceQuad or false
+    self.forceMesh=args.forceMesh or false
     self.spriteTransparency=args.spriteTransparency or 1
 
     self.spriteExtraDirection=0
@@ -132,9 +135,10 @@ function Bullet:draw()
         quad=self.sprite.quad,
         rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),
         zoom=self.size,
-        normalBatch=self.batch,
-        meshBatch=self.meshBatch,
+        normalBatch=(not self.forceMesh)and self.batch,
+        meshBatch=(not self.forceQuad)and self.meshBatch,
         color=color,
+        isSquare=self.sprite.data.isSquare
     }
 end
 

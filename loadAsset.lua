@@ -11,6 +11,7 @@ local Asset={}
 ---@field key string key in Asset.bulletSprites like "round"
 ---@field isLaser boolean? if the sprite is laser (needs different drawing method) 
 ---@field isGIF boolean? if the sprite is gif (circle.lua will copy table, randomize initial frame and call update for it)
+---@field isSquare boolean? if true, will draw a square instead of a circle. quad always draw square and only mesh drawing need to know this.
 ---@field possibleColors color[]?
 
 ---@class love.Quad
@@ -389,6 +390,7 @@ for i,batch in pairs(Asset.BatchesList) do
     end
 end
 local isHighlightBatch={}
+isHighlightBatch[Asset.playerBulletMeshes]=true
 isHighlightBatch[Asset.playerBulletBatch]=true
 isHighlightBatch[Asset.bigBulletMeshes]=true
 isHighlightBatch[Asset.bulletHighlightBatch]=true

@@ -103,6 +103,9 @@ return {
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
         base.frame=0
+        if G.runInfo.player then
+            G.runInfo.player.shotType=ShotTypes[G.runInfo.shotType]
+        end
     end,
     update=function(self,dt)
         base:updateHierarchy()

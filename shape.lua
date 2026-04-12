@@ -57,6 +57,7 @@ end
 ---@field meshBatch MeshBatch|nil
 ---@field color number[]|nil
 ---@field kinematicState KinematicState|nil if provided, will be used to determine the position and whether to draw as quad or mesh. if not provided, use self.kinematicState.
+---@field isSquare boolean|nil
 
 ---@param args DrawQuadArgs
 function Shape:drawQuad(args)
@@ -111,7 +112,7 @@ function Shape:drawQuad(args)
         if not meshBatch then
             error('Shape:drawQuad: tries to mesh draw with meshBatch = nil')
         end
-        self:meshDrawQuad(kinematicState.pos,w*sizeRatio,h*sizeRatio,rotation,quad,color,meshBatch,suggestedSideNum)
+        self:meshDrawQuad(kinematicState.pos,w*sizeRatio,h*sizeRatio,rotation,quad,color,meshBatch,suggestedSideNum,args.isSquare)
     end
 end
 
@@ -128,15 +129,16 @@ function Shape:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeX,sizeY,normalBatc
 end
 
 ---@param pos Position
----@param radius number
 ---@param w number
 ---@param h number
+---@param rotation number
 ---@param quad love.Quad
 ---@param color number[]|nil
 ---@param meshBatch MeshBatch
 ---@param sideNum integer
-function Shape:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum)
-    MeshFuncs.fanMesh(pos,w,h,rotation,quad,sideNum,color,false,meshBatch)
+---@param isSquare boolean|nil if sprite is square
+function Shape:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum,isSquare)
+    MeshFuncs.fanMesh(pos,w,h,rotation,quad,sideNum,color,isSquare,meshBatch)
 end
 
 ---@class Shape:GameObject

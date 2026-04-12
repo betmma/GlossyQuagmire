@@ -54,11 +54,18 @@ local fadeStrategies={
     amuletHuge={mode=fadeMode.PLAY_GIF},
 }
 
+--- due to player shots move at very high speed and player will not focus on them, only a few will need mesh for high precision.
+local useMesh={
+    amuletHuge=true
+}
+
 -- class for player's shot (bullet)
 ---@class PlayerShot:Bullet
 ---@field hitEffect fun(self: PlayerShot, enemy: Enemy): nil called when hit an enemy. effects like switching to a fade out animation
 ---@field fadeStrategy fadeStrategy
 PlayerShot=Bullet:extend()
+
+PlayerShot.meshDrawQuad=Shape.meshDrawQuad
 
 function PlayerShot:new(args)
     PlayerShot.super.new(self, args)
@@ -67,6 +74,11 @@ function PlayerShot:new(args)
         local data=self.sprite.data
         if data.isGIF then
             self.sprite:reset() -- Bullet.new randomizes gif frame. for player shot, we want all bullets to start from the first frame, since it's a fade out animation
+        end
+        if data.key=='amuletHuge' then
+            self.spriteRotationSpeed=math.pi/10
+            self.spriteExtraDirection=math.eval(0,999)
+            self.extraUpdate[1].params.fadeTransparency=0.5
         end
     end
 end
@@ -96,6 +108,13 @@ function PlayerShot:hitEffect(enemy)
             table.insert(self.extraUpdate,Bullet.FadeOut(loopTime,false))
             self.lifeFrame=self.frame+loopTime
         end
+    elseif self.fadeStrategy.mode==fadeMode.PLAY_GIF then
+        local sprite=self.sprite
+        ---@cast sprite GIFSprite
+        sprite:reset()
+        self.extraUpdate=self.extraUpdate or {}
+        table.insert(self.extraUpdate,Bullet.FadeOut(sprite:getDuration(),false))
+        self.lifeFrame=self.frame+sprite:getDuration()
     end
     self.kinematicState.speed=200
 end
@@ -116,6 +135,23 @@ local HOMING_MODE={
     CLAMP=3, -- change direction by a max angle towards the target
 }
 
+local function findClosestEnemy(bullet)
+    local closestDistance=bullet.homingDistance or 9e9
+    local closestEnemy
+    local enemyClasses={Enemy, Boss}
+    for _, enemyClass in pairs(enemyClasses) do
+        for key, value in pairs(enemyClass.objects) do
+            ---@cast value Enemy
+            local dis=G.runInfo.geometry:distance(bullet.kinematicState.pos,value.kinematicState.pos)
+            if dis<closestDistance then
+                closestDistance=dis
+                closestEnemy=value
+            end
+        end
+    end
+    return closestEnemy
+end
+
 ---@param bullet PlayerShot
 ---@param mode HOMING_MODE
 ---@param arg number
@@ -127,7 +163,7 @@ local function addHoming(bullet,mode,arg)
         arg=arg or 0.1
     end
     bullet.homing=true
-    local closestEnemy
+    local closestEnemy=findClosestEnemy(bullet)
     Event.LoopEvent{
         obj=bullet,
         period=1,
@@ -135,19 +171,8 @@ local function addHoming(bullet,mode,arg)
             if not bullet.homing then -- some level effect removing homing
                 return
             end
-            local closestDistance=bullet.homingDistance or 9e9
             if times%15==1 then -- only update target every 15 frames for performance
-                local enemyClasses={Enemy, Boss}
-                for _, enemyClass in pairs(enemyClasses) do
-                    for key, value in pairs(enemyClass.objects) do
-                        ---@cast value Enemy
-                        local dis=G.runInfo.geometry:distance(bullet.kinematicState.pos,value.kinematicState.pos)
-                        if dis<closestDistance then
-                            closestDistance=dis
-                            closestEnemy=value
-                        end
-                    end
-                end
+                closestEnemy=findClosestEnemy(bullet)
             end
             if closestEnemy and not closestEnemy.removed then
                 local aim=math.modClamp(G.runInfo.geometry:to(bullet.kinematicState.pos,closestEnemy.kinematicState.pos),bullet.kinematicState.dir)
@@ -218,7 +243,8 @@ function ShootingPattern:shoot(shooter, powerLevel)
     local shootState=self:transformShootState(shooter)
     local direction=shootState.dir
     direction=direction+math.eval(self.angle)
-    local bullet=PlayerShot{kinematicState={pos=copy_table(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Bullet.FadeIn(1,false)}}
+    local useMesh=useMesh[self.sprite.data.key]
+    local bullet=PlayerShot{kinematicState={pos=copy_table(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Bullet.FadeIn(1,false)},forceQuad=not useMesh}
     if self.isHoming then
         addHoming(bullet, self.homingMode, self.homingArg)
     end
@@ -290,9 +316,9 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
     end
     if isShooting then
         local optionPatterns=isFocused and self.optionShot.focused or self.optionShot.unfocused
-        for i, option in pairs(options) do
-            for j, pattern in pairs(optionPatterns) do
-                if pattern:update(dt) then
+        for j, pattern in pairs(optionPatterns) do
+            if pattern:update(dt) then
+                for i, option in pairs(options) do
                     pattern:shoot(option.kinematicState, powerLevel)
                 end
             end
@@ -352,7 +378,7 @@ local ShotTypes={
             for i=1,powerLevel do
                 local optionAngle
                 if isFocused then
-                    optionAngle=math.pi/10*(i-powerLevel/2-0.5)
+                    optionAngle=math.pi/9*(i-powerLevel/2-0.5)
                 else
                     optionAngle=math.pi*2/powerLevel*(i-1)+frame*math.pi/150
                 end
@@ -377,6 +403,43 @@ local ShotTypes={
             angle=0,
         }}},
     }
+}
+ShotTypes.REIMUB=ShotType{
+    mainShot=ShotTypes.REIMUA.mainShot,
+    optionSprite=Asset.playerShotSprites.yinyangOrb.blue,
+        optionArrangement=function(powerLevel, isFocused, playerState, frame)
+            local radius=30
+            local angle=playerState.dir
+            ---@type KinematicState[]
+            local returnStates={}
+            for i=1,powerLevel do
+                local optionAngle
+                if isFocused then
+                    optionAngle=math.pi/9*(i-powerLevel/2-0.5)
+                else
+                    optionAngle=math.pi/4*(i-powerLevel/2-0.5)
+                end
+                local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
+                if isFocused then 
+                    optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters
+                end
+                table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
+            end
+            return returnStates
+        end,
+    optionShot={focused={ShootingPattern{
+        sprite=Asset.playerShotSprites.amuletHuge,
+        frequency=8,
+        damage=function(self, powerLevel) return 6 end,
+        angle=0,
+        size=0.75
+    }}, unfocused={ShootingPattern{
+        sprite=Asset.playerShotSprites.amuletHuge,
+        frequency=8,
+        damage=function(self, powerLevel) return 8 end,
+        angle='0+0.1',
+        size=0.75
+    }}},
 }
 
 return ShotTypes
