@@ -53,6 +53,9 @@ return {
                         if key=='hiScore' or key=='score' then
                             return string.format('%09d',G.runInfo[key])
                         end
+                        if key=='power' then
+                            return string.format('%.2f/4.00',G.runInfo[key]/100)
+                        end
                         return tostring(G.runInfo[key])
                     end,
                     fontSize=24,color={1,1,1,1},autoSize=true,

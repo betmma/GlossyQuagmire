@@ -295,6 +295,7 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
     elseif existingOptions<powerLevel then
         for i=existingOptions,powerLevel do
             local newOption=Bullet{kinematicState={pos=playerState.pos,dir=0,speed=0},sprite=self.optionSprite,lifeFrame=99999,safe=true,invincible=true,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes}
+            newOption.spriteRotationSpeed=0.1
             table.insert(options, newOption)
         end
     end
@@ -380,7 +381,7 @@ local ShotTypes={
                 if isFocused then
                     optionAngle=math.pi/9*(i-powerLevel/2-0.5)
                 else
-                    optionAngle=math.pi*2/powerLevel*(i-1)+frame*math.pi/150
+                    optionAngle=math.pi*2/powerLevel*(i-1)+frame*math.pi/25
                 end
                 local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
                 optionAngle2=optionAngle2-optionAngle -- let it face upward

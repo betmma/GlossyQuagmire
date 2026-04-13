@@ -266,6 +266,78 @@ return {
                             zh_cn = '开发中 :P',
                         },
                     },
+                },
+                REIMUA = {
+                    title = {
+                        en_us = 'Homing Type',
+                        zh_cn = '追踪型',
+                    },
+                    unfocusedShot = {
+                        title = {
+                            en_us = 'Sealing Needle',
+                            zh_cn = '封魔针',
+                        },
+                        description = {
+                            en_us = 'Forward shot',
+                            zh_cn = '前方射击',
+                        },
+                    },
+                    focusedShot = {
+                        title = {
+                            en_us = 'Homing Amulet',
+                            zh_cn = '追踪符札',
+                        },
+                        description = {
+                            en_us = 'Automatically tracks enemies',
+                            zh_cn = '自动追踪敌人',
+                        },
+                    },
+                    spellCard = {
+                        title = {
+                            en_us = 'Spirit Sign "Fantasy Seal"',
+                            zh_cn = '灵符「梦想封印」',
+                        },
+                        description = {
+                            en_us = 'Can hit multiple times',
+                            zh_cn = '可以多次命中',
+                        },
+                    }
+                },
+                REIMUB = {
+                    title = {
+                        en_us = 'Wide Type',
+                        zh_cn = '广范围型',
+                    },
+                    unfocusedShot = {
+                        title = {
+                            en_us = 'Big Amulet',
+                            zh_cn = '巨大符札',
+                        },
+                        description = {
+                            en_us = 'Wide shot',
+                            zh_cn = '广范围射击',
+                        },
+                    },
+                    focusedShot = {
+                        title = {
+                            en_us = 'Big Amulet',
+                            zh_cn = '巨大符札',
+                        },
+                        description = {
+                            en_us = 'Forward shot',
+                            zh_cn = '前方射击',
+                        },
+                    },
+                    spellCard = {
+                        title = {
+                            en_us = 'Spirit Sign "Fantasy Seal"',
+                            zh_cn = '灵符「梦想封印」',
+                        },
+                        description = {
+                            en_us = 'Can hit multiple times',
+                            zh_cn = '可以多次命中',
+                        },
+                    }
                 }
             }
         },

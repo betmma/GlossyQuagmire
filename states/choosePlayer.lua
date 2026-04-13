@@ -75,6 +75,10 @@ return {
                             self.y=math.lerp(self.y,(self.currentOptionIndex-1)*optionCollapseYGap+10,lerpRatio)
                             if self.focused and isPressed('z') then
                                 local selectedShotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player][self.currentOptionIndex]
+                                if not ShotTypes[selectedShotType] then -- the shot type isn't implemented yet
+                                    SFX:play('cancel',true)
+                                    return
+                                end
                                 G.runInfo.playerType=player
                                 G.runInfo.shotType=selectedShotType
                                 G:switchState(G.STATES.IN_GAME)
@@ -110,7 +114,7 @@ return {
                             local valueText=shotTypeDetailsBox:child(UI.Text{
                                 text=Localize{'ui','CHOOSE_PLAYER','shotTypeDescriptions',shotType,key,'title'},
                                 fontSize=16,color={1,1,1,1},boldColor=playerColorBold,
-                                x=10,y=yBase,width=150,align='left',extraUpdates={extraUpdate}
+                                x=10,y=yBase,width=250,align='left',extraUpdates={extraUpdate}
                             })
                             local extraUpdate2=function(self)
                                 self.y=math.lerpCondition(self.y,self.focused,yBase+20,0,lerpRatio)
