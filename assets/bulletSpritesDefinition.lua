@@ -37,8 +37,9 @@ local Asset=...
 ---moon: Sprite, anchor: Sprite, playerFocus: Sprite, \
 ---nuke: Sprite}
 
+---@type bulletSpriteLoaders
 local loaders=Asset.bulletSpriteLoaders
-local switchTargets,single,gifSingle,spectrum,matrix,simpleOffsetFunc,setCenterPosition=loaders.switchTargets,loaders.single,loaders.gifSingle,loaders.spectrum,loaders.matrix,loaders.simpleOffsetFunc,loaders.setCenterPosition
+local switchTargets,single,gifSingle,movingSingle,spectrum,matrix,simpleOffsetFunc,setCenterPosition=loaders.switchTargets,loaders.single,loaders.gifSingle,loaders.movingSingle,loaders.spectrum,loaders.matrix,loaders.simpleOffsetFunc,loaders.setCenterPosition
 
 ---@type AssetBulletSpritesCollection
 Asset.bulletSprites={}
@@ -151,6 +152,9 @@ single{
 }:addToAsset()
 -- some old names mapping
 Asset.shards={dot=Asset.bulletSprites.dot.white,round=Asset.bulletSprites.fog.white}
+
+----------------------------------------- Player Shot sprites (player.png)
+
 ---@class BlPuRe
 ---@field blue Sprite
 ---@field purple Sprite
@@ -249,4 +253,81 @@ spectrum{
     colors={'blue','green'},
     offsetFunc=simpleOffsetFunc(16,0),
     baseX=0+16*22,baseY=baseY+64+48,
+}:addToAsset()
+
+
+----------------------------------------- Fairy sprites
+
+---@class fairySpectrum
+---@field red MovingSprite
+---@field blue MovingSprite
+---@field green MovingSprite
+---@field orange MovingSprite
+---@field purple MovingSprite
+---@field white MovingSprite
+---@field black MovingSprite
+
+---@alias AssetFairySpritesCollection {\
+--- small:fairySpectrum, medium:fairySpectrum, large:fairySpectrum}
+
+---@type AssetFairySpritesCollection
+Asset.fairySprites={}
+
+switchTargets(Asset.fairyImage, Asset.fairySprites)
+
+local fairyColors={'red','blue','green','orange','purple','white','black'}
+
+local size=32
+
+local function getSmallFairySingleSpriteDataArg()
+    return {
+        normal={frameCount=4,offsetX=0,offsetY=0,frameOffsetFunc=simpleOffsetFunc(size,0)},
+        moveTransition={
+            left={frameCount=1,offsetX=size*4,offsetY=0,frameOffsetFunc=simpleOffsetFunc(0,0)},
+            right={frameCount=1,offsetX=size*13,offsetY=0,frameOffsetFunc=simpleOffsetFunc(0,0)},
+        },
+        moving={
+            left={frameCount=4,offsetX=size*5,offsetY=0,frameOffsetFunc=simpleOffsetFunc(size,0)},
+            right={frameCount=4,offsetX=size*12,offsetY=0,frameOffsetFunc=simpleOffsetFunc(-size,0)},
+        },
+        frameTime={normal=8,moveTransition=8,moving=8},
+    }
+end
+
+spectrum{
+    unit=movingSingle{
+        sizeX=size,sizeY=size,name='small',
+        data=getSmallFairySingleSpriteDataArg(),
+    },
+    colors=fairyColors,
+    offsetFunc=simpleOffsetFunc(0,size),
+    baseX=0,baseY=0,
+}:addToAsset()
+
+local function getMediumLargeFairySingleSpriteDataArg()
+    return {
+        normal={frameCount=4,offsetX=0,offsetY=0,frameOffsetFunc=simpleOffsetFunc(size,0)},
+        moveTransition={
+            left={frameCount=1,offsetX=size*4,offsetY=0,frameOffsetFunc=simpleOffsetFunc(0,0)},
+            right={frameCount=1,offsetX=size*11,offsetY=0,frameOffsetFunc=simpleOffsetFunc(0,0)},
+        },
+        moving={
+            left={frameCount=3,offsetX=size*5,offsetY=0,frameOffsetFunc=simpleOffsetFunc(size,0)},
+            right={frameCount=3,offsetX=size*10,offsetY=0,frameOffsetFunc=simpleOffsetFunc(-size,0)},
+        },
+        frameTime={normal=8,moveTransition=8,moving=8},
+    }
+end
+
+size=48
+matrix{
+    unit=movingSingle{
+        sizeX=size,sizeY=size,
+        data=getMediumLargeFairySingleSpriteDataArg(),
+    },
+    names={'large','medium'},
+    colors=fairyColors,
+    nameOffsetFunc=simpleOffsetFunc(0,size*#fairyColors),
+    colorOffsetFunc=simpleOffsetFunc(0,size),
+    baseX=0,baseY=32*7,
 }:addToAsset()

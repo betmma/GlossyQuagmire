@@ -24,8 +24,8 @@ function Enemy:update(dt)
         self.hp=self.bindedEnemy.hp
         self.damageResistance=self.bindedEnemy.damageResistance
     end
-    self:calculateMovingTransitionSprite()
     self.orientation=self:upwardDeltaOrientation()
+    self:calculateMovingTransitionSprite()
 end
 
 --- make this enemy share hp and transfer damage with otherEnemy
@@ -90,6 +90,68 @@ function Enemy:dieEffect()
     self:remove()
 end
 
+
+function Enemy:calculateMovingTransitionSprite()
+    if not self.sprite then
+        return
+    end
+    if self.sprite.is and self.sprite:is(Asset.MovingSprite) then
+        local movingDir=math.cos(self.kinematicState.dir-self.orientation)
+        local isLeft=movingDir<-0.5
+        local isRight=movingDir>0.5
+        self.sprite:countDown(isLeft,isRight)
+        self.currentSprite=self.sprite.quad
+    end
+
+    if self.sprite.key=='boss'then -- calculate whether enemy is moving left or right relative to player is kinda complex, so just use normal sprites
+        local sprites=self.sprite.normal
+        local t=self.time
+        local index=math.floor(t/0.2)%#sprites+1
+        self.currentSprite=sprites[index]
+    end
+end
+
+-- originally it's designed to calculate to make the sprite upward, how much to rotate the sprite. but it would require an equivalent lua function of shaders used by geometry and feel ugly, currently it just faces player
+function Enemy:upwardDeltaOrientation()
+    local player=G.runInfo.player
+    if not player then
+        return 0
+    end
+    -- local rotateAngle=player.viewDirection
+    local selfToPlayer=G.runInfo.geometry:to(self.kinematicState.pos,player.kinematicState.pos)
+    -- local playerToSelf=G.runInfo.geometry:to(player.kinematicState.pos,self.kinematicState.pos)
+    return selfToPlayer-math.pi/2
+end
+
+function Enemy:drawSprite()
+    local sprite=self.sprite
+    if not sprite then
+        return
+    end
+    local orientation=self.orientation or 0
+    if sprite.key=='boss' then
+        local kinematicState=self.kinematicState
+        local offDistance=math.sin(self.time)*3 -- slightly floating
+        local pos,direction=G.runInfo.geometry:rThetaGo(kinematicState.pos,offDistance,orientation+math.pi/2)
+        self:drawQuad{
+            kinematicState={pos=pos,dir=direction,speed=kinematicState.speed},
+            quad=self.currentSprite,
+            rotation=orientation,
+            zoom=self.size,
+            normalBatch=Asset.bossBatch,
+            meshBatch=Asset.bossMeshes,
+        }
+    else
+        self:drawQuad{
+            quad=self.currentSprite,
+            rotation=orientation,
+            zoom=self.size,
+            normalBatch=Asset.fairyBatch,
+            -- meshBatch=Asset.bigBulletMeshes,
+        }
+    end
+end
+
 ---@class Boss:Enemy
 local Boss=Enemy:extend()
 Enemy.hpSegmentsFuncShockwave=function(self,hpLevel,canRemove)
@@ -148,59 +210,6 @@ function Boss:bind(otherEnemy)
     self.showHexagram=otherEnemy.showHexagram
     if self.mainEnemy then
         error('Enemy:bind: mainEnemy cannot bind with other enemy')
-    end
-end
-
-function Enemy:calculateMovingTransitionSprite()
-    if not self.sprite then
-        return
-    end
-    if self.sprite.key=='fairy' or self.sprite.key=='boss'then -- calculate whether enemy is moving left or right relative to player is kinda complex, so just use normal sprites
-        local sprites=self.sprite.normal
-        local t=self.time
-        local index=math.floor(t/0.2)%#sprites+1
-        self.currentSprite=sprites[index]
-    end
-end
-
--- to calculate to make the sprite upward, how much to rotate the sprite. not implemented yet.
-function Enemy:upwardDeltaOrientation()
-    local player=G.runInfo.player
-    if not player then
-        return 0
-    end
-    -- local rotateAngle=player.viewDirection
-    -- local selfToPlayer=G.runInfo.geometry:to(self.kinematicState.pos,player.kinematicState.pos)
-    -- local playerToSelf=G.runInfo.geometry:to(player.kinematicState.pos,self.kinematicState.pos)
-    return 0
-end
-
-function Enemy:drawSprite()
-    local sprite=self.sprite
-    if not sprite then
-        return
-    end
-    if sprite.key=='fairy' then
-        self:drawQuad{
-            quad=self.currentSprite,
-            rotation=0,
-            zoom=self.size,
-            normalBatch=Asset.fairyBatch,
-            -- meshBatch=Asset.bigBulletMeshes,
-        }
-    elseif sprite.key=='boss' then
-        local kinematicState=self.kinematicState
-        local offDistance=math.sin(self.time)*3 -- slightly floating
-        local orientation=self.orientation or 0
-        local pos,direction=G.runInfo.geometry:rThetaGo(kinematicState.pos,offDistance,orientation+math.pi/2)
-        self:drawQuad{
-            kinematicState={pos=pos,dir=direction,speed=kinematicState.speed},
-            quad=self.currentSprite,
-            rotation=0,
-            zoom=self.size,
-            normalBatch=Asset.bossBatch,
-            meshBatch=Asset.bossMeshes,
-        }
     end
 end
 

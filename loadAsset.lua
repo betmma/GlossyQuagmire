@@ -37,7 +37,7 @@ end
 ---@field private quads love.Quad[]
 ---@field private currentFrame number
 ---@field private frameTime number 
----@field private switchCountin number 
+---@field private switchCounting number 
 ---@field randomizeCurrentFrame fun(self):nil randomize the current frame, called when creating a new bullet with the sprite, so that not all bullets with the same sprite are in sync
 local GIFSprite=Sprite:extend()
 Asset.GIFSprite=GIFSprite
@@ -86,6 +86,84 @@ function GIFSprite:getDuration()
     return self.frameTime*#self.quads
 end
 
+---@alias MovingSpriteState 'normal'|'moveTransition'|'moving'
+
+---@class MovingSprite:Sprite sprite including normal (not moving), transition left/right and left/right variations. Calculate which to use on countdown(). Used for player and fairy.
+---@field normal love.Quad[]
+---@field moveTransition {left:love.Quad[],right:love.Quad[]}
+---@field moving {left:love.Quad[],right:love.Quad[]}
+---@field tilt integer range is -#moveTransition.left*frameTime.left to #moveTransition.right*frameTime.right
+---@field keptFrame integer how many frames have been kept in the current state, used for animation of normal and moving state.
+---@field frameTime table<MovingSpriteState,integer>
+---@field data MovingSpriteData
+---@overload fun(quads:MovingSpriteQuads,data:MovingSpriteData):MovingSprite
+local MovingSprite=Sprite:extend()
+Asset.MovingSprite=MovingSprite
+---@class MovingSpriteQuads
+---@field normal love.Quad[] -- animation of normal state
+---@field moveTransition {left:love.Quad[],right:love.Quad[]} -- these quads are more and more tilted, not animation of same tilt extent.
+---@field moving {left:love.Quad[],right:love.Quad[]} -- animation of moving (most tilted) state
+
+---@class MovingSpriteData:spriteData
+---@field frameTime table<MovingSpriteState,integer>
+
+---@param quads MovingSpriteQuads
+---@param data MovingSpriteData
+function MovingSprite:new(quads,data)
+    self.quads=quads
+    if not quads then
+        error('MovingSprite:new: quads is nil')
+    end
+    if not quads.normal or not quads.moveTransition or not quads.moving then
+        error('MovingSprite:new: quads must have normal, moveTransition and moving')
+    end
+    GIFSprite.super.new(self,quads.normal[1],data)
+    self.frameTime=data.frameTime
+    self.state='normal'
+    self.tilt=0
+    self.keptFrame=0
+end
+
+---@param movingLeft boolean
+---@param movingRight boolean
+function MovingSprite:countDown(movingLeft, movingRight)
+    -- 1 means moving right, -1 means moving left, 0 means not moving
+    local rightness=(movingRight and 1 or 0)-(movingLeft and 1 or 0)
+    local tilt,keptFrame=self.tilt,self.keptFrame
+    local tiltMax=#self.quads.moveTransition[tilt<0 and 'left' or 'right']*self.data.frameTime.moveTransition -- max tilt is the duration of transition
+    if tilt==0 then -- normal state
+        if rightness==0 then -- not moving
+            keptFrame=keptFrame+1 -- keeping unmove
+        else -- start moving
+            keptFrame=0
+            tilt=tilt+rightness
+        end
+    elseif math.abs(tilt)==tiltMax then -- moving (max tilt) state
+        if math.sign(rightness)==math.sign(tilt) then -- keep moving at the same direction
+            keptFrame=keptFrame+1
+        else -- not moving at the same direction
+            keptFrame=0
+            tilt=tilt-math.sign(tilt) -- reduce tilt towards 0
+        end
+    else -- in transition
+        keptFrame=0 -- keptFrame is not used in transition state
+        tilt=tilt+(rightness==0 and -math.sign(tilt) or rightness) -- if not moving, reduce tilt towards 0. if do move, add tilt towards the moving direction. 
+    end
+    self.tilt=tilt
+    self.keptFrame=keptFrame
+    local direction=tilt>0 and 'right' or 'left'
+    if tilt==0 then
+        local index=math.ceil(keptFrame/self.data.frameTime.normal)%#self.quads.normal+1
+        self.quad=self.quads.normal[index]
+    elseif math.abs(tilt)==tiltMax then
+        local index=math.ceil(keptFrame/self.data.frameTime.moving)%#self.quads.moving[direction]+1
+        self.quad=self.quads.moving[direction][index]
+    else
+        local index=math.ceil(math.abs(tilt)/self.data.frameTime.moveTransition)
+        self.quad=self.quads.moveTransition[direction][index]
+    end
+end
+
 local playerImage = love.graphics.newImage( "assets/player.png" )
 Asset.playerImage=playerImage
 
@@ -95,9 +173,16 @@ bulletImage:setFilter("nearest", "linear") -- this "linear filter" removes some 
 
 local hitRadius={laser=4,scale=2.4,rim=2.4,round=4,rice=2.4,kunai=2.4,crystal=2.4,bill=2.8,bullet=2.4,blackrice=2.4,star=4,darkdot=2.4,dot=2.4,bigStar=7,bigRound=8.5,butterfly=7,knife=6,ellipse=7,fog=8.5,heart=10,giant=14,lightRound=14,hollow=2.4,flame=6,orb=6,moon=60,nuke=96,explosion=38,snake=2.4}
 Asset.hitRadius=hitRadius
+
+local fairyImage = love.graphics.newImage( "assets/fairy.png" )
+Asset.fairyImage=fairyImage
+
 love.filesystem.load('loadBulletSprites.lua')(Asset)
 ---@type AssetPlayerShotSpritesCollection
 Asset.playerShotSprites=Asset.playerShotSprites
+---@type AssetFairySpritesCollection
+Asset.fairySprites=Asset.fairySprites
+
 Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yellow='yellow',green='green',teal='green',cyan='blue',blue='blue',purple='purple',magenta='purple',black='gray'}
 
 local bgImage = love.graphics.newImage( "assets/bg.png" )
@@ -127,26 +212,6 @@ end
 for i=1,4 do
     Asset.player.moving.left[i]=love.graphics.newQuad((i-1+4)*playerWidth,playerHeight,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
     Asset.player.moving.right[i]=love.graphics.newQuad((i-1+4)*playerWidth,playerHeight*2,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
-end
-
-local fairyImage = love.graphics.newImage( "assets/fairy.png" )
-Asset.fairyImage=fairyImage
-Asset.fairyColors={'red','blue','green','orange','purple','white','black'}
-Asset.fairy={}
-local fairyWidth,fairyHeight=32,32
-Asset.fairy.width=fairyWidth
-Asset.fairy.height=fairyHeight
-for i,color in pairs(Asset.fairyColors) do
-    Asset.fairy[color]={key='fairy',normal={},moveTransition={},moving={}}
-    for j=1,9 do
-        local type='normal'
-        if j==5 then
-            type='moveTransition'
-        elseif j>5 then
-            type='moving'
-        end
-        Asset.fairy[color][type][#Asset.fairy[color][type]+1]=love.graphics.newQuad((j-1)*fairyWidth,(i-1)*fairyHeight,fairyWidth,fairyHeight,fairyImage:getWidth(),fairyImage:getHeight())
-    end
 end
 
 local bossImage = love.graphics.newImage( "assets/placeholderBossSprite.png" )

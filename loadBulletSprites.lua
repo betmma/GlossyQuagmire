@@ -47,10 +47,12 @@ function BulletSpriteSingle:addToAsset()
     bulletSprites[name]=self:getSprite()
 end
 
+---@alias OffsetFunc fun(index:number):{x:number,y:number} x and y offset of each item
+
 ---@class BulletSpriteGIFSingle:BulletSpriteSingle
 ---@field frameCount number
 ---@field frameTime number
----@field frameOffsetFunc fun(index:number):{x:number,y:number} x and y offset of each frame
+---@field frameOffsetFunc OffsetFunc x and y offset of each frame
 local BulletSpriteGIFSingle = BulletSpriteSingle:extend()
 function BulletSpriteGIFSingle:new(args)
     BulletSpriteSingle.new(self,args)
@@ -75,10 +77,61 @@ function BulletSpriteGIFSingle:addToAsset()
     bulletSprites[name]=self:getSprite()
 end
 
+---@alias MovingSpriteSingleDataItem {frameCount:integer,offsetX:integer,offsetY:integer,frameOffsetFunc:OffsetFunc}
+
+---@class MovingSpriteSingleData
+---@field normal MovingSpriteSingleDataItem
+---@field moveTransition {left:MovingSpriteSingleDataItem,right:MovingSpriteSingleDataItem}
+---@field moving {left:MovingSpriteSingleDataItem,right:MovingSpriteSingleDataItem}
+---@field frameTime table<MovingSpriteState,integer> number of frames for each state
+
+---@class MovingSpriteSingle:BulletSpriteSingle
+---@field data MovingSpriteSingleData data for moving sprite, including frameCount, frameTime and offsetFunc for each state (normal, moveTransition and moving)
+---@overload fun(args:{data:MovingSpriteSingleData}):MovingSpriteSingle
+local MovingSpriteSingle=BulletSpriteSingle:extend()
+
+function MovingSpriteSingle:new(args)
+    BulletSpriteSingle.new(self,args)
+    self.data=args.data
+end
+
+function MovingSpriteSingle:getSprite()
+    local name=self.name
+    local spriteData={sizeX=self.sizeX,sizeY=self.sizeY,hitRadius=getHitRadius(name,self.sizeX),key=name,isLaser=false,frameTime=self.data.frameTime}
+    local quads={normal={},moveTransition={left={},right={}},moving={left={},right={}}}
+    local states={'normal','moveTransitionLeft','moveTransitionRight','movingLeft','movingRight'}
+    for _,state in ipairs(states) do
+        local stateData,target
+        if state=='normal' then
+            stateData=self.data.normal
+            target=quads.normal
+        elseif state=='moveTransitionLeft' then
+            stateData=self.data.moveTransition.left
+            target=quads.moveTransition.left
+        elseif state=='moveTransitionRight' then
+            stateData=self.data.moveTransition.right
+            target=quads.moveTransition.right
+        elseif state=='movingLeft' then
+            stateData=self.data.moving.left
+            target=quads.moving.left
+        elseif state=='movingRight' then
+            stateData=self.data.moving.right
+            target=quads.moving.right
+        end
+        for i=1,stateData.frameCount do
+            local offset=stateData.frameOffsetFunc(i)
+            local x=offset.x
+            local y=offset.y
+            target[i]=quad(self.baseX+stateData.offsetX+x,self.baseY+stateData.offsetY+y,self.sizeX,self.sizeY)
+        end
+    end
+    return Asset.MovingSprite(quads,spriteData)
+end
+
 ---@class BulletSpriteSpectrum information of a spectrum (different colors of same shape) of bullets
 ---@field unit BulletSpriteSingle unit:getSprite() will be called. baseXY are overridden.
 ---@field colors string[]
----@field offsetFunc fun(index:number):{x:number,y:number} x and y offset of each color bullet in the group
+---@field offsetFunc OffsetFunc x and y offset of each color bullet in the group
 ---@field baseX number
 ---@field baseY number
 ---@field getSprite fun(self):table<string,Sprite> return color:Sprite table of the group
@@ -120,8 +173,8 @@ end
 ---@field unit BulletSpriteSingle
 ---@field colors string[] array of colors of the spectrums
 ---@field names string[] array of names of the spectrums
----@field nameOffsetFunc fun(index:number):{x:number,y:number} x and y offset of each spectrum
----@field colorOffsetFunc fun(index:number):{x:number,y:number} x and y offset of each color in the spectrum
+---@field nameOffsetFunc OffsetFunc x and y offset of each spectrum
+---@field colorOffsetFunc OffsetFunc x and y offset of each color in the spectrum
 ---@field baseX number
 ---@field baseY number
 ---@field addToAsset fun(self):nil 
@@ -190,10 +243,14 @@ local function setCenterPosition(name,centerX,centerY)
     end
 end
 
+---@alias bulletSpriteLoaders {switchTargets:(fun(newImage:love.Image,newSpritesTable:table):nil),
+---single:(fun(args:table):BulletSpriteSingle), gifSingle:(fun(args:table):BulletSpriteGIFSingle), movingSingle:(MovingSpriteSingle), spectrum:(fun(args:table):BulletSpriteSpectrum), matrix:(fun(args:table):BulletSpriteMatrix), simpleOffsetFunc:(fun(dx:number,dy:number):OffsetFunc), setCenterPosition:(fun(name:string,centerX:number,centerY:number):nil)}
+
 Asset.bulletSpriteLoaders={
     switchTargets=switchTargets,
     single=BulletSpriteSingle,
     gifSingle=BulletSpriteGIFSingle,
+    movingSingle=MovingSpriteSingle,
     spectrum=BulletSpriteSpectrum,
     matrix=BulletSpriteMatrix,
     simpleOffsetFunc=simpleOffsetFunc,

@@ -101,7 +101,7 @@ return {
         Effect.Charge{obj=spawner}
         local boss=Boss{kinematicState={pos=spawnerPos,speed=0,dir=0},maxhp=5000,sprite=Asset.boss.flandre}
         local fairyPos=G.runInfo.geometry:rThetaGo(spawnerPos,150,math.pi/4)
-        local fairy=Enemy{kinematicState={pos=fairyPos,speed=0,dir=0},maxhp=100,sprite=Asset.fairy.red}
+        local fairy=Enemy{kinematicState={pos=fairyPos,speed=0,dir=0},maxhp=100,sprite=Asset.fairySprites.small.red}
     end,
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)

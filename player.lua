@@ -129,9 +129,9 @@ end
 function Player:calculateShoot(dt)
     if DEV_MODE then
         if love.keyboard.isDown(',') then
-            G.runInfo.power=G.runInfo.power-1
+            G.runInfo.power=G.runInfo.power-2
         elseif love.keyboard.isDown('.') then
-            G.runInfo.power=G.runInfo.power+1
+            G.runInfo.power=G.runInfo.power+2
         end
     end
     if not self.shotType then
