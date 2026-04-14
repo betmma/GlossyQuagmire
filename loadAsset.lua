@@ -182,6 +182,8 @@ love.filesystem.load('loadBulletSprites.lua')(Asset)
 Asset.playerShotSprites=Asset.playerShotSprites
 ---@type AssetFairySpritesCollection
 Asset.fairySprites=Asset.fairySprites
+---@type playerSpectrum
+Asset.playerSprites=Asset.playerSprites
 
 Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yellow='yellow',green='green',teal='green',cyan='blue',blue='blue',purple='purple',magenta='purple',black='gray'}
 
@@ -192,27 +194,6 @@ Asset.backgroundQuad=love.graphics.newQuad(0,0,bgImage:getWidth(),bgImage:getHei
 Asset.backgroundRight=love.graphics.newQuad(500,0,300,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
 local titleImage = love.graphics.newImage( "assets/title.png" )
 Asset.title=love.graphics.newQuad(0,0,1280,720,titleImage:getWidth(),titleImage:getHeight())
-
--- load player sprite
-Asset.player={
-    normal={},
-    moveTransition={left={},right={}},
-    moving={left={},right={}},
-} -- each sprite is 32x48
-local playerWidth,playerHeight=32,48
-Asset.player.width=playerWidth
-Asset.player.height=playerHeight
-for i=1,8 do
-    Asset.player.normal[i]=love.graphics.newQuad((i-1)*playerWidth,0,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
-end
-for i=1,4 do
-    Asset.player.moveTransition.left[i]=love.graphics.newQuad((i-1)*playerWidth,playerHeight,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
-    Asset.player.moveTransition.right[i]=love.graphics.newQuad((i-1)*playerWidth,playerHeight*2,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
-end
-for i=1,4 do
-    Asset.player.moving.left[i]=love.graphics.newQuad((i-1+4)*playerWidth,playerHeight,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
-    Asset.player.moving.right[i]=love.graphics.newQuad((i-1+4)*playerWidth,playerHeight*2,playerWidth,playerHeight,playerImage:getWidth(),playerImage:getHeight())
-end
 
 local bossImage = love.graphics.newImage( "assets/placeholderBossSprite.png" )
 bossImage:setFilter("nearest", "nearest")

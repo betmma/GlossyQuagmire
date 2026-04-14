@@ -255,6 +255,36 @@ spectrum{
     baseX=0+16*22,baseY=baseY+64+48,
 }:addToAsset()
 
+----------------------------------------- Player sprites (also player.png)
+
+Asset.playerSprites={}
+switchTargets(Asset.playerImage, Asset.playerSprites)
+
+---@class playerSpectrum
+---@field REIMU MovingSprite
+---@field MARISA MovingSprite
+---@field KOTOBA MovingSprite
+
+local sizeX,sizeY=32,48
+spectrum{
+    unit=movingSingle{sizeX=sizeX,sizeY=sizeY,name='player',data={
+        normal={frameCount=8,offsetX=0,offsetY=0,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+        moveTransition={
+            left={frameCount=4,offsetX=0,offsetY=sizeY,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+            right={frameCount=4,offsetX=0,offsetY=sizeY*2,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+        },
+        moving={
+            left={frameCount=4,offsetX=sizeX*4,offsetY=sizeY,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+            right={frameCount=4,offsetX=sizeX*4,offsetY=sizeY*2,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+        },
+        frameTime={normal=8,moveTransition=2,moving=8},
+    }},
+    colors={'REIMU','MARISA','KOTOBA'},
+    offsetFunc=simpleOffsetFunc(sizeX*8,0),
+    baseX=0,baseY=0,
+}:addToAsset()
+-- current structure is Asset.playerSprites.player.REIMU. simplify it to Asset.playerSprites.REIMU for easier access
+Asset.playerSprites=Asset.playerSprites.player
 
 ----------------------------------------- Fairy sprites
 

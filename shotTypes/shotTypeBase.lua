@@ -31,6 +31,8 @@
     - unfocused: straight piercing lasers
     - focused: straight explosive bullets
     Marisa B option:
+    - unfocused: 360 degree explosive, auto rotates towards closest enemy
+    - focused: leave options at current position
 ]]
 ---@enum fadeMode
 local fadeMode={

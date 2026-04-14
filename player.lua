@@ -1,4 +1,5 @@
 ---@class Player:Shape
+---@field sprite MovingSprite
 ---@field viewDirection number in natural move mode, the direction of the right-hand-side.
 ---@field moveSpeed number
 ---@field diagonalSpeedAddition boolean if true, when moving diagonally, the speed is the addition of 2 vectors of U/D and L/R.
@@ -26,6 +27,7 @@ Player.moveModes={
 function Player:new(args)
     args=args or {}
     Player.super.new(self, args)
+    self.sprite=args.sprite or Asset.playerSprites[G.runInfo.playerType]
     -- in natural move mode, the direction of the right-hand-side. initially it's 0, means without moving, the right to player is the same as the right to the screen. (it's not the "up" direction where player's sprite faces.)
     self.viewDirection=0
     self.lifeFrame=9999999
@@ -200,41 +202,7 @@ function Player:calculateMovingTransitionSprite()
     if Shape.timeSpeed==0 then
         return -- stop sprite transition when time is stopped
     end
-    local lingerFrame={normal=8,moveTransition=2,moving=8}
-    local tiltMax=#Asset.player.moveTransition.left*lingerFrame.moveTransition
-    local right=self:isDownInt(KEYS.DIRECTIONS.RIGHT)-self:isDownInt(KEYS.DIRECTIONS.LEFT)
-    local tilt=self.tilt or 0
-    local keptFrame=self.keptFrame or 0 -- how long player has been keeping unmove or moving at the same direction (after transition of tiltMax frames)
-    if tilt==0 then
-        if right==0 then
-            keptFrame=keptFrame+1 -- at current frame keeping unmove
-        else
-            keptFrame=0 -- start moving
-            tilt=tilt+right
-        end
-    elseif math.abs(tilt)==tiltMax then
-        if math.sign(right)==math.sign(tilt) then -- keep moving at the same direction
-            keptFrame=keptFrame+1
-        else
-            keptFrame=0
-            tilt=tilt-math.sign(tilt) -- reduce tilt as not moving at the same direction
-        end
-    else
-        keptFrame=0
-        tilt=tilt+(right==0 and -math.sign(tilt) or right) -- if do move, change tilt to the moving direction. if not moving, reduce tilt towards 0.
-    end
-    self.tilt=tilt
-    self.keptFrame=keptFrame
-    local direction=tilt>0 and 'right' or 'left'
-    local sprite
-    if tilt==0 then
-        sprite=Asset.player.normal[math.ceil(keptFrame/lingerFrame.normal)%#Asset.player.normal+1]
-    elseif math.abs(tilt)==tiltMax then
-        sprite=Asset.player.moving[direction][math.ceil(keptFrame/lingerFrame.moving)%#Asset.player.moving[direction]+1]
-    else
-        sprite=Asset.player.moveTransition[direction][math.ceil(math.abs(tilt)/lingerFrame.moveTransition)]
-    end
-    self.sprite=sprite
+    self.sprite:countDown(self:isDownInt(KEYS.DIRECTIONS.LEFT)>0,self:isDownInt(KEYS.DIRECTIONS.RIGHT)>0)
 end
 
 function Player:calculateFocusPointTransparency()
@@ -260,7 +228,7 @@ function Player:draw()
         ,normalBatch=nil} -- force mesh
     local sizeFactor=1
     if self.sprite then
-        self:drawQuad{quad=self.sprite,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=drawColor}
+        self:drawQuad{quad=self.sprite.quad,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=drawColor}
     end
 end
 
