@@ -25,6 +25,7 @@ function Larger:new(args)
     self.animationFrame=args.animationFrame or 30
     self.spriteTransparency=args.spriteTransparency or 1
     self.batch=Asset.effectBatch
+    self.meshBatch=Asset.bigBulletMeshes
 end
 
 function Larger:update(dt)

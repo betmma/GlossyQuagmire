@@ -84,7 +84,7 @@ end
 
 function GeometryBase:zoomFactorToScreen(position)
     local screenPos=self:toScreen(position)
-    local kinematicState={pos=copy_table(position),speed=60,dir=0}
+    local kinematicState={pos=copyTable(position),speed=60,dir=0}
     self:update(kinematicState,1/60) -- use update to move a small step in geometry space (1 unit)
     local screenPos2=self:toScreen(kinematicState.pos)
     local screenDistance={}

@@ -27,6 +27,10 @@ function Shape:new(args)
     -- self.removeDistance=args.removeDistance or Shape.removeDistance
 end
 
+function Shape:bindState(other)
+    self.kinematicState=other.kinematicState
+    self.binded=other
+end
 
 function Shape:update(dt)
     self.time=self.time+dt*Shape.timeSpeed
@@ -35,7 +39,13 @@ function Shape:update(dt)
         self:remove()
     end
     local geometry=G.runInfo.geometry
-    geometry:update(self.kinematicState,dt)
+    if not self.binded then
+        geometry:update(self.kinematicState,dt)
+    else
+        if self.binded.removed then
+            self:remove()
+        end
+    end
     -- if self:distanceRemoveCheck() then
     --     self:remove()
     -- end
@@ -148,5 +158,7 @@ end
 ---@field kinematicState KinematicState
 ---@field getHitboxRadius fun(self:Shape):number get the hitbox radius of this shape. By default, it's self.size, but if the sprite has a hitRadius defined in its data, it will be that value multiplied by self.size.
 ---@field drawQuad fun(self:Shape,args:DrawQuadArgs):nil general function to draw a quad. geometry could decide it to drawn as a quad or a mesh (with more vertices), and it's possible to force either mode by not providing the corresponding batch. image is only used for mesh drawing.
+---@field bindState fun(self:Shape,other:Shape):nil set self's kinematicState to other's kinematicState, and cancel update to self.kinematicState, so it will follow other's kinematicState exactly. will remove self if other is removed.
+---@field private binded Shape what shape the shape is binded to. if not nil, self won't update its own kinematicState.
 -- -@field removeDistance number distance from the screen after which the object will be removed (roughly)
 return Shape

@@ -178,7 +178,7 @@ end
 
 function Player:moveUpdate(dt)
     self.kinematicState.speed, self.kinematicState.dir=self:getKeyboardMoveSpeed()
-    local kinematicStateRef=copy_table(self.kinematicState)
+    local kinematicStateRef=copyTable(self.kinematicState)
 
     self.super.update(self,dt) -- actually move
 
@@ -287,7 +287,7 @@ function Player:hitEffect(damage)
     end
     self.invincibleFrame=self.invincibleFrame+self.hitInvincibleFrame
     self.immobileFrame=self.immobileFrame+self.hitImmobileFrame
-    Effect.Shockwave{kinematicState={pos=copy_table(self.kinematicState.pos),speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
+    Effect.Shockwave{kinematicState={pos=copyTable(self.kinematicState.pos),speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
     SFX:play('playerHit',true)
     self.duringDeath=true
     Event.EaseEvent{

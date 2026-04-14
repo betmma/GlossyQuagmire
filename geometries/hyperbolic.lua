@@ -142,7 +142,7 @@ end
 
 function Hyperbolic:rThetaGo(position,length,direction)
     if length==0 then
-        return copy_table(position),direction
+        return copyTable(position),direction
     end
     local rLT0=length<0
     if rLT0 then

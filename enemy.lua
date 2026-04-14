@@ -12,11 +12,24 @@ function Enemy:new(args)
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.sprite=args.sprite
-    if not self.sprite then
+    self.spriteTransparency=args.spriteTransparency or 1
+    if self.sprite and self.sprite.is and self.sprite:is(Asset.MovingSprite) then
+        self.sprite=shallowCopyTable(self.sprite)
+    end
+    self.extraUpdate=args.extraUpdate or {}
+    if type(self.extraUpdate)=='function' then
+        self.extraUpdate={self.extraUpdate}
     end
 end
 
 function Enemy:update(dt)
+    for k, func in pairs(self.extraUpdate or {}) do
+        if type(func)=='function' then
+            func(self,dt)
+        elseif type(func)=='table' and func.isAction then
+            func.func(self,func.params)
+        end
+    end
     Enemy.super.update(self,dt)
     Bullet.checkHitPlayer(self)
     self:checkHitByPlayer(self.bindedEnemy)
@@ -53,7 +66,7 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     objToReduceHp=objToReduceHp or self
     damageFactor=damageFactor or 1
     local damageSum=0
-    local selfRadius=self:getHitboxRadius()*2 -- easier to hit. doesn't directly increase hitbox so player can stand above enemy to hit without being hit.
+    local selfRadius=self:getHitboxRadius()+32 -- easier to hit. doesn't directly increase hitbox so player can stand above enemy to hit without being hit.
     for key, circ in pairs(PlayerShot.objects) do
         ---@cast circ PlayerShot
         local radius=selfRadius+circ:getHitboxRadius()
@@ -65,7 +78,7 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
             local speed=5+10*rand1
             local rand2=math.pseudoRandom(circ.kinematicState.pos,2)
             local direction=rand2*math.pi*2
-            local kinematicState={pos=copy_table(circ.kinematicState.pos),dir=direction,speed=speed}
+            local kinematicState={pos=copyTable(circ.kinematicState.pos),dir=direction,speed=speed}
             Effect.Larger{kinematicState=kinematicState,sprite=Asset.shards.dot,size=3,growSpeed=0,animationFrame=20,spriteTransparency=0.3}
             -- if self.hp<self.maxhp*0.01 and self.mainEnemy and not self.presaved then
             --     self.presaved=true
@@ -86,7 +99,8 @@ end
 
 function Enemy:dieEffect()
     SFX:play('kill',true)
-    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave.gray,size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
+    local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
+    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[spriteColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
     self:remove()
 end
 
@@ -100,7 +114,6 @@ function Enemy:calculateMovingTransitionSprite()
         local isLeft=movingDir<-0.5
         local isRight=movingDir>0.5
         self.sprite:countDown(isLeft,isRight)
-        self.currentSprite=self.sprite.quad
     end
 
     if self.sprite.key=='boss'then -- calculate whether enemy is moving left or right relative to player is kinda complex, so just use normal sprites
@@ -143,10 +156,11 @@ function Enemy:drawSprite()
         }
     else
         self:drawQuad{
-            quad=self.currentSprite,
+            quad=self.sprite.quad,
             rotation=orientation,
             zoom=self.size,
             normalBatch=Asset.fairyBatch,
+            color={1,1,1,self.spriteTransparency or 1},
             -- meshBatch=Asset.bigBulletMeshes,
         }
     end

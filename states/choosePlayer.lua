@@ -81,8 +81,9 @@ return {
                                 end
                                 G.runInfo.playerType=player
                                 G.runInfo.shotType=selectedShotType
-                                G:switchState(G.STATES.IN_GAME)
                                 SFX:play('select',true)
+                                StageManager:load('stage1')
+                                G:switchState(G.STATES.IN_GAME)
                             end
                         end
                     },

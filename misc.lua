@@ -234,13 +234,21 @@ function indexOf(tbl, value)
     return nil
 end
 
-function copy_table(O)
+function shallowCopyTable(tbl)
+    local copy = {}
+    for k, v in pairs(tbl) do
+        copy[k] = v
+    end
+    return copy
+end
+
+function copyTable(O)
     local O_type = type(O)
     local copy
     if O_type == 'table' then
         copy = {}
         for k, v in next, O, nil do
-            copy[copy_table(k)] = copy_table(v)
+            copy[copyTable(k)] = copyTable(v)
         end
         setmetatable(copy, getmetatable(O))
     else

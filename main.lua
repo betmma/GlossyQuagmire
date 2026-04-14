@@ -1,4 +1,4 @@
-VERSION="0.0.7.7"
+VERSION="0.0.8"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"
@@ -25,6 +25,7 @@ function love.load()
     MeshFuncs = require "meshFuncs"
     Shape = require "shape"
     Player = require "player"
+    Action = require "action"
     Bullet = require "bullet"
     -- Laser=require"laser"
     -- PolyLine = require "polyline"
@@ -43,6 +44,7 @@ function love.load()
     -- DialogueController=require"localization.dialogue"
     -- Upgrades = require "upgrades"
     G=require"state"
+    StageManager=require"stages.stageManager"
     ---@type NoticeManager
     NoticeManager=require"notice"
     -- ScreenshotManager=require"screenshotManager"

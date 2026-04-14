@@ -2,67 +2,6 @@
 ---@class Bullet:Shape
 local Bullet = Shape:extend()
 
----@class Action
----@field isAction true
----@field params table<string, any>
----@field func fun(self:Bullet, params:table<string, any>):nil
-
-
-local fadeOut=function(self,params)
-    local fadeFrame=params.fadeFrame or 30
-    if self.frame+fadeFrame>=self.lifeFrame then
-        if params.setSafe then
-            self.safe=true
-        end
-        self.spriteTransparency=(self.lifeFrame - self.frame)/fadeFrame
-    end
-end
-
----@param fadeFrame integer number of frames for the fade out animation, default 30
----@param setSafe boolean whether to set the bullet safe when start fading out, default false
---- @return Action
-Bullet.FadeOut=function(fadeFrame,setSafe)
-    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe},func=fadeOut}
-end
-
-local fadeIn=function(self,params)
-    local fadeFrame=params.fadeFrame or 30
-    if self.frame<=fadeFrame then
-        if params.setSafe then
-            self.safe=true
-        end
-        self.spriteTransparency=(params.fadeTransparency or 1) * self.frame/fadeFrame
-    elseif self.frame==fadeFrame+1 then
-        if params.setSafe then
-            self.safe=false
-        end
-    end
-end
-
----@param fadeFrame integer number of frames for the fade in animation, default 30
----@param setSafe boolean whether to set the bullet safe when start fading in, default false
----@param fadeTransparency number|nil if you want to set a specific transparency instead of 0-1, default nil
---- @return Action
-Bullet.FadeIn=function(fadeFrame,setSafe,fadeTransparency)
-    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe,fadeTransparency=fadeTransparency},func=fadeIn}
-end
-
-local zoomIn=function(self,params)
-    local zoomFrame=params.zoomFrame or 30
-    local targetSize=params.targetSize or self.size
-    if self.frame<=zoomFrame then
-        self.size=targetSize*self.frame/zoomFrame
-    end
-end
-
--- bullet size grows from 0 to [self.targetSize] in [self.zoomFrame] frames.
---- @param zoomFrame integer number of frames for the zoom animation, default 30
---- @param targetSize number target size for the zoom animation, default self.size
---- @return Action
-Bullet.ZoomIn=function(zoomFrame,targetSize)
-    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize},func=zoomIn}
-end
-
 function Bullet:new(args)
     Bullet.super.new(self, args)
     self.size = args.size or 1
@@ -75,7 +14,7 @@ function Bullet:new(args)
         end
         if data.isGIF then
             ---@type GIFSprite
-            self.sprite=copy_table(self.sprite)
+            self.sprite=copyTable(self.sprite)
             self.sprite:randomizeCurrentFrame()
         end
     end
@@ -217,7 +156,7 @@ function Bullet:grazeValue()
 end
 
 function Bullet:removeEffect()
-    Effect.Larger{kinematicState=copy_table(self.kinematicState),sprite=Asset.shards.dot,radius=1,growSpeed=0.1,animationFrame=20}
+    Effect.Larger{kinematicState=copyTable(self.kinematicState),sprite=Asset.shards.dot,radius=1,growSpeed=0.1,animationFrame=20}
 end
 
 function Bullet:changeSpriteColor(color)
@@ -238,7 +177,7 @@ function Bullet:changeSprite(sprite)
     self.sprite=sprite
     data=self.sprite.data
     if data.isGIF then
-        self.sprite=copy_table(self.sprite)
+        self.sprite=copyTable(self.sprite)
         self.sprite:randomizeCurrentFrame()
     end
         if not self.sprite then

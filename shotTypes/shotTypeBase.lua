@@ -95,7 +95,7 @@ function PlayerShot:hitEffect(enemy)
     self.homing=false
     if self.fadeStrategy.mode==fadeMode.TRANSPARENT then
         self.extraUpdate=self.extraUpdate or {}
-        table.insert(self.extraUpdate,Bullet.FadeOut(10,false))
+        table.insert(self.extraUpdate,Action.FadeOut(10,false))
         self.lifeFrame=self.frame+10
     elseif self.fadeStrategy.mode==fadeMode.CHANGE_SPRITE then
         local color=self.sprite.data.color
@@ -107,7 +107,7 @@ function PlayerShot:hitEffect(enemy)
             sprite:reset()
             local loopTime=sprite:getDuration()
             self.extraUpdate=self.extraUpdate or {}
-            table.insert(self.extraUpdate,Bullet.FadeOut(loopTime,false))
+            table.insert(self.extraUpdate,Action.FadeOut(loopTime,false))
             self.lifeFrame=self.frame+loopTime
         end
     elseif self.fadeStrategy.mode==fadeMode.PLAY_GIF then
@@ -115,7 +115,7 @@ function PlayerShot:hitEffect(enemy)
         ---@cast sprite GIFSprite
         sprite:reset()
         self.extraUpdate=self.extraUpdate or {}
-        table.insert(self.extraUpdate,Bullet.FadeOut(sprite:getDuration(),false))
+        table.insert(self.extraUpdate,Action.FadeOut(sprite:getDuration(),false))
         self.lifeFrame=self.frame+sprite:getDuration()
     end
     self.kinematicState.speed=200
@@ -246,7 +246,7 @@ function ShootingPattern:shoot(shooter, powerLevel)
     local direction=shootState.dir
     direction=direction+math.eval(self.angle)
     local useMesh=useMesh[self.sprite.data.key]
-    local bullet=PlayerShot{kinematicState={pos=copy_table(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Bullet.FadeIn(1,false)},forceQuad=not useMesh}
+    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(1,false)},forceQuad=not useMesh}
     if self.isHoming then
         addHoming(bullet, self.homingMode, self.homingArg)
     end
@@ -350,7 +350,7 @@ local mainShotArgsTemplate={
 }
 
 local function applyTemplate(template,args)
-    local newArgs=copy_table(template)
+    local newArgs=copyTable(template)
     for k,v in pairs(args) do
         newArgs[k]=v
     end
