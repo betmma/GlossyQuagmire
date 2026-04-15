@@ -110,7 +110,7 @@ function Enemy:calculateMovingTransitionSprite()
         return
     end
     if self.sprite.is and self.sprite:is(Asset.MovingSprite) then
-        local movingDir=math.cos(self.kinematicState.dir-self.orientation)
+        local movingDir=math.cos(self.kinematicState.dir-self.orientation+math.pi/2)
         local isLeft=movingDir<-0.5
         local isRight=movingDir>0.5
         self.sprite:countDown(isLeft,isRight)

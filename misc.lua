@@ -239,6 +239,7 @@ function shallowCopyTable(tbl)
     for k, v in pairs(tbl) do
         copy[k] = v
     end
+    setmetatable(copy, getmetatable(tbl))
     return copy
 end
 
