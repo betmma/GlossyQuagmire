@@ -381,7 +381,7 @@ switchTargets(Asset.itemImage, Asset.itemSprites)
 ---@field [5] Sprite
 
 ---@alias AssetItemSpritesCollection {\
---- powerSmall:ItemAndIndicator, powerLarge:ItemAndIndicator, powerFull:ItemAndIndicator, point:ItemAndIndicator, pointGolden:ItemAndIndicator, lifePiece:ItemAndIndicator, bombPiece:ItemAndIndicator, lifeFull:ItemAndIndicator, bombFull:ItemAndIndicator,\
+--- powerSmall:ItemAndIndicator, powerLarge:ItemAndIndicator, powerFull:ItemAndIndicator, point:ItemAndIndicator, pointGolden:ItemAndIndicator, lifePiece:ItemAndIndicator, bombPiece:ItemAndIndicator, life:ItemAndIndicator, bomb:ItemAndIndicator,\
 --- lifeMeter:LifeOrBombMeter, bombMeter:LifeOrBombMeter, enemySpellcardIndicator:Sprite}
 
 matrix{
@@ -394,7 +394,7 @@ matrix{
 }:addToAsset()
 matrix{
     unit=single{sizeX=32,sizeY=32},
-    names={'lifePiece','bombPiece','lifeFull','bombFull'},
+    names={'lifePiece','bombPiece','life','bomb'},
     colors={'item','indicator'},
     nameOffsetFunc=simpleOffsetFunc(32,0),
     colorOffsetFunc=simpleOffsetFunc(0,32),

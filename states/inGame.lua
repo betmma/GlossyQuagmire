@@ -54,7 +54,7 @@ return {
             if idx<=currentValue then
                 return meterSpriteTable[5]
             end
-            return meterSpriteTable[math.ceil((currentValue%1)*5)]
+            return meterSpriteTable[math.ceil((currentValue%1)*5-0.5)]
         end
         for i,key in ipairs(items) do
             local y=i*30+30

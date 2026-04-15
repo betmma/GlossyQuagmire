@@ -374,10 +374,11 @@ Asset.titleBatch=love.graphics.newSpriteBatch(titleImage,1,'stream') -- title sc
 -- for boss effects like hexagon and hp bar
 Asset.bossEffectMeshes=MeshBatch(Asset.bulletImage,500)
 Asset.bossMeshes=MeshBatch(Asset.bossImage,5)
-Asset.fairyBatch=love.graphics.newSpriteBatch(fairyImage,100,'stream')
 Asset.playerBatch=love.graphics.newSpriteBatch(playerImage, 5,'stream')
 Asset.playerBulletMeshes=MeshBatch(playerImage,200)
 Asset.playerBulletBatch=love.graphics.newSpriteBatch(playerImage, 2000,'stream')
+Asset.fairyBatch=love.graphics.newSpriteBatch(fairyImage,100,'stream')
+Asset.itemBatch=love.graphics.newSpriteBatch(itemImage,100,'stream')
 Asset.bigBulletMeshes=MeshBatch(Asset.bulletImage,1000)
 Asset.bulletHighlightBatch = love.graphics.newSpriteBatch(bulletImage, 2000,'stream')
 Asset.laserMeshes=MeshBatch(Asset.bulletImage,1000)
@@ -401,6 +402,7 @@ Asset.Batches={
             Asset.playerBulletMeshes,
             Asset.playerBulletBatch,
             Asset.fairyBatch,
+            Asset.itemBatch,
             Asset.bigBulletMeshes,
             Asset.bulletHighlightBatch,
             Asset.laserMeshes,

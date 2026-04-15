@@ -53,10 +53,11 @@ end
 
 
 function Shape:getHitboxRadius()
+    local size=self.size or 1
     if self.sprite and self.sprite.data and self.sprite.data.hitRadius then
-        return self.sprite.data.hitRadius * self.size
+        return self.sprite.data.hitRadius * size
     end
-    return self.hitboxRadius or self.size
+    return self.hitboxRadius or size
 end
 
 ---@class DrawQuadArgs

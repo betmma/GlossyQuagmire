@@ -1,6 +1,7 @@
 ---@class Enemy:Shape
 ---@field maxhp number
 ---@field hp number
+---@field dropItems table<ItemType,integer> how many items to drop when killed. e.g. {powerSmall=3}
 local Enemy=Shape:extend()
 
 function Enemy:new(args)
@@ -20,6 +21,7 @@ function Enemy:new(args)
     if type(self.extraUpdate)=='function' then
         self.extraUpdate={self.extraUpdate}
     end
+    self.dropItems=args.dropItems or {}
 end
 
 function Enemy:update(dt)
@@ -101,6 +103,14 @@ function Enemy:dieEffect()
     SFX:play('kill',true)
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
     Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[spriteColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
+    for itemType,num in pairs(self.dropItems) do
+        for i=1,num do
+            local angle=math.random()*math.pi*2
+            local speed=math.eval(200,150)
+            local kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed}
+            Item{kinematicState=kinematicState,type=itemType}
+        end
+    end
     self:remove()
 end
 
