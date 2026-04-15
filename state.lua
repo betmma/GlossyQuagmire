@@ -2,7 +2,6 @@ BackgroundPattern=require"backgroundPattern"
 local G={
     CONSTANTS={
         DRAW=function(self)
-            Asset:clearBatches()
             local colorRef={love.graphics.getColor()}
             Asset.foregroundBatch:setColor(colorRef[1],colorRef[2],colorRef[3],self.foregroundTransparency)
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
@@ -328,6 +327,7 @@ G:switchState(G.STATES.MAIN_MENU)
 
 
 G.update=function(self,dt)
+    Asset:clearBatches()
     self.frame=self.frame+1
     self.currentUI=self.UIDEF[self.STATE]
     NoticeManager:update()

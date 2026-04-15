@@ -361,3 +361,54 @@ matrix{
     colorOffsetFunc=simpleOffsetFunc(0,size),
     baseX=0,baseY=32*7,
 }:addToAsset()
+
+
+----------------------------------------- Items (item.png)
+
+Asset.itemSprites={}
+switchTargets(Asset.itemImage, Asset.itemSprites)
+
+---@class ItemAndIndicator like P box and triangle indicator of P box
+---@field item Sprite
+---@field indicator Sprite
+
+---@class LifeOrBombMeter 0 is empty, 5 is full, 1-4 are 1-4 pieces filled
+---@field [0] Sprite
+---@field [1] Sprite
+---@field [2] Sprite
+---@field [3] Sprite
+---@field [4] Sprite
+---@field [5] Sprite
+
+---@alias AssetItemSpritesCollection {\
+--- powerSmall:ItemAndIndicator, powerLarge:ItemAndIndicator, powerFull:ItemAndIndicator, point:ItemAndIndicator, pointGolden:ItemAndIndicator, lifePiece:ItemAndIndicator, bombPiece:ItemAndIndicator, lifeFull:ItemAndIndicator, bombFull:ItemAndIndicator,\
+--- lifeMeter:LifeOrBombMeter, bombMeter:LifeOrBombMeter, enemySpellcardIndicator:Sprite}
+
+matrix{
+    unit=single{sizeX=16,sizeY=16},
+    names={'powerSmall','powerLarge','powerFull','point','pointGolden'},
+    colors={'item','indicator'},
+    nameOffsetFunc=simpleOffsetFunc(16,0),
+    colorOffsetFunc=simpleOffsetFunc(0,16),
+    baseX=0,baseY=64,
+}:addToAsset()
+matrix{
+    unit=single{sizeX=32,sizeY=32},
+    names={'lifePiece','bombPiece','lifeFull','bombFull'},
+    colors={'item','indicator'},
+    nameOffsetFunc=simpleOffsetFunc(32,0),
+    colorOffsetFunc=simpleOffsetFunc(0,32),
+    baseX=48,baseY=0,
+}:addToAsset()
+single{
+    sizeX=16,sizeY=16,name='enemySpellcardIndicator',
+    baseX=32,baseY=32,
+}:addToAsset()
+matrix{
+    unit=single{sizeX=32,sizeY=32},
+    names={'lifeMeter','bombMeter'},
+    colors={0,1,2,3,4,5},
+    nameOffsetFunc=simpleOffsetFunc(0,32),
+    colorOffsetFunc=simpleOffsetFunc(32,0),
+    baseX=0,baseY=96,
+}:addToAsset()

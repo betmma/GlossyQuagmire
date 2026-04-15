@@ -177,6 +177,9 @@ Asset.hitRadius=hitRadius
 local fairyImage = love.graphics.newImage( "assets/fairy.png" )
 Asset.fairyImage=fairyImage
 
+local itemImage = love.graphics.newImage( "assets/item.png" )
+Asset.itemImage=itemImage
+
 love.filesystem.load('loadBulletSprites.lua')(Asset)
 ---@type AssetPlayerShotSpritesCollection
 Asset.playerShotSprites=Asset.playerShotSprites
@@ -184,6 +187,8 @@ Asset.playerShotSprites=Asset.playerShotSprites
 Asset.fairySprites=Asset.fairySprites
 ---@type playerSpectrum
 Asset.playerSprites=Asset.playerSprites
+---@type AssetItemSpritesCollection
+Asset.itemSprites=Asset.itemSprites
 
 Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yellow='yellow',green='green',teal='green',cyan='blue',blue='blue',purple='purple',magenta='purple',black='gray'}
 
@@ -382,6 +387,8 @@ Asset.playerFocusMeshes=MeshBatch(Asset.bulletImage,5)
 -- deprecated, use meshes for higher quality. maybe useful if a level has thousands of focus points and lags for meshes
 Asset.playerFocusBatch=love.graphics.newSpriteBatch(bulletImage, 5,'stream')
 Asset.foregroundBatch=love.graphics.newSpriteBatch(bgImage,5,'stream')
+-- for lives and bombs icons on UI
+Asset.itemUIBatch=love.graphics.newSpriteBatch(itemImage,20,'stream')
 Asset.portraitBatch=love.graphics.newSpriteBatch(portraitsImage,2)
 Asset.dialogueBatch=FunctionBatch()
 Asset.Batches={
@@ -407,6 +414,7 @@ Asset.Batches={
         name='UI',
         batches={
             Asset.foregroundBatch,
+            Asset.itemUIBatch,
             Asset.titleBatch, -- draw the logo at bottom right in game
             Asset.portraitBatch,
             Asset.dialogueBatch,

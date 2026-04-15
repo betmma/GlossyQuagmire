@@ -37,33 +37,61 @@ return {
             end
         end
         local items={'hiScore','score','empty','lives','bombs','power','grazes'}
+        local function getAlignToForegroundExtraUpdate(offsetX)
+            return function(self)
+                local xr,yr=self:getXY()
+                self.x=math.lerp(self.x,getForegroundBaseX(yr+self.height/2)+offsetX,0.1)
+            end
+        end
+        ---@param key 'lives'|'bombs'
+        ---@param idx integer
+        local function getLifeOrBombMeterSprite(key,idx)
+            local currentValue=G.runInfo[key]
+            local meterSpriteTable=Asset.itemSprites[key=='lives' and 'lifeMeter' or 'bombMeter']
+            if idx>currentValue+1 then
+                return meterSpriteTable[0]
+            end
+            if idx<=currentValue then
+                return meterSpriteTable[5]
+            end
+            return meterSpriteTable[math.ceil((currentValue%1)*5)]
+        end
         for i,key in ipairs(items) do
             local y=i*30+30
             if key~='empty' then
                 nameText=rightSide:child(UI.Text{
                     text=Localize{'ui','IN_GAME',key},
                     fontSize=24,color={1,1,1,1},autoSize=true,
-                    x=20,y=y,width=100,extraUpdates={function(self)
-                        local xr,yr=self:getXY()
-                        self.x=math.lerp(self.x,getForegroundBaseX(yr+self.height/2)+20,0.1)
-                    end}
+                    x=20,y=y,width=100,extraUpdates={getAlignToForegroundExtraUpdate(20)}
                 })
-                rightText=rightSide:child(UI.Text{
-                    text='',updateText=function(self)
-                        if key=='hiScore' or key=='score' then
-                            return string.format('%09d',G.runInfo[key])
-                        end
-                        if key=='power' then
-                            return string.format('%.2f/4.00',G.runInfo[key]/100)
-                        end
-                        return tostring(G.runInfo[key])
-                    end,
-                    fontSize=24,color={1,1,1,1},autoSize=true,
-                    x=120,y=y,width=200,extraUpdates={function(self)
-                        local xr,yr=self:getXY()
-                        self.x=math.lerp(self.x,getForegroundBaseX(yr+self.height/2)+120,0.1)
-                    end}
-                })
+                if key=='lives' or key=='bombs' then -- draw item icons
+                    ---@cast key 'lives'|'bombs'
+                    rightBase=rightSide:child(UI.Base{x=120,y=y,height=16,extraUpdates={getAlignToForegroundExtraUpdate(120)}})
+                    for idx=1,8 do -- display up to 8 lives/bombs
+                        icon=rightBase:child(UI.Image{
+                            batch=Asset.itemUIBatch,quad=getLifeOrBombMeterSprite(key,idx).quad,
+                            x=(idx-1)*16,y=8,sx=0.5,sy=0.5,
+                            extraUpdates={function(self)
+                                local sprite=getLifeOrBombMeterSprite(key,idx)
+                                self.quad=sprite.quad
+                            end}
+                        })
+                    end
+                else -- draw text
+                    rightText=rightSide:child(UI.Text{
+                        text='',updateText=function(self)
+                            if key=='hiScore' or key=='score' then
+                                return string.format('%09d',G.runInfo[key])
+                            end
+                            if key=='power' then
+                                return string.format('%.2f/4.00',G.runInfo[key]/100)
+                            end
+                            return tostring(G.runInfo[key])
+                        end,
+                        fontSize=24,color={1,1,1,1},autoSize=true,
+                        x=120,y=y,width=200,extraUpdates={getAlignToForegroundExtraUpdate(120)}
+                    })
+                end
             end
         end
         -- for test
