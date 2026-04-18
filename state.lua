@@ -370,7 +370,7 @@ G.draw=function(self)
     shove.endLayer()
     shove.beginLayer('text')
     self:drawText()
-    if DEV_MODE then
+    if DEV_MODE and not love.keyboard.isDown('f5') then
         SetFont(12)
         love.graphics.print("FPS: "..love.timer.getFPS(), 20, 20)
     end

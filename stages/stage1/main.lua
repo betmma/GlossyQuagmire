@@ -1,8 +1,9 @@
 
 ---@type OneStageData
 return{
-    key='stage1',
     segments={
+        
+        require('stages.stage1.boss'),
         {
             key='1-1',
             type='midStage',
@@ -20,6 +21,6 @@ return{
                 end
                 wait(300)
             end
-        }
+        },
     }
 }

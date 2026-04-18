@@ -1,13 +1,17 @@
 ---@class Enemy:Shape
 ---@field maxhp number
 ---@field hp number
----@field dropItems table<ItemType,integer> how many items to drop when killed. e.g. {powerSmall=3}
+---@field damageResistance number a factor that reduces damage taken.
+---@field invincible boolean
+---@field dropItems DropItems
 local Enemy=Shape:extend()
 
 function Enemy:new(args)
     Enemy.super.new(self, args)
     self.maxhp=args.maxhp or args.hp or 1000
     self.hp=args.hp or self.maxhp
+    self.damageResistance=1
+    self.invincible=args.invincible
     self.size=1
     self.hitboxRadius=16
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
@@ -28,10 +32,13 @@ function Enemy:update(dt)
     self:executeExtraUpdate(dt)
     Enemy.super.update(self,dt)
     Bullet.checkHitPlayer(self)
-    self:checkHitByPlayer(self.bindedEnemy)
+    if not self.invincible then 
+        self:checkHitByPlayer(self.bindedEnemy)
+    end
     if self.bindedEnemy then
         self.hp=self.bindedEnemy.hp
         self.damageResistance=self.bindedEnemy.damageResistance
+        self.invincible=self.bindedEnemy.invincible
     end
     self.orientation=self:upwardDeltaOrientation()
     self:calculateMovingTransitionSprite()
@@ -89,8 +96,13 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     SFX:play('damage')
     objToReduceHp.hp=objToReduceHp.hp-damageSum*damageFactor/(objToReduceHp.damageResistance or 1)
     if objToReduceHp.hp<0 and not objToReduceHp.removed then
-        objToReduceHp:dieEffect()
+        objToReduceHp:die()
     end
+end
+
+function Enemy:die()
+    self:dieEffect()
+    self:remove()
 end
 
 function Enemy:dieEffect()
@@ -105,7 +117,6 @@ function Enemy:dieEffect()
             Item{kinematicState=kinematicState,type=itemType}
         end
     end
-    self:remove()
 end
 
 
@@ -172,10 +183,6 @@ end
 
 ---@class Boss:Enemy
 local Boss=Enemy:extend()
-Enemy.hpSegmentsFuncShockwave=function(self,hpLevel,canRemove)
-    SFX:play('enemyCharge',true)
-    Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=20,radius=20,growSpeed=1.2,color='yellow',canRemove=canRemove or {bullet=true,invincible=true}}
-end
 
 -- parameters: [maxhp], [hp] (defaulted as maxhp), [mainEnemy] if true, killing it wins the scene. [hpSegments] a table of hp levels that triggers special effects. [hpSegmentsFunc] a function that triggers special effects when hp reaches a certain level. note that the hpLevel parameter passed to hpSegmentsFunc is 1-based. (hplevel 1->2 sends 1)
 function Boss:new(args)
@@ -186,21 +193,20 @@ function Boss:new(args)
     self.mainEnemy=true--args.mainEnemy
     self.showCircleHPBar=self.mainEnemy
     self.showHexagram=self.mainEnemy
-    -- if self.mainEnemy then
-    --     G.mainEnemy=self
-    -- end
+    -- managed in stages/bossManager.lua. if true, on :die() wont remove itself but set invincible=true instead
+    self.revivable=args.revivable
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.hpBarTransparency=1
     self.hpSegments=args.hpSegments or {} -- draw a small bar marking special hp values. These are only visual effects. If you want a shockwave removing bullets when reaching special values, you need to do it manually.
     table.sort(self.hpSegments,function (a,b) return a>b end) -- we want it decreasing
     self.hpSegmentsFunc=args.hpSegmentsFunc or function(self,hpLevel)end 
-    self.damageResistance=1
     self._hpLevel=self:getHPLevel()
     self.sprite=args.sprite
     if not self.sprite then
         self.sprite=Asset.boss.placeholder
     end
+    self.currentSprite=self.sprite.normal[1]
     self.bindedEnemy=nil
 
 end
@@ -255,8 +261,30 @@ function Boss:getHPPercentOfCurrentLevel()
     end
 end
 
+function Boss:die()
+    if self.invincible then
+        return
+    end
+    if self.revivable then
+        self.invincible=true
+        self:dieEffect()
+        return
+    end
+    Boss.super.die(self)
+end
+
 function Boss:dieEffect()
-    Boss.super.dieEffect(self)
+    SFX:play('kill',true)
+    local final=not self.revivable -- final shockwave need to be more juicy
+    Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=20,radius=20,growSpeed=1.2,spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
+    for itemType,num in pairs(self.dropItems) do
+        for i=1,num do
+            local angle=G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.3)
+            local speed=math.eval(400,200)
+            local kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed}
+            Item{kinematicState=kinematicState,type=itemType}
+        end
+    end
 end
 
 function Enemy:draw()

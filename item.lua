@@ -10,6 +10,21 @@ ItemType={
     life='life',
     bomb='bomb',
 }
+---@alias never "That's a wrong key" workaround from https://github.com/LuaLS/lua-language-server/issues/1990. LuaLS is shit
+
+---@class DropItems for enemy, how many items to drop when killed. e.g. {powerSmall=3} dunno why table<ItemType,integer> cannot ensure key is ItemType.
+---@field powerSmall integer|nil
+---@field powerLarge integer|nil
+---@field powerFull integer|nil
+---@field point integer|nil
+---@field pointGolden integer|nil
+---@field lifePiece integer|nil
+---@field bombPiece integer|nil
+---@field life integer|nil
+---@field bomb integer|nil
+---@field [any] never
+
+
 ---@class ItemArgs
 ---@field kinematicState KinematicState
 ---@field type ItemType

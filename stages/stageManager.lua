@@ -12,14 +12,11 @@ provide a function to display stage title text
 ---@alias SegmentType 'midStage'|'boss'
 
 ---@class Segment
----@field key string
+---@field key string stage practice will be able to start from any segment, and segments will be listed. names like '1-1' '1-mid' '2-5A' are enough and do not need localization.
 ---@field type SegmentType
 ---@field func fun() the content of the segment. like spawn some fairies or a boss
 
----@class BossSegment:Segment
-
 ---@class OneStageData
----@field key string like "stage1". will be sent to Localize
 ---@field segments Segment[]
 
 ---@alias StageKey 'stage1'|'stage2'|'stage3'|'stage4'|'stage5'|'stage6'|'stageEX'
@@ -39,7 +36,7 @@ local function loadStageData()
         StageData[stageKey]=require('stages.'..stageKey..'.main')
     end
 end
-
+require 'stages.bossManager'
 loadStageData()
 
 ---@param item StageKey
@@ -53,7 +50,7 @@ end
 
 function StageManager:update(dt)
     if self.currentCoroutine and coroutine.status(self.currentCoroutine)~='dead' then
-        local success, message=coroutine.resume(self.currentCoroutine,dt)
+        local success, message=coroutine.resume(self.currentCoroutine,self.currentStageData.segments[self.currentSegmentIndex])
         if not success then
             error(message)
         end
@@ -63,7 +60,7 @@ function StageManager:update(dt)
     elseif self.callback then
         self.callback()
         self.callback=nil
-     end
+    end
 end
 
 return StageManager

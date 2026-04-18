@@ -12,9 +12,9 @@ Death bombing
 
 #### System
 ~Shot type system~
-Player spellcard
 Level control logic
 Boss progress logic
+Player spellcard
 Border class
 Many remaining menus
 

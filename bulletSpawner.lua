@@ -97,11 +97,13 @@ end
 
 function BulletSpawner:update(dt)
     BulletSpawner.super.update(self,dt)
-    -- for k,shockwave in pairs(Effect.Shockwave.objects) do
-    --     if shockwave.canRemove.bulletSpawner and G.runInfo.geometry:distance(shockwave.x,shockwave.y,self.x,self.y)<shockwave.size+self.size then
-    --         self:remove()
-    --     end
-    -- end
+    local selfHitboxRadius=self:getHitboxRadius()
+    for k,shockwave in pairs(Effect.Shockwave.objects) do
+        ---@cast shockwave Shockwave
+        if shockwave.canRemove.bulletSpawner and G.runInfo.geometry:distance(shockwave.kinematicState.pos,self.kinematicState.pos)<shockwave:getHitboxRadius()+selfHitboxRadius then
+            self:remove()
+        end
+    end
 end
 
 function BulletSpawner:draw()
