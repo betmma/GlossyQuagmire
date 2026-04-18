@@ -51,6 +51,17 @@ function Shape:update(dt)
     -- end
 end
 
+--- extra update logic is common among different shapes, but not needed for every shape, so it's separated from the main update function. subclasses can call self:executeExtraUpdate(dt) in their update function to execute the extra update logic.
+function Shape:executeExtraUpdate(dt)
+    for k, func in pairs(self.extraUpdate or {}) do
+        if type(func)=='function' then
+            func(self,dt)
+        elseif type(func)=='table' and func.isAction then
+            func.func(self,func.params)
+        end
+    end
+end
+
 
 function Shape:getHitboxRadius()
     local size=self.size or 1
@@ -161,5 +172,6 @@ end
 ---@field drawQuad fun(self:Shape,args:DrawQuadArgs):nil general function to draw a quad. geometry could decide it to drawn as a quad or a mesh (with more vertices), and it's possible to force either mode by not providing the corresponding batch. image is only used for mesh drawing.
 ---@field bindState fun(self:Shape,other:Shape):nil set self's kinematicState to other's kinematicState, and cancel update to self.kinematicState, so it will follow other's kinematicState exactly. will remove self if other is removed.
 ---@field private binded Shape what shape the shape is binded to. if not nil, self won't update its own kinematicState.
+---@field executeExtraUpdate fun(self:Shape,dt:number):nil extra update logic is common among different shapes, but not needed for every shape, so it's separated from the main update function. subclasses can call self:executeExtraUpdate(dt) in their update function to execute the extra update logic.
 -- -@field removeDistance number distance from the screen after which the object will be removed (roughly)
 return Shape

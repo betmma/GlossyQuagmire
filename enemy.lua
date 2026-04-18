@@ -25,13 +25,7 @@ function Enemy:new(args)
 end
 
 function Enemy:update(dt)
-    for k, func in pairs(self.extraUpdate or {}) do
-        if type(func)=='function' then
-            func(self,dt)
-        elseif type(func)=='table' and func.isAction then
-            func.func(self,func.params)
-        end
-    end
+    self:executeExtraUpdate(dt)
     Enemy.super.update(self,dt)
     Bullet.checkHitPlayer(self)
     self:checkHitByPlayer(self.bindedEnemy)

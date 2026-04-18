@@ -95,13 +95,7 @@ function Bullet:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum)
 end
 
 function Bullet:update(dt)
-    for k, func in pairs(self.extraUpdate or {}) do
-        if type(func)=='function' then
-            func(self,dt)
-        elseif type(func)=='table' and func.isAction then
-            func.func(self,func.params)
-        end
-    end
+    self:executeExtraUpdate(dt)
     Shape.update(self,dt)
     if not self.safe then
         if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
