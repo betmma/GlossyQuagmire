@@ -20,7 +20,7 @@ return BossManager.BossSegment{
                 end
             },
             BossManager.SpellcardPhase{
-                id=1,
+                key='test',
                 bonusScore=10000,
                 time=900,
                 hp=900,

@@ -65,7 +65,7 @@ function UIText:draw()
     local colorref={love.graphics.getColor()}
     SetFont(self.fontSize,self.fontName)
     love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*colorref[4])
-    local args={love.graphics.print,self.text,x,y}
+    local args={love.graphics.print,self.text or '',x,y}
     if self.align then
         args[1]=love.graphics.printf
         table.insert(args,self.width)

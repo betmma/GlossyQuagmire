@@ -260,9 +260,9 @@ end
 
 function Player:drawText()
     self:displayKeysPressed()
-    if DEV_MODE then 
-        love.graphics.print('X='..string.format("%.2f", self.kinematicState.pos.x)..'\nY='..string.format("%.2f", self.kinematicState.pos.y)..'\nView Direction='..string.format("%.2f", self.viewDirection),30,140)
-    end
+    -- if DEV_MODE then 
+    --     love.graphics.print('X='..string.format("%.2f", self.kinematicState.pos.x)..'\nY='..string.format("%.2f", self.kinematicState.pos.y)..'\nView Direction='..string.format("%.2f", self.viewDirection),30,140)
+    -- end
 end
 
 -- spawn a white dot to show the graze effect. 

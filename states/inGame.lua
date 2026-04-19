@@ -3,64 +3,7 @@ local base=UI.Base()
 return {
     base=base,
     init=function(self)
-        --- for in-game UI like stage title, boss name, remaining time things
-        local dynamicObjs=base:child(UI.Base{x=0,y=0})
-        local centerBase=base:child(UI.Base{x=0,y=0,
-            extraUpdates={function(self)
-                local shader=G.foregroundShaderData.shader
-                if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
-                    local centerXY=G.foregroundShaderData.args.centerXY
-                    self.x,self.y=centerXY[1],centerXY[2]
-                elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
-                    local xywh=G.foregroundShaderData.args.xywh
-                    self.x,self.y=xywh[1]+xywh[3]/2,xywh[2]+xywh[4]/3
-                end
-            end}})
-        --- the main part
-        local stageTitleText=centerBase:child(UI.Text{
-            text='',fontSize=48,color={1,1,1,1},autoSize=true,
-            x=0,y=30,align='center',toggleX=true,transparency=0
-        })
-        --- the small text above main title text. like STAGE 1 Somewhere in Gensokyo
-        local stageTitleSmallText=centerBase:child(UI.Text{
-            text='',fontSize=24,color={1,1,1,1},autoSize=true,
-            x=0,y=-20,align='center',toggleX=true,transparency=0,
-        })
-        --- display soundtrack name at bottom
-        local soundtrackText=dynamicObjs:child(UI.Text{
-            text='',fontSize=20,color={1,1,1,1},autoSize=true,
-            x=0,y=0,align='center',toggleX=true,transparency=0,
-            extraUpdates={function(self)
-                local shader=G.foregroundShaderData.shader
-                if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
-                    local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
-                    self.x,self.y=centerXY[1],centerXY[2]+radius-self.height-10
-                    self.align='center'
-                elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
-                    local xywh=G.foregroundShaderData.args.xywh
-                    self.x,self.y=xywh[1]+xywh[3],xywh[2]+xywh[4]-self.height-10
-                    self.align='right'
-                end
-            end}
-        })
-        --- display boss name at top during boss fight
-        local bossNameText=dynamicObjs:child(UI.Text{
-            text='',fontSize=20,color={1,1,1,1},autoSize=true,
-            x=0,y=0,align='center',toggleX=true,transparency=0,
-            extraUpdates={function(self)
-                local shader=G.foregroundShaderData.shader
-                if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
-                    local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
-                    self.x,self.y=centerXY[1],centerXY[2]-radius+10
-                    self.align='center'
-                elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
-                    local xywh=G.foregroundShaderData.args.xywh
-                    self.x,self.y=xywh[1],xywh[2]
-                    self.align='left'
-                end
-            end}
-        })
-
+        -- dynamic ui objects like spellcard title are created in stages/dynamicObjs.lua.
         local rightSide=base:child(UI.Base{x=500,y=20})
         local difficultyText=rightSide:child(UI.Text{
             text='',updateText=function(self)

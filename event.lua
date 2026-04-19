@@ -23,7 +23,7 @@ function Event:new(args)
 end
 
 wait=function(frames)
-    for i=1,frames do
+    for i=1,frames or 1 do
         coroutine.yield()
     end
 end

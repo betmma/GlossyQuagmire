@@ -1,19 +1,30 @@
 ---@alias lang string
 ---@alias localizationItem table<lang,string>
----@class obfuscationItem
----@field from string the characters to be replaced
----@field to string|nil the characters to replace with (randomly chosen), defaults to from
----@field toTable string[]|nil automatically generated (in misc.lua) table of characters in "to" string
-
----@alias obfuscationList obfuscationItem[]
-
 return {
+    spellcards={
+        test = {
+            name = {
+                en_us = 'Test Spellcard',
+                zh_cn = '测试符卡',
+            },
+        }
+    },
     levelData = {
     },
     ---@class CharacterLocalization
     ---@field name localizationItem like "Reimu Hakurei"
     ---@field nickname localizationItem like "Shrine Maiden"
     characters = {
+        __default__ = {
+            name = {
+                en_us = 'Unknown Character',
+                zh_cn = '未知角色',
+            },
+            nickname = {
+                en_us = 'Unknown Nickname',
+                zh_cn = '未知称号',
+            },
+        },
         REIMU = {
             name = {
                 en_us = 'Reimu Hakurei',
@@ -342,6 +353,22 @@ return {
             }
         },
         IN_GAME = {
+            ---@class StageTitleLocalization
+            ---@field main localizationItem
+            ---@field small localizationItem
+            ---@type table<StageKey, StageTitleLocalization>
+            STAGE_TITLE = {
+                stage1 = {
+                    main = {
+                        en_us = 'test',
+                        zh_cn = '测试',
+                    },
+                    small = {
+                        en_us = 'STAGE 1   Hyperbolic Domain',
+                        zh_cn = 'STAGE 1   双曲域',
+                    }
+                }
+            },
             hiScore = {
                 en_us = 'Hi-Score',
                 zh_cn = '最高分',
@@ -365,7 +392,11 @@ return {
             grazes = {
                 en_us = 'Grazes',
                 zh_cn = '擦弹',
-            }
+            },
+            bgm = {
+                en_us = 'BGM: {bgm}',
+                zh_cn = '背景音乐: {bgm}',
+            },
         },
 
         -- below are from previous game

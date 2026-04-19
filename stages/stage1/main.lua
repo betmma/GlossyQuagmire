@@ -8,6 +8,7 @@ return{
             key='1-1',
             type='midStage',
             func=function()
+                DynamicUIObjs.showSoundtrack()
                 local basePos=G.runInfo.geometry:init().pos
                 local pos1,dir1=G.runInfo.geometry:rThetaGo(basePos,200,-math.pi/2)
                 local pos2,dir2=G.runInfo.geometry:rThetaGo(pos1,-400,dir1+math.pi/2)
@@ -19,6 +20,7 @@ return{
                     }:bindState(fairy)
                     wait(30)
                 end
+                DynamicUIObjs.showStageTitle('stage1')
                 wait(300)
             end
         },

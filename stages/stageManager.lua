@@ -36,6 +36,7 @@ local function loadStageData()
         StageData[stageKey]=require('stages.'..stageKey..'.main')
     end
 end
+require 'stages.dynamicObjs'
 require 'stages.bossManager'
 loadStageData()
 

@@ -25,15 +25,26 @@ function BossSegment:func()
         kinematicState={pos=self.getBossSpawnPos(self)},
         sprite=Asset.boss[self.bossName],maxhp=9999,revivable=true
     }
+    DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
+    Event.Event{obj=boss,action=function()
+        for i, round in ipairs(self.rounds) do
+            wait(10)
+            DynamicUIObjs.bossStars:addStar()
+        end
+    end
+    }
+    
     -- after dialogues are implemented, could add something before the rounds
     for i, round in ipairs(self.rounds) do
         round:func(boss)
+        DynamicUIObjs.bossStars:removeStar()
     end
     -- after battle dialogue could be added here
     boss.revivable=false
     boss.invincible=false
     boss.dropItems={}
     boss:die()
+    DynamicUIObjs.bossNameText:setText('')
 end
 
 ---@class BossRoundArgsDefault
@@ -82,7 +93,7 @@ end
 
 ---@alias BossPhaseType 'nonspell'|'spellcard'
 
----@class BossPhase:Object
+---@class BossPhase:Object should not create a BossPhase directly; only use NonSpellPhase and SpellcardPhase.
 ---@field type BossPhaseType
 ---@field time integer frames of the phase
 ---@field isTimeout boolean if the phase is timeout type (survive until time runs out)
@@ -137,6 +148,7 @@ end
 
 function BossPhase:run(boss)
     self.remainingFrames=self.time
+    DynamicUIObjs.setRemainingTimeText(self.time/60)
     boss.maxhp=self.hp
     boss.invincible=true
     boss.hp=1 -- prevent hp being 0 and triggering end of phase before it starts.
@@ -151,10 +163,12 @@ function BossPhase:run(boss)
             if not success then error(err) end
         end
         self.remainingFrames=self.remainingFrames-1
+        DynamicUIObjs.setRemainingTimeText(self.remainingFrames/60)
         -- Check if HP <= 0 or Time <= 0 here
         if self:isFinished(boss) then break end
         coroutine.yield() -- for outer coroutine
     end
+    DynamicUIObjs.setRemainingTimeText(nil)
     if self.isTimeout then -- reduce boss hp to 0 gradually
         for i=1,30 do
             boss.hp=math.max(0, boss.hp - boss.maxhp/30)
@@ -175,16 +189,33 @@ end
 local NonSpellPhase=BossPhase:extend()
 
 ---@class SpellcardPhaseArgs:BossPhaseBaseArgs
----@field id integer a key to be sent to Localize to get name. must be distinct. the in-game spellcard id like in spellcard history will be auto generated and not related to this id field.
+---@field key string a key to be sent to Localize to get name. must be distinct. the in-game spellcard id like in spellcard history will be auto generated.
 ---@field bonusScore integer score player gets after clearing the spellcard.
 
 --- to be implemented.
 ---@class SpellcardPhase:BossPhase
 ---@field type 'spellcard'
----@field id integer a key to be sent to Localize to get name. must be distinct. the in-game spellcard id like in spellcard history will be auto generated and not related to this id field.
+---@field key string
 ---@field bonusScore integer score player gets after clearing the spellcard.
 ---@overload fun(args:SpellcardPhaseArgs):SpellcardPhase
 local SpellcardPhase=BossPhase:extend()
+
+function SpellcardPhase:new(args)
+    BossPhase.new(self, args)
+    self.key=args.key
+    self.bonusScore=args.bonusScore
+end
+
+function SpellcardPhase:run(boss)
+    DynamicUIObjs.slideSpellcardInfo()
+    DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, 'name'})
+    DynamicUIObjs.spellcardBonusHistoryText:setText('0/0'..'  BONUS '.. self.bonusScore)
+    BossPhase.run(self, boss)
+    -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
+    G.runInfo.score=G.runInfo.score+self.bonusScore
+    DynamicUIObjs.spellcardNameText:setText('')
+    DynamicUIObjs.spellcardBonusHistoryText:setText('')
+end
 
 BossManager={
     BossSegment=BossSegment,
