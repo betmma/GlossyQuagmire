@@ -394,8 +394,8 @@ return {
                 zh_cn = '擦弹',
             },
             bgm = {
-                en_us = 'BGM: {bgm}',
-                zh_cn = '背景音乐: {bgm}',
+                en_us = 'BGM: {bgm}', -- this font doesnt have the eighth note symbol
+                zh_cn = '♪ {bgm}',
             },
         },
 

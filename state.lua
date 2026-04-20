@@ -290,6 +290,7 @@ G.reloadUI=function(self)
             end
         end
     end
+    makeDynamicUIObjs() -- these UI objects are not defined in any state and wont be reloaded by the loop above, so need to call this function again to reload them.
 end
 
 local function loadState(uppercaseName)

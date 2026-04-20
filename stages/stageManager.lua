@@ -36,7 +36,8 @@ local function loadStageData()
         StageData[stageKey]=require('stages.'..stageKey..'.main')
     end
 end
-require 'stages.dynamicObjs'
+require 'stages.dynamicUIObjs'
+makeDynamicUIObjs()
 require 'stages.bossManager'
 loadStageData()
 
