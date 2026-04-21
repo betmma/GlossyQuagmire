@@ -163,6 +163,11 @@ function BossPhase:run(boss)
             if not success then error(err) end
         end
         self.remainingFrames=self.remainingFrames-1
+        local remaining=self.remainingFrames
+        if remaining%60==0 and remaining<=600 then
+            SFX.data.timeout:setPitch(remaining<=300 and 1.5 or 1) -- increase pitch when time is less than 5 seconds to make it more intense
+            SFX:play('timeout',true,3)
+        end
         DynamicUIObjs.setRemainingTimeText(self.remainingFrames/60)
         -- Check if HP <= 0 or Time <= 0 here
         if self:isFinished(boss) then break end

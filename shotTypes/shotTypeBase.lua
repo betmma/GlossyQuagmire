@@ -71,6 +71,7 @@ PlayerShot.meshDrawQuad=Shape.meshDrawQuad
 
 function PlayerShot:new(args)
     PlayerShot.super.new(self, args)
+    self.fromPlayer=true
     self.fadeStrategy=fadeStrategies[args.sprite.data.key]
     if self.sprite then
         local data=self.sprite.data

@@ -25,8 +25,7 @@ function Bullet:new(args)
     end
     -- safe means won't hit player 
     self.safe=args.safe or false
-    -- fromPlayer means can hit enemy
-    self.fromPlayer=args.fromPlayer or false
+    self.fromPlayer=false
     -- invincible means won't be removed by normal shockwave (win shockwave can)
     self.invincible=args.invincible or false
 
@@ -115,7 +114,11 @@ function Bullet:checkShockwaveRemove()
     local selfRadius=self:getHitboxRadius()
     for k,shockwave in pairs(Effect.Shockwave.objects) do
         ---@cast shockwave Shockwave
-        if shockwave.canRemove.bullet==true and(self.invincible==false or shockwave.canRemove.invincible==true)and(self.safe==false or shockwave.canRemove.safe==true) and G.runInfo.geometry:distance(shockwave.kinematicState.pos,self.kinematicState.pos)<shockwave:getHitboxRadius()+selfRadius then
+        if shockwave.canRemove.bullet==true and
+        (self.invincible==false or shockwave.canRemove.invincible==true) and
+        (self.safe==false or shockwave.canRemove.safe==true) and
+        (self.fromPlayer==false or shockwave.canRemove.fromPlayer==true) and
+        G.runInfo.geometry:distance(shockwave.kinematicState.pos,self.kinematicState.pos)<shockwave:getHitboxRadius()+selfRadius then
             EventManager.post(EventManager.EVENTS.SHOCKWAVE_REMOVE_BULLET,self,shockwave)
             self:remove()
             self:removeEffect()
