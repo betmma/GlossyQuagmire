@@ -60,7 +60,7 @@ function UIText:setText(text)
     end
 end
 
-function UIText:draw()
+function UIText:drawText()
     local x,y=self:getXY()
     local colorref={love.graphics.getColor()}
     SetFont(self.fontSize,self.fontName)

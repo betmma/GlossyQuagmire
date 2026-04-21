@@ -118,12 +118,13 @@ return {
         base:updateHierarchy()
     end,
     draw=function(self)
+        base:drawHierarchy()
     end,
     drawText=function(self)
         if love.keyboard.isDown('f2') then
             return
         end
-        base:drawHierarchy()
+        base:drawTextHierarchy()
         Asset.titleBatch:flush()
         love.graphics.draw(Asset.titleBatch)
     end

@@ -16,8 +16,8 @@ function UIImage:new(args)
     self.sy=args.sy or 1
 end
 
-function UIImage:update()
-    UIImage.super.update(self)
+function UIImage:draw()
+    UIImage.super.draw(self)
     if self.batch and self.quad then
         local x,y=self:getXY()
         self.batch:add(self.quad,x,y,self.r,self.sx,self.sy)

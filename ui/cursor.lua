@@ -56,7 +56,7 @@ function UICursor:snap()
     end
 end
 
-function UICursor:draw()
+function UICursor:drawText()
     local x,y=self:getXY()
     local fluctuation=(math.sin(self.frame/self.fluctuatePeriod*2*math.pi)*0.5+0.5)*self.fluctuateRatio
     local dw,dh=self.width*fluctuation,self.height*fluctuation

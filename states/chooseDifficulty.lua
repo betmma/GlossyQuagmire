@@ -86,6 +86,6 @@ return {
     draw=function(self)
     end,
     drawText=function(self)
-        base:drawHierarchy()
+        base:drawTextHierarchy()
     end,
 }

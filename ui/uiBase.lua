@@ -18,7 +18,8 @@
 ---@field public getXY fun(self):number,number get the actual position of this UI element on screen, which is the sum of its own x,y and all its parents' x,y
 ---@field public getCenterXY fun(self):number,number return getXY + half of width and height
 ---@field public canChildHaveFocus fun(self,childIndex:integer):boolean root element of ui will get focus between update is called. if an element has focus, after its update, it will pass focus to all children that this function returns true.
----@field public draw fun(self):nil
+---@field public draw fun(self):nil draw using batch must be done in this function. the reason is Asset.drawBatches are called before drawText, so adding quad to batch in drawText will never be drawn.
+---@field public drawText fun(self):nil draw the element (direct love.graphics calls)
 ---@field public update fun(self):nil
 ---@field public extraUpdates (fun(self):nil)[] a list of extra update functions to be called in update
 ---@field public emit fun(self,eventName:UIEvent,...):nil what this element does when an event is emitted on it. like get focus, lose focus, or confirmed by cursor
@@ -81,8 +82,10 @@ function UIBase:getCenterXY()
     return x+self.width/2,y+self.height/2
 end
 
-function UIBase:draw()
-    
+function UIBase:draw() 
+end
+
+function UIBase:drawText()
 end
 
 function UIBase:update()
@@ -135,11 +138,18 @@ function UIBase:updateHierarchy()
 end
 
 function UIBase:drawHierarchy()
-    local colorRef={love.graphics.getColor()}
-    love.graphics.setColor(colorRef[1],colorRef[2],colorRef[3],self.transparency*colorRef[4])
     self:draw()
     for i, child in ipairs(self.children) do
         child:drawHierarchy()
+    end
+end
+
+function UIBase:drawTextHierarchy()
+    local colorRef={love.graphics.getColor()}
+    love.graphics.setColor(colorRef[1],colorRef[2],colorRef[3],self.transparency*colorRef[4])
+    self:drawText()
+    for i, child in ipairs(self.children) do
+        child:drawTextHierarchy()
     end
     love.graphics.setColor(colorRef[1],colorRef[2],colorRef[3],colorRef[4])
 end

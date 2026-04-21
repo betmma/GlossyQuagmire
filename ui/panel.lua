@@ -14,7 +14,7 @@ function UIPanel:new(args)
     self.shader=args.shader
 end
 
-function UIPanel:draw()
+function UIPanel:drawText()
     local x,y=self:getXY()
     local colorRef={love.graphics.getColor()}
     love.graphics.setColor(self.fillColor[1],self.fillColor[2],self.fillColor[3],self.fillColor[4]*colorRef[4])

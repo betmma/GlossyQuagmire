@@ -9,6 +9,9 @@ local G={
                 Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
             end
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
+            if self.currentUI.base then
+                self.currentUI.base:drawHierarchy() -- UI elements that need batches. currently only UI.Image.
+            end
             Asset:flushBatches()
             Asset:drawBatches()
             love.graphics.setShader()
@@ -312,7 +315,7 @@ for stateName,state in pairs(G.STATES) do
             end
             self.currentUI.inited=true
         end
-        if self.currentUI.base then -- note that base.updateHierarchy and drawHierarchy should not be added to wrap, since some states may need different order
+        if self.currentUI.base then -- note that base.updateHierarchy and drawTextHierarchy should not be added to wrap, since some states may need different order
             self.currentUI.base.focused=true
         end
         update(self,...)
@@ -328,7 +331,6 @@ G:switchState(G.STATES.MAIN_MENU)
 
 
 G.update=function(self,dt)
-    Asset:clearBatches()
     self.frame=self.frame+1
     self.currentUI=self.UIDEF[self.STATE]
     NoticeManager:update()
@@ -358,6 +360,7 @@ G.update=function(self,dt)
 end
 G.mainCanvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 G.draw=function(self)
+    Asset:clearBatches()
     shove.beginLayer('main')
     self.currentUI=self.UIDEF[self.STATE]
     self:_drawBatches()

@@ -171,6 +171,6 @@ return {
             SFX:play('select')
             self:switchState(self.STATES.CHOOSE_PLAYER)
         end
-        base:drawHierarchy()
+        base:drawTextHierarchy()
     end
 }
