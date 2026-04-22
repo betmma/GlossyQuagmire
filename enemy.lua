@@ -151,6 +151,10 @@ function Enemy:upwardDeltaOrientation()
     return selfToPlayer-math.pi/2
 end
 
+function Enemy:draw()
+    self:drawSprite()
+end
+
 function Enemy:drawSprite()
     local sprite=self.sprite
     if not sprite then
@@ -191,14 +195,13 @@ function Boss:new(args)
     self.size=2
     self.hitboxRadius=32
     self.mainEnemy=true--args.mainEnemy
-    self.showCircleHPBar=self.mainEnemy
     self.showHexagram=self.mainEnemy
     -- managed in stages/bossManager.lua. if true, on :die() wont remove itself but set invincible=true instead
     self.revivable=args.revivable
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.hpBarTransparency=1
-    self.hpSegments=args.hpSegments or {} -- draw a small bar marking special hp values. These are only visual effects. If you want a shockwave removing bullets when reaching special values, you need to do it manually.
+    self.hpSegments=args.hpSegments or {} -- hpSegments are not very useful for boss since now boss.hp and maxhp are both for one phase (one non or spellcard). still could be useful for multi subphases in one phase like final spellcard of stage 6
     table.sort(self.hpSegments,function (a,b) return a>b end) -- we want it decreasing
     self.hpSegmentsFunc=args.hpSegmentsFunc or function(self,hpLevel)end 
     self._hpLevel=self:getHPLevel()
@@ -230,7 +233,6 @@ end
 function Boss:bind(otherEnemy)
     Boss.super.bind(self,otherEnemy)
     self.hpSegments=otherEnemy.hpSegments
-    self.showCircleHPBar=otherEnemy.showCircleHPBar
     self.showHexagram=otherEnemy.showHexagram
     if self.mainEnemy then
         error('Enemy:bind: mainEnemy cannot bind with other enemy')
@@ -287,87 +289,16 @@ function Boss:dieEffect()
     end
 end
 
-function Enemy:draw()
-    self:drawSprite()
-end
-
 function Boss:draw()
     Boss.super.draw(self)
     if self.showHexagram then
         self:drawHexagram()
     end
-    -- if not G.levelIsTimeoutSpellcard and self.showCircleHPBar then
-    --     self:drawCircleHPBar()
-    -- end
 end
 
 function Boss:drawText()
-    -- if self.showUpperHPBar and not G.levelIsTimeoutSpellcard then
-    --     self:drawUpperHPBar()
-    -- end
 end
 
--- an HP bar around enemy (like DDC)
-function Boss:drawCircleHPBar()
-    local color={love.graphics.getColor()}
-    love.graphics.setColor(1,0.3,0.3,self.hpBarTransparency)
-    Shape.drawCircle(self.x,self.y,30.5)--inner circle
-    Shape.drawCircle(self.x,self.y,32.5)--outer circle
-    local ratio=self.hp/self.maxhp
-    local yellowRatio=(self.damageResistance or 1)^0.5
-    love.graphics.setColor(1,1,1/yellowRatio,self.hpBarTransparency)
-    local vertices={}
-    local angle0=self.orientation+math.pi*(1.5-2*ratio)
-    local num=50
-    local X,Y,W,H=love.graphics.getQuadXYWHOnImage(BulletSprites.laser.white.quad,Asset.bulletImage)
-    for i=0,num do
-        local angle=angle0+i/num*math.pi*2*ratio
-        local x1,y1=Shape.rThetaPos(self.x,self.y,30.5,angle)
-        local x2,y2=Shape.rThetaPos(self.x,self.y,32.5,angle)
-        table.insert(vertices,{x1,y1,X,Y,1,1,1/yellowRatio,self.hpBarTransparency})
-        table.insert(vertices,{x2,y2,X+W,Y,1,1,1/yellowRatio,self.hpBarTransparency})
-    end
-    if not self.circleHPBarMesh then
-        self.circleHPBarMesh=love.graphics.newMesh(vertices,'strip')
-        self.circleHPBarMesh:setTexture(Asset.bulletImage)
-    else
-        self.circleHPBarMesh:setVertices(vertices)
-    end
-    Asset.bossEffectMeshes:add(self.circleHPBarMesh)
-    -- love.graphics.setColor(1,0.3,0.3,self.hpBarTransparency)
-    for i,ratio in pairs(self.hpSegments) do
-        local rin,rout=29.5,33.5
-        local x1,y1=Shape.rThetaPos(self.x,self.y,rin,self.orientation+math.pi*(1.5-2*ratio))
-        local x2,y2=Shape.rThetaPos(self.x,self.y,rout,self.orientation+math.pi*(1.5-2*ratio))
-        Shape.drawSegment(x1,y1,x2,y2)
-    end
-    -- SetFont(12)
-    -- love.graphics.print(""..ratio..', ', 10, 100)
-    love.graphics.setColor(color[1],color[2],color[3])
-end
-
--- an HP bar at top of screen (like UFO)
-function Boss:drawUpperHPBar()
-    local color={love.graphics.getColor()}
-    local ratio=self.hp/self.maxhp
-    local yellowRatio=(self.damageResistance or 1)^0.5
-    local beginX=5
-    local width=490
-    local last=0
-    local num=#self.hpSegments
-    local hpLevel=self:getHPLevel()
-    for i=num,hpLevel,-1 do -- increasing order of hpSegments. hpLevel is the last full part of the bar and drawn as grey
-        local ratio=self.hpSegments[i]
-        love.graphics.setColor(0.5,0.5,0.5,0.7)
-        love.graphics.rectangle('fill',beginX+width*last,1,width*(ratio-last),3)
-        last=ratio
-        love.graphics.setColor(1,0.3,0.3,1)
-        love.graphics.rectangle('fill',beginX+width*ratio,0,3,5) -- a red mark on segment point
-    end
-    love.graphics.setColor(1,1,1/yellowRatio,0.7)
-    love.graphics.rectangle('fill',beginX+width*last,1,width*(ratio-last),3)
-    love.graphics.setColor(color[1],color[2],color[3])
-end
 
 -- due to hyperbolic geometry, it's not feasible to prepare an image for rotating hexagram
 function Boss:drawHexagram()
