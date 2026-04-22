@@ -10,10 +10,10 @@ local function strategy(circleStrategy, rectangleStrategy)
         local shader=G.foregroundShaderData.shader
         if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
             local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
-            circleStrategy(self, centerXY, radius)
+            return circleStrategy(self, centerXY, radius)
         elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
             local xywh=G.foregroundShaderData.args.xywh
-            rectangleStrategy(self, xywh)
+            return rectangleStrategy(self, xywh)
         end
     end
 end
@@ -85,7 +85,7 @@ function makeDynamicUIObjs()
         extraUpdates={
             strategy(
                 function(self, centerXY, radius)
-                    self.x,self.y=centerXY[1]-150,centerXY[2]-radius+10
+                    self.x,self.y=centerXY[1]-100,centerXY[2]-radius
                 end,
                 function(self, xywh)
                     self.x,self.y=xywh[1]+10,xywh[2]+10
@@ -93,12 +93,12 @@ function makeDynamicUIObjs()
             )}
     })
     local bossNameText=bossNameBase:child(DynamicText{
-        text='',fontSize=20,color={1,1,1,1},autoSize=true,
+        text='',fontSize=16,color={1,1,1,1},autoSize=true,
         x=0,y=0,align='center',toggleX=true,transparency=0,
         extraUpdates={
             strategy(
                 function(self, centerXY, radius)
-                    self.align='center'
+                    self.align='right'
                 end,
                 function(self, xywh)
                     self.align='left'
@@ -109,9 +109,17 @@ function makeDynamicUIObjs()
     ---@field addStar fun(self):nil add a star
     ---@field removeStar fun(self):nil remove a star, if there is any
     local bossStars=bossNameBase:child(UI.Arranger{
-        x=0,y=30,arrange=function(self,index)
+        x=0,y=20,arrange=function(self,index)
             return (index-1)*30,0
-        end
+        end,
+        extraUpdates={
+            strategy(
+                function(self, centerXY, radius)
+                    self.x=-bossNameText.width
+                end,
+                function(self, xywh)
+                end
+            )}
     })
 
     function bossStars:addStar()
@@ -123,7 +131,9 @@ function makeDynamicUIObjs()
         if #self.children>0 then
             local toRemove=self.children[#self.children]
             toRemove:unchild()
-            toRemove:remove()
+            Event.EaseEvent{obj=toRemove,duration=10,aims={transparency=0},afterFunc=function()
+                toRemove:remove()
+            end}
         end
     end
 
@@ -169,6 +179,14 @@ function makeDynamicUIObjs()
         text='',fontSize=20,color={1,1,1,1},autoSize=true,
         x=0,y=0,align='right',toggleX=true,transparency=0
     })
+
+    local spellcardLineBelowName=spellcardNameText:child(UI.Panel{
+        x=-50,y=25,width=100,height=1,edgeColor={0.8,0.8,1,1},fillColor={0.8,0.8,1,1},transparency=0.3,
+        extraUpdates={function(self)
+            self.width=spellcardNameText.width+50
+        end}
+    })
+
     local spellcardBonusHistoryText=spellcardInfoMoveUp:child(DynamicText{
         text='',fontSize=16,color={1,1,1,1},autoSize=true,
         x=30,y=30,align='right',toggleX=true,transparency=0,
@@ -182,6 +200,125 @@ function makeDynamicUIObjs()
                 end
             )}
     })
+
+    ---@class HPBar:UIImage
+    ---@field batch MeshBatch
+    ---@field phases number[] sorted in decreasing order. like {0.5,0.2} means 3 phases: 0.5-1, 0.2-0.5, 0-0.2
+    ---@field colors {[1]:number,[2]:number,[3]:number}[]
+    ---@field currentPhaseIndex integer which phase the boss's current hp is in 
+    ---@field hpRatio number between 0 and 1. means the hpRatio in the whole hp bar. NOT MEANING THE SAME AS THE PARAMETER SENT TO updatePhaseHP, which is the hpRatio in the current phase.
+    ---@field ratioToPos fun(self, ratio:number, upOrDown:boolean):ScreenPosition get the screen position of the hpbar at ratio percentage, at up or down side. used for mesh points
+    ---@field setPhases fun(self, phases:number[], colors:{[1]:number,[2]:number,[3]:number}[]):nil set phases and colors.
+    ---@field initHP fun(self):nil play the animation to initialize hp bar when boss appears
+    ---@field increasePhase fun(self):nil increase currentPhaseIndex by 1, called when each boss phase ends.
+    ---@field updatePhaseHP fun(self, hpRatio:number):nil update hp ratio in the current phase. hpRatio is a number between 0 and 1, means the hpRatio in the current phase, not the whole hp bar.
+    local hpBar=dynamicObjs:child(UI.Image{
+        batch=Asset.itemUIMeshes,quad=Asset.itemSprites.hpBar.quad,
+        x=0,y=0,transparency=0,extraUpdates={function(self)
+            self.transparency=bossNameText.transparency -- sync hp bar transparency with boss name
+        end}})
+    hpBar.phases={}
+    hpBar.colors={{1,1,1}}
+    hpBar.currentPhaseIndex=1
+    hpBar.hpRatio=0
+
+    ---return the screen position of the hpbar at ratio percentage, at up or down side. used for mesh points
+    ---@param ratio number
+    ---@param upOrDown boolean true for up side of hp bar, false for down side of hp bar
+    ---@return ScreenPosition
+    function hpBar:ratioToPos(ratio,upOrDown)
+        local shader=G.foregroundShaderData.shader
+        if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
+            local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
+            local startAngle,endAngle=-math.pi*3/4,-math.pi/4
+            local angle=math.lerp(startAngle,endAngle,ratio)
+            local r=radius-(upOrDown and 5 or 10)
+            return {
+                x=centerXY[1]+math.cos(angle)*r,
+                y=centerXY[2]+math.sin(angle)*r,
+            }
+        elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
+            local xywh=G.foregroundShaderData.args.xywh
+            local startx=xywh[1]+5
+            local endx=xywh[1]+xywh[3]-5
+            local y=xywh[2]+(upOrDown and 5 or 10)
+            return {
+                x=math.lerp(startx,endx,ratio),
+                y=y,
+            }
+        else
+            return {x=0,y=0}
+        end
+    end
+
+    ---@param phases number[] will be sorted in decreasing order but colors will not be sorted.
+    ---@param colors {[1]:number,[2]:number,[3]:number}[] should be one more than phases. like if phase is {0.5}, then colors should have color for phase 0-0.5 and color for phase 0.5-1. first color is for 1 to sorted phase[1], ...
+    function hpBar:setPhases(phases,colors)
+        table.sort(phases,function (a,b) return a>b end) -- decreasing
+        self.phases=phases
+        self.colors=colors
+        self.currentPhaseIndex=1
+    end
+
+    function hpBar:initHP()
+        self.duringInit=true
+        Event.EaseEvent{obj=self,duration=60,aims={hpRatio=1},afterFunc=function()
+            self.duringInit=false
+        end}
+    end
+
+    function hpBar:getHighAndLow(phaseIndex)
+        local high=phaseIndex==1 and 1 or self.phases[phaseIndex-1]
+        local low=phaseIndex==#self.phases+1 and 0 or self.phases[phaseIndex]
+        return high,low
+    end
+
+    function hpBar:increasePhase()
+        self.currentPhaseIndex=math.min(self.currentPhaseIndex+1,#self.phases+1)
+    end
+
+    ---@param hpRatio number between 0 and 1. means the hpRatio in the current phase, not the whole hp bar. this function never calls increasePhase.
+    function hpBar:updatePhaseHP(hpRatio)
+        if self.duringInit then
+            return -- during init animation, hpRatio is controlled by the animation, so ignore updatePhaseHP calls from bossManager.
+        end
+        local index=self.currentPhaseIndex
+        local high,low=self:getHighAndLow(index)
+        self.hpRatio=math.lerp(low,high,hpRatio)
+    end
+
+    function hpBar:draw()
+        if self.transparency==0 then
+            return
+        end
+        local x,y,w,h=love.graphics.getQuadXYWHOnImage(self.quad,Asset.itemImage)
+        for i=#self.phases+1,1,-1 do
+            local high,low=self:getHighAndLow(i)
+            if self.hpRatio<low then -- this phase and the following phases are empty
+                break
+            end
+            local ratioInPhase=math.min((self.hpRatio-low)/(high-low),1)
+            local realHigh=math.lerp(low,high-0.005,ratioInPhase) -- -0.005 to create a gap between phases
+            local color=self.colors[i] or {1,1,1}
+            local gap=0.01
+            local count=math.max(math.ceil((realHigh-low)/gap),1)
+            local meshPoints={}
+            local shadeMeshPoints={}
+            local shadeOffset=2
+            local shadeColor={0.5,0.5,0.5,1}
+            for j=0,count-1 do
+                local ratio=math.lerp(low,realHigh,j/(count-1))
+                local posUp=self:ratioToPos(ratio,true)
+                local posDown=self:ratioToPos(ratio,false)
+                table.insert(meshPoints,{posUp.x,posUp.y,x+w,y,color[1],color[2],color[3],1})
+                table.insert(shadeMeshPoints,{posUp.x+shadeOffset,posUp.y+shadeOffset,x+w,y,shadeColor[1],shadeColor[2],shadeColor[3],shadeColor[4]})
+                table.insert(meshPoints,{posDown.x,posDown.y,x,y,color[1],color[2],color[3],1})
+                table.insert(shadeMeshPoints,{posDown.x+shadeOffset,posDown.y+shadeOffset,x,y,shadeColor[1],shadeColor[2],shadeColor[3],shadeColor[4]})
+            end
+            self.batch:add(shadeMeshPoints,'strip')
+            self.batch:add(meshPoints,'strip')
+        end
+    end
 
     ----- below are high-level functions to return
 
@@ -221,10 +358,13 @@ function makeDynamicUIObjs()
     end
 
     local function slideSpellcardInfo()
-        spellcardInfoMoveUp.y=300
+        local y0=300
+        spellcardInfoMoveUp.y=y0
         Event.Event{obj=G.runInfo.player,action=function(self)
+            wait(60)
             for i=1,60 do
-                spellcardInfoMoveUp.y=spellcardInfoMoveUp.y*0.95
+                local ratio=i/60
+                spellcardInfoMoveUp.y=(1-Event.sineIOProgressFunc(ratio))*y0
                 wait()
             end
         end}
@@ -247,6 +387,7 @@ function makeDynamicUIObjs()
         setRemainingTimeText=setRemainingTimeText,
         slideSpellcardInfo=slideSpellcardInfo,
         spellcardNameText=spellcardNameText,
-        spellcardBonusHistoryText=spellcardBonusHistoryText
+        spellcardBonusHistoryText=spellcardBonusHistoryText,
+        hpBar=hpBar,
     }
 end

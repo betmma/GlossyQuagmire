@@ -1,7 +1,7 @@
 local UI=...
 
 ---@class UIImage:UIBase
----@field public batch love.SpriteBatch
+---@field public batch love.SpriteBatch|SpecialBatch
 ---@field public quad love.Quad
 ---@field public r number rotation in radians
 ---@field public sx number scale x

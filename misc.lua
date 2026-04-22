@@ -56,6 +56,8 @@ function math.interpolateTable(a,b,t)
     return result
 end
 
+math.lerpTable=math.interpolateTable -- alias
+
 -- returns random number in (0,1). sometimes (especially particle system) random numbers are needed each frame. The bad part of using math.random is it easily break every replay on slightest change of a particle. So use this function instead. seeds can be (obj, seed2) which expands to (obj.x, seed2, obj.y, obj.frame). seed2 is to generate different numbers for same obj at same frame.
 function math.pseudoRandom(seed1,seed2,seed3,seed4)
     if type(seed1)=='table' then

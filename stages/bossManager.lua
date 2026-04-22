@@ -68,12 +68,40 @@ function BossRound:new(args)
             local count={nonspell=0,spellcard=0}
             for _, phase in pairs(self.phases) do
                 if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
+                    if phase.type~='nonspell' and phase.type~='spellcard' then
+                        error('BossRound:new: invalid phase type '.. tostring(phase.type))
+                    end
                     count[phase.type]=count[phase.type]+1
                 end
             end
             return count
         end
         self.func=function(self, boss)
+            -- calculate phases and colors for hp bar.
+            local phaseCount=self:phaseCount()
+            local colors={}
+            local currentColor={1,1,1}
+            for i=1,phaseCount.nonspell do
+                table.insert(colors,currentColor)
+                currentColor=math.lerpTable(currentColor,{0.5,0.5,0.5},0.2) -- gray for nonspell phases
+            end
+            currentColor={0.7,0.7,1}
+            for i=1,phaseCount.spellcard do
+                table.insert(colors,currentColor)
+                currentColor=math.lerpTable(currentColor,{0.3,0.3,1},0.2) -- blue for spellcard phases
+            end
+            local phases={}
+            local eachSpellcard=phaseCount.spellcard<4 and 0.2 or 0.6/phaseCount.spellcard
+            for i=1,phaseCount.spellcard do
+                table.insert(phases,i*eachSpellcard)
+            end
+            local spellcardTakesup=phaseCount.spellcard*eachSpellcard
+            for i=1,phaseCount.nonspell-1 do
+                table.insert(phases,spellcardTakesup+i*(1-spellcardTakesup)/phaseCount.nonspell)
+            end
+            print(pprint(phaseCount)..pprint(phases)..pprint(colors))
+            DynamicUIObjs.hpBar:setPhases(phases,colors)
+            DynamicUIObjs.hpBar:initHP()
             for _, phase in pairs(self.phases) do
                 if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
                     phase:run(boss)
@@ -150,11 +178,8 @@ function BossPhase:run(boss)
     self.remainingFrames=self.time
     DynamicUIObjs.setRemainingTimeText(self.time/60)
     boss.maxhp=self.hp
-    boss.invincible=true
-    boss.hp=1 -- prevent hp being 0 and triggering end of phase before it starts.
-    Event.EaseEvent{
-        obj=boss,duration=60,aims={hp=self.hp},afterFunc=function()boss.invincible=false end
-    }
+    boss.hp=boss.maxhp
+    boss.invincible=false
     boss.dropItems=self.dropItems -- update drop items for the phase, which will be dropped after clearing the phase.
     local task=coroutine.create(self.func)
     while true do
@@ -169,20 +194,22 @@ function BossPhase:run(boss)
             SFX:play('timeout',true,3)
         end
         DynamicUIObjs.setRemainingTimeText(self.remainingFrames/60)
+        DynamicUIObjs.hpBar:updatePhaseHP(boss.hp/boss.maxhp) -- update hp bar
         -- Check if HP <= 0 or Time <= 0 here
         if self:isFinished(boss) then break end
         coroutine.yield() -- for outer coroutine
     end
     DynamicUIObjs.setRemainingTimeText(nil)
-    if self.isTimeout then -- reduce boss hp to 0 gradually
-        for i=1,30 do
+    if self.isTimeout or boss.hp>0 then -- reduce boss hp to 0 gradually
+        while boss.hp>0 do
             boss.hp=math.max(0, boss.hp - boss.maxhp/30)
+            DynamicUIObjs.hpBar:updatePhaseHP(boss.hp/boss.maxhp) -- update hp bar
             coroutine.yield()
         end
         boss:die()
-    else
-        wait(30) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
     end
+    DynamicUIObjs.hpBar:increasePhase() -- move to next phase in hp bar
+    wait(30) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
 end
 
 ---@class NonSpellPhaseArgs:BossPhaseBaseArgs
@@ -192,6 +219,10 @@ end
 ---@field type 'nonspell'
 ---@overload fun(args:NonSpellPhaseArgs):NonSpellPhase
 local NonSpellPhase=BossPhase:extend()
+function NonSpellPhase:new(args)
+    NonSpellPhase.super.new(self, args)
+    self.type='nonspell'
+end
 
 ---@class SpellcardPhaseArgs:BossPhaseBaseArgs
 ---@field key string a key to be sent to Localize to get name. must be distinct. the in-game spellcard id like in spellcard history will be auto generated.
@@ -207,6 +238,7 @@ local SpellcardPhase=BossPhase:extend()
 
 function SpellcardPhase:new(args)
     BossPhase.new(self, args)
+    self.type='spellcard'
     self.key=args.key
     self.bonusScore=args.bonusScore
 end
@@ -214,7 +246,10 @@ end
 function SpellcardPhase:run(boss)
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, 'name'})
-    DynamicUIObjs.spellcardBonusHistoryText:setText('0/0'..'  BONUS '.. self.bonusScore)
+    Event.Event{obj=boss,action=function()
+        wait(90)
+        DynamicUIObjs.spellcardBonusHistoryText:setText('0/0'..'  BONUS '.. self.bonusScore)
+    end}
     BossPhase.run(self, boss)
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
     G.runInfo.score=G.runInfo.score+self.bonusScore

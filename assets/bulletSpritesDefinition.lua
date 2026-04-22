@@ -382,7 +382,7 @@ switchTargets(Asset.itemImage, Asset.itemSprites)
 
 ---@alias AssetItemSpritesCollection {\
 --- powerSmall:ItemAndIndicator, powerLarge:ItemAndIndicator, powerFull:ItemAndIndicator, point:ItemAndIndicator, pointGolden:ItemAndIndicator, lifePiece:ItemAndIndicator, bombPiece:ItemAndIndicator, life:ItemAndIndicator, bomb:ItemAndIndicator,\
---- lifeMeter:LifeOrBombMeter, bombMeter:LifeOrBombMeter, enemySpellcardIndicator:Sprite}
+--- lifeMeter:LifeOrBombMeter, bombMeter:LifeOrBombMeter, enemySpellcardIndicator:Sprite, hpBar:Sprite}
 
 matrix{
     unit=single{sizeX=16,sizeY=16},
@@ -403,6 +403,10 @@ matrix{
 single{
     sizeX=16,sizeY=16,name='enemySpellcardIndicator',
     baseX=32,baseY=32,
+}:addToAsset()
+single{
+    sizeX=16,sizeY=16,name='hpBar',
+    baseX=0,baseY=0,
 }:addToAsset()
 matrix{
     unit=single{sizeX=32,sizeY=32},

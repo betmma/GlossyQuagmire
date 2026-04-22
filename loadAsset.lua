@@ -388,6 +388,8 @@ Asset.playerFocusMeshes=MeshBatch(Asset.bulletImage,5)
 -- deprecated, use meshes for higher quality. maybe useful if a level has thousands of focus points and lags for meshes
 Asset.playerFocusBatch=love.graphics.newSpriteBatch(bulletImage, 5,'stream')
 Asset.foregroundBatch=love.graphics.newSpriteBatch(bgImage,5,'stream')
+-- for hp bar (could be curly in circle foreground)
+Asset.itemUIMeshes=MeshBatch(Asset.itemImage,100)
 -- for lives and bombs icons on UI
 Asset.itemUIBatch=love.graphics.newSpriteBatch(itemImage,20,'stream')
 Asset.portraitBatch=love.graphics.newSpriteBatch(portraitsImage,2)
@@ -416,6 +418,7 @@ Asset.Batches={
         name='UI',
         batches={
             Asset.foregroundBatch,
+            Asset.itemUIMeshes,
             Asset.itemUIBatch,
             Asset.titleBatch, -- draw the logo at bottom right in game
             Asset.portraitBatch,
