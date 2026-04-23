@@ -169,8 +169,7 @@ function MeshFuncs.ringMesh(position,innerR,outerR,orientation,quad,n,color,loop
     n = n - n % loopNum -- make sure it's multiple of loopNum, or can't loop properly
     for i = 0, n do
         local angle = math.pi * 2 / n * i
-        local loopRatio = i % oneLoopVertices / oneLoopVertices
-        local loopHappens = loopRatio == 0 and i > 0
+        local loopRatio = math.abs(i % (oneLoopVertices*2) / oneLoopVertices-1)*0.8 -- triangle wave. boss hexagram uses laserDark.red, if max loopRatio=1 this causes strange fade at the loop point. it looks like the sprite below is leaking but it should not happen. snake.red doesn't leak when max is 1.
         -- Geometric positions
         local posOuter = G.runInfo.geometry:rThetaGo(position, outerR, angle + orientation)
         local posInner = G.runInfo.geometry:rThetaGo(position, innerR, angle + orientation)
@@ -183,13 +182,6 @@ function MeshFuncs.ringMesh(position,innerR,outerR,orientation,quad,n,color,loop
             if not pO.dummy and not pI.dummy then
                 ---@cast pO ScreenPosition
                 ---@cast pI ScreenPosition
-                if loopHappens then 
-                    -- add 2 points with loopRatio=1. boss hexagram uses laserDark.red, if loopRatio=1 this causes strange fade at the loop point. it looks like the sprite below is leaking but it should not happen
-                    acc:add(si,
-                        {pO.x, pO.y, x, y + h * 0.95, c[1], c[2], c[3], c[4]},
-                        {pI.x, pI.y, x + w, y + h * 0.95, c[1], c[2], c[3], c[4]}
-                    )
-                end
                 acc:add(si,
                     {pO.x, pO.y, x, y + h * loopRatio, c[1], c[2], c[3], c[4]},
                     {pI.x, pI.y, x + w, y + h * loopRatio, c[1], c[2], c[3], c[4]}

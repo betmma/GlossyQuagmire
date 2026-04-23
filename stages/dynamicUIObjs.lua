@@ -292,6 +292,7 @@ function makeDynamicUIObjs()
         if self.duringInit then
             return -- during init animation, hpRatio is controlled by the animation, so ignore updatePhaseHP calls from bossManager.
         end
+        hpRatio=math.clamp(hpRatio,0,1)
         local index=self.currentPhaseIndex
         local high,low=self:getHighAndLow(index)
         self.hpRatio=math.lerp(low,high,hpRatio)

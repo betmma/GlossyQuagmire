@@ -6,7 +6,6 @@
 ---@field focusFactor number speed factor when holding focus key
 ---@field focusPointTransparency number between 0 and 1, the transparency of the focus point
 ---@field orientation number extra rotation of player sprite and focus sprite
----@field border any not implemented now
 ---@field hitInvincibleFrame number how many frames player will be invincible after hit
 ---@field invincibleFrame number how many frames player is still invincible
 ---@field grazeRadiusFactor number the factor multiplied to radius to get graze radius
@@ -15,6 +14,7 @@
 ---@field shotType ShotType
 ---@field options Bullet[]
 ---@field duringDeath boolean whether player is in death animation.
+---@field border Border|nil
 local Player = Shape:extend()
 
 ---@enum PlayerMoveMode
@@ -39,19 +39,7 @@ function Player:new(args)
     self.radius = 3.0 -- hitbox
     -- orientation determines extra rotation of player sprite and focus sprite. since player sprite faces up, orientation is normally 0.
     self.orientation=0
-
-    if args.noBorder then
-        self.border=nil
-    else
-        -- rectangle border. border is not implemented
-        self.border=args.border or {
-            inside=function(_,x,y)
-                return x>=150 and x<=650 and y>=0 and y<=600
-            end,
-            default=true,
-            remove=function()end
-        }
-    end
+    self.border=nil
 
     self.hitInvincibleFrame=300
     self.invincibleFrame=0
@@ -173,8 +161,37 @@ function Player:getKeyboardMoveSpeed()
 end
 
 function Player:limitInBorder()
+    if not self.border then
+        return
+    end
+    local pos=self.kinematicState.pos
+    local limitedPos=self.border:findInside(pos)
+    if limitedPos==pos then
+        return
+    end
+    self.kinematicState.pos=limitedPos
+    -- cannot only set pos to limitedPos, due to the geometry can change direction during the move. without adding that change, moving towards the border perpendicularly can cause player to rotate, as the forward movement in self.super.update adds to viewDirection (though not directly, through updateViewDirection), but directly set pos back does not cancel the rotation.
+    local moveDir=G.runInfo.geometry:to(pos,limitedPos)
+    local moveDistance=G.runInfo.geometry:distance(pos,limitedPos)
+    local kinematicState={pos=pos,dir=moveDir,speed=moveDistance*60}
+    G.runInfo.geometry:update(kinematicState,1/60)
+    local dirDelta=kinematicState.dir-moveDir
+    self.kinematicState.dir=self.kinematicState.dir+dirDelta
 end
 
+---@param kstateRef KinematicState
+---@param kstateAfter KinematicState
+function Player:updateViewDirection(kstateRef,kstateAfter)
+    if self.moveMode==Player.moveModes.Natural then
+        local dtheta=math.modClamp(kstateAfter.dir-kstateRef.dir)
+        if DEV_MODE and love.keyboard.isDown('[') then --debug use
+            self.viewDirection=self.viewDirection-0.03
+        elseif DEV_MODE and love.keyboard.isDown(']') then
+            self.viewDirection=self.viewDirection+0.03
+        end
+        self.viewDirection=(self.viewDirection+dtheta)%(math.pi*2)
+    end
+end
 
 function Player:moveUpdate(dt)
     self.kinematicState.speed, self.kinematicState.dir=self:getKeyboardMoveSpeed()
@@ -184,16 +201,7 @@ function Player:moveUpdate(dt)
 
     -- limit player in border
     self:limitInBorder()
-
-    if self.moveMode==Player.moveModes.Natural then
-        local dtheta=math.modClamp(self.kinematicState.dir-kinematicStateRef.dir)
-        if DEV_MODE and love.keyboard.isDown('[') then --debug use
-            self.viewDirection=self.viewDirection-0.03
-        elseif DEV_MODE and love.keyboard.isDown(']') then
-            self.viewDirection=self.viewDirection+0.03
-        end
-        self.viewDirection=(self.viewDirection+dtheta)%(math.pi*2)
-    end
+    self:updateViewDirection(kinematicStateRef,self.kinematicState)
 end
 
 

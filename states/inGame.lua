@@ -96,7 +96,6 @@ return {
             end
         end
         -- for test
-        G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
         -- local spawnerPos=G.runInfo.geometry:rThetaGo(G.runInfo.player.kinematicState.pos,100,-math.pi/2)
         -- local spawner=BulletSpawner{
         --     kinematicState={pos=spawnerPos,speed=0,dir=0},period=616,firstPeriod=9993,lifeFrame=9999,bulletNumber=8,bulletSpeed=50,bulletSize=5,angle=0,range=math.pi*4,bulletSprite=BulletSprites.arrow.blue,bulletLifeFrame=600,bulletEvents={
@@ -132,11 +131,10 @@ return {
         -- local fairy=Enemy{kinematicState={pos=fairyPos,speed=0,dir=0},maxhp=100,sprite=Asset.fairySprites.small.red}
     end,
     enter=function(self)
+        GameObject:removeAll()
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
         base.frame=0
-        if G.runInfo.player then
-            G.runInfo.player.shotType=ShotTypes[G.runInfo.shotType]
-        end
+        G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
     end,
     update=function(self,dt)
         base:updateHierarchy()

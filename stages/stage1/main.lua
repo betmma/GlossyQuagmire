@@ -2,12 +2,12 @@
 ---@type OneStageData
 return{
     segments={
-        
-        require('stages.stage1.boss'),
         {
             key='1-1',
             type='midStage',
             func=function()
+                local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
+                G.runInfo.player.border=border
                 DynamicUIObjs.showSoundtrack()
                 local basePos=G.runInfo.geometry:init().pos
                 local pos1,dir1=G.runInfo.geometry:rThetaGo(basePos,200,-math.pi/2)
@@ -24,5 +24,7 @@ return{
                 wait(300)
             end
         },
+        
+        require('stages.stage1.boss'),
     }
 }

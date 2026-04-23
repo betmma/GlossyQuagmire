@@ -1,3 +1,8 @@
+---@alias never "That's a wrong key" workaround from https://github.com/LuaLS/lua-language-server/issues/1990. LuaLS is shit
+
+---@class strict
+---@field [any] never
+
 function math.acosh(x)
     return math.log(x+(x*x-1)^0.5)
 end
@@ -236,6 +241,9 @@ function indexOf(tbl, value)
     return nil
 end
 
+---@generic T
+---@param tbl T
+---@return T
 function shallowCopyTable(tbl)
     local copy = {}
     for k, v in pairs(tbl) do
@@ -245,6 +253,9 @@ function shallowCopyTable(tbl)
     return copy
 end
 
+---@generic T
+---@param O T
+---@return T
 function copyTable(O)
     local O_type = type(O)
     local copy
