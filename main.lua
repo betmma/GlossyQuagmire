@@ -1,4 +1,4 @@
-VERSION="0.1.1.2"
+VERSION="0.1.1.3"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"

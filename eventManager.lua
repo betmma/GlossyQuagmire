@@ -1,8 +1,10 @@
 local EventManager = {}
+---@enum EVENT
 EventManager.EVENTS={
     SWITCH_STATE='switchState',
     PLAY_AUDIO='playAudio',
     PLAYER_HIT='playerHit',
+    GAIN_SCORE='gainScore',
     -- below are from previous game
     PLAYER_GRAZE='playerGraze',
     PLAYER_ACCUMULATE_FLASHBOMB='playerAccumulateFlashbomb',
@@ -20,9 +22,9 @@ EventManager.DELETE_LISTENER='deleteListener'
 
 EventManager.listeners = {}
 
----@param eventName string
+---@param eventName EVENT
 ---@param func function
----@param removeEventName string|nil
+---@param removeEventName EVENT|nil
 --- Registers a listener for an event. If `removeEventName` is provided, the listener will be removed when that event is posted.
 function EventManager.listenTo(eventName, func, removeEventName)
     if not EventManager.listeners[eventName] then
@@ -50,11 +52,8 @@ function EventManager.removeListener(eventName, func)
         end
     end
 end
--- though arbitrary params can be used, since there is no ide to hint the listener function, it's suggested to use:
--- first arg: main object (if listener is a method, it will be the self)
--- second arg: quantity
--- third arg: string to tell different source 
----@param eventName string
+
+---@param eventName EVENT
 function EventManager.post(eventName, ...)
     if EventManager.listeners[eventName] then
         -- make a copy to avoid issues if listeners are modified during iteration

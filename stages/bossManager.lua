@@ -282,7 +282,7 @@ function SpellcardPhase:run(boss)
         self.failedBonus=true
     end
     if not self.failedBonus then
-        G.runInfo.score=G.runInfo.score+self.currentBonus
+        EventManager.post(EventManager.EVENTS.GAIN_SCORE, self.currentBonus)
         DynamicUIObjs.showNotice("getSpellCardBonus")
     else
         -- show bonus failed text

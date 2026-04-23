@@ -63,6 +63,9 @@ function Item:update(dt)
             self:remove()
         end
     end
+    if self.frame+120>self.lifeFrame then
+        self.spriteTransparency=math.max(0,(self.lifeFrame-self.frame)/120)
+    end
     Item.super.update(self, dt)
 end
 
@@ -73,72 +76,94 @@ function Item:draw()
         zoom=1,
         normalBatch=self.batch,
         meshBatch=self.meshBatch,
-        isSquare=true
+        isSquare=true,
+        color={1,1,1,self.spriteTransparency or 1}
     }
 end
 
 -- to deal with potential floating point error when adding 0.2 for life and bomb pieces
 ---@param value number
 ---@return number newValue
----@return boolean reachesNewInteger
-local function addOneFifth(value)
-    value=value+0.2
+local function roundToFifth(value)
     value=value*5
     value=math.floor(value+0.5)
     value=value/5
-    return value,value%1==0
+    return value
 end
+
+local function gainPower(amount)
+    if G.runInfo.power>=400 then
+        SFX:play('select',true)
+        return
+    end
+    local powerBefore=G.runInfo.power
+    G.runInfo.power=G.runInfo.power+amount
+    if G.runInfo.power>400 then
+        G.runInfo.power=400
+    end
+    if G.runInfo.power==400 and powerBefore<400 then
+        DynamicUIObjs.showNotice('fullPowerUp')
+    end
+    if math.floor(powerBefore/100)<math.floor(G.runInfo.power/100) then
+        SFX:play('extend',true)
+    else
+        SFX:play('select',true)
+    end
+end
+
+local function gainLife(amount)
+    local livesBefore=G.runInfo.lives
+    G.runInfo.lives=roundToFifth(G.runInfo.lives+amount)
+    if math.floor(livesBefore)<math.floor(G.runInfo.lives) then
+        SFX:play('extend',true)
+        DynamicUIObjs.showNotice('extend')
+    else
+        SFX:play('select',true)
+    end
+end
+
+local function gainBomb(amount)
+    local bombsBefore=G.runInfo.bombs
+    G.runInfo.bombs=roundToFifth(G.runInfo.bombs+amount)
+    if math.floor(bombsBefore)<math.floor(G.runInfo.bombs) then
+        SFX:play('extend',true)
+    else
+        SFX:play('select',true)
+    end
+end
+
+local function gainScore(amount)
+    local newScore=G.runInfo.score+amount
+    if G.runInfo.score<G.runInfo.hiScore and G.runInfo.hiScore<newScore then -- new hiscore
+        DynamicUIObjs.showNotice('hiscore')
+        SFX:play('extend',true)
+    end
+    G.runInfo.score=newScore
+    G.runInfo.hiScore=math.max(G.runInfo.hiScore,G.runInfo.score)
+end
+
+EventManager.listenTo(EventManager.EVENTS.GAIN_SCORE, gainScore)
 
 function Item:picked()
     if self.type==ItemType.powerSmall then
-        if G.runInfo.power>=400 then
-            SFX:play('select',true)
-            return
-        end
-        G.runInfo.power=G.runInfo.power+1
-        if G.runInfo.power%100==0 then
-            SFX:play('extend',true)
-        else
-            SFX:play('select',true)
-        end
+        gainPower(1)
     elseif self.type==ItemType.powerLarge then
-        if G.runInfo.power>=400 then
-            SFX:play('select',true)
-            return
-        end
-        G.runInfo.power=G.runInfo.power+100
-        SFX:play('extend',true)
+        gainPower(100)
     elseif self.type==ItemType.powerFull then
-        G.runInfo.power=400
-        SFX:play('extend',true)
+        gainPower(400)
     elseif self.type==ItemType.point then
-        SFX:play('select',true)
-        -- score not implemented yet
+        local scoreGain=1000*(1-self.frame/self.lifeFrame)
+        EventManager.post(EventManager.EVENTS.GAIN_SCORE,scoreGain)
     elseif self.type==ItemType.pointGolden then
-        SFX:play('extend',true)
-        -- score not implemented yet
+        EventManager.post(EventManager.EVENTS.GAIN_SCORE,1000)
     elseif self.type==ItemType.lifePiece then
-        local newValue, reachedInteger = addOneFifth(G.runInfo.lives)
-        G.runInfo.lives = newValue
-        if reachedInteger then
-            SFX:play('extend',true)
-        else
-            SFX:play('select',true)
-        end
+        gainLife(0.2)
     elseif self.type==ItemType.bombPiece then
-        local newValue, reachedInteger = addOneFifth(G.runInfo.bombs)
-        G.runInfo.bombs = newValue
-        if reachedInteger then
-            SFX:play('extend',true)
-        else
-            SFX:play('select',true)
-        end
+        gainBomb(0.2)
     elseif self.type==ItemType.life then
-        G.runInfo.lives=G.runInfo.lives+1
-        SFX:play('extend',true)
+        gainLife(1)
     elseif self.type==ItemType.bomb then
-        G.runInfo.bombs=G.runInfo.bombs+1
-        SFX:play('extend',true)
+        gainBomb(1)
     end
 end
 
