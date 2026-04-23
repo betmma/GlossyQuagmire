@@ -320,7 +320,7 @@ end
 
 -- localize a string. args example: {'ui', 'upgradesCurrentXP', xp=100}
 ---@return string
----@return boolean success
+-- -@return boolean success
 function Localize(args)
     local rawString,success=getRawLocalizeString(args)
     local result=rawString
@@ -331,7 +331,7 @@ function Localize(args)
         success=false
         result=result:gsub('{.-}','MISSING VALUE')
     end
-    return result, success
+    return result--, success
 end
 
 function isVersionSmaller(version1, version2)

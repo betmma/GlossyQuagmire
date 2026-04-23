@@ -2,8 +2,8 @@ local EventManager = {}
 EventManager.EVENTS={
     SWITCH_STATE='switchState',
     PLAY_AUDIO='playAudio',
-    -- below are from previous game
     PLAYER_HIT='playerHit',
+    -- below are from previous game
     PLAYER_GRAZE='playerGraze',
     PLAYER_ACCUMULATE_FLASHBOMB='playerAccumulateFlashbomb',
     PLAYER_SHOOTING='playerShooting',

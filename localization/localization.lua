@@ -397,6 +397,33 @@ return {
                 en_us = 'BGM: {bgm}', -- this font doesnt have the eighth note symbol
                 zh_cn = '♪ {bgm}',
             },
+            ---@enum (key) NoticeKey
+            notices = {
+                getSpellCardBonus = {
+                    en_us = 'Get Spell Card Bonus!!',
+                    zh_cn = '获得符卡奖励！！',
+                },
+                spellCardBonusFailed = {
+                    en_us = 'Bonus Failed...',
+                    zh_cn = '奖励失败……',
+                },
+                challengeNextStage = {
+                    en_us = 'Challenge Next Stage!',
+                    zh_cn = '挑战下一关！',
+                },
+                fullPowerUp = {
+                    en_us = 'Full Power-Up!',
+                    zh_cn = '火力全开！',
+                },
+                hiscore = {
+                    en_us = 'Hi-Score!',
+                    zh_cn = '新高分！',
+                },
+                extend = {
+                    en_us = 'Extend!!',
+                    zh_cn = '获得残机！！',
+                },
+            }
         },
 
         -- below are from previous game

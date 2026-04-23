@@ -22,12 +22,16 @@ function makeDynamicUIObjs()
     local base=G.UIDEF.IN_GAME.base
 
     ---@class DynamicText:UIText
-    ---@field setText fun(self, text:string):nil set text with fade in/out effect. if text is set to empty string, it will fade out and then set text, otherwise it will set text and then fade in.
+    ---@field setText fun(self, text:string, direct:boolean|nil):nil set text with fade in/out effect. if text is set to empty string, it will fade out and then set text, otherwise it will set text and then fade in. if direct is true, it will set text directly without fade in/out effect.
     local DynamicText=UI.Text:extend()
     -- set text with fade in/out effect. if text is set to empty string, it will fade out and then set text, otherwise it will set text and then fade in.
-    function DynamicText:setText(text)
+    function DynamicText:setText(text,direct)
         if self.text==nil then -- the first set in UI.Text.new() is not considered as a real setText, so just set it directly without fade in/out effect.
             self.text=text
+            return
+        end
+        if direct then
+            UI.Text.setText(self,text)
             return
         end
         if text~='' then
@@ -63,6 +67,12 @@ function makeDynamicUIObjs()
     local stageTitleSmallText=centerBase:child(DynamicText{
         text='',fontSize=24,color={1,1,1,1},autoSize=true,
         x=0,y=-20,align='center',toggleX=true,transparency=0,
+    })
+
+    -- general notices for "Get Spell Card Bonus!!, Bonus Failed..., Challenge next stage!, Full PowerUp!, Hiscore! and Extend!!"
+    local noticeText=centerBase:child(DynamicText{
+        text='',fontSize=40,color={1,1,1,1},autoSize=true,
+        x=0,y=0,align='center',toggleX=true,transparency=0,
     })
 
     -- display soundtrack name at bottom
@@ -188,7 +198,7 @@ function makeDynamicUIObjs()
     })
 
     local spellcardBonusHistoryText=spellcardInfoMoveUp:child(DynamicText{
-        text='',fontSize=16,color={1,1,1,1},autoSize=true,
+        text='',fontSize=14,color={1,1,1,1},autoSize=true,
         x=30,y=30,align='right',toggleX=true,transparency=0,
         extraUpdates={
             strategy(
@@ -334,6 +344,18 @@ function makeDynamicUIObjs()
         end}
     end
 
+    ---@param key NoticeKey
+    local function showNotice(key)
+        local notice=Localize{'ui','IN_GAME','notices',key}
+        noticeText:setText(notice)
+        Event.Event{obj=G.runInfo.player,action=function(self)
+            wait(120)
+            if noticeText.text==notice then -- if the notice is not changed during the 120 frames, then clear it. if it is changed, it means another notice is shown, so do not clear it.
+                noticeText:setText('')
+            end
+        end}
+    end
+
     local function showSoundtrack()
         local soundtrackName=BGM.currentAudio
         local name=Localize{'musicData',soundtrackName,'name'}
@@ -381,6 +403,7 @@ function makeDynamicUIObjs()
     ---@field spellcardBonusHistoryText DynamicText
     DynamicUIObjs={
         showStageTitle=showStageTitle,
+        showNotice=showNotice,
         showSoundtrack=showSoundtrack,
         bossNameText=bossNameText,
         bossStars=bossStars,

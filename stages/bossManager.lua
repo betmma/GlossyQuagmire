@@ -99,7 +99,6 @@ function BossRound:new(args)
             for i=1,phaseCount.nonspell-1 do
                 table.insert(phases,spellcardTakesup+i*(1-spellcardTakesup)/phaseCount.nonspell)
             end
-            print(pprint(phaseCount)..pprint(phases)..pprint(colors))
             DynamicUIObjs.hpBar:setPhases(phases,colors)
             DynamicUIObjs.hpBar:initHP()
             for _, phase in pairs(self.phases) do
@@ -131,6 +130,7 @@ end
 ---@field func fun(self, boss:Boss) the concrete content of the boss phase. like spawn bullets
 ---@field run fun(self, boss:Boss) create a coroutine for self.func and run until it ends.
 ---@field isFinished fun(self, boss:Boss):boolean check if the phase is finished. for timeout type, check if time runs out. for hp type, check if hp<=0. this is used to determine when to end the phase and move on to the next one.
+---@field update fun(self, boss:Boss) extra update logic to be executed every frame during the phase. like counting down remaining frames, and for spellcard subclass, counting down bonus score.
 local BossPhase=Object:extend()
 
 local ALL_DIFFICULTIES={}
@@ -148,7 +148,7 @@ end
 ---@field dropItems nil|DropItems items to drop after clearing the phase.
 ---@field difficulties nil|table<DIFFICULTY,true>
 ---@field players nil|table<PLAYER,true>
----@field func fun(self, boss:Boss)
+---@field func fun(self, boss:Boss) the concrete content of the boss phase. like spawn bullets
 
 ---@class BossPhaseArgs
 ---@field type BossPhaseType
@@ -164,6 +164,17 @@ function BossPhase:new(args)
     self.difficulties=args.difficulties or ALL_DIFFICULTIES
     self.players=args.players or ALL_PLAYERS
     self.func=args.func or function()end
+end
+
+function BossPhase:update(boss)
+    self.remainingFrames=self.remainingFrames-1
+    local remaining=self.remainingFrames
+    if remaining%60==0 and remaining<=600 then
+        SFX.data.timeout:setPitch(remaining<=300 and 1.5 or 1) -- increase pitch when time is less than 5 seconds to make it more intense
+        SFX:play('timeout',true,3)
+    end
+    DynamicUIObjs.setRemainingTimeText(self.remainingFrames/60)
+    DynamicUIObjs.hpBar:updatePhaseHP(boss.hp/boss.maxhp) -- update hp bar
 end
 
 function BossPhase:isFinished(boss)
@@ -187,14 +198,7 @@ function BossPhase:run(boss)
             local success, err = coroutine.resume(task, self, boss)
             if not success then error(err) end
         end
-        self.remainingFrames=self.remainingFrames-1
-        local remaining=self.remainingFrames
-        if remaining%60==0 and remaining<=600 then
-            SFX.data.timeout:setPitch(remaining<=300 and 1.5 or 1) -- increase pitch when time is less than 5 seconds to make it more intense
-            SFX:play('timeout',true,3)
-        end
-        DynamicUIObjs.setRemainingTimeText(self.remainingFrames/60)
-        DynamicUIObjs.hpBar:updatePhaseHP(boss.hp/boss.maxhp) -- update hp bar
+        self:update(boss) -- update remaining time and hp bar every frame
         -- Check if HP <= 0 or Time <= 0 here
         if self:isFinished(boss) then break end
         coroutine.yield() -- for outer coroutine
@@ -233,6 +237,8 @@ end
 ---@field type 'spellcard'
 ---@field key string
 ---@field bonusScore integer score player gets after clearing the spellcard.
+---@field currentBonus integer current bonus score, which counts down every frame.
+---@field failedBonus boolean whether the player has failed the spellcard and lost the bonus score. failed means getting hit or using bomb or time runs out.
 ---@overload fun(args:SpellcardPhaseArgs):SpellcardPhase
 local SpellcardPhase=BossPhase:extend()
 
@@ -241,18 +247,47 @@ function SpellcardPhase:new(args)
     self.type='spellcard'
     self.key=args.key
     self.bonusScore=args.bonusScore
+    self.currentBonus=self.bonusScore
+    self.failedBonus=false
+end
+
+function SpellcardPhase:getBonusHistoryText()
+    local bonusText=self.failedBonus and 'FAILED' or string.format('%07d', math.floor(self.currentBonus))
+    return string.format('HISTORY %d/%d  BONUS %s', 0, 0, bonusText)
+end
+
+function SpellcardPhase:update(boss)
+    SpellcardPhase.super.update(self, boss)
+    self.currentBonus=math.max(0, self.currentBonus - self.bonusScore/self.time)
+    DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText(),true)
 end
 
 function SpellcardPhase:run(boss)
+    self.currentBonus=self.bonusScore
+    self.failedBonus=false
+    local cancelBonus=function()
+        self.failedBonus=true
+    end
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, 'name'})
     Event.Event{obj=boss,action=function()
         wait(90)
-        DynamicUIObjs.spellcardBonusHistoryText:setText('0/0'..'  BONUS '.. self.bonusScore)
+        DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText())
     end}
     BossPhase.run(self, boss)
+    EventManager.removeListener(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
-    G.runInfo.score=G.runInfo.score+self.bonusScore
+    if self.remainingFrames==0 and not self.isTimeout then
+        self.failedBonus=true
+    end
+    if not self.failedBonus then
+        G.runInfo.score=G.runInfo.score+self.currentBonus
+        DynamicUIObjs.showNotice("getSpellCardBonus")
+    else
+        -- show bonus failed text
+        DynamicUIObjs.showNotice('spellCardBonusFailed')
+    end
     DynamicUIObjs.spellcardNameText:setText('')
     DynamicUIObjs.spellcardBonusHistoryText:setText('')
 end
