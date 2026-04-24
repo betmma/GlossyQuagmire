@@ -3,7 +3,7 @@ local Action={}
 ---@class Action
 ---@field isAction true
 ---@field params table<string, any>
----@field func fun(self:Bullet, params:table<string, any>):nil
+---@field func fun(self:Bullet, params:table<string, any>):nil it should not modify the params as this table may be shared among multiple objects. store into self if needed.
 
 
 local fadeOut=function(self,params)
@@ -62,14 +62,15 @@ Action.ZoomIn=function(zoomFrame,targetSize)
 end
 
 local appearingHint=function(self,params)
-    if params.executed then
+    if self.appearingHintexecuted then
         return
     end
-    params.executed=true
+    self.appearingHintexecuted=true
     local size=params.size or self.size*2
     local duration=params.duration or 10
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
-    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[spriteColor],size=size,growSpeed=-size/duration,animationFrame=duration,spriteTransparency=0.8}
+    local shockwaveColor=Asset.spectrum1MapSpectrum2[spriteColor] or 'gray'
+    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=size,growSpeed=-size/duration,animationFrame=duration,spriteTransparency=0.8}
 end
 
 --- a shrinking shockwave to hint something appears.
@@ -77,6 +78,19 @@ end
 --- @param duration integer|nil number of frames for the hint animation, default 10
 Action.AppearingHint=function(size,duration)
     return {isAction=true,params={size=size,duration=duration},func=appearingHint}
+end
+
+
+local actionPack=function(self,params)
+    for k,action in ipairs(params) do
+        action.func(self,action.params)
+    end
+end
+
+--- execute multiple actions. a way to nest actions and make preset action combinations.
+--- @param actions table<string, Action> a table of actions to be executed.
+Action.Pack=function(actions)
+    return {isAction=true,params=actions,func=actionPack}
 end
 
 return Action

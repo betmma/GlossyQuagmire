@@ -17,6 +17,7 @@ provide a function to display stage title text
 ---@field func fun() the content of the segment. like spawn some fairies or a boss
 
 ---@class OneStageData
+---@field init fun() to initialize the stage, like setting player border.
 ---@field segments Segment[]
 
 ---@alias StageKey 'stage1'|'stage2'|'stage3'|'stage4'|'stage5'|'stage6'|'stageEX'
@@ -45,9 +46,9 @@ loadStageData()
 ---@param callback function|nil to be called after stage is finished
 function StageManager:load(item,callback)
     self.currentStageData=StageData[item]
-    self.currentSegmentIndex=1
+    self.currentSegmentIndex=0
     self.callback=callback
-    self.currentCoroutine=coroutine.create(self.currentStageData.segments[self.currentSegmentIndex].func)
+    self.currentCoroutine=coroutine.create(self.currentStageData.init)
 end
 
 function StageManager:update(dt)

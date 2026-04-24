@@ -3,21 +3,19 @@ local Shape = GameObject:extend()
 -- Shape.removeDistance=100
 Shape.timeSpeed=1
 
+---@class ShapeArgs:strict
+---@field kinematicState KinematicState|nil if not provided, will be initialized to geometry:init()
+---@field lifeFrame number after which the object will be removed, default 1000 frames
+---@param args ShapeArgs
 function Shape:new(args)
     args=args or {}
     self.args=args
     if args.kinematicState then
         if not args.kinematicState.pos then
-            args.kinematicState.pos=args.kinematicState.position
-        end
-        if not args.kinematicState.pos then
             error('Shape:new: kinematicState must have pos')
         end
         if not args.kinematicState.speed then
             args.kinematicState.speed=0
-        end
-        if not args.kinematicState.dir then
-            args.kinematicState.dir=args.kinematicState.direction or 0
         end
     end
     self.kinematicState=args.kinematicState or G.runInfo.geometry:init()
@@ -163,6 +161,8 @@ function Shape:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum,isSqua
     MeshFuncs.fanMesh(pos,w,h,rotation,quad,sideNum,color,isSquare,meshBatch)
 end
 
+---@alias ExtraUpdate (function|Action)[]
+
 ---@class Shape:GameObject
 ---@field lifeFrame number after which the object will be removed
 ---@field frame number number of frames since the object was created. It's just an incrementer, so you can modify it freely.
@@ -173,5 +173,6 @@ end
 ---@field bindState fun(self:Shape,other:Shape):nil set self's kinematicState to other's kinematicState, and cancel update to self.kinematicState, so it will follow other's kinematicState exactly. will remove self if other is removed.
 ---@field private binded Shape what shape the shape is binded to. if not nil, self won't update its own kinematicState.
 ---@field executeExtraUpdate fun(self:Shape,dt:number):nil extra update logic is common among different shapes, but not needed for every shape, so it's separated from the main update function. subclasses can call self:executeExtraUpdate(dt) in their update function to execute the extra update logic.
+---@field extraUpdate ExtraUpdate
 -- -@field removeDistance number distance from the screen after which the object will be removed (roughly)
 return Shape

@@ -4,8 +4,19 @@
 ---@field damageResistance number a factor that reduces damage taken.
 ---@field invincible boolean
 ---@field dropItems DropItems
+---@overload fun(args:EnemyArgs):Enemy
 local Enemy=Shape:extend()
 
+---@class EnemyArgs:ShapeArgs
+---@field dropItems DropItems|nil
+---@field maxhp number
+---@field hp number|nil defaulted as maxhp
+---@field invincible boolean|nil default false
+---@field sprite Sprite
+---@field extraUpdate ExtraUpdate|function|nil
+---@field spriteTransparency number|nil default 1
+
+---@param args EnemyArgs
 function Enemy:new(args)
     Enemy.super.new(self, args)
     self.maxhp=args.maxhp or args.hp or 1000
@@ -23,10 +34,14 @@ function Enemy:new(args)
     end
     self.extraUpdate=args.extraUpdate or {}
     if type(self.extraUpdate)=='function' then
-        self.extraUpdate={self.extraUpdate}
+        self.extraUpdate={self.extraUpdate--[[@as function]]}
     end
     self.dropItems=args.dropItems or {}
 end
+
+Enemy.presetActions={
+    fadeAndHint=Action.Pack{Action.FadeIn(30,true),Action.FadeOut(30,true),Action.AppearingHint()},
+}
 
 function Enemy:update(dt)
     self:executeExtraUpdate(dt)
@@ -108,7 +123,8 @@ end
 function Enemy:dieEffect()
     SFX:play('kill',true)
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
-    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[spriteColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
+    local shockwaveColor=Asset.spectrum1MapSpectrum2[spriteColor] or 'gray'
+    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
     for itemType,num in pairs(self.dropItems) do
         for i=1,num do
             local angle=math.random()*math.pi*2
@@ -189,6 +205,10 @@ end
 local Boss=Enemy:extend()
 
 -- parameters: [maxhp], [hp] (defaulted as maxhp), [mainEnemy] if true, killing it wins the scene. [hpSegments] a table of hp levels that triggers special effects. [hpSegmentsFunc] a function that triggers special effects when hp reaches a certain level. note that the hpLevel parameter passed to hpSegmentsFunc is 1-based. (hplevel 1->2 sends 1)
+---@class BossArgs:EnemyArgs
+---@field hpSegments number[]|nil
+---@field hpSegmentsFunc function|nil
+---@param args BossArgs
 function Boss:new(args)
     args.lifeFrame=99999999
     Boss.super.new(self, args)
