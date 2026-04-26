@@ -19,6 +19,7 @@ local function strategy(circleStrategy, rectangleStrategy)
 end
 
 function makeDynamicUIObjs()
+    ---@type UIBase
     local base=G.UIDEF.IN_GAME.base
 
     ---@class DynamicText:UIText
@@ -144,6 +145,14 @@ function makeDynamicUIObjs()
             Event.EaseEvent{obj=toRemove,duration=10,aims={transparency=0},afterFunc=function()
                 toRemove:remove()
             end}
+        end
+    end
+
+    function bossStars:clearStars()
+        for i=#self.children,1,-1 do
+            local toRemove=self.children[i]
+            toRemove:unchild()
+            toRemove:remove()
         end
     end
 

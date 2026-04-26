@@ -1,4 +1,4 @@
-VERSION="0.1.3"
+VERSION="0.1.3.1"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"
@@ -46,6 +46,8 @@ function love.load()
     -- DialogueController=require"localization.dialogue"
     -- Upgrades = require "upgrades"
     require"state"
+    ---@type G
+    G=G
     require 'stages.dynamicUIObjs'
     makeDynamicUIObjs()
     ---@type NoticeManager

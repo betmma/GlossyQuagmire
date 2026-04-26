@@ -46,6 +46,9 @@ function UIBase:new(args)
     self.extraUpdates=args.extraUpdates or {}
 end
 
+---@generic T:UIBase
+---@param child T
+---@return T
 function UIBase:child(child)
     if not child then
         error("Child cannot be nil")

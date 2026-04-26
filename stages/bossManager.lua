@@ -28,6 +28,7 @@ function BossSegment:func()
         sprite=Asset.boss[self.bossName],maxhp=9999,revivable=true
     }
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
+    DynamicUIObjs.bossStars:clearStars()
     Event.Event{obj=boss,action=function()
         for i, round in ipairs(self.rounds) do
             wait(10)
@@ -196,7 +197,7 @@ function BossPhase:run(boss)
     boss.dropItems=self.dropItems -- update drop items for the phase, which will be dropped after clearing the phase.
     local task=coroutine.create(self.func)
     while true do
-        while coroutine.status(task) ~= "dead" do
+        if coroutine.status(task) ~= "dead" then
             local success, err = coroutine.resume(task, self, boss)
             if not success then error(err) end
         end

@@ -72,8 +72,38 @@ G={
     },
 }
 local geometries=require"geometries.geometryBase"
+---@class UIState
+---@field init? fun(self: G)
+---@field enter? fun(self: G, args: any)
+---@field update? fun(self: G, dt: number)
+---@field draw? fun(self: G)
+---@field drawText? fun(self: G)
+---@field base? UIBase -- UI object hierarchy
+---@field inited? boolean
+---@field reloaded? boolean
+---@field TRANSITION? boolean
+
 ---@class G
 ---@field runInfo runInfo
+---@field CONSTANTS table
+---@field CONSTANTS.VIEW_MODES {NORMAL: string, FOLLOW: string}
+---@field CONSTANTS.FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader}
+---@field CONSTANTS.DIFFICULTIES_DATA table<DIFFICULTY, {value: string, shortForm: string, color: colorValue}>
+---@field CONSTANTS.PLAYERS_DATA table<PLAYER, {value: string, color: colorValue}>
+---@field CONSTANTS.PLAYER_TO_SHOT_TYPES table<PLAYER, SHOT_TYPE[]>
+---@field backgroundPattern any -- BackgroundPattern object
+---@field STATE string -- Current state key
+---@field STATES table<string, string> -- Enum of all state keys
+---@field UIDEF table<string, UIState> -- State definitions
+---@field currentUI UIState -- Shortcut to UIDEF[STATE]
+---@field save Save
+---@field language string
+---@field frame integer
+---@field replay table|nil
+---@field mainCanvas love.Canvas
+---@field foregroundShaderData {shader: love.Shader, args: table}
+---@field transitionData table<string, table<string, table>>
+---@field sceneTempObjs any[]
 G={
     backgroundPattern=BackgroundPattern.MainMenuTesselation(),
     switchState=function(self,state)
@@ -397,7 +427,7 @@ G.drawText=function(self)
     NoticeManager:drawText()
 end
 G._drawBatches=function(self)
-    if not self.backgroundPattern.noZoom or G.viewMode.mode==G.CONSTANTS.VIEW_MODES.NORMAL then
+    if not self.backgroundPattern.noZoom then
         self.backgroundPattern:draw()
     end
     self.currentUI.draw(self)
@@ -409,9 +439,6 @@ end
 G.removeAll=function(self)
     Asset:clearBatches()
     GameObject:removeAll()
-    if self.spellNameText and not self.spellNameText.removed then
-        self.spellNameText:remove()
-    end
     for i,obj in pairs(self.sceneTempObjs) do
         if not obj.removed then
             obj:remove()
@@ -419,4 +446,3 @@ G.removeAll=function(self)
     end
     self.sceneTempObjs={}
 end
-
