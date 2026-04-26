@@ -135,6 +135,28 @@ SaveManager.defaultSaveData=DefaultRoot{
         playTimeOverall=0,
         playTimeInLevel=0,
     },
+    spellcardHistory=AlwaysFunction(function(otherTable,key)
+        otherTable[key]=otherTable[key] or {}
+        local spellcardHistory=otherTable[key]
+        for _,value in ipairs(SpellcardCollection) do
+            spellcardHistory[value.key]=spellcardHistory[value.key] or {}
+            local oneSCData=spellcardHistory[value.key]
+            oneSCData[value.difficulty]=oneSCData[value.difficulty] or {}
+            local oneDiffData=oneSCData[value.difficulty]
+            for player,_ in pairs(value.players) do
+                for _,shotType in ipairs(G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player]) do
+                    oneDiffData[shotType]=oneDiffData[shotType] or {}
+                    for _,type in ipairs({'ingame','practice'}) do
+                        oneDiffData[shotType][type]=oneDiffData[shotType][type] or {
+                            cleared=false,
+                            passes=0,
+                            tries=0,
+                        }
+                    end
+                end
+            end
+        end
+    end),
     extraUnlock={
     },
     musicUnlock={

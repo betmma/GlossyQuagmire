@@ -5,6 +5,7 @@ EventManager.EVENTS={
     PLAY_AUDIO='playAudio',
     PLAYER_HIT='playerHit',
     GAIN_SCORE='gainScore',
+    SPELLCARD_BONUS='spellcardBonus',
     -- below are from previous game
     PLAYER_GRAZE='playerGraze',
     PLAYER_ACCUMULATE_FLASHBOMB='playerAccumulateFlashbomb',

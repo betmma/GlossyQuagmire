@@ -31,14 +31,12 @@ local StageManager={}
 
 ---@type table<StageKey,OneStageData>
 local StageData={}
-
+local currentStageKeys={'stage1'} -- currently existing stages.
 local function loadStageData()
-    for _,stageKey in pairs({'stage1'}) do
+    for _,stageKey in pairs(currentStageKeys) do
         StageData[stageKey]=require('stages.'..stageKey..'.main')
     end
 end
-require 'stages.dynamicUIObjs'
-makeDynamicUIObjs()
 require 'stages.bossManager'
 loadStageData()
 
@@ -65,5 +63,51 @@ function StageManager:update(dt)
         self.callback=nil
     end
 end
+
+---@class SpellcardCollectionItem:strict
+---@field ID integer auto increments. only used for in game menu, must not use it in save data
+---@field key string same as SpellcardPhase.key
+---@field stage StageKey the stage this spellcard belongs to
+---@field difficulty DIFFICULTY every item in SpellcardPhase.difficulties
+---@field players table<PLAYER,true> same as SpellcardPhase.players
+---@alias SpellcardCollection SpellcardCollectionItem[] to store all spellcards for spellcard practice and history
+---@type SpellcardCollection
+SpellcardCollection={}
+
+function StageManager:buildSpellcardCollection()
+    local nextID = 1
+    for _, stageKey in ipairs(currentStageKeys) do
+        local data = StageData[stageKey]
+        if not (data and data.segments) then goto continue_stage end
+        for _, segment in ipairs(data.segments) do
+            if segment.type ~= 'boss' then goto continue_segment end
+            ---@cast segment BossSegment
+            for _, round in ipairs(segment.rounds) do
+                if not round.phases then goto continue_round end
+                for _, phase in ipairs(round.phases) do
+                    if phase.type ~= 'spellcard' then goto continue_phase end
+                    ---@cast phase SpellcardPhase
+                    -- Create entry for every supported difficulty
+                    for diff, active in pairs(phase.difficulties) do
+                        table.insert(SpellcardCollection, {
+                            ID = nextID,
+                            key = phase.key,
+                            stage = stageKey,
+                            difficulty = diff,
+                            players = phase.players,
+                            phaseObj = phase -- Useful for jumping directly to the phase in practice
+                        })
+                        nextID = nextID + 1
+                    end
+                    ::continue_phase::
+                end
+                ::continue_round::
+            end
+            ::continue_segment::
+        end
+        ::continue_stage::
+    end
+end
+StageManager:buildSpellcardCollection()
 
 return StageManager

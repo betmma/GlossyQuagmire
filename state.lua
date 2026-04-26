@@ -1,5 +1,5 @@
 BackgroundPattern=require"backgroundPattern"
-local G={
+G={
     CONSTANTS={
         DRAW=function(self)
             local colorRef={love.graphics.getColor()}
@@ -72,6 +72,8 @@ local G={
     },
 }
 local geometries=require"geometries.geometryBase"
+---@class G
+---@field runInfo runInfo
 G={
     backgroundPattern=BackgroundPattern.MainMenuTesselation(),
     switchState=function(self,state)
@@ -219,7 +221,8 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@type {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil}
+    ---@alias runInfo {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil, practice: boolean}
+    ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
         playerType=G.CONSTANTS.PLAYERS[1],
@@ -233,6 +236,7 @@ G={
         stage=1,
         geometry=geometries.Hyperbolic,
         player=nil,
+        practice=false
     },
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
     frame=0,
@@ -245,15 +249,19 @@ G={
 }
 
 
+StageManager=require"stages.stageManager"
+
 local SaveManager=require"saveManager"
 G.saveData=function(self)
     SaveManager:saveData(self)
 end
+---@alias spellcardHistoryKey 'ingame'|'practice'
 -- an example of its structure
 ---@class Save
 ---@field options {master_volume: integer, music_volume: integer, sfx_volume: integer, language: string, resolution: {width: integer, height: integer}}
 ---@field defaultName string
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
+---@field spellcardHistory table<string, table<DIFFICULTY, table<SHOT_TYPE, table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>>>>>
 ---@field extraUnlock {[string]: boolean} -- secret level unlocks, format not decided
 ---@field musicUnlock {[string]: boolean}
 ---@field nicknameUnlock {[string]: boolean}
@@ -266,6 +274,7 @@ G.save={
         playTimeOverall=0,
         playTimeInLevel=0,
     },
+    spellcardHistory={},
     extraUnlock={
     }, -- secret level unlocks, format not decided
     musicUnlock={},
@@ -411,4 +420,3 @@ G.removeAll=function(self)
     self.sceneTempObjs={}
 end
 
-return G
