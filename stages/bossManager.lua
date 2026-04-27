@@ -21,10 +21,11 @@ function BossSegment:new(args)
 end
 
 function BossSegment:func()
-    Effect.Charge{obj={kinematicState={pos=self.getBossSpawnPos(self),dir=0,speed=0}}}
+    local pos=self.getBossSpawnPos(self)
+    Effect.Charge{obj={kinematicState={pos=copyTable(pos),dir=0,speed=0}}}
     wait(60)
     local boss=Boss{
-        kinematicState={pos=self.getBossSpawnPos(self),dir=0,speed=0},
+        kinematicState={pos=pos,dir=0,speed=0},
         sprite=Asset.boss[self.bossName],maxhp=9999,revivable=true
     }
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})

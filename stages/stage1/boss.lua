@@ -1,11 +1,11 @@
 
 ---@type BossSegment
 return BossManager.BossSegment{
-    bossName='test',
+    bossName='kotoba',
     key='1-mid',
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
-        local pos,dir=geometry:rThetaGo(geometry:init().pos,200,-math.pi/2)
+        local pos,dir=geometry:rThetaGo(geometry:init().pos,200,G.runInfo.player.viewDirection-math.pi/2)
         return pos
     end,
     rounds={
@@ -27,34 +27,32 @@ return BossManager.BossSegment{
                                 period=3,firstPeriod=30,lifeFrame=60,bulletNumber=2,bulletSpeed=90,range=math.pi/4,bulletSize=1,angle=dir,bulletSprite=BulletSprites.heart.gray,bulletLifeFrame=600,bulletEvents={
                                     function(cir,args,self)
                                         self.bulletSpeed=self.bulletSpeed+7
-                                        Event{
-                                            obj=cir,action=function()
-                                                local edge=math.abs(i-num/2)
-                                                wait(30)
-                                                local speedRef=cir.kinematicState.speed
-                                                for i=1,30 do
-                                                    cir.kinematicState.speed=cir.kinematicState.speed*0.8
-                                                end
-                                                wait(30)
-                                                if edge>10 then
-                                                    cir.kinematicState.dir=math.eval(cir.kinematicState.dir,1)
-                                                    cir:changeSpriteColor('yellow')
-                                                    cir.kinematicState.speed=speedRef
-                                                    return
-                                                end
-                                                local sign=math.sign(i-num/2)
-                                                if edge>3 then
-                                                    wait((edge-3)*10)
-                                                    cir.kinematicState.dir=cir.kinematicState.dir-sign*math.pi*0.7*flip
-                                                    cir:changeSpriteColor('green')
-                                                    cir.kinematicState.speed=speedRef
-                                                else
-                                                    wait(30)
-                                                    cir:changeSpriteColor('purple')
-                                                    cir.kinematicState.speed=speedRef
-                                                end
+                                        Event{obj=cir,action=function()
+                                            local edge=math.abs(i-num/2)
+                                            wait(30)
+                                            local speedRef=cir.kinematicState.speed
+                                            for i=1,30 do
+                                                cir.kinematicState.speed=cir.kinematicState.speed*0.8
                                             end
-                                        }
+                                            wait(30)
+                                            if edge>10 then
+                                                cir.kinematicState.dir=math.eval(cir.kinematicState.dir,1.5)
+                                                cir:changeSpriteColor('yellow')
+                                                cir.kinematicState.speed=speedRef
+                                                return
+                                            end
+                                            local sign=math.sign(i-num/2)
+                                            if edge>3 then
+                                                wait((edge-3)*10)
+                                                cir.kinematicState.dir=cir.kinematicState.dir-sign*math.pi*(0.5+edge*0.03)*flip
+                                                cir:changeSpriteColor('green')
+                                                cir.kinematicState.speed=speedRef
+                                            else
+                                                wait(30)
+                                                cir:changeSpriteColor('purple')
+                                                cir.kinematicState.speed=speedRef
+                                            end
+                                        end}
                                     end
                                 }
                             }

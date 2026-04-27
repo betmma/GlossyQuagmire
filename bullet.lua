@@ -146,9 +146,6 @@ function Bullet:checkHitPlayer()
 end
 function Bullet:grazeValue()
     local baseValue=self.baseGrazeValue or 1
-    if self.lifeFrame<3 or self.frame<3 then
-        return 0.05*baseValue
-    end
     return 1*baseValue
 end
 

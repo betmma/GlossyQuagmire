@@ -99,5 +99,75 @@ return{
             end
         },
         require('stages.stage1.boss'),
+        {
+            key='1-3',
+            type='midStage',
+            --[[large fairy has small fairies rounding. small fairies shoot small bullets forming a circle (rounding a hidden center)]]
+            func=function()
+                local basePos=G.runInfo.geometry:init().pos
+                for i=1,4 do
+                    local color=({'red','green','blue','purple'})[i]
+                    Event{action=function()
+                        local r=math.eval(300,100)
+                        local angle=math.pi/2*i+math.eval(0,math.pi/4)
+                        local pos,dir=G.runInfo.geometry:rThetaGo(basePos,r,angle)
+                        local bigFairy=Enemy{kinematicState={pos=pos,dir=dir,speed=0},maxhp=400,sprite=Asset.fairySprites.large[color],lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                            local pos,dir=G.runInfo.geometry:rThetaGo(basePos,r*(0.6+0.4*math.cos(self.frame/300)),angle+self.frame/300*math.mod2Sign(i))
+                            self.kinematicState.pos=pos
+                            self.kinematicState.dir=dir+math.pi/2
+                        end},dropItems={powerSmall=20,point=10}}
+                        local firstSpawner
+                        local cores={}
+                        for j=1,10 do
+                            local function bulletevent(cir,args,self)
+                                cir.spriteTransparency=0
+                                local index=args.index
+                                if not cores[index] or math.abs(cores[index].frame-cir.frame)>20 then -- the j=1 spawner could have died so the first spawner finding current core doesnt exist should create one. and, every index has its own core so cores is a table
+                                    cores[index]=Bullet{kinematicState={pos=copyTable(bigFairy.kinematicState.pos),dir=cir.kinematicState.dir,speed=150},sprite=Asset.bulletSprites.round[color],lifeFrame=600,safe=true,invincible=true,spriteTransparency=0,extraUpdate=function(self)
+                                        self.kinematicState.speed=self.kinematicState.speed+1
+                                    end}
+                                end
+                                Event{obj=cir,action=function()
+                                    local r,dir
+                                    while true do
+                                        wait()
+                                        if cores[index] then
+                                            cir.core=cores[index]
+                                            r=G.runInfo.geometry:distance(cir.kinematicState.pos,cores[index].kinematicState.pos)
+                                            dir=G.runInfo.geometry:to(cores[index].kinematicState.pos,cir.kinematicState.pos)
+                                            break
+                                        end
+                                    end
+                                    cir.spriteTransparency=1
+                                    while not cir.core.removed do
+                                        dir=dir+1/60
+                                        local pos=G.runInfo.geometry:rThetaGo(cir.core.kinematicState.pos,r,dir)
+                                        cir.kinematicState.pos=pos
+                                        wait()
+                                    end
+                                end}
+                            end
+                            wait(5)
+                            local smallFairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir+math.pi,speed=0},maxhp=70,sprite=Asset.fairySprites.small[color],lifeFrame=600-j*5,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                                local pos,dir=G.runInfo.geometry:rThetaGo(bigFairy.kinematicState.pos,50*math.clamp(self.frame/60,0,1),angle+bigFairy.frame/60*math.mod2Sign(i)+math.pi*2*j/10)
+                                self.kinematicState.pos=pos
+                                self.kinematicState.dir=dir+math.pi/2
+                            end},dropItems={powerSmall=1}}
+                            local spawner=BulletSpawner{
+                                period=60,firstPeriod=120-j*5,lifeFrame=540-j*5,bulletNumber=4,bulletSpeed=0,bulletSize=1,angle='0+999',bulletSprite=BulletSprites.round[color],bulletLifeFrame=600,visible=false,bulletEvents={bulletevent
+                                }
+                            }
+                            spawner:bindState(smallFairy)
+                            if j==1 then
+                                firstSpawner=spawner
+                            end
+                            spawner.firstSpawner=firstSpawner
+                        end
+                    end}
+                    wait(150)
+                end
+                wait(500)
+            end
+        },
     }
 }

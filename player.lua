@@ -45,7 +45,7 @@ function Player:new(args)
     self.invincibleFrame=0
     self.hitImmobileFrame=120
     self.immobileFrame=0
-    self.grazeRadiusFactor=3
+    self.grazeRadiusFactor=5
 
     self.moveMode=args.moveMode or Player.moveModes.Natural
     self.dieShockwaveRadius=2
