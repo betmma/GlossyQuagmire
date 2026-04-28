@@ -76,7 +76,7 @@ function PlayerShot:new(args)
     if self.sprite then
         local data=self.sprite.data
         if data.isGIF then
-            self.sprite:reset() -- Bullet.new randomizes gif frame. for player shot, we want all bullets to start from the first frame, since it's a fade out animation
+            self.sprite--[[@as GIFSprite]]:reset() -- Bullet.new randomizes gif frame. for player shot, we want all bullets to start from the first frame, since it's a fade out animation
         end
         if data.key=='amuletHuge' then
             self.spriteRotationSpeed=math.pi/10
@@ -126,14 +126,14 @@ function PlayerShot:updateSprite()
     self.spriteExtraDirection=self.spriteExtraDirection+self.spriteRotationSpeed*Shape.timeSpeed
     if self.hasHitEnemy then
         if self.sprite.data.isGIF then
-            self.sprite:countDown()
+            self.sprite--[[@as GIFSprite]]:countDown()
         end
     end
 end
 
 ---@enum HOMING_MODE
 local HOMING_MODE={
-    ABRUPT=1, -- directly change direction to aim at target
+    ABRUPT=1, -- directly change direction to aim at target. ignore arg
     PORTION=2, -- change direction by a portion of the angle to target
     CLAMP=3, -- change direction by a max angle towards the target
 }
@@ -254,13 +254,18 @@ function ShootingPattern:shoot(shooter, powerLevel)
 end
 
 ---@alias OptionArrangement fun(powerLevel: integer, isFocused: boolean, playerState: KinematicState, frame:integer): KinematicState[] positions and directions of options. normally options number equals powerLevel
+---@alias PlayerSpellcardFunc fun(playerState: KinematicState, isFocused: boolean): nil -- spellcard is kinda complex so just make it a function. though not planned to have different spellcards for focused/unfocused, the param is there
+---@class PlayerSpellcard
+---@field duration integer duration of spellcard in frames. used for player to set duringBomb state.
+---@field canShoot boolean whether player can shoot during spellcard.
+---@field func PlayerSpellcardFunc the actual spellcard function
 
 ---@class ShotType:Object
 ---@field mainShot ShootingPattern[]
 ---@field optionSprite Sprite
 ---@field optionArrangement OptionArrangement
 ---@field optionShot {focused: ShootingPattern[], unfocused: ShootingPattern[]}
----@field spellcard any -- to be designed
+---@field spellcard PlayerSpellcard
 ---@field update fun(self: ShotType, playerState: KinematicState, isFocused: boolean, isShooting: boolean, powerLevel: integer, frame: integer, dt: number, options: Bullet[], optionTransparency: number): nil update options position and shoot with optionShot
 ---@overload fun(args: ShotTypeArgs): ShotType
 local ShotType=Object:extend()
@@ -270,7 +275,7 @@ local ShotType=Object:extend()
 ---@field optionSprite Sprite
 ---@field optionArrangement OptionArrangement
 ---@field optionShot {focused: ShootingPattern[], unfocused: ShootingPattern[]}
----@field spellcard any -- to be designed
+---@field spellcard PlayerSpellcard
 function ShotType:new(args)
     self.mainShot=args.mainShot
     self.optionSprite=args.optionSprite
@@ -366,6 +371,31 @@ local function buildMainShot(args)
     return {ShootingPattern(leftArgs), ShootingPattern(rightArgs)}
 end
 
+---@type PlayerSpellcardFunc
+local function reimuSpellcardFunc(playerState, isFocused)
+    Event{obj=G.runInfo.player,action=function()
+        local bigAmulet=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0},sprite=Asset.playerShotSprites.amuletHuge,size=0,damage=12,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
+            -- create shockwave regularly to clear bullets (ughh lame)
+            if self.frame%10==1 then
+                Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=10,radius=self.size,growSpeed=0.3,spriteTransparency=0.5,color='red',canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
+            end
+            if self.frame>265 then
+                self.sprite:countDown() -- start fade out animation when about to end
+                self.spriteTransparency=self.spriteTransparency-0.01
+            end
+        end},forceMesh=true}
+        bigAmulet.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. it will keep damaging
+        end
+        -- bigAmulet.spriteRotationSpeed=math.pi/10
+        wait(60)
+        -- starting to aim for enemies
+        addHoming(bigAmulet, HOMING_MODE.ABRUPT, 0.2)
+        bigAmulet.kinematicState.speed=300
+    end}
+end
+
+local reimuSpellcard={duration=300, canShoot=true, func=reimuSpellcardFunc}
+
 ---@type table<SHOT_TYPE, ShotType>
 local ShotTypes={
     REIMUA=ShotType{
@@ -406,6 +436,7 @@ local ShotTypes={
             damage=function(self, powerLevel) return 3 end,
             angle=0,
         }}},
+        spellcard=reimuSpellcard
     }
 }
 ShotTypes.REIMUB=ShotType{
@@ -444,6 +475,7 @@ ShotTypes.REIMUB=ShotType{
         angle='0+0.1',
         size=0.75
     }}},
+    spellcard=reimuSpellcard
 }
 
 return ShotTypes

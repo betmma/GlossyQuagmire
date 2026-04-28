@@ -13,7 +13,9 @@
 ---@field dieShockwaveRadius number
 ---@field shotType ShotType
 ---@field options Bullet[]
+---@field duringDeathbombWindow boolean whether player is in deathbomb window, which is a short time after hit where player can still bomb to avoid death.
 ---@field duringDeath boolean whether player is in death animation.
+---@field duringBomb boolean whether player is in bomb animation. if true, player cannot bomb again. 
 ---@field border Border|nil
 local Player = Shape:extend()
 
@@ -53,6 +55,9 @@ function Player:new(args)
     self.shotType=args.shotType
     self.options={}
 
+    self.duringDeath=false
+    self.duringBomb=false
+
     -- for replay system. could be moved elsewhere
     self.keyRecord={}
     self.replaying=args.replaying or false
@@ -61,7 +66,7 @@ function Player:new(args)
     end
     self.key2Value={up=1,right=2,down=4,left=8,lshift=16,z=32,x=64,c=128}
     self.keyIsDown=love.keyboard.isDown
-    self.keyIsPressed=isPressed -- check if current frame is the first frame that key be pressed down. only used for switching hyperbolic model (X key)
+    self.keyIsPressed=isPressed -- check if current frame is the first frame that key be pressed down. only used for switching hyperbolic model (C key)
     self.realCreatedTime=os.date('%Y-%m-%d %H:%M:%S')
 end
 
@@ -129,7 +134,24 @@ function Player:calculateShoot(dt)
     end
     local powerLevel=math.floor(G.runInfo.power/100)
     local kinematicState={pos=self.kinematicState.pos,dir=self.viewDirection-math.pi/2, speed=0} -- note that the dir must not be self.kinematicState.dir, because that value is the moving direction, not the shooting (facing) direction. viewDirection is the right hand side direction, so shooting direction is viewDirection-math.pi/2
-    self.shotType:update(kinematicState, self.keyIsDown('lshift'), self.keyIsDown('z') and not self.duringDeath, powerLevel, self.frame, dt, self.options, self.transparency)
+    local shooting=self.keyIsDown('z') and not self.duringDeath and (not self.duringBomb or self.shotType.spellcard.canShoot)
+    self.shotType:update(kinematicState, self.keyIsDown('lshift'), shooting, powerLevel, self.frame, dt, self.options, self.transparency)
+    if not self.duringBomb and not self.duringDeath and self.keyIsDown('x') and G.runInfo.bombs>=1 then
+        self.duringDeathbombWindow=false -- exit deathbomb window to prevent death
+        self.invincibleFrame=self.shotType.spellcard.duration
+        self.transparency=0.5 -- make player semi-transparent during bomb invincibility
+        G.runInfo.bombs=G.runInfo.bombs-1
+        SFX:play('enemyPowerfulShot',true)
+        self.shotType.spellcard.func(kinematicState, self.keyIsDown('lshift'))
+        self.duringBomb=true
+        Event{obj=self,action=function()
+            wait(self.shotType.spellcard.duration-30)
+
+            wait(30)
+            self.duringBomb=false
+            self.transparency=1
+        end}
+    end
 end
 
 
@@ -290,13 +312,27 @@ function Player:hitEffect(damage)
     damage=damage or 1
     self.hitFrame=self.frame
     G.runInfo.lives=G.runInfo.lives-damage
+    G.runInfo.power=math.max(0,G.runInfo.power-100)
+    G.runInfo.bombs=math.max(3,G.runInfo.bombs)
+    ---@type DropItems
+    local dropItems={powerSmall=20}
     if G.runInfo.lives<0 then
+        dropItems={powerFull=3}
         -- G:lose()
+    end
+    
+    for itemType,num in pairs(dropItems) do
+        for i=1,num do
+            local angle=self.viewDirection-math.pi/2+math.eval(0,1)
+            local speed=math.eval(200,50)
+            local pos,angle2=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,80,angle)
+            local kinematicState={pos=pos,dir=angle2,speed=speed}
+            Item{kinematicState=kinematicState,type=itemType}
+        end
     end
     self.invincibleFrame=self.invincibleFrame+self.hitInvincibleFrame
     self.immobileFrame=self.immobileFrame+self.hitImmobileFrame
     Effect.Shockwave{kinematicState={pos=copyTable(self.kinematicState.pos),speed=0,dir=0},size=self.dieShockwaveRadius,growSpeed=1.1,animationFrame=30,spriteTransparency=0.8,sprite=BulletSprites.shockwave.gray}
-    SFX:play('playerHit',true)
     self.duringDeath=true
     Event.EaseEvent{
         obj=self,duration=self.hitInvincibleFrame,aims={transparency=0},progressFunc=function(x)
@@ -309,6 +345,19 @@ function Player:hitEffect(damage)
         end
     }
 end
-EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.hitEffect)
+
+function Player:enterDeathbombing(damage)
+    SFX:play('playerHit',true)
+    self.duringDeathbombWindow=true
+    -- should have some visual effect here
+    Event{obj=self,action=function()
+        wait(8)
+        if self.duringDeathbombWindow then
+            self.duringDeathbombWindow=false
+            self:hitEffect(damage)
+        end
+    end}
+end
+EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT,Player.enterDeathbombing)
 
 return Player

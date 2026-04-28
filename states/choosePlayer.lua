@@ -123,7 +123,7 @@ return {
                             local valueDescription=shotTypeDetailsBox:child(UI.Text{
                                 text=Localize{'ui','CHOOSE_PLAYER','shotTypeDescriptions',shotType,key,'description'},
                                 fontSize=14,color={0.7,0.7,0.7,1},boldColor=playerColorBold,
-                                x=10,y=yBase+20,width=150,align='left',extraUpdates={extraUpdate2}
+                                x=10,y=yBase+20,width=250,align='left',extraUpdates={extraUpdate2}
                             })
                         end
                         return shotTypeBox

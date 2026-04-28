@@ -305,12 +305,12 @@ return {
                     },
                     spellCard = {
                         title = {
-                            en_us = 'Spirit Sign "Fantasy Seal"',
-                            zh_cn = '灵符「梦想封印」',
+                            en_us = 'Spirit Sign "Fantasy Amulet"',
+                            zh_cn = '灵符「梦想符札」',
                         },
                         description = {
-                            en_us = 'Can hit multiple times',
-                            zh_cn = '可以多次命中',
+                            en_us = 'Huge amulet with mystery pattern',
+                            zh_cn = '有着神秘图案的巨大符札',
                         },
                     }
                 },
@@ -341,12 +341,12 @@ return {
                     },
                     spellCard = {
                         title = {
-                            en_us = 'Spirit Sign "Fantasy Seal"',
-                            zh_cn = '灵符「梦想封印」',
+                            en_us = 'Spirit Sign "Fantasy Amulet"',
+                            zh_cn = '灵符「梦想符札」',
                         },
                         description = {
-                            en_us = 'Can hit multiple times',
-                            zh_cn = '可以多次命中',
+                            en_us = 'Huge amulet with mystery pattern',
+                            zh_cn = '有着神秘图案的巨大符札',
                         },
                     }
                 }
