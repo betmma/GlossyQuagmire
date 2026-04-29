@@ -66,9 +66,9 @@ function Bullet:draw()
     end
     local color={1,1,1,1}
     if self.spriteColor then
-        color=self.spriteColor
+        color=copyTable(self.spriteColor)
     end
-    color[4]=color[4]*self.spriteTransparency
+    color[4]=(color[4]or 1)*self.spriteTransparency
     self:drawQuad{
         quad=self.sprite.quad,
         rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),

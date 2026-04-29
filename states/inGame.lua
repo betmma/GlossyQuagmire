@@ -135,6 +135,7 @@ return {
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
         base.frame=0
         G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
+        DynamicUIObjs.reset()
     end,
     update=function(self,dt)
         base:updateHierarchy()

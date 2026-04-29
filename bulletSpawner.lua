@@ -33,6 +33,7 @@ function BulletSpawner:new(args)
     self.fogEffect=args.fogEffect or false
     self.fogTime=args.fogTime or 60
     self.spawnSFXVolume=args.spawnSFXVolume -- nil means default volume set in audio.lua (50%)
+    self.spawnTimes=0
     self.spawnBulletFunc=args.spawnBulletFunc or function(self,_args)
         if not _args.lifeFrame then
             _args.lifeFrame=self.bulletLifeFrame
@@ -91,6 +92,7 @@ function BulletSpawner:new(args)
     end
     ---@type LoopEvent
     self.spawnEvent=Event.LoopEvent{obj=self,period=self.period,firstPeriod=self.firstPeriod,times=self.times,executeFunc=function(event,dt)
+        self.spawnTimes=self.spawnTimes+1
         self:spawnBatchFunc()
     end}
 end

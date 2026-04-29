@@ -49,6 +49,7 @@ function BossSegment:func()
     boss.dropItems={}
     boss:die()
     DynamicUIObjs.bossNameText:setText('')
+    wait(60)
 end
 
 ---@class BossRoundArgsDefault

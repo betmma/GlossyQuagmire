@@ -44,7 +44,7 @@ loadStageData()
 ---@param callback function|nil to be called after stage is finished
 function StageManager:load(item,callback)
     self.currentStageData=StageData[item]
-    self.currentSegmentIndex=0
+    self.currentSegmentIndex=0 -- after init finishes it will increment to 1 and start the first segment
     self.callback=callback
     self.currentCoroutine=coroutine.create(self.currentStageData.init)
 end

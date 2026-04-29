@@ -13,7 +13,7 @@
 ---@field public transparency number between 0 and 1, multiplied to the alpha value of all children and itself.
 ---@field public parent UIBase|nil
 ---@field public children table<number, UIBase>
----@field public child fun(self,child:UIBase):UIBase add a child UI element to this element. return the child element for chaining
+----@field public child fun(self,child:UIBase):UIBase add a child UI element to this element. return the child element for chaining
 ---@field public unchild fun(self):nil remove this element from its parent
 ---@field public getXY fun(self):number,number get the actual position of this UI element on screen, which is the sum of its own x,y and all its parents' x,y
 ---@field public getCenterXY fun(self):number,number return getXY + half of width and height
@@ -26,7 +26,19 @@
 ---@field public events table<UIEvent, fun(self, ...):nil> a table of event handlers. when an event is emitted, if this table has a handler for that event, it will be called.
 ---@field public remove fun(self):nil
 ---@field public addLerpConditionUpdate fun(self,valueKey:string,conditionKey:string,trueValue:any,falseValue:any,lerpRatio:number):UIBase add an extra update that lerps self.valueKey to trueValue when self.conditionKey is true, and falseValue when self.conditionKey is false. the lerpRatio controls how fast the value changes. a shorthand for adding common lerp updates, such as fade in/out when focused/unfocused (and it defaults to this effect). it will return self for chaining.
+---@overload fun(args?:UIBaseArgs):UIBase
 local UIBase=Object:extend()
+
+---@class UIBaseArgs
+---@field x? number
+---@field y? number
+---@field width? number
+---@field height? number
+---@field disabled? boolean
+---@field transparency? number
+---@field events? table<UIEvent, fun(self, ...):nil>
+---@field extraUpdates? (fun(self):nil)[]
+---@field parent? UIBase
 
 function UIBase:new(args)
     args=args or {}
@@ -46,6 +58,7 @@ function UIBase:new(args)
     self.extraUpdates=args.extraUpdates or {}
 end
 
+---add a child UI element to this element. return the child element for chaining
 ---@generic T:UIBase
 ---@param child T
 ---@return T

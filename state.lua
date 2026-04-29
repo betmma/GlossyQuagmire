@@ -259,7 +259,7 @@ G={
         shotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[G.CONSTANTS.PLAYERS[1]][1],
         hiScore=0,
         score=0,
-        lives=3,
+        lives=2,
         bombs=3,
         power=0,
         grazes=0,
@@ -268,6 +268,13 @@ G={
         player=nil,
         practice=false
     },
+    resetRunInfo=function(self,lives,bombs)
+        self.runInfo.lives=lives or 2
+        self.runInfo.bombs=bombs or 3
+        self.runInfo.power=0
+        self.runInfo.score=0
+        self.runInfo.grazes=0
+    end,
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
     frame=0,
     ---@type replayData|nil

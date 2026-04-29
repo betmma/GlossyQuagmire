@@ -402,6 +402,20 @@ function makeDynamicUIObjs()
         end}
     end
 
+    --- when starting a new game
+    local function reset()
+        stageTitleText:setText('')
+        stageTitleSmallText:setText('')
+        noticeText:setText('')
+        soundtrackText:setText('')
+        bossNameText:setText('')
+        bossStars:clearStars()
+        setRemainingTimeText(nil)
+        spellcardNameText:setText('')
+        spellcardBonusHistoryText:setText('')
+        hpBar.hpRatio=0
+    end
+
     ---@class DynamicObjs
     ---@field showStageTitle fun(stageKey:StageKey):nil
     ---@field showSoundtrack fun():nil reads BGM.currentAudio to display soundtrack name
@@ -422,5 +436,6 @@ function makeDynamicUIObjs()
         spellcardNameText=spellcardNameText,
         spellcardBonusHistoryText=spellcardBonusHistoryText,
         hpBar=hpBar,
+        reset=reset,
     }
 end

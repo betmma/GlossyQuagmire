@@ -1,4 +1,23 @@
 
+local function smallFairyFunc(basePos,flip,r,shooting)
+    r=r or 400
+    local sign=flip and -1 or 1
+    local dir0=G.runInfo.player.viewDirection
+    for i=1,30 do
+        wait(10)
+        local dir1=dir0+math.pi/30*i*sign
+        local pos2,dir2=G.runInfo.geometry:rThetaGo(basePos,r,dir1)
+        local fairy=Enemy{kinematicState={pos=pos2,dir=dir2+math.pi,speed=200},maxhp=10,sprite=Asset.fairySprites.small.orange,lifeFrame=300,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+            local ratio=1-2*self.frame/self.lifeFrame
+            self.kinematicState.dir=G.runInfo.geometry:to(self.kinematicState.pos,basePos)+math.pi*(0.5-ratio*0.3)*sign
+        end},dropItems={powerSmall=1}}
+        if shooting~=false then
+            BulletSpawner{
+                period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.5,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false
+            }:bindState(fairy)
+        end
+    end
+end
 ---@type OneStageData
 return{
     init=function()
@@ -75,26 +94,10 @@ return{
                     wait(600)
                     largeFairyFunc(true)
                 end}
-                local function smallFairyFunc(flip)
-                    local sign=flip and -1 or 1
-                    local dir0=G.runInfo.player.viewDirection
-                    for i=1,30 do
-                        wait(10)
-                        local dir1=dir0+math.pi/30*i*sign
-                        local pos2,dir2=G.runInfo.geometry:rThetaGo(basePos,400,dir1)
-                        local fairy=Enemy{kinematicState={pos=pos2,dir=dir2+math.pi,speed=200},maxhp=10,sprite=Asset.fairySprites.small.orange,lifeFrame=300,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
-                            local ratio=1-2*self.frame/self.lifeFrame
-                            self.kinematicState.dir=G.runInfo.geometry:to(self.kinematicState.pos,basePos)+math.pi*(0.5-ratio*0.3)*sign
-                        end},dropItems={powerSmall=1}}
-                        BulletSpawner{
-                            period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.5,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false
-                        }:bindState(fairy)
-                    end
-                end
                 wait(120)
-                smallFairyFunc(false)
+                smallFairyFunc(basePos,false)
                 wait(300)
-                smallFairyFunc(true)
+                smallFairyFunc(basePos,true)
                 wait(300)
             end
         },
@@ -148,7 +151,7 @@ return{
                                 end}
                             end
                             wait(5)
-                            local smallFairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir+math.pi,speed=0},maxhp=70,sprite=Asset.fairySprites.small[color],lifeFrame=600-j*5,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                            local smallFairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir+math.pi,speed=0},maxhp=40,sprite=Asset.fairySprites.small[color],lifeFrame=600-j*5,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
                                 local pos,dir=G.runInfo.geometry:rThetaGo(bigFairy.kinematicState.pos,50*math.clamp(self.frame/60,0,1),angle+bigFairy.frame/60*math.mod2Sign(i)+math.pi*2*j/10)
                                 self.kinematicState.pos=pos
                                 self.kinematicState.dir=dir+math.pi/2
@@ -169,5 +172,82 @@ return{
                 wait(500)
             end
         },
+        {
+            key='1-4',
+            type='midStage',
+            func=function()
+                local basePos=G.runInfo.geometry:init().pos
+                local colors={{1,0.1,0.1},{0.1,1,0.1},{0.1,0.1,1},{1,0.1,1}}
+                local count=0
+                local function wallFairy(angle,sign)
+                    sign=sign or 1
+                    local color=colors[count%4+1]
+                    count=count+1
+                    local pos,dir=G.runInfo.geometry:rThetaGo(basePos,350,angle)
+                    local pos2,dir2=G.runInfo.geometry:rThetaGo(pos,-600,dir+math.pi/2*sign)
+                    local fairy=Enemy{kinematicState={pos=pos2,dir=dir2,speed=600},maxhp=120,sprite=Asset.fairySprites.medium.black,lifeFrame=120,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=2}}
+                    BulletSpawner{
+                        period=2,firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=500,visible=false,bulletEvents={
+                            function(cir,args,self)
+                                cir.safe=true
+                                cir.spriteTransparency=0
+                                cir.kinematicState.speed=cir.kinematicState.speed+50*(self.spawnTimes%4)
+                                Event.EaseEvent{
+                                    obj=cir,easeObj=cir.kinematicState,duration=80,aims={speed=-200},progressFunc=Event.sineBackProgressFunc
+                                }
+                                cir.kinematicState.dir=fairy.kinematicState.dir+math.pi/2*sign-0.1*(self.spawnTimes%4)*sign
+                                cir.shade=math.interpolateTable({1,1,1},color,(self.spawnTimes%4+0.5)/4)
+                            end
+                        },bulletExtraUpdate={function(self)
+                            if self.frame%8==7 and self.frame<40 then
+                                self.count=(self.count or -1)+1
+                                for i=-1,1,2 do
+                                    local numRef=self.count
+                                    local follower=Bullet{kinematicState=copyTable(self.kinematicState),sprite=BulletSprites.rim.white,lifeFrame=900,spriteTransparency=0.5,spriteColor={1,1,1,1},extraUpdate={
+                                        function(cirF)
+                                            if self.removed then
+                                                if not cirF.flag then
+                                                    cirF.flag=true
+                                                    cirF.kinematicState.dir=math.eval(math.pi,1)+self.kinematicState.dir
+                                                end
+                                                return
+                                            end
+                                            cirF.spriteTransparency=math.clamp(cirF.spriteTransparency+0.05,0,1)
+                                            if cirF.frame>100 then
+                                                cirF.spriteColor=math.lerpTable(cirF.spriteColor,self.shade,0.02)
+                                            end
+                                            cirF.kinematicState.dir=self.kinematicState.dir
+                                            local smooth=math.clamp(cirF.frame/8,0,1)
+                                            cirF.kinematicState.pos=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,10*i*math.max(0.01,numRef+smooth-1),self.kinematicState.dir+math.pi*(1/2))
+                                        end
+                                    }}
+                                end
+                            end
+                        end}
+                    }:bindState(fairy)
+                end
+                Event{action=function()
+                    smallFairyFunc(basePos,false,200,false)
+                end}
+                wait(60)
+                wallFairy(0)
+                wallFairy(0,-1)
+                wait(100)
+                wallFairy(math.pi)
+                wallFairy(math.pi,-1)
+                wait(200)
+                local angle=math.eval(0,999)
+                Event{action=function()
+                    wait(120)
+                    smallFairyFunc(basePos,true,200,false)
+                end}
+                for i=1,4 do
+                    wallFairy(angle-math.pi/2*i)
+                    wait(60)
+                end
+                wait(400)
+            end
+        },
+        -- require('stages.stage1.boss'),
     }
 }

@@ -104,9 +104,8 @@ function Player:update(dt)
     end
     self:calculateShoot()
 
-    self.immobileFrame=self.immobileFrame-1
-    if self.immobileFrame<=0 then
-        self.immobileFrame=0
+    self.immobileFrame=math.max(0,self.immobileFrame-1)
+    if self.immobileFrame<=0 and not self.duringDeathbombWindow then
         self:moveUpdate(dt)
     end
 
@@ -347,7 +346,7 @@ function Player:hitEffect(damage)
 end
 
 function Player:enterDeathbombing(damage)
-    SFX:play('playerHit',true)
+    SFX:play('playerHit',true,3)
     self.duringDeathbombWindow=true
     -- should have some visual effect here
     Event{obj=self,action=function()

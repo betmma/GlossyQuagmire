@@ -24,7 +24,7 @@ return BossManager.BossSegment{
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
                             local spawner=BulletSpawner{
                                 kinematicState={pos=pos,dir=dir,speed=0},
-                                period=3,firstPeriod=30,lifeFrame=60,bulletNumber=2,bulletSpeed=90,range=math.pi/4,bulletSize=1,angle=dir,bulletSprite=BulletSprites.heart.gray,bulletLifeFrame=600,bulletEvents={
+                                period=4,firstPeriod=30,lifeFrame=60,bulletNumber=2,bulletSpeed=90,range=math.pi/4,bulletSize=1,angle=dir,bulletSprite=BulletSprites.heart.gray,bulletLifeFrame=600,bulletEvents={
                                     function(cir,args,self)
                                         self.bulletSpeed=self.bulletSpeed+7
                                         Event{obj=cir,action=function()
