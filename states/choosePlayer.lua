@@ -84,7 +84,7 @@ return {
                                 G:resetRunInfo()
                                 SFX:play('select',true)
                                 StageManager:load('stage1')
-                                if DEV_MODE and love.keyboard.isDown('f9') then
+                                if DEV_MODE and SKIP_MODE then
                                     StageManager.currentSegmentIndex=#StageManager.currentStageData.segments-1 -- skip to the end of the stage for testing
                                 end
                                 G:switchState(G.STATES.IN_GAME)

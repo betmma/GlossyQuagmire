@@ -55,6 +55,16 @@ return {
                 zh_cn = '双关语具现者',
             },
         },
+        kotoba = { -- player names are uppercase, boss names are lowercase
+            name = {
+                en_us = 'Kotoba Kyokuwa',
+                zh_cn = '曲话言波',
+            },
+            nickname = {
+                en_us = 'Pun Materializer',
+                zh_cn = '双关语具现者',
+            },
+        },
     },
     ui = {
         MAIN_MENU={

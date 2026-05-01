@@ -377,6 +377,11 @@ G:switchState(G.STATES.MAIN_MENU)
 
 
 G.update=function(self,dt)
+    if DEV_MODE then
+        if isPressed('f9') then
+            SKIP_MODE=not SKIP_MODE
+        end
+    end
     self.frame=self.frame+1
     self.currentUI=self.UIDEF[self.STATE]
     NoticeManager:update()
@@ -423,6 +428,9 @@ G.draw=function(self)
     if DEV_MODE and not love.keyboard.isDown('f5') then
         SetFont(12)
         love.graphics.print("FPS: "..love.timer.getFPS(), 0, 0)
+        if SKIP_MODE then
+            love.graphics.print("SKIP MODE ON", 0, 13)
+        end
     end
     shove.endLayer()
 end

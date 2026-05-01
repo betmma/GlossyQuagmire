@@ -22,6 +22,7 @@ end
 
 function BossSegment:func()
     local pos=self.getBossSpawnPos(self)
+    Effect.Shockwave{kinematicState={pos=copyTable(pos),dir=0,speed=0},lifeFrame=20,radius=20,growSpeed=1.2,spriteTransparency=1,color='yellow',canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
     Effect.Charge{obj={kinematicState={pos=copyTable(pos),dir=0,speed=0}}}
     wait(60)
     local boss=Boss{
@@ -31,7 +32,7 @@ function BossSegment:func()
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
     DynamicUIObjs.bossStars:clearStars()
     Event.Event{obj=boss,action=function()
-        for i, round in ipairs(self.rounds) do
+        for i=1,#self.rounds-1 do
             wait(10)
             DynamicUIObjs.bossStars:addStar()
         end
@@ -40,7 +41,13 @@ function BossSegment:func()
     
     -- after dialogues are implemented, could add something before the rounds
     for i, round in ipairs(self.rounds) do
-        round:func(boss)
+        if DEV_MODE and SKIP_MODE then -- skip to the last round for testing
+            if i==#self.rounds then
+                round:func(boss)
+            end
+        else
+            round:func(boss)
+        end
         DynamicUIObjs.bossStars:removeStar()
     end
     -- after battle dialogue could be added here
@@ -106,9 +113,15 @@ function BossRound:new(args)
             end
             DynamicUIObjs.hpBar:setPhases(phases,colors)
             DynamicUIObjs.hpBar:initHP()
-            for _, phase in pairs(self.phases) do
+            for i, phase in ipairs(self.phases) do
                 if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
-                    phase:run(boss)
+                    if DEV_MODE and SKIP_MODE then -- skip to the last phase for testing
+                        if i==#self.phases then
+                            phase:run(boss)
+                        end      
+                    else
+                        phase:run(boss)
+                    end
                 end
             end
         end
@@ -208,6 +221,7 @@ function BossPhase:run(boss)
         if self:isFinished(boss) then break end
         coroutine.yield() -- for outer coroutine
     end
+    EventManager.post(EventManager.EVENTS.FINISH_BOSS_PHASE)
     DynamicUIObjs.setRemainingTimeText(nil)
     if self.isTimeout or boss.hp>0 then -- reduce boss hp to 0 gradually
         while boss.hp>0 do

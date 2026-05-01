@@ -6,6 +6,7 @@ EventManager.EVENTS={
     PLAYER_HIT='playerHit',
     GAIN_SCORE='gainScore',
     SPELLCARD_BONUS='spellcardBonus',
+    FINISH_BOSS_PHASE='finishBossPhase',
     -- below are from previous game
     PLAYER_GRAZE='playerGraze',
     PLAYER_ACCUMULATE_FLASHBOMB='playerAccumulateFlashbomb',

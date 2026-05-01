@@ -18,6 +18,7 @@ local function smallFairyFunc(basePos,flip,r,shooting)
         end
     end
 end
+local bosses=require('stages.stage1.boss')
 ---@type OneStageData
 return{
     init=function()
@@ -101,7 +102,7 @@ return{
                 wait(300)
             end
         },
-        require('stages.stage1.boss'),
+        bosses[1],
         {
             key='1-3',
             type='midStage',
@@ -187,7 +188,7 @@ return{
                     local pos2,dir2=G.runInfo.geometry:rThetaGo(pos,-600,dir+math.pi/2*sign)
                     local fairy=Enemy{kinematicState={pos=pos2,dir=dir2,speed=600},maxhp=120,sprite=Asset.fairySprites.medium.black,lifeFrame=120,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=2}}
                     BulletSpawner{
-                        period=2,firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=500,visible=false,bulletEvents={
+                        period=2,firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=100,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=500,visible=false,bulletEvents={
                             function(cir,args,self)
                                 cir.safe=true
                                 cir.spriteTransparency=0
@@ -248,6 +249,6 @@ return{
                 wait(400)
             end
         },
-        -- require('stages.stage1.boss'),
+        bosses[2]
     }
 }
