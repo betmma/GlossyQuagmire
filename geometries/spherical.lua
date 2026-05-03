@@ -230,6 +230,36 @@ function Spherical:sideToLine(position, linePoint1, linePoint2)
     return dot(u, normal) > 0
 end
 
+function Spherical:nearestToLine(position, linePoint1, linePoint2)
+    local u = to_unit(position)
+    local a = to_unit(linePoint1)
+    local b = to_unit(linePoint2)
+
+    -- The normal vector to the plane containing the Great Circle
+    local normal = cross(a, b)
+    local len = length3(normal)
+
+    -- If linePoint1 and linePoint2 are the same or antipodal, the line is undefined.
+    if len < Spherical.EPS then
+        return copy_pos(linePoint1)
+    end
+    normal = scale(normal, 1 / len)
+
+    -- Project the point u onto the plane: proj = u - (u · normal) * normal
+    local distToPlane = dot(u, normal)
+    local proj = sub(u, scale(normal, distToPlane))
+
+    -- If the point is exactly at the "pole" of the great circle, 
+    -- all points on the circle are equidistant. Return a default.
+    local projLen = length3(proj)
+    if projLen < Spherical.EPS then
+        return copy_pos(linePoint1)
+    end
+
+    -- Normalize the projection to move it to the sphere's surface and scale to radius
+    return from_unit(scale(proj, 1 / projLen))
+end
+
 function Spherical:toScreen(position)
     local u = to_unit(position)
     ---@type (Dummy|ScreenPosition)[]

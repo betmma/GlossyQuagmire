@@ -51,6 +51,18 @@ function GeometryBase:sideToLine(position,linePoint1,linePoint2)
     return value>0
 end
 
+function GeometryBase:nearestToLine(position,linePoint1,linePoint2)
+    local lineDX=linePoint2.x-linePoint1.x
+    local lineDY=linePoint2.y-linePoint1.y
+    local lineLengthSquared=lineDX*lineDX+lineDY*lineDY
+    local t=((position.x-linePoint1.x)*lineDX+(position.y-linePoint1.y)*lineDY)/lineLengthSquared
+    return {
+        x=linePoint1.x+t*lineDX,
+        y=linePoint1.y+t*lineDY,
+    }
+end
+
+
 function GeometryBase:toScreen(position)
     return {position}
 end

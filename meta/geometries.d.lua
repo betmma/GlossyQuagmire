@@ -39,6 +39,8 @@
 ---@alias def.GeometryBase.to fun(self:GeometryBase,position:Position,target:Position):number
 ---Returns which side of the line formed by linePoint1 and linePoint2 the position is on. It doesn't matter which side is true or false.
 ---@alias def.GeometryBase.sideToLine fun(self:GeometryBase,position:Position,linePoint1:Position,linePoint2:Position):boolean
+---find the nearest point to position on the line formed by linePoint1 and linePoint2.
+---@alias def.GeometryBase.nearestToLine fun(self:GeometryBase,position:Position,linePoint1:Position,linePoint2:Position):Position
 ---Convert the position in geometry space to screen space. It's possible to return multiple positions for later shader processing, and the draw function needs to handle that. If returns multiple positions (like to two circles), ensure the order (first element goes to the first circle. If does not map to first circle, first element should be Dummy). It could consider the viewConfig (and like following in it).
 ---@alias def.GeometryBase.toScreen fun(self:GeometryBase,position:Position):PossiblePosition[]
 ---Returns whether an object at the position with the radius (in geometry space) can be drawn with a simple quad within acceptable distortion. If false, the object should be drawn with a custom mesh and second return value indicates the suggested number of sides in the mesh. Second value is STILL MEANINGFUL if first value is true, as draw function can still choose to draw with mesh for better visual effect.
@@ -61,6 +63,7 @@
 ---@field distance def.GeometryBase.distance
 ---@field to def.GeometryBase.to
 ---@field sideToLine def.GeometryBase.sideToLine
+---@field nearestToLine def.GeometryBase.nearestToLine
 ---@field toScreen def.GeometryBase.toScreen
 ---@field canSimpleDraw def.GeometryBase.canSimpleDraw
 ---@field MESH_MAX_SIDES integer the maximum number of sides that the geometry will suggest for canSimpleDraw, can control performance. note that, even if not reaching MESH_MAX_SIDES, the geometry can still adjust the number of sides based on this (like math.floor(MESH_MAX_SIDES*0.5))
@@ -86,6 +89,7 @@
 ---@field distance def.GeometryBase.distance
 ---@field to def.GeometryBase.to
 ---@field sideToLine def.GeometryBase.sideToLine
+---@field nearestToLine def.GeometryBase.nearestToLine
 ---@field toScreen def.GeometryBase.toScreen
 ---@field canSimpleDraw def.GeometryBase.canSimpleDraw
 ---@field applyVertexShader def.GeometryBase.applyVertexShader
@@ -102,6 +106,7 @@
 ---@field distance def.GeometryBase.distance
 ---@field to def.GeometryBase.to
 ---@field sideToLine def.GeometryBase.sideToLine
+---@field nearestToLine def.GeometryBase.nearestToLine
 ---@field toScreen def.GeometryBase.toScreen
 ---@field canSimpleDraw def.GeometryBase.canSimpleDraw
 ---@field applyVertexShader def.GeometryBase.applyVertexShader

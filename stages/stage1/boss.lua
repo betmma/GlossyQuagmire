@@ -167,7 +167,7 @@ local finalBoss=BossManager.BossSegment{
                         wait(220)
                     end
                 end
-            }
+            },
         }},
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
@@ -223,7 +223,8 @@ local finalBoss=BossManager.BossSegment{
                         wait(220)
                     end
                 end
-            }
+            },
+            require 'stages.stage1.spellcards.swallow',
         }},
     }
 }

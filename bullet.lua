@@ -96,9 +96,7 @@ end
 function Bullet:update(dt)
     self:executeExtraUpdate(dt)
     Shape.update(self,dt)
-    if not self.safe then
-        if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
-    end
+    if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
     self:checkHitPlayer()
     self:updateSprite()
 end

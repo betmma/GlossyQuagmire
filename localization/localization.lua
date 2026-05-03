@@ -7,6 +7,12 @@ return {
                 en_us = 'Test Spellcard',
                 zh_cn = '测试符卡',
             },
+        },
+        ['kotoba-swallow'] = {
+            name = {
+                en_us = 'Swallow Sign "Death of the Black Wings"',
+                zh_cn = '吞燕「玄鸟之死」',
+            },
         }
     },
     levelData = {

@@ -183,6 +183,36 @@ function Hyperbolic:sideToLine(position,linePoint1,linePoint2)
     return Hyperbolic:onscreenDistanceToLineSigned(x1,y1,x2,y2,x3,y3)>0
 end
 
+function Hyperbolic:nearestToLine(position,linePoint1,linePoint2)
+    local xc,yc=position.x,position.y
+    local x1,y1=linePoint1.x,linePoint1.y
+    local x2,y2=linePoint2.x,linePoint2.y
+    if math.abs(x1-x2)<Hyperbolic.EPS then -- vertical
+        local r2=(yc-Hyperbolic.axisY)^2+(xc-x1)^2
+        return {x=x1,y=Hyperbolic.axisY+math.sqrt(r2)}
+    end
+    local centerX,radius=Hyperbolic:lineCenter(x1,y1,x2,y2)
+    --[[ let the semicircle from xc,yc to the foot of the perpendicular line intersecting the semicircle of (centerX,radius) be (centerX2, radius2), then radius2 is radius*tan(direction) (this can be negative, but we only use squared value below so doesn't matter), centerX2 is centerX+radius/cos(direction), xc,yc is on it, so (xc-centerX2)^2+(yc-Hyperbolic.axisY)^2=radius2^2, which is:
+    (xc-centerX-radius/cos(direction))^2+(yc-Hyperbolic.axisY)^2=radius^2*tan(direction)^2
+    let xc-centerX=a, (yc-Hyperbolic.axisY)^2=b, radius=R, then we have:
+    (a-R/cos(direction))^2+b=R^2*tan(direction)^2
+    expand, we get:
+    a^2-2aR/cos(direction)+R^2/cos(direction)^2+b=R^2*tan(direction)^2
+    a^2-2aR/cos(direction)+R^2/cos(direction)^2+b=R^2*(1/cos(direction)^2-1)
+    multiplying cos(direction)^2 and let cos(direction)=x, we get:
+    (a^2+b)x^2-2aRx+R^2=R^2-R^2x^2
+    (a^2+b+R^2)x^2-2aRx=0
+    x=(2aR)/(a^2+b+R^2) (discard x=0 solution)
+    ]]
+    local a=xc-centerX
+    local b=(yc-Hyperbolic.axisY)^2
+    local R=radius
+    local x=(2*a*R)/(a^2+b+R^2)
+    -- direction is limited in (0,pi) so sin(direction) is positive
+
+    return {x=centerX+radius*x,y=Hyperbolic.axisY+radius*math.sqrt(1-x^2)}
+end
+
 function Hyperbolic:toScreen(position)
     return {position}
 end
