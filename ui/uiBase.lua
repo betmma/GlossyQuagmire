@@ -47,26 +47,31 @@ function UIBase:new(args)
     self.width=args.width or 100
     self.height=args.height or 100
     self.frame=0
-    if args.parent then
-        args.parent:child(self)
-    end
     self.children={}
     self.events=args.events or {}
     self.disabled=args.disabled or false
     self.focused=false
     self.transparency=args.transparency or 1
     self.extraUpdates=args.extraUpdates or {}
+    if args.parent then
+        args.parent:child(self)
+    end
 end
 
 ---add a child UI element to this element. return the child element for chaining
 ---@generic T:UIBase
 ---@param child T
+---@param asFirst boolean|nil whether to add the child as the first child. default false, which means adding as the last child.
 ---@return T
-function UIBase:child(child)
+function UIBase:child(child,asFirst)
     if not child then
         error("Child cannot be nil")
     end
-    table.insert(self.children,child)
+    if asFirst then
+        table.insert(self.children,1,child)
+    else
+        table.insert(self.children,child)
+    end
     child.parent=self
     child:emit(UI.EVENTS.SET_PARENT,self)
     return child
@@ -137,13 +142,13 @@ function UIBase:cleanObjects()
   self.objects=nextObjects
 end
 
-function UIBase:canChildHaveFocus()
+function UIBase:canChildHaveFocus(childIndex)
     return true
 end
 
 function UIBase:updateHierarchy()
-    self:update()
     local hasFocus=self.focused
+    self:update()
     self.focused=false
     for key, obj in pairs(self.children) do
         if hasFocus and self:canChildHaveFocus(key) then
@@ -207,12 +212,19 @@ local UI={
     Base=UIBase,
 }
 
+---@type UIPanel
 UI.Panel=love.filesystem.load("ui/panel.lua")(UI)
+---@type UICursor
 UI.Cursor=love.filesystem.load("ui/cursor.lua")(UI)
+---@type UIText
 UI.Text=love.filesystem.load("ui/text.lua")(UI)
+---@type UIImage
 UI.Image=love.filesystem.load("ui/image.lua")(UI)
+---@type UIArranger
 UI.Arranger=love.filesystem.load("ui/arranger.lua")(UI)
+---@type UIOptions
 UI.Options=love.filesystem.load("ui/options.lua")(UI)
+---@type UISwitcher
 UI.Switcher=love.filesystem.load("ui/switcher.lua")(UI)
 
 return UI

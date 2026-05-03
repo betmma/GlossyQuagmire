@@ -149,6 +149,7 @@ SaveManager.defaultSaveData=DefaultRoot{
                     for _,type in ipairs({'ingame','practice'}) do
                         oneDiffData[shotType][type]=oneDiffData[shotType][type] or {
                             cleared=false,
+                            unlocked=false,
                             passes=0,
                             tries=0,
                         }

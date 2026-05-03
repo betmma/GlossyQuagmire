@@ -291,7 +291,7 @@ function SpellcardPhase:run(boss)
     end
     EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
     DynamicUIObjs.slideSpellcardInfo()
-    DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, 'name'})
+    DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
         wait(90)
         DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText())
@@ -318,11 +318,13 @@ end
 local function spellcardBonusCallbackAddToHistory(key, success)
     local historyType=G.runInfo.practice and 'practice' or 'ingame'
     local historyTable=G.save.spellcardHistory[key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
+    historyTable.unlocked=true
     historyTable.tries=historyTable.tries+1
     if success then
         historyTable.cleared=true
         historyTable.passes=historyTable.passes+1
     end
+    G:saveData()
 end
 EventManager.listenTo(EventManager.EVENTS.SPELLCARD_BONUS, spellcardBonusCallbackAddToHistory)
 

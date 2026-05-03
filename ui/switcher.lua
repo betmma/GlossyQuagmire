@@ -17,6 +17,7 @@ local UI=...
 ---@field private switchOption fun(self,direction:integer):nil a function that switches options in the given direction (1 for next, -1 for previous). this will be called when the switch key is pressed.
 ---@field private makeOptions fun(self):boolean a function that constructs the UI for the current option index and its preview options. returns false if current option index is out of range (optionConstructor returns nil).
 ---@field private lerpOffset fun(self,ratio:number|nil):nil a function that lerps the lerpingOptionIndexOffset by the given ratio. if ratio is nil, use self.lerpRatio.
+---@overload fun(args:UISwitcherConfig):UISwitcher
 local UISwitcher=UI.Base:extend()
 
 ---@enum PREVIEW_DECAY_MODE
@@ -25,7 +26,7 @@ UISwitcher.PREVIEW_DECAY_MODES={
     INDEX=2,
 }
 
----@class UISwitcherConfig
+---@class UISwitcherConfig:UIBaseArgs
 ---@field optionConstructor fun(self,optionIndex:integer):UIBase|nil
 ---@field currentOptionIndex integer|nil
 ---@field preview integer|nil
@@ -37,6 +38,7 @@ UISwitcher.PREVIEW_DECAY_MODES={
 ---@field canHold boolean|nil
 ---@field increaseKey love.KeyConstant|nil
 ---@field decreaseKey love.KeyConstant|nil
+
 function UISwitcher:new(args)
     UI.Base.new(self,args)
     self.optionConstructor=args.optionConstructor

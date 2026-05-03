@@ -8,8 +8,16 @@ local UI=...
 ---@field public lerpRatio number the ratio of lerp, between 0 and 1.
 ---@field public fluctuateRatio number the ratio of fluctuation
 ---@field public fluctuatePeriod number the period of fluctuation in frames
+---@field public drawStyle UICursorDrawStyle defaults to UICursor.DRAW_STYLE.Line
 ---@field public snap fun(self):nil snap the cursor to its parent immediately.
 local UICursor=UI.Base:extend()
+
+---@enum UICursorDrawStyle
+UICursor.DRAW_STYLE={
+    Line=1,
+    Face=2,
+}
+
 function UICursor:new(args)
     args=args or {}
     args.events=args.events or {}
@@ -24,6 +32,7 @@ function UICursor:new(args)
     self.lerpRatio=args.lerpRatio or 0.2
     self.fluctuateRatio=args.fluctuateRatio or 0.1
     self.fluctuatePeriod=args.fluctuatePeriod or 60
+    self.drawStyle=args.drawStyle or UICursor.DRAW_STYLE.Line
 end
 
 -- function UICursor:setParent(parent)
@@ -57,13 +66,33 @@ function UICursor:snap()
 end
 
 function UICursor:drawText()
+    if self.drawStyle==UICursor.DRAW_STYLE.Line then
+        self:drawTextLineStyle()
+    elseif self.drawStyle==UICursor.DRAW_STYLE.Face then
+        self:drawTextFaceStyle()
+    end
+end
+
+function UICursor:drawTextFaceStyle()
     local x,y=self:getXY()
     local fluctuation=(math.sin(self.frame/self.fluctuatePeriod*2*math.pi)*0.5+0.5)*self.fluctuateRatio
     local dw,dh=self.width*fluctuation,self.height*fluctuation
     x,y=x-dw/2,y-dh/2
     local w,h=self.width+dw,self.height+dh
     local colorref={love.graphics.getColor()}
-    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4])
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*self.transparency)
+    love.graphics.rectangle('fill',x,y,w,h)
+    love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
+end
+
+function UICursor:drawTextLineStyle()
+    local x,y=self:getXY()
+    local fluctuation=(math.sin(self.frame/self.fluctuatePeriod*2*math.pi)*0.5+0.5)*self.fluctuateRatio
+    local dw,dh=self.width*fluctuation,self.height*fluctuation
+    x,y=x-dw/2,y-dh/2
+    local w,h=self.width+dw,self.height+dh
+    local colorref={love.graphics.getColor()}
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*self.transparency)
     local lineLengthX=self.lineLengthRatio*w/2
     local lineLengthY=self.lineLengthRatio*h/2
     if self.useShortSide then

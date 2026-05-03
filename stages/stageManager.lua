@@ -28,6 +28,7 @@ provide a function to display stage title text
 ---@field currentCoroutine thread
 ---@field callback function|nil to be called after stage is finished
 local StageManager={}
+StageManager.allStageKeys={'stage1','stage2','stage3','stage4','stage5','stage6','stageEX'}
 
 ---@type table<StageKey,OneStageData>
 local StageData={}
@@ -70,9 +71,22 @@ end
 ---@field stage StageKey the stage this spellcard belongs to
 ---@field difficulty DIFFICULTY every item in SpellcardPhase.difficulties
 ---@field players table<PLAYER,true> same as SpellcardPhase.players
----@alias SpellcardCollection SpellcardCollectionItem[] to store all spellcards for spellcard practice and history
+
+---@class SpellcardCollectionItemCombineDifficulty:strict
+---@field ID integer auto increments. only used for in game menu, must not use it in save data
+---@field key string same as SpellcardPhase.key
+---@field stage StageKey the stage this spellcard belongs to
+---@field difficulties table<DIFFICULTY,true> same as SpellcardPhase.difficulties
+---@field players table<PLAYER,true> same as SpellcardPhase.players
+
+---@class SpellcardCollection to store all spellcards for spellcard practice and history
+---@field all SpellcardCollectionItem[] flat table of all spellcards
+---@field byStage table<StageKey, SpellcardCollectionItemCombineDifficulty[]> spellcards grouped by stage
 ---@type SpellcardCollection
-SpellcardCollection={}
+SpellcardCollection={
+    all={},
+    byStage={},
+}
 
 function StageManager:buildSpellcardCollection()
     local nextID = 1
@@ -89,16 +103,28 @@ function StageManager:buildSpellcardCollection()
                     ---@cast phase SpellcardPhase
                     -- Create entry for every supported difficulty
                     for diff, active in pairs(phase.difficulties) do
-                        table.insert(SpellcardCollection, {
+                        local item={
                             ID = nextID,
                             key = phase.key,
                             stage = stageKey,
                             difficulty = diff,
                             players = phase.players,
                             phaseObj = phase -- Useful for jumping directly to the phase in practice
-                        })
+                        }
+                        table.insert(SpellcardCollection.all, item)
                         nextID = nextID + 1
                     end
+                    local item={
+                        key = phase.key,
+                        stage = stageKey,
+                        difficulties = phase.difficulties,
+                        players = phase.players,
+                        phaseObj = phase -- Useful for jumping directly to the phase in practice
+                    }
+                    if not SpellcardCollection.byStage[stageKey] then
+                        SpellcardCollection.byStage[stageKey] = {}
+                    end
+                    table.insert(SpellcardCollection.byStage[stageKey], item)
                     ::continue_phase::
                 end
                 ::continue_round::

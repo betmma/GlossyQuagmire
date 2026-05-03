@@ -1,17 +1,35 @@
 ---@alias lang string
 ---@alias localizationItem table<lang,string>
 return {
+    ---@class spellcardLocalizationUnit:strict
+    ---@field name localizationItem
+    ---@class spellcardLocalization:strict
+    ---@field __default__? spellcardLocalizationUnit
+    ---@field [DIFFICULTY] spellcardLocalizationUnit
+    ---@type table<string, spellcardLocalization>
     spellcards={
+        UNKNOWN = {
+            __default__ = {
+                name = {
+                    en_us = 'Unknown Spellcard',
+                    zh_cn = '未知符卡',
+                },
+            },
+        },
         test = {
-            name = {
-                en_us = 'Test Spellcard',
-                zh_cn = '测试符卡',
+            __default__ = {
+                name = {
+                    en_us = 'Test Spellcard',
+                    zh_cn = '测试符卡',
+                },
             },
         },
         ['kotoba-swallow'] = {
-            name = {
-                en_us = 'Swallow Sign "Death of the Black Wings"',
-                zh_cn = '吞燕「玄鸟之死」',
+            __default__ = {
+                name = {
+                    en_us = 'Swallow Sign "Death of the Black Wings"',
+                    zh_cn = '吞燕「玄鸟之死」',
+                },
             },
         }
     },
@@ -439,6 +457,47 @@ return {
                     en_us = 'Extend!!',
                     zh_cn = '获得残机！！',
                 },
+            }
+        },
+        SPELL_PRACTICE = {
+            ---@type table<StageKey, localizationItem>
+            stages = {
+                stage1 = {
+                    en_us = 'Stage 1',
+                    zh_cn = '一面',
+                },
+                stage2 = {
+                    en_us = 'Stage 2',
+                    zh_cn = '二面',
+                },
+                stage3 = {
+                    en_us = 'Stage 3',
+                    zh_cn = '三面',
+                },
+                stage4 = {
+                    en_us = 'Stage 4',
+                    zh_cn = '四面',
+                },
+                stage5 = {
+                    en_us = 'Stage 5',
+                    zh_cn = '五面',
+                },
+                stage6 = {
+                    en_us = 'Stage 6',
+                    zh_cn = '六面',
+                },
+                stageEX = {
+                    en_us = 'Extra Stage',
+                    zh_cn = 'EX面',
+                },
+            },
+            spellcard = {
+                en_us = 'Spellcard {index}',
+                zh_cn = '符卡 {index}',
+            },
+            spellcardHistory = {
+                en_us = 'IN GAME {ingamePass}/{ingameTries} PRACTICE {practicePass}/{practiceTries}',
+                zh_cn = '实战 {ingamePass}/{ingameTries} 练习 {practicePass}/{practiceTries}',
             }
         },
 

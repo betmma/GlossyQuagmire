@@ -40,6 +40,13 @@ G={
 
         ---@alias colorValue {[1]: number, [2]: number, [3]: number, [4]: number}
         ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
+        DIFFICULTIES={
+            'EASY',
+            'NORMAL',
+            'HARD',
+            'LUNATIC',
+            'EXTRA',
+        },
         ---@type {DIFFICULTY: {value: string, shortForm: string, color:colorValue}}
         DIFFICULTIES_DATA={
             EASY={value='EASY',shortForm='E',color={0,0.7,0,1}},
@@ -53,6 +60,9 @@ G={
             'NORMAL',
             'HARD',
             'LUNATIC',
+        },
+        EXTRA_DIFFICULTIES={
+            'EXTRA',
         },
         ---@alias PLAYER 'REIMU'|'MARISA'|'KOTOBA'
         PLAYERS={'REIMU','MARISA','KOTOBA'},
@@ -70,6 +80,16 @@ G={
             KOTOBA={'KOTOBAA','KOTOBAB'},
         },
     },
+}
+---@type table<StageKey, DIFFICULTY[]>
+G.CONSTANTS.STAGE_TO_DIFFICULTIES={
+    stage1=G.CONSTANTS.REGULAR_DIFFICULTIES,
+    stage2=G.CONSTANTS.REGULAR_DIFFICULTIES,
+    stage3=G.CONSTANTS.REGULAR_DIFFICULTIES,
+    stage4=G.CONSTANTS.REGULAR_DIFFICULTIES,
+    stage5=G.CONSTANTS.REGULAR_DIFFICULTIES,
+    stage6=G.CONSTANTS.REGULAR_DIFFICULTIES,
+    stageEX=G.CONSTANTS.EXTRA_DIFFICULTIES,
 }
 local geometries=require"geometries.geometryBase"
 ---@class UIState
@@ -164,6 +184,7 @@ G={
         MAIN_MENU='MAIN_MENU',
         CHOOSE_DIFFICULTY='CHOOSE_DIFFICULTY',
         CHOOSE_PLAYER='CHOOSE_PLAYER',
+        SPELL_PRACTICE='SPELL_PRACTICE',
         MUSIC_ROOM='MUSIC_ROOM',
         -- NICKNAMES='NICKNAMES',
         OPTIONS='OPTIONS',
@@ -182,6 +203,9 @@ G={
         MAIN_MENU={
             CHOOSE_DIFFICULTY={
                 slideDirection='up',
+            },
+            SPELL_PRACTICE={
+                slideDirection='left',
             },
             LOAD_REPLAY={
                 slideDirection='left'
@@ -239,6 +263,11 @@ G={
             IN_GAME={
                 transitionState='TRANSITION_IMAGE',
             }
+        },
+        SPELL_PRACTICE={
+            MAIN_MENU={
+                slideDirection='right',
+            },
         },
         LOAD_REPLAY={
             MAIN_MENU={
@@ -298,7 +327,7 @@ end
 ---@field options {master_volume: integer, music_volume: integer, sfx_volume: integer, language: string, resolution: {width: integer, height: integer}}
 ---@field defaultName string
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
----@field spellcardHistory table<string, table<DIFFICULTY, table<SHOT_TYPE, table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>>>>>
+---@field spellcardHistory table<string, table<DIFFICULTY, table<SHOT_TYPE, table<spellcardHistoryKey, {cleared: boolean, unlocked: boolean, passes: integer, tries: integer}>>>>>
 ---@field extraUnlock {[string]: boolean} -- secret level unlocks, format not decided
 ---@field musicUnlock {[string]: boolean}
 ---@field nicknameUnlock {[string]: boolean}

@@ -77,7 +77,7 @@ local midboss=BossManager.BossSegment{
             --             period=20,firstPeriod=20,lifeFrame=880,bulletNumber=5,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round.blue,bulletLifeFrame=600
             --         }:bindState(boss)
             --     end
-            -- }
+            -- },
         }}
     }
 }

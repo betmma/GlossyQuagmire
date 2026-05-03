@@ -39,7 +39,7 @@ return {
                 {value='GAME_START',state='CHOOSE_DIFFICULTY'},
                 {value='EXTRA_START',disabled=true},
                 {value='PRACTICE',disabled=true},
-                {value='SPELL_PRACTICE',disabled=true},
+                {value='SPELL_PRACTICE'},
                 {value='REPLAY',disabled=true},
                 {value='PLAYER_DATA',disabled=true},
                 {value='MUSIC_ROOM'},

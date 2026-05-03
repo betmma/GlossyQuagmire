@@ -12,8 +12,23 @@ local UI=...
 ---@field public boldOffset number the offset ratio for simulating bold (will be multiplied by font size to get actual offset). default to 0.05 = 5% of font size.
 ---@field public boldColor table the color for simulating bold, default to 1-color with same alpha.
 ---@field public setText fun(self, text:string):nil set the text of this UIText. this is a function instead of a simple setter because it may need to do some extra work like updating width and height when autoSize is true.
----@field public updateText nil|fun(self):string if set, this function will be called in update to update the text. this is useful for dynamic text that changes every frame, like score or fps.
+---@field public updateText nil|fun(self):string if set, this function will be called in update to update the text. this is useful for dynamic text that changes every frame, like score.
+---@overload fun(args: UITextArgs): UIText
 local UIText=UI.Base:extend()
+---@alias rgbColor {[1]: number, [2]: number, [3]: number, [4]: number|nil}
+
+---@class UITextArgs:UIBaseArgs
+---@field align nil|"center"|"left"|"right"|"justify" if nil, uses love.graphics.print, otherwise uses love.graphics.printf with this align. 
+---@field text string
+---@field color rgbColor
+---@field fontSize number|nil
+---@field fontName string|nil if nil, use default font for current language
+---@field toggleX boolean|nil whether to toggle x for more instinctive alignment. if true, with center or justify alignment, center of text will be at x. with right alignment, right edge of text will be at x. default true.
+---@field autoSize boolean|nil whether to automatically set width to the width of the text using font:getWidth, and same to height. default false.
+---@field isBold boolean|nil whether to simulate bold by drawing text multiple times with slight offset. default true.
+---@field boldOffset number|nil the offset ratio for simulating bold (will be multiplied by font size to get actual offset). default to 0.05 = 5% of font size.
+---@field boldColor rgbColor|nil the color for simulating bold, default to 1-color with same alpha.
+---@field updateText nil|fun(self):string if set, this function will be called in update to update the text. this is useful for dynamic text that changes every frame, like score.
 
 function UIText:new(args)
     UI.Base.new(self,args)
