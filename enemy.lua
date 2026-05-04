@@ -298,7 +298,7 @@ end
 function Boss:dieEffect()
     SFX:play('kill',true)
     local final=not self.revivable -- final shockwave need to be more juicy
-    Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=20,radius=20,growSpeed=1.2+(final and 0.5 or 0),spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
+    Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=20,radius=20,growSpeed=1.7,spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
     for itemType,num in pairs(self.dropItems) do
         for i=1,num do
             local angle=G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.3)

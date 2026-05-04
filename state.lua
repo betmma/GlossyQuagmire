@@ -38,7 +38,6 @@ G={
         -- ---@enum GEOMETRY
         -- GEOMETRIES={EUCLIDEAN='EUCLIDEAN',HYPERBOLIC='HYPERBOLIC'},
 
-        ---@alias colorValue {[1]: number, [2]: number, [3]: number, [4]: number}
         ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
         DIFFICULTIES={
             'EASY',
@@ -47,7 +46,7 @@ G={
             'LUNATIC',
             'EXTRA',
         },
-        ---@type {DIFFICULTY: {value: string, shortForm: string, color:colorValue}}
+        ---@type {DIFFICULTY: {value: string, shortForm: string, color:rgbaColor}}
         DIFFICULTIES_DATA={
             EASY={value='EASY',shortForm='E',color={0,0.7,0,1}},
             NORMAL={value='NORMAL',shortForm='N',color={0.5,0.5,1,1}},
@@ -64,6 +63,8 @@ G={
         EXTRA_DIFFICULTIES={
             'EXTRA',
         },
+        ---@alias StageKey 'stage1'|'stage2'|'stage3'|'stage4'|'stage5'|'stage6'|'stageEX'
+        STAGE_KEYS={'stage1','stage2','stage3','stage4','stage5','stage6','stageEX'},
         ---@alias PLAYER 'REIMU'|'MARISA'|'KOTOBA'
         PLAYERS={'REIMU','MARISA','KOTOBA'},
         PLAYERS_DATA={
@@ -73,6 +74,15 @@ G={
         },
         ---@alias SHOT_TYPE 'REIMUA'|'REIMUB'|'MARISAA'|'MARISAB'|'KOTOBAA'|'KOTOBAB'
         SHOT_TYPES={'REIMUA','REIMUB','MARISAA','MARISAB','KOTOBAA','KOTOBAB'},
+        ---@type table<SHOT_TYPE, PLAYER>
+        SHOT_TYPE_TO_PLAYER={
+            REIMUA='REIMU',
+            REIMUB='REIMU',
+            MARISAA='MARISA',
+            MARISAB='MARISA',
+            KOTOBAA='KOTOBA',
+            KOTOBAB='KOTOBA',
+        },
         ---@type table<PLAYER, SHOT_TYPE[]>
         PLAYER_TO_SHOT_TYPES={
             REIMU={'REIMUA','REIMUB'},
@@ -108,8 +118,8 @@ local geometries=require"geometries.geometryBase"
 ---@field CONSTANTS table
 ---@field CONSTANTS.VIEW_MODES {NORMAL: string, FOLLOW: string}
 ---@field CONSTANTS.FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader}
----@field CONSTANTS.DIFFICULTIES_DATA table<DIFFICULTY, {value: string, shortForm: string, color: colorValue}>
----@field CONSTANTS.PLAYERS_DATA table<PLAYER, {value: string, color: colorValue}>
+---@field CONSTANTS.DIFFICULTIES_DATA table<DIFFICULTY, {value: string, shortForm: string, color: rgbaColor}>
+---@field CONSTANTS.PLAYERS_DATA table<PLAYER, {value: string, color: rgbaColor}>
 ---@field CONSTANTS.PLAYER_TO_SHOT_TYPES table<PLAYER, SHOT_TYPE[]>
 ---@field backgroundPattern any -- BackgroundPattern object
 ---@field STATE string -- Current state key
@@ -180,6 +190,7 @@ G={
         end
     end,
     CONSTANTS=G.CONSTANTS,
+    ---@enum STATE
     STATES={
         MAIN_MENU='MAIN_MENU',
         CHOOSE_DIFFICULTY='CHOOSE_DIFFICULTY',
@@ -268,6 +279,17 @@ G={
             MAIN_MENU={
                 slideDirection='right',
             },
+            IN_GAME={
+                transitionState='TRANSITION_IMAGE',
+            }
+        },
+        IN_GAME={
+            CHOOSE_PLAYER={
+                transitionState='TRANSITION_IMAGE',
+            },
+            SPELL_PRACTICE={
+                transitionState='TRANSITION_IMAGE',
+            },
         },
         LOAD_REPLAY={
             MAIN_MENU={
@@ -280,7 +302,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil, practice: boolean}
+    ---@alias runInfo {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil, practice: boolean, exitToState: STATE|nil}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
@@ -295,7 +317,8 @@ G={
         stage=1,
         geometry=geometries.Hyperbolic,
         player=nil,
-        practice=false
+        practice=false,
+        exitToState=nil -- defaults to G.STATES.CHOOSE_PLAYER
     },
     resetRunInfo=function(self,lives,bombs)
         self.runInfo.lives=lives or 2

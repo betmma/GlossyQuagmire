@@ -7,8 +7,8 @@ return BossManager.SpellcardPhase{
     func=function(self,boss)
         local bossPos=boss.kinematicState.pos
         local base=G.runInfo.geometry:init().pos
-        local dir=G.runInfo.geometry:to(base,bossPos)
-        local aim=G.runInfo.geometry:rThetaGo(base,200,dir+math.pi)
+        local bossAim=G.runInfo.geometry:rThetaGo(base,200,G.runInfo.player.viewDirection-math.pi/2)
+        local aim=G.runInfo.geometry:rThetaGo(base,200,G.runInfo.player.viewDirection+math.pi/2)
         ---@type Player
         local player=G.runInfo.player
         local mouthBase=Bullet{kinematicState={pos=copyTable(aim),speed=0,dir=player.viewDirection},sprite=BulletSprites.scale.red,invincible=true,safe=true,lifeFrame=1800,spriteTransparency=0}

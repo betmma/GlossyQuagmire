@@ -82,11 +82,9 @@ return {
                                 G.runInfo.playerType=player
                                 G.runInfo.shotType=selectedShotType
                                 G:resetRunInfo()
+                                G.runInfo.practice=false
                                 SFX:play('select',true)
                                 StageManager:load('stage1')
-                                if DEV_MODE and SKIP_MODE then
-                                    StageManager.currentSegmentIndex=#StageManager.currentStageData.segments-1 -- skip to the end of the stage for testing
-                                end
                                 G:switchState(G.STATES.IN_GAME)
                             end
                         end

@@ -19,7 +19,8 @@ return {
         local previewCircleRadius=800
         local anglePerOption=math.asin(optionHeight/previewCircleRadius)
         --- a circle arrangement switcher, each option means a stage. each option is a uiBase including stage X text and a switcher for spellcards in that stage. right to the second switcher is options to select difficulties
-        local stageSwitcher=UI.Switcher{
+        local stageSwitcher
+        stageSwitcher=UI.Switcher{
             parent=base,
             x=optionBaseX,y=optionBaseY,
             preview=0,
@@ -33,7 +34,7 @@ return {
                 end
             end,},
             optionConstructor=function(_, optionIndex)
-                local stageKey=StageManager.allStageKeys[optionIndex]
+                local stageKey=G.CONSTANTS.STAGE_KEYS[optionIndex]
                 if not stageKey then return nil end
                 ---@class SpellPracticeStageOption: UIOptions
                 local horizontalOptions=UI.Options{cursor=UI.Cursor{
@@ -82,17 +83,21 @@ return {
                     for i,diff in ipairs(G.CONSTANTS.STAGE_TO_DIFFICULTIES[stageKey]) do
                         if item.difficulties[diff] then
                             local status=2 -- 1, 2, 3 means locked, unlocked, cleared respectively
-                            local historyTable=G.save.spellcardHistory[item.key][diff][shotType]
+                            local historyTable=G.save.spellcardHistory[item.phaseKey][diff][shotType]
                             if historyTable.practice.cleared or historyTable.ingame.cleared then
                                 status=3
                             elseif not historyTable.ingame.unlocked then
                                 status=1
                             end
                             local color=({{0.5,0.5,0.5,1},{1,1,1,1},{0.75,0.75,1,1}})[status]
+                            ---@class SpellPracticeDifficultyOption: UIBase
                             local base=UI.Base{width=500,height=40}
+                            base.difficulty=diff
                             local diffText=diff
                             local difficultyText=UI.Text{text=diffText,fontSize=20,color=color,boldColor={0,0,0,1},x=0,y=0,width=200,parent=base}
-                            local spellcardName=status>=2 and Localize{'spellcards',item.key, diff,'name'} or Localize{'spellcards','UNKNOWN', diff,'name'}
+                            local id=item.difficulties[diff]
+                            local idText=UI.Text{text='ID. '..tostring(id),fontSize=16,color=color,boldColor={0,0,0,1},x=0,y=20,parent=base}
+                            local spellcardName=status>=2 and Localize{'spellcards',item.phaseKey, diff,'name'} or Localize{'spellcards','UNKNOWN', diff,'name'}
                             local spellcardNameText=UI.Text{text=spellcardName,fontSize=20,color=color,boldColor={0,0,0,1},x=500,y=0,width=400,align="right",parent=base}
                             local historyText=Localize{'ui','SPELL_PRACTICE','spellcardHistory',
                                 ingamePass=historyTable.ingame.passes,
@@ -125,6 +130,31 @@ return {
                         extraUpdates={function(self)
                             self.transparency=math.lerpCondition(self.transparency,self.focused,1,0,0.1)
                         end},
+                    },
+                    events={
+                        [UI.EVENTS.SELECT]=function (self)
+                            local item=spellcards[spellcardSwitcher.currentOptionIndex]
+                            if not item then return end
+                            local diff=self.cursor.parent.difficulty
+                            local id=item.difficulties[diff]
+                            local spellcardData=SpellcardCollection.all[id]
+                            local historyTable=G.save.spellcardHistory[item.phaseKey][diff][shotType]
+                            if not historyTable.ingame.unlocked then
+                                SFX:play('cancel',true)
+                                return
+                            end
+                            SFX:play('select',true)
+                            G.runInfo.difficulty=diff
+                            G.runInfo.playerType=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]
+                            G.runInfo.shotType=shotType
+                            StageManager:load(spellcardData.stage,spellcardData.segmentKey,true,function ()
+                                G:switchState(G.STATES.SPELL_PRACTICE) -- after adding replay, should goto save replay state
+                            end,{practicePhase=item.phaseKey})
+                            G:resetRunInfo(0,0)
+                            G.runInfo.practice=true
+                            G.runInfo.exitToState=G.STATES.SPELL_PRACTICE
+                            G:switchState(G.STATES.IN_GAME)
+                        end
                     }
                 }
                 horizontalOptions:addOption(difficultyOptions)
@@ -133,6 +163,7 @@ return {
         }
     end,
     enter=function(self)
+        self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
         base.frame=0
         if updateOptions then updateOptions() end -- to refresh the options when entering the state, in case there are changes in spellcard history after playing a stage or practice
     end,

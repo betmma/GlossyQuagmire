@@ -58,7 +58,7 @@ function UIOptions:update()
             end
         end
         if isPressed(KEYS.SELECT) then
-            self.cursor.parent:emit(UI.EVENTS.SELECT)
+            self.cursor.parent:emit(UI.EVENTS.SELECT,self.cursor.parent)
         end
     end
 end
@@ -114,6 +114,9 @@ function UIOptions:switchOption(option,snap,init)
     local asFirst=self.cursor.drawStyle==UI.Cursor.DRAW_STYLE.Face -- face style cursor should be under the option, line style cursor should be above the option
     option:child(self.cursor,asFirst)
     option:emit(UI.EVENTS.FOCUS,{init=init})
+    if not init then
+        SFX:play('select')
+    end
     if snap then
         self.cursor:snap()
     end

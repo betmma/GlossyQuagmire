@@ -16,6 +16,7 @@ local UI=...
 ---@overload fun(args: UITextArgs): UIText
 local UIText=UI.Base:extend()
 ---@alias rgbColor {[1]: number, [2]: number, [3]: number, [4]: number|nil}
+---@alias rgbaColor {[1]: number, [2]: number, [3]: number, [4]: number}
 
 ---@class UITextArgs:UIBaseArgs
 ---@field align nil|"center"|"left"|"right"|"justify" if nil, uses love.graphics.print, otherwise uses love.graphics.printf with this align. 

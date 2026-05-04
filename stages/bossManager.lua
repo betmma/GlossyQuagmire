@@ -20,7 +20,26 @@ function BossSegment:new(args)
     self.rounds=args.rounds
 end
 
-function BossSegment:func()
+local BossRound -- forward declare for BossSegment func
+
+---@class BossSegmentFuncArgs
+---@field practicePhase string|nil if not nil, will build a temporary func with only one round which only includes this phase
+
+---@param args BossSegmentFuncArgs
+function BossSegment:func(args)
+    ---@type BossRound[]
+    local roundsToRun=self.rounds
+    if args.practicePhase then -- build a temporary round
+        -- find the bossPhase with the key matching args.practicePhase
+        for _, round in pairs(self.rounds) do
+            for _, phase in pairs(round.phases) do
+                if phase.key==args.practicePhase then
+                    roundsToRun={BossRound{phases={phase}}}
+                    break
+                end
+            end
+        end
+    end
     local pos=self.getBossSpawnPos(self)
     Effect.Shockwave{kinematicState={pos=copyTable(pos),dir=0,speed=0},lifeFrame=20,radius=20,growSpeed=1.2,spriteTransparency=1,color='yellow',canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
     Effect.Charge{obj={kinematicState={pos=copyTable(pos),dir=0,speed=0}}}
@@ -32,7 +51,7 @@ function BossSegment:func()
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
     DynamicUIObjs.bossStars:clearStars()
     Event.Event{obj=boss,action=function()
-        for i=1,#self.rounds-1 do
+        for i=1,#roundsToRun-1 do
             wait(10)
             DynamicUIObjs.bossStars:addStar()
         end
@@ -40,9 +59,9 @@ function BossSegment:func()
     }
     
     -- after dialogues are implemented, could add something before the rounds
-    for i, round in ipairs(self.rounds) do
+    for i, round in ipairs(roundsToRun) do
         if DEV_MODE and SKIP_MODE then -- skip to the last round for testing
-            if i==#self.rounds then
+            if i==#roundsToRun then
                 round:func(boss)
             end
         else
@@ -63,59 +82,36 @@ end
 ---@field phases BossPhase[]
 
 ---@class BossRoundArgsGimmick
----@field phaseCount table<BossPhaseType, integer>
+---@field phases BossPhase[]
 ---@field func fun(self)
 
 ---@class BossRound:Object a round typically contains one nonspell and one spellcard. this layer is used to calculate remaining stars besides boss name and calculate HP bar (all phases in the same round compose one multi part HP bar)
 ---@field phaseCount fun(self):table<BossPhaseType, integer> how many phases of each type in the round. can differ based on difficulties.
----@field func fun(self, boss:Boss) call phases:run(). implement special branches like based on player's performance.
----@field phases nil|BossPhase[] if no gimmicks, set this in args and will auto build phaseCount and func. will run phases in order and skip those not fitting current difficulty or player.
+---@field func fun(self, boss:Boss) call phases:run(). auto built func will run phases in order and skip those not fitting current difficulty or player. or pass specific func to implement special branches like based on player's performance.
+---@field phases BossPhase[] gimmick round also needs to list all possible phases here for stage manager to loop and register spellcards, jump to specific phase, etc.
 ---@overload fun(args:BossRoundArgsDefault|BossRoundArgsGimmick):BossRound
-local BossRound=Object:extend()
+BossRound=Object:extend()
 
 function BossRound:new(args)
-    if args.phases then
-        self.phases=args.phases
-        self.phaseCount=function(self)
-            local count={nonspell=0,spellcard=0}
-            for _, phase in pairs(self.phases) do
-                if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
-                    if phase.type~='nonspell' and phase.type~='spellcard' then
-                        error('BossRound:new: invalid phase type '.. tostring(phase.type))
-                    end
-                    count[phase.type]=count[phase.type]+1
+    self.phases=args.phases
+    self.phaseCount=function(self)
+        local count={nonspell=0,spellcard=0}
+        for _, phase in pairs(self.phases) do
+            if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
+                if phase.type~='nonspell' and phase.type~='spellcard' then
+                    error('BossRound:new: invalid phase type '.. tostring(phase.type))
                 end
+                count[phase.type]=count[phase.type]+1
             end
-            return count
         end
+        return count
+    end
+    if not args.func then
         self.func=function(self, boss)
-            -- calculate phases and colors for hp bar.
-            local phaseCount=self:phaseCount()
-            local colors={}
-            local currentColor={1,1,1}
-            for i=1,phaseCount.nonspell do
-                table.insert(colors,currentColor)
-                currentColor=math.lerpTable(currentColor,{0.5,0.5,0.5},0.2) -- gray for nonspell phases
-            end
-            currentColor={0.7,0.7,1}
-            for i=1,phaseCount.spellcard do
-                table.insert(colors,currentColor)
-                currentColor=math.lerpTable(currentColor,{0.3,0.3,1},0.2) -- blue for spellcard phases
-            end
-            local phases={}
-            local eachSpellcard=phaseCount.spellcard<4 and 0.2 or 0.6/phaseCount.spellcard
-            for i=1,phaseCount.spellcard do
-                table.insert(phases,i*eachSpellcard)
-            end
-            local spellcardTakesup=phaseCount.spellcard*eachSpellcard
-            for i=1,phaseCount.nonspell-1 do
-                table.insert(phases,spellcardTakesup+i*(1-spellcardTakesup)/phaseCount.nonspell)
-            end
-            DynamicUIObjs.hpBar:setPhases(phases,colors)
-            DynamicUIObjs.hpBar:initHP()
+            self:initHPBar() -- init hp bar for the round
             for i, phase in ipairs(self.phases) do
                 if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
-                    if DEV_MODE and SKIP_MODE then -- skip to the last phase for testing
+                    if DEV_MODE and SKIP_MODE then -- skip to the last phase for testing. note that the hp bar will be wrong as it is based on all phases but it's for dev testing so doesnt matter
                         if i==#self.phases then
                             phase:run(boss)
                         end      
@@ -126,14 +122,42 @@ function BossRound:new(args)
             end
         end
     else
-        if not args.phaseCount or not args.func then
-            error('BossRound:new: if args.phases is not provided, args.phaseCount and args.func must be provided')
-        end
-        self.phaseCount=args.phaseCount
         self.func=args.func
     end
 end
 
+-- calculate phases and colors for hp bar.
+function BossRound:initHPBar()
+    local phaseCount=self:phaseCount()
+    local colors={}
+    local currentColor={1,1,1}
+    for i=1,phaseCount.nonspell do
+        table.insert(colors,currentColor)
+        currentColor=math.lerpTable(currentColor,{0.5,0.5,0.5},0.2) -- gray for nonspell phases. grayer for later nonspell phases
+    end
+    currentColor={0.7,0.7,1}
+    for i=1,phaseCount.spellcard do
+        table.insert(colors,currentColor)
+        currentColor=math.lerpTable(currentColor,{0.3,0.3,1},0.2) -- blue for spellcard phases. more blue for later spellcard phases
+    end
+    local phases={}
+    local hasNonspell=phaseCount.nonspell>0
+    local eachSpellcard
+    if hasNonspell then
+        eachSpellcard=phaseCount.spellcard<4 and 0.2 or 0.6/phaseCount.spellcard
+    else
+        eachSpellcard=1/phaseCount.spellcard
+    end
+    for i=1,phaseCount.spellcard-(hasNonspell and 0 or 1) do
+        table.insert(phases,i*eachSpellcard)
+    end
+    local spellcardTakesup=phaseCount.spellcard*eachSpellcard
+    for i=1,phaseCount.nonspell-1 do
+        table.insert(phases,spellcardTakesup+i*(1-spellcardTakesup)/phaseCount.nonspell)
+    end
+    DynamicUIObjs.hpBar:setPhases(phases,colors)
+    DynamicUIObjs.hpBar:initHP()
+end
 
 
 ---@alias BossPhaseType 'nonspell'|'spellcard'
@@ -160,6 +184,7 @@ for player,_ in pairs(G.CONSTANTS.PLAYERS_DATA) do
     ALL_PLAYERS[player]=true
 end
 ---@class BossPhaseBaseArgs
+---@field key string
 ---@field time integer
 ---@field isTimeout boolean|nil
 ---@field hp integer
@@ -172,6 +197,7 @@ end
 ---@field type BossPhaseType
 function BossPhase:new(args)
     self.type=args.type
+    self.key=args.key
     self.time=args.time
     self.isTimeout=args.isTimeout
     self.hp=args.hp
@@ -251,10 +277,9 @@ end
 ---@field key string a key to be sent to Localize to get name. must be distinct. the in-game spellcard id like in spellcard history will be auto generated.
 ---@field bonusScore integer score player gets after clearing the spellcard.
 
---- to be implemented.
+
 ---@class SpellcardPhase:BossPhase
 ---@field type 'spellcard'
----@field key string
 ---@field bonusScore integer score player gets after clearing the spellcard.
 ---@field currentBonus integer current bonus score, which counts down every frame.
 ---@field failedBonus boolean whether the player has failed the spellcard and lost the bonus score. failed means getting hit or using bomb or time runs out.
@@ -264,7 +289,6 @@ local SpellcardPhase=BossPhase:extend()
 function SpellcardPhase:new(args)
     BossPhase.new(self, args)
     self.type='spellcard'
-    self.key=args.key
     self.bonusScore=args.bonusScore
     self.currentBonus=self.bonusScore
     self.failedBonus=false

@@ -57,12 +57,6 @@ return {
                     autoSize=true,
                     align='center',transparency=data.disabled and 0.5 or 1,
                     events={
-                        [UI.EVENTS.FOCUS]=function(self,args)
-                            if args.init then
-                                return
-                            end
-                            SFX:play('select')
-                        end,
                         [UI.EVENTS.SELECT]=function(_)
                             if data.disabled then
                                 SFX:play('cancel',true)

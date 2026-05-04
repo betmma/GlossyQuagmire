@@ -10,6 +10,7 @@ local midboss=BossManager.BossSegment{
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
+                key='1-mid-non-1',
                 time=1200,
                 hp=1800,
                 func=function(self, boss)
@@ -110,6 +111,7 @@ local finalBoss=BossManager.BossSegment{
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
+                key='1-boss-non-1',
                 time=1500,
                 hp=2000,
                 func=function(self, boss)
@@ -171,6 +173,7 @@ local finalBoss=BossManager.BossSegment{
         }},
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
+                key='1-boss-non-2',
                 time=1500,
                 hp=2000,
                 func=function(self, boss)
