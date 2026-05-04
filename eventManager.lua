@@ -7,6 +7,10 @@ EventManager.EVENTS={
     GAIN_SCORE='gainScore',
     SPELLCARD_BONUS='spellcardBonus',
     FINISH_BOSS_PHASE='finishBossPhase',
+    -- when player uses bomb
+    PLAYER_BOMB='playerBomb',
+    -- when leaving a run and will never return, like returning to main menu but not including pausing
+    LEAVE_GAME='leaveGame',
     -- below are from previous game
     PLAYER_GRAZE='playerGraze',
     PLAYER_ACCUMULATE_FLASHBOMB='playerAccumulateFlashbomb',
@@ -40,6 +44,7 @@ function EventManager.listenTo(eventName, func, removeEventName)
             EventManager.removeListener(removeEventName, removeFunc)
         end
         EventManager.listenTo(removeEventName, removeFunc)
+        return removeFunc -- return the removeFunc so that it can be manually removed if needed. generally isnt needed because removeFunc removes itself at removeEventName, but it can be useful if you want to remove the listener before that.
     end
 end
 

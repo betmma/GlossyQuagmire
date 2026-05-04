@@ -309,11 +309,12 @@ end
 
 function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
-    self.failedBonus=false
+    self.failedBonus=false  
     local cancelBonus=function()
         self.failedBonus=true
     end
-    EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus, EventManager.EVENTS.LEAVE_GAME)
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus, EventManager.EVENTS.LEAVE_GAME)
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
@@ -322,6 +323,7 @@ function SpellcardPhase:run(boss)
     end}
     BossPhase.run(self, boss)
     EventManager.removeListener(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
+    EventManager.removeListener(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
     if self.remainingFrames==0 and not self.isTimeout then
         self.failedBonus=true

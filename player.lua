@@ -136,6 +136,7 @@ function Player:calculateShoot(dt)
     local shooting=self.keyIsDown('z') and not self.duringDeath and (not self.duringBomb or self.shotType.spellcard.canShoot)
     self.shotType:update(kinematicState, self.keyIsDown('lshift'), shooting, powerLevel, self.frame, dt, self.options, self.transparency)
     if not self.duringBomb and not self.duringDeath and self.keyIsDown('x') and G.runInfo.bombs>=1 then
+        EventManager.post(EventManager.EVENTS.PLAYER_BOMB)
         self.duringDeathbombWindow=false -- exit deathbomb window to prevent death
         self.invincibleFrame=self.shotType.spellcard.duration
         self.transparency=0.5 -- make player semi-transparent during bomb invincibility
@@ -145,7 +146,9 @@ function Player:calculateShoot(dt)
         self.duringBomb=true
         Event{obj=self,action=function()
             wait(self.shotType.spellcard.duration-30)
-
+            Event.EaseEvent{obj=self,duration=30,aims={transparency=1},progressFunc=function(x)
+                return math.sin(x*math.pi*8)*0.5+x
+            end}
             wait(30)
             self.duringBomb=false
             self.transparency=1

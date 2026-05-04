@@ -168,6 +168,7 @@ return {
         end
         if isPressed('escape') then
             SFX:play('select')
+            EventManager.post(EventManager.EVENTS.LEAVE_GAME)
             self:switchState(G.runInfo.exitToState or G.STATES.CHOOSE_PLAYER)
         end
         base:drawTextHierarchy()

@@ -25,7 +25,6 @@ provide a function to display stage title text
 
 ---@class StageManager
 ---@field currentStageData OneStageData
----@field currentSegmentIndex number
 ---@field currentCoroutine thread
 ---@field callback function|nil to be called after stage is finished
 local StageManager={}
@@ -48,7 +47,6 @@ loadStageData()
 ---@param segmentFuncArgs BossSegmentFuncArgs|nil if not nil, will be passed to segment func as args when calling segment:func(args). used for spellcard practice to pass specific phase to func to jump directly to a phase.
 function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, segmentFuncArgs)
     self.currentStageData=StageData[item]
-    self.currentSegmentIndex=0 -- after init finishes it will increment to 1 and start the first segment
     self.callback=callback
     segmentFuncArgs=segmentFuncArgs or {}
     if not skipToSegmentKey then
@@ -85,7 +83,7 @@ end
 
 function StageManager:update(dt)
     if self.currentCoroutine and coroutine.status(self.currentCoroutine)~='dead' then
-        local success, message=coroutine.resume(self.currentCoroutine,self.currentStageData.segments[self.currentSegmentIndex])
+        local success, message=coroutine.resume(self.currentCoroutine)
         if not success then
             error(message)
         end
