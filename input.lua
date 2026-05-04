@@ -1,6 +1,7 @@
 local Input={}
 
 KEYS={
+    SLOW='lshift',
     SELECT='z',
     CANCEL='x',
     DIRECTIONS={

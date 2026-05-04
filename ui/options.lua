@@ -1,4 +1,6 @@
 local UI=...
+---@alias Direction 'up'|'down'|'left'|'right'
+
 --- a bunch of elements arranged. have a cursor to select one of the options.
 ---@class UIOptions:UIBase
 ---@field public cursor UICursor
@@ -7,6 +9,7 @@ local UI=...
 ---@field public switchOptionOnDirection fun(self: UIOptions, direction: number|string) switch to another option.
 ---@field public switchOption fun(self: UIOptions, option: UIBase, snap: boolean|nil, init: boolean|nil) switch to another option. if snap is true, cursor will snap to the new option immediately instead of lerping.
 ---@field public loopable boolean whether to loop around when switching options. default true.
+---@field public keysToDirections table<love.KeyConstant, Direction>
 ---@overload fun(args: UIOptionsArgs): UIOptions
 local UIOptions=UI.Base:extend()
 
@@ -14,6 +17,7 @@ local UIOptions=UI.Base:extend()
 ---@field loopable boolean|nil whether to loop around when switching options. default true.
 ---@field container UIBase|nil the options container. usually an arranger to arrange the options
 ---@field cursor UICursor|nil the cursor to indicate the current option. if not provided, a default UICursor will be used.
+---@field keysToDirections table<love.KeyConstant, Direction>|nil the keys to directions mapping. default to arrow keys.
 
 function UIOptions:new(args)
     UI.Base.new(self,args)
@@ -21,6 +25,12 @@ function UIOptions:new(args)
     self.container=args.container or UI.Base()
     self:child(self.container)
     self.cursor=args.cursor or UI.Cursor()
+    self.keysToDirections=args.keysToDirections or {
+        [KEYS.DIRECTIONS.UP] = 'up',
+        [KEYS.DIRECTIONS.DOWN] = 'down',
+        [KEYS.DIRECTIONS.LEFT] = 'left',
+        [KEYS.DIRECTIONS.RIGHT] = 'right'
+    }
     self.child=function(self,child)
         if child:is(UI.Cursor) then
             UI.Base.child(self,child)
@@ -51,8 +61,8 @@ end
 function UIOptions:update()
     UIOptions.super.update(self)
     if self.cursor.parent and self.focused then
-        for i,key in pairs(KEYS.DIRECTIONS) do
-            if isPressed(key) then
+        for i,key in pairs(self.keysToDirections) do
+            if isPressed(i) then
                 self:switchOptionOnDirection(key)
                 break
             end

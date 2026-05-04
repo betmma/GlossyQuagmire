@@ -138,9 +138,9 @@ SaveManager.defaultSaveData=DefaultRoot{
     spellcardHistory=AlwaysFunction(function(otherTable,key)
         otherTable[key]=otherTable[key] or {}
         local spellcardHistory=otherTable[key]
-        for _,value in ipairs(SpellcardCollection) do
-            spellcardHistory[value.key]=spellcardHistory[value.key] or {}
-            local oneSCData=spellcardHistory[value.key]
+        for _,value in ipairs(SpellcardCollection.all) do
+            spellcardHistory[value.phaseKey]=spellcardHistory[value.phaseKey] or {}
+            local oneSCData=spellcardHistory[value.phaseKey]
             oneSCData[value.difficulty]=oneSCData[value.difficulty] or {}
             local oneDiffData=oneSCData[value.difficulty]
             for player,_ in pairs(value.players) do

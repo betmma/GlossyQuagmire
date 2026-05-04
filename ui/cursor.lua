@@ -73,12 +73,17 @@ function UICursor:drawText()
     end
 end
 
-function UICursor:drawTextFaceStyle()
-    local x,y=self:getXY()
+function UICursor:getFluctuationXYWH()
     local fluctuation=(math.sin(self.frame/self.fluctuatePeriod*2*math.pi)*0.5+0.5)*self.fluctuateRatio
     local dw,dh=self.width*fluctuation,self.height*fluctuation
+    local x,y=self:getXY()
     x,y=x-dw/2,y-dh/2
     local w,h=self.width+dw,self.height+dh
+    return x,y,w,h
+end
+
+function UICursor:drawTextFaceStyle()
+    local x,y,w,h=self:getFluctuationXYWH()
     local colorref={love.graphics.getColor()}
     love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*self.transparency)
     love.graphics.rectangle('fill',x,y,w,h)
@@ -86,11 +91,7 @@ function UICursor:drawTextFaceStyle()
 end
 
 function UICursor:drawTextLineStyle()
-    local x,y=self:getXY()
-    local fluctuation=(math.sin(self.frame/self.fluctuatePeriod*2*math.pi)*0.5+0.5)*self.fluctuateRatio
-    local dw,dh=self.width*fluctuation,self.height*fluctuation
-    x,y=x-dw/2,y-dh/2
-    local w,h=self.width+dw,self.height+dh
+    local x,y,w,h=self:getFluctuationXYWH()
     local colorref={love.graphics.getColor()}
     love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*self.transparency)
     local lineLengthX=self.lineLengthRatio*w/2

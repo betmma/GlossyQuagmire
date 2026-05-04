@@ -404,15 +404,15 @@ function makeDynamicUIObjs()
 
     --- when starting a new game
     local function reset()
-        stageTitleText:setText('')
-        stageTitleSmallText:setText('')
-        noticeText:setText('')
-        soundtrackText:setText('')
-        bossNameText:setText('')
+        stageTitleText:setText('',true)
+        stageTitleSmallText:setText('',true)
+        noticeText:setText('',true)
+        soundtrackText:setText('',true)
+        bossNameText:setText('',true)
         bossStars:clearStars()
         setRemainingTimeText(nil)
-        spellcardNameText:setText('')
-        spellcardBonusHistoryText:setText('')
+        spellcardNameText:setText('',true)
+        spellcardBonusHistoryText:setText('',true)
         hpBar.hpRatio=0
     end
 

@@ -133,16 +133,16 @@ function Player:calculateShoot(dt)
     end
     local powerLevel=math.floor(G.runInfo.power/100)
     local kinematicState={pos=self.kinematicState.pos,dir=self.viewDirection-math.pi/2, speed=0} -- note that the dir must not be self.kinematicState.dir, because that value is the moving direction, not the shooting (facing) direction. viewDirection is the right hand side direction, so shooting direction is viewDirection-math.pi/2
-    local shooting=self.keyIsDown('z') and not self.duringDeath and (not self.duringBomb or self.shotType.spellcard.canShoot)
-    self.shotType:update(kinematicState, self.keyIsDown('lshift'), shooting, powerLevel, self.frame, dt, self.options, self.transparency)
-    if not self.duringBomb and not self.duringDeath and self.keyIsDown('x') and G.runInfo.bombs>=1 then
+    local shooting=self.keyIsDown(KEYS.SELECT) and not self.duringDeath and (not self.duringBomb or self.shotType.spellcard.canShoot)
+    self.shotType:update(kinematicState, self.keyIsDown(KEYS.SLOW), shooting, powerLevel, self.frame, dt, self.options, self.transparency)
+    if not self.duringBomb and not self.duringDeath and self.keyIsDown(KEYS.CANCEL) and G.runInfo.bombs>=1 then
         EventManager.post(EventManager.EVENTS.PLAYER_BOMB)
         self.duringDeathbombWindow=false -- exit deathbomb window to prevent death
         self.invincibleFrame=self.shotType.spellcard.duration
         self.transparency=0.5 -- make player semi-transparent during bomb invincibility
         G.runInfo.bombs=G.runInfo.bombs-1
         SFX:play('enemyPowerfulShot',true)
-        self.shotType.spellcard.func(kinematicState, self.keyIsDown('lshift'))
+        self.shotType.spellcard.func(kinematicState, self.keyIsDown(KEYS.SLOW))
         self.duringBomb=true
         Event{obj=self,action=function()
             wait(self.shotType.spellcard.duration-30)
@@ -178,7 +178,7 @@ function Player:getKeyboardMoveSpeed()
     if rightAmount~=0 and downAmount~=0 and self.diagonalSpeedAddition then
         speed=speed*math.sqrt(vxunit^2+vyunit^2) -- it means when moving diagonally, the speed is the addition of 2 vectors of U/D and L/R. Not multiplying by sqrt(2) is because U/D vector and L/R vector could be not orthogonal.
     end
-    if self.keyIsDown('lshift') then
+    if self.keyIsDown(KEYS.SLOW) then
         speed=speed*self.focusFactor
     end
     return speed, dir
@@ -238,7 +238,7 @@ function Player:calculateMovingTransitionSprite()
 end
 
 function Player:calculateFocusPointTransparency()
-    local focus=self.keyIsDown('lshift')
+    local focus=self.keyIsDown(KEYS.SLOW)
     self.focusPointTransparency=self.focusPointTransparency or 0
     local add=0.2
     if focus then

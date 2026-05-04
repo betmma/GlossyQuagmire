@@ -67,6 +67,7 @@ function UIBase:child(child,asFirst)
     if not child then
         error("Child cannot be nil")
     end
+    child:unchild() -- remove from previous parent if has
     if asFirst then
         table.insert(self.children,1,child)
     else
@@ -131,6 +132,7 @@ end
 -- UI system is different from other game objects, as it passes update calls from parent to child, instead of the classes pass updateAll to subclasses. why? since draw order depends on the hierarchy, draw calls cannot come from class passing down to subclasses, instead it has to come from the root of the hierarchy and pass down to children. so update follows the same pattern to keep it consistent. updateAll is only used to clear removed elements.
 function UIBase:cleanObjects()
   for key, cls in pairs(self.subclasses) do
+      ---@cast cls UIBase
       cls:cleanObjects()
   end
   local nextObjects={}

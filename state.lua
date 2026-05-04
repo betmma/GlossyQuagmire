@@ -73,6 +73,7 @@ G={
             KOTOBA={value='KOTOBA',color={1,0.5,1,1}},
         },
         ---@alias SHOT_TYPE 'REIMUA'|'REIMUB'|'MARISAA'|'MARISAB'|'KOTOBAA'|'KOTOBAB'
+        ---@type SHOT_TYPE[]
         SHOT_TYPES={'REIMUA','REIMUB','MARISAA','MARISAB','KOTOBAA','KOTOBAB'},
         ---@type table<SHOT_TYPE, PLAYER>
         SHOT_TYPE_TO_PLAYER={

@@ -487,8 +487,18 @@ return {
                     zh_cn = '六面',
                 },
                 stageEX = {
-                    en_us = 'Extra Stage',
+                    en_us = 'Stage EX',
                     zh_cn = 'EX面',
+                },
+            },
+            cursor = {
+                back = {
+                    en_us = 'BACK',
+                    zh_cn = '返回',
+                },
+                start = {
+                    en_us = 'START',
+                    zh_cn = '开始',
                 },
             },
             spellcard = {
@@ -498,6 +508,33 @@ return {
             spellcardHistory = {
                 en_us = 'IN GAME {ingamePass}/{ingameTries} PRACTICE {practicePass}/{practiceTries}',
                 zh_cn = '实战 {ingamePass}/{ingameTries} 练习 {practicePass}/{practiceTries}',
+            },
+            ---@type table<SHOT_TYPE, localizationItem>
+            shotTypes = {
+                REIMUA = {
+                    en_us = 'Reimu A',
+                    zh_cn = '灵梦A',
+                },
+                REIMUB = {
+                    en_us = 'Reimu B',
+                    zh_cn = '灵梦B',
+                },
+                MARISAA = {
+                    en_us = 'Marisa A',
+                    zh_cn = '魔理沙A',
+                },
+                MARISAB = {
+                    en_us = 'Marisa B',
+                    zh_cn = '魔理沙B',
+                },
+                KOTOBAA = {
+                    en_us = 'Kotoba A',
+                    zh_cn = '言波A',
+                },
+                KOTOBAB = {
+                    en_us = 'Kotoba B',
+                    zh_cn = '言波B',
+                },
             }
         },
 

@@ -161,14 +161,18 @@ end
 
 
 ---@alias BossPhaseType 'nonspell'|'spellcard'
+---@class HasDifficulty:strict
+---@field [DIFFICULTY] true
+---@class HasPlayer:strict
+---@field [PLAYER] true
 
 ---@class BossPhase:Object should not create a BossPhase directly; only use NonSpellPhase and SpellcardPhase.
 ---@field type BossPhaseType
 ---@field time integer frames of the phase
 ---@field isTimeout boolean if the phase is timeout type (survive until time runs out)
 ---@field hp integer hp of the phase. ignored if isTimeout is true
----@field difficulties nil|table<DIFFICULTY,true> which difficulties the phase will appear in. if nil, considers as appearing in all difficulties. spellcard practice menu and default bossRound will use this.
----@field players nil|table<PLAYER,true> same logic as above
+---@field difficulties nil|HasDifficulty which difficulties the phase will appear in. if nil, considers as appearing in all difficulties. spellcard practice menu and default bossRound will use this.
+---@field players nil|HasPlayer same logic as above
 ---@field func fun(self, boss:Boss) the concrete content of the boss phase. like spawn bullets
 ---@field run fun(self, boss:Boss) create a coroutine for self.func and run until it ends.
 ---@field isFinished fun(self, boss:Boss):boolean check if the phase is finished. for timeout type, check if time runs out. for hp type, check if hp<=0. this is used to determine when to end the phase and move on to the next one.
@@ -189,8 +193,8 @@ end
 ---@field isTimeout boolean|nil
 ---@field hp integer
 ---@field dropItems nil|DropItems items to drop after clearing the phase.
----@field difficulties nil|table<DIFFICULTY,true>
----@field players nil|table<PLAYER,true>
+---@field difficulties nil|HasDifficulty which difficulties the phase will appear in. if nil, considers as appearing in all difficulties. spellcard practice menu and default bossRound will use this.
+---@field players nil|HasPlayer same logic as above
 ---@field func fun(self, boss:Boss) the concrete content of the boss phase. like spawn bullets
 
 ---@class BossPhaseArgs

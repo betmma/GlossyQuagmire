@@ -31,7 +31,7 @@ local StageManager={}
 
 ---@type table<StageKey,OneStageData>
 local StageData={}
-local currentStageKeys={'stage1'} -- currently existing stages.
+local currentStageKeys={'stage1',} -- currently existing stages.
 local function loadStageData()
     for _,stageKey in pairs(currentStageKeys) do
         StageData[stageKey]=require('stages.'..stageKey..'.main')
