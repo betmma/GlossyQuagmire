@@ -71,11 +71,7 @@ end
 function Enemy:addHPProtection(time,value)
     self.damageResistance=(self.damageResistance or 1)+value
     Event.EaseEvent{
-        obj=self,
-        easeFrame=time,
-        aimTable=self,
-        aimKey='damageResistance',
-        aimValue=self.damageResistance-value,
+        obj=self,duration=time,aims={damageResistance=self.damageResistance-value},
     }
 end
 

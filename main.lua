@@ -1,4 +1,4 @@
-VERSION="0.1.5.3"
+VERSION="0.1.6"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"
@@ -27,6 +27,7 @@ function love.load()
     Player = require "player"
     Action = require "action"
     Bullet = require "bullet"
+    GeoLaser = require "laser"
     Item = require "item"
     -- Laser=require"laser"
     -- PolyLine = require "polyline"

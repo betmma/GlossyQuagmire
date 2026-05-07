@@ -1,4 +1,4 @@
---! file: shape.lua
+---@overload fun(args:ShapeArgs):Shape
 local Shape = GameObject:extend()
 -- Shape.removeDistance=100
 Shape.timeSpeed=1
@@ -51,7 +51,7 @@ end
 
 --- extra update logic is common among different shapes, but not needed for every shape, so it's separated from the main update function. subclasses can call self:executeExtraUpdate(dt) in their update function to execute the extra update logic.
 function Shape:executeExtraUpdate(dt)
-    for k, func in pairs(self.extraUpdate or {}) do
+    for k, func in ipairs(self.extraUpdate or {}) do
         if type(func)=='function' then
             func(self,dt)
         elseif type(func)=='table' and func.isAction then

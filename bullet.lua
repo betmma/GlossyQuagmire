@@ -1,7 +1,46 @@
 --! file: circle.lua
 ---@class Bullet:Shape
+---@field size number The scale/zoom factor of the bullet.
+---@field sprite Sprite|GIFSprite The visual representation of the bullet.
+---@field spriteColor rgbaColor|nil RGBA table for tinting the sprite.
+---@field safe boolean If true, the bullet will not damage the player.
+---@field fromPlayer boolean Whether the bullet originated from the player.
+---@field invincible boolean If true, normal shockwaves won't remove this bullet.
+---@field damage number Amount of damage dealt to player on hit. Probably wont be value other than 1.
+---@field grazed boolean Whether this bullet has already triggered a graze event.
+---@field baseGrazeValue number The amount added to graze stats. Probably wont be value other than 1.
+---@field batch love.SpriteBatch|nil The sprite batch used for standard drawing.
+---@field meshBatch MeshBatch|nil The mesh batch used for complex/deformed drawing.
+---@field forceQuad boolean If true, forces simple quad drawing even if geometry suggests mesh.
+---@field forceMesh boolean If true, forces mesh drawing.
+---@field spriteTransparency number Alpha multiplier (0-1).
+---@field spriteExtraDirection number Internal rotation offset (e.g., for 'note' sprites or rotation effects).
+---@field spriteRotationSpeed number How fast the sprite rotates over time.
+---@field updateSprite fun(self:Bullet):nil Updates animation frames and rotation.
+---@field checkShockwaveRemove fun(self:Bullet):nil Checks collision with active shockwaves.
+---@field checkHitPlayer fun(self:Bullet):nil Checks collision with player hitbox and graze box.
+---@field grazeValue fun(self:Bullet):number Calculates the final graze value.
+---@field removeEffect fun(self:Bullet):nil Spawns visual effects upon bullet removal.
+---@field changeSpriteColor fun(self:Bullet, color?:string):nil Changes the sprite variant based on a color key.
+---@field changeSprite fun(self:Bullet, sprite:Sprite):nil Safely swaps the bullet sprite and handles GIF initialization.
+---@overload fun(args:BulletArgs):Bullet
 local Bullet = Shape:extend()
 
+---@class BulletArgs:ShapeArgs
+---@field size number|nil The scale/zoom factor of the bullet. Default is 1.
+---@field sprite Sprite
+---@field spriteColor rgbaColor|nil RGBA table for tinting the sprite.
+---@field safe boolean|nil If true, the bullet will not damage the player. Default is false.
+---@field invincible boolean|nil If true, normal shockwaves won't remove this bullet. Default is false.
+---@field damage number|nil Amount of damage dealt to player on hit. Default is 1.
+---@field grazed boolean|nil Whether this bullet has already triggered a graze event. Default is false.
+---@field baseGrazeValue number|nil The amount added to graze stats. Default is 1.
+---@field batch love.SpriteBatch|nil The sprite batch used for standard drawing. Default is BulletBatch or Asset.bulletHighlightBatch if highlight is true.
+---@field meshBatch MeshBatch|nil The mesh batch used for complex/deformed drawing. Default is Asset.bigBulletMeshes.
+---@field forceQuad boolean|nil If true, forces simple quad drawing even if geometry suggests mesh. Default is false.
+---@field forceMesh boolean|nil If true, forces mesh drawing. Default is false.
+---@field spriteTransparency number|nil Alpha multiplier (0-1). Default is 1.
+---@field extraUpdate ExtraUpdate|function|nil Additional update functions or actions to execute each frame.
 function Bullet:new(args)
     Bullet.super.new(self, args)
     self.size = args.size or 1
@@ -53,8 +92,13 @@ function Bullet:new(args)
         self.spriteRotationSpeed=0.01
     end
 
+    for _, func in ipairs(self.extraUpdate) do
+        if type(func)=='table' and func.isAction and func.init then
+            func.init(self, func.params)
+        end
+    end
     if args.events then
-        for _, eventFunc in pairs(args.events) do
+        for _, eventFunc in ipairs(args.events) do
             eventFunc(self, args)
         end
     end
@@ -65,16 +109,17 @@ function Bullet:draw()
         return
     end
     local color={1,1,1,1}
-    if self.spriteColor then
-        color=copyTable(self.spriteColor)
+    local spriteColor=self.spriteColor
+    if spriteColor then
+        color=copyTable(spriteColor)
     end
     color[4]=(color[4]or 1)*self.spriteTransparency
     self:drawQuad{
         quad=self.sprite.quad,
         rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),
         zoom=self.size,
-        normalBatch=(not self.forceMesh)and self.batch,
-        meshBatch=(not self.forceQuad)and self.meshBatch,
+        normalBatch=(not self.forceMesh)and self.batch or nil,
+        meshBatch=(not self.forceQuad)and self.meshBatch or nil,
         color=color,
         isSquare=self.sprite.data.isSquare
     }
@@ -85,7 +130,7 @@ end
 ---@param h number
 ---@param rotation number
 ---@param quad love.Quad
----@param color number[]|nil
+---@param color rgbaColor|nil
 ---@param meshBatch MeshBatch
 ---@param sideNum integer
 function Bullet:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum)

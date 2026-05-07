@@ -4,6 +4,7 @@ local Action={}
 ---@field isAction true
 ---@field params table<string, any>
 ---@field func fun(self:Bullet, params:table<string, any>):nil it should not modify the params as this table may be shared among multiple objects. store into self if needed.
+---@field init (fun(self:Bullet, params:table<string, any>):nil)|nil an optional function to initialize the action, called at bullet:new. 
 
 
 local fadeOut=function(self,params)
@@ -37,28 +38,54 @@ local fadeIn=function(self,params)
     end
 end
 
+local fadeInInit=function(self,params)
+    self.spriteTransparency=0
+    self.safe=true
+end
+
 ---@param fadeFrame integer number of frames for the fade in animation, default 30
 ---@param setSafe boolean whether to set the bullet safe when start fading in, default false
 ---@param fadeTransparency number|nil if you want to set a specific transparency instead of 0-1, default nil
 --- @return Action
 Action.FadeIn=function(fadeFrame,setSafe,fadeTransparency)
-    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe,fadeTransparency=fadeTransparency},func=fadeIn}
+    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe,fadeTransparency=fadeTransparency},func=fadeIn,init=fadeInInit}
+end
+
+local zoomOut=function(self,params)
+    local zoomFrame=params.zoomFrame or 30
+    local initialSize=self.sizeReference or self.size
+    if self.frame+zoomFrame>=self.lifeFrame then
+        self.sizeReference=self.sizeReference or initialSize
+        self.size=initialSize*(self.lifeFrame - self.frame)/zoomFrame
+    end
+end
+
+--- the bullet shrinks from its size to 0 in the last [zoomFrame] frames of its life.
+--- @param zoomFrame integer number of frames for the zoom out animation, default 30
+--- @return Action
+Action.ZoomOut=function(zoomFrame)
+    return {isAction=true,params={zoomFrame=zoomFrame},func=zoomOut}
 end
 
 local zoomIn=function(self,params)
     local zoomFrame=params.zoomFrame or 30
-    local targetSize=params.targetSize or self.size
+    local targetSize=params.targetSize or self.zoomInTargetSize
     if self.frame<=zoomFrame then
         self.size=targetSize*self.frame/zoomFrame
     end
 end
 
+local zoomInInit=function(self,params)
+    self.zoomInTargetSize=self.size
+    self.size=0
+end
+
 -- bullet size grows from 0 to [self.targetSize] in [self.zoomFrame] frames.
 --- @param zoomFrame integer number of frames for the zoom animation, default 30
---- @param targetSize number target size for the zoom animation, default self.size
+--- @param targetSize number|nil target size for the zoom animation, default self.size
 --- @return Action
 Action.ZoomIn=function(zoomFrame,targetSize)
-    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize},func=zoomIn}
+    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize},func=zoomIn,init=zoomInInit}
 end
 
 local appearingHint=function(self,params)

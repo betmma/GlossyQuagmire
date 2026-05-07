@@ -63,7 +63,7 @@ end
 ---@param poses Position[]
 ---@param width number
 ---@param quad love.Quad "quad of sprite"
----@param color number[]|nil
+---@param color rgbaColor|nil
 ---@param gap number|nil the gap of interpolated points between two positions
 ---@param maxMiddlePoints number|nil the max number of interpolated points between two positions, to prevent too many points when the distance is long
 ---@param meshBatch MeshBatch adds the generated meshes to this batch
@@ -109,7 +109,7 @@ end
 ---@param objH number height of object
 ---@param quad love.Quad "quad of sprite"
 ---@param n integer "number of vertices on the circle"
----@param color number[]|nil "color RGBA, each in [0,1]"
+---@param color rgbaColor|nil "color RGBA, each in [0,1]"
 ---@param square boolean|nil "if true, vertices are calculated on a square instead of a circle (for square sprites)"
 ---@param meshBatch MeshBatch adds the generated meshes to this batch
 function MeshFuncs.fanMesh(position,objW,objH,orientation,quad,n,color,square,meshBatch)
@@ -158,7 +158,7 @@ end
 ---@param orientation angle "orientation of object"
 ---@param quad love.Quad "quad of sprite"
 ---@param n integer "number of vertices on the circle"
----@param color number[]|nil "color RGBA, each in [0,1]"
+---@param color rgbaColor|nil "color RGBA, each in [0,1]"
 ---@param loopNum integer|nil "number of times the texture loops around the ring, default 1"
 ---@param meshBatch MeshBatch adds the generated meshes to this batch
 function MeshFuncs.ringMesh(position,innerR,outerR,orientation,quad,n,color,loopNum,meshBatch)
@@ -203,7 +203,7 @@ end
 ---@param orientation angle "orientation of object"
 ---@param quad love.Quad "quad of sprite"
 ---@param n integer "number of vertices on the circle"
----@param color number[]|nil "color RGBA, each in [0,1]"
+---@param color rgbaColor|nil "color RGBA, each in [0,1]"
 ---@param meshBatch MeshBatch adds the generated meshes to this batch
 function MeshFuncs.ringFanMesh(position,innerR,outerWidth,outerHeight,orientation,quad,n,color,meshBatch)
     local x, y, w, h, c = MeshHelper.getUVsAndColor(quad, meshBatch, color)
@@ -260,6 +260,93 @@ function MeshFuncs.ringFanMesh(position,innerR,outerWidth,outerHeight,orientatio
     end
     ringAcc:flushAll()
     fanAcc:flushAll()
+end
+
+--- the area between two rays for GeoLaser
+---@param rays GeoLaserRays
+---@param quad love.Quad
+---@param color rgbaColor|nil
+---@param meshBatch MeshBatch
+---@param budget GeoLaserMeshBudget|nil
+function MeshFuncs.twoRaysMesh(rays,quad,color,meshBatch,budget)
+    local x, y, w, h, c = MeshHelper.getUVsAndColor(quad, meshBatch, color)
+    local step=budget and budget.step or 70
+    local num=budget and budget.num or 20
+    local distFunc=function(i)
+        return step*i
+    end
+    local geometry=G.runInfo.geometry
+    if geometry==G.geometries.Spherical then
+        ---@cast geometry Spherical
+        local perimeter=math.pi*2*geometry.radius
+        step=perimeter/num
+    elseif geometry==G.geometries.Hyperbolic then
+        -- ---@cast geometry Hyperbolic
+        -- distFunc=function(i)
+        --     return step*(i+i*i/num)
+        -- end
+    end
+    local leftHitboxU=(rays.borderRadius-rays.hitboxRadius)/(rays.borderRadius*2)
+    local rightHitboxU=(rays.borderRadius+rays.hitboxRadius)/(rays.borderRadius*2)
+    local strips={
+        {rays.border.left,rays.hitbox.left,x,x+w*leftHitboxU},
+        {rays.hitbox.left,rays.hitbox.right,x+w*leftHitboxU,x+w*rightHitboxU},
+        {rays.hitbox.right,rays.border.right,x+w*rightHitboxU,x+w}
+    }
+
+    for _,strip in ipairs(strips) do
+        local ray1,ray2,u1,u2=strip[1],strip[2],strip[3],strip[4]
+        local acc = MeshHelper.newAccumulator(meshBatch, 'strip')
+        local lastRay1Pos, lastRay2Pos
+        for i=0,num do
+            local ray1Pos=geometry:rThetaGo(ray1.pos,distFunc(i),ray1.dir)
+            local ray2Pos=geometry:rThetaGo(ray2.pos,distFunc(i),ray2.dir)
+            if i==num then
+                lastRay1Pos=ray1Pos
+                lastRay2Pos=ray2Pos
+            end
+            local ray1Screens=geometry:toScreen(ray1Pos)
+            local ray2Screens=geometry:toScreen(ray2Pos)
+            for si=1,math.min(#ray1Screens,#ray2Screens) do
+                local p1,p2=ray1Screens[si],ray2Screens[si]
+                if not p1.dummy and not p2.dummy then
+                    acc:add(si,
+                        {p1.x, p1.y, u1, y, c[1], c[2], c[3], c[4]},
+                        {p2.x, p2.y, u2, y, c[1], c[2], c[3], c[4]}
+                    )
+                else
+                    acc:breakMesh(si)
+                end
+            end
+        end
+        if geometry==G.geometries.Hyperbolic and geometry--[[@as Hyperbolic]].viewConfig.hyperbolicModel~=geometry--[[@as Hyperbolic]].HYPERBOLIC_MODELS.UHP then -- the two end points will form a chord on the disk. add more points along the arc to fill the gap. also in hyperbolic it's ensured toScreen returns one non dummy screenPosition.
+            local r,angle=geometry:rThetaTo(ray1.pos,ray2.pos)
+            local center=geometry:rThetaGo(ray1.pos,r/2,angle)
+            local angle1=geometry:to(center,lastRay1Pos)
+            local angle2=geometry:to(center,lastRay2Pos)
+            if angle2<angle1 then
+                angle2=angle2+math.pi*2
+            end
+            local angleDiff=angle2-angle1
+            local midPoints=budget and budget.capNum or 16
+            for i=1,midPoints-1 do
+                local sign=math.mod2Sign(i)
+                local ratio
+                if sign==-1 then
+                    ratio=i/midPoints/2
+                else
+                    ratio=1-i/midPoints/2
+                end
+                local midAngle=angle1+angleDiff*ratio
+                local midPos=geometry:rThetaGo(center,distFunc(num),midAngle)
+                local midScreen=geometry:toScreen(midPos)[1]
+                acc:add(1,
+                    {midScreen.x, midScreen.y, math.lerp(u1,u2,ratio), y, c[1], c[2], c[3], c[4]}
+                )
+            end
+        end
+        acc:flushAll()
+    end
 end
 
 return MeshFuncs

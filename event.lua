@@ -1,13 +1,14 @@
 ---@class Event:GameObject
 ---@field obj GameObject the object that the event is attached to.
 ---@field coroutine thread
+---@overload fun(args:EventArgs):Event
 local Event = GameObject:extend()
 
 Event.Event = Event
 
 ---@class EventArgs
----@field obj GameObject the object that the event is attached to.
----@field action fun(self:Event) the function to be executed. it will be wrapped in a coroutine.
+---@field obj GameObject|nil the object that the event is attached to.
+---@field action fun(self:Event)|nil the function to be executed. it will be wrapped in a coroutine.
 ---@field afterFunc function|nil the function to be executed after the action is done. not useful in basic Event, but can be used in LoopEvent and EaseEvent.
 
 ---@param args EventArgs
@@ -45,12 +46,13 @@ function Event:update(dt)
 end
 
 ---@class LoopEvent:Event
+---@overload fun(args:LoopEventArgs):LoopEvent
 local LoopEvent = Event:extend()
 
 ---@class LoopEventArgs:EventArgs
 ---@field period number number of frames between each execution of the function. default is 60.
----@field firstPeriod number number of frames before the first execution of the function. default is period.
----@field times number the number of times to execute the function. default is math.huge.
+---@field firstPeriod number|nil number of frames before the first execution of the function. default is period.
+---@field times number|nil the number of times to execute the function. default is math.huge.
 ---@field executeFunc fun(self:Event, index:number, total:number) the function to be executed.
 
 ---@param args LoopEventArgs
@@ -80,6 +82,7 @@ Event.sineOProgressFunc = function(x) return math.sin(x * math.pi / 2) end
 Event.sineBackProgressFunc = function(x) return math.sin(x * math.pi) end
 
 ---@class EaseEvent:Event
+---@overload fun(args:EaseEventArgs):EaseEvent
 local EaseEvent = Event:extend()
 
 ---@enum EaseMode
@@ -100,6 +103,9 @@ function EaseEvent:new(args)
     local duration = args.duration or 60
     local aims = args.aims or {}
     local easeObj = args.easeObj or args.obj
+    if not easeObj then
+        error('EaseEvent:new: no object to ease')
+    end
     local progressFunc = args.progressFunc or function(x) return x end
     local easeMode = args.easeMode or EaseEvent.easeMode.soft
 

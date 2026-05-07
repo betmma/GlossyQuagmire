@@ -228,6 +228,23 @@ local finalBoss=BossManager.BossSegment{
                 end
             },
             require 'stages.stage1.spellcards.swallow',
+            BossManager.SpellcardPhase{
+                key='test',
+                bonusScore=10000,
+                time=4500,
+                hp=3000,
+                func=function(self, boss)
+                    local spawner=BulletSpawner{kinematicState=copyTable(boss.kinematicState),
+                        period=600,firstPeriod=20,lifeFrame=4400,bulletNumber=1,bulletSpeed=-30,bulletSize=4,angle='0+999',bulletSprite=BulletSprites.giant.red,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeIn(30,true),Action.FadeOut(30,true),function(self)
+                            -- self.kinematicState.dir=self.kinematicState.dir+0.01
+                        end},bulletEvents={
+                            function(cir,args,self)
+                                GeoLaser{kinematicState=cir.kinematicState,sprite=BulletSprites.laser.red,size=16,lifeFrame=500,extraUpdate={Action.ZoomIn(40),Action.FadeIn(40,true),Action.ZoomOut(20)}}:bindState(cir)
+                            end
+                        }
+                    }
+                end
+            }
         }},
     }
 }

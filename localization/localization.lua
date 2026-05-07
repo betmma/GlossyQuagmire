@@ -1,11 +1,13 @@
 ---@alias lang string
+---@alias magicString string -- defined in misc.getRawLocalizeString. something like '@op:val' that can be used to refer to other localization items or do some operations. currently only supports '@ref:someKey' to refer to other localization items in the same table to avoid repetition.
 ---@alias localizationItem table<lang,string>
+
 return {
     ---@class spellcardLocalizationUnit:strict
     ---@field name localizationItem
     ---@class spellcardLocalization:strict
     ---@field __default__? spellcardLocalizationUnit
-    ---@field [DIFFICULTY] spellcardLocalizationUnit
+    ---@field [DIFFICULTY] spellcardLocalizationUnit|magicString
     ---@type table<string, spellcardLocalization>
     spellcards={
         UNKNOWN = {
@@ -25,12 +27,27 @@ return {
             },
         },
         ['kotoba-swallow'] = {
+            EASY = {
+                name = {
+                    en_us = 'Swallow Sign "Death of the Clumsy Birds"',
+                    zh_cn = '吞燕「拙燕之死」',
+                },
+            },
+            NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
                     en_us = 'Swallow Sign "Death of the Black Wings"',
                     zh_cn = '吞燕「玄鸟之死」',
                 },
             },
+        },
+        ['kotoba-star'] = {
+            EASY = {
+                name = {
+                    en_us = 'Star Sign "Dazzling Fame"',
+                    zh_cn = '明星「耀世之名」',
+                }
+            }
         }
     },
     levelData = {

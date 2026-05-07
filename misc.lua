@@ -315,13 +315,23 @@ local function getRawLocalizeString(args)
     local current=localization
     for key, value in ipairs(args) do
         if current[value] then
-            current=current[value]
+            local next=current[value]
+            if type(next)=="string" then
+                local op,val=next:match('@(.+):(.+)')
+                if op=='ref' then
+                    next=current[val]
+                else
+                    return 'ERROR', false
+                end
+            end
+            current=next
         elseif current['__default__'] then
             current=current['__default__']
         else
             return 'ERROR', false
         end
     end
+    ---@cast current localizationItem
     if current[lang] then
         return current[lang], true
     else
