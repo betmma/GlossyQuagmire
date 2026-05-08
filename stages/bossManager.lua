@@ -61,7 +61,7 @@ function BossSegment:func(args)
     -- after dialogues are implemented, could add something before the rounds
     for i, round in ipairs(roundsToRun) do
         if DEV_MODE and SKIP_MODE then -- skip to the last round for testing
-            if i==#roundsToRun then
+            if i==#roundsToRun or round.SKIP_INCLUDE then
                 round:func(boss)
             end
         else
@@ -79,6 +79,7 @@ function BossSegment:func(args)
 end
 
 ---@class BossRoundArgsDefault
+---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this round. for testing middle rounds.
 ---@field phases BossPhase[]
 
 ---@class BossRoundArgsGimmick
@@ -86,6 +87,7 @@ end
 ---@field func fun(self)
 
 ---@class BossRound:Object a round typically contains one nonspell and one spellcard. this layer is used to calculate remaining stars besides boss name and calculate HP bar (all phases in the same round compose one multi part HP bar)
+---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this round. for testing middle rounds.
 ---@field phaseCount fun(self):table<BossPhaseType, integer> how many phases of each type in the round. can differ based on difficulties.
 ---@field func fun(self, boss:Boss) call phases:run(). auto built func will run phases in order and skip those not fitting current difficulty or player. or pass specific func to implement special branches like based on player's performance.
 ---@field phases BossPhase[] gimmick round also needs to list all possible phases here for stage manager to loop and register spellcards, jump to specific phase, etc.
@@ -93,6 +95,7 @@ end
 BossRound=Object:extend()
 
 function BossRound:new(args)
+    self.SKIP_INCLUDE=args.SKIP_INCLUDE
     self.phases=args.phases
     self.phaseCount=function(self)
         local count={nonspell=0,spellcard=0}
@@ -112,7 +115,7 @@ function BossRound:new(args)
             for i, phase in ipairs(self.phases) do
                 if phase.difficulties[G.runInfo.difficulty] and phase.players[G.runInfo.playerType] then
                     if DEV_MODE and SKIP_MODE then -- skip to the last phase for testing. note that the hp bar will be wrong as it is based on all phases but it's for dev testing so doesnt matter
-                        if i==#self.phases then
+                        if i==#self.phases or phase.SKIP_INCLUDE then
                             phase:run(boss)
                         end      
                     else
@@ -167,6 +170,7 @@ end
 ---@field [PLAYER] true
 
 ---@class BossPhase:Object should not create a BossPhase directly; only use NonSpellPhase and SpellcardPhase.
+---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this phase. for testing middle phases.
 ---@field type BossPhaseType
 ---@field time integer frames of the phase
 ---@field isTimeout boolean if the phase is timeout type (survive until time runs out)
@@ -196,10 +200,12 @@ end
 ---@field difficulties nil|HasDifficulty which difficulties the phase will appear in. if nil, considers as appearing in all difficulties. spellcard practice menu and default bossRound will use this.
 ---@field players nil|HasPlayer same logic as above
 ---@field func fun(self, boss:Boss) the concrete content of the boss phase. like spawn bullets
+---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this phase. for testing middle phases.
 
 ---@class BossPhaseArgs
 ---@field type BossPhaseType
 function BossPhase:new(args)
+    self.SKIP_INCLUDE=args.SKIP_INCLUDE
     self.type=args.type
     self.key=args.key
     self.time=args.time

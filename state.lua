@@ -1,5 +1,20 @@
 BackgroundPattern=require"backgroundPattern"
 G={
+    ---@class G.CONSTANTS
+    ---@field DRAW fun(self)
+    ---@field FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader}
+    ---@field USE_FOREGROUND_SHADER fun(key: string, args: table)
+    ---@field DIFFICULTIES DIFFICULTY[]
+    ---@field DIFFICULTIES_DATA table<DIFFICULTY, {value: string, shortForm: string, color: rgbaColor}>
+    ---@field REGULAR_DIFFICULTIES DIFFICULTY[]
+    ---@field EXTRA_DIFFICULTIES DIFFICULTY[]
+    ---@field STAGE_KEYS StageKey[]
+    ---@field PLAYERS PLAYER[]
+    ---@field PLAYERS_DATA table<PLAYER, {value: string, color: rgbaColor}>
+    ---@field SHOT_TYPES SHOT_TYPE[]
+    ---@field SHOT_TYPE_TO_PLAYER table<SHOT_TYPE, PLAYER>
+    ---@field PLAYER_TO_SHOT_TYPES table<PLAYER, SHOT_TYPE[]>
+    ---@field STAGE_TO_DIFFICULTIES table<StageKey, DIFFICULTY[]>
     CONSTANTS={
         DRAW=function(self)
             local colorRef={love.graphics.getColor()}
@@ -39,6 +54,7 @@ G={
         -- GEOMETRIES={EUCLIDEAN='EUCLIDEAN',HYPERBOLIC='HYPERBOLIC'},
 
         ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
+        ---@type DIFFICULTY[]
         DIFFICULTIES={
             'EASY',
             'NORMAL',
@@ -115,13 +131,9 @@ local geometries=require"geometries.geometryBase"
 ---@field TRANSITION? boolean
 
 ---@class G
+---@field [DIFFICULTY] integer -- only used for danmaku scripts to compare difficulty. like DIFF()>=G.HARD
 ---@field runInfo runInfo
----@field CONSTANTS table
----@field CONSTANTS.VIEW_MODES {NORMAL: string, FOLLOW: string}
----@field CONSTANTS.FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader}
----@field CONSTANTS.DIFFICULTIES_DATA table<DIFFICULTY, {value: string, shortForm: string, color: rgbaColor}>
----@field CONSTANTS.PLAYERS_DATA table<PLAYER, {value: string, color: rgbaColor}>
----@field CONSTANTS.PLAYER_TO_SHOT_TYPES table<PLAYER, SHOT_TYPE[]>
+---@field CONSTANTS G.CONSTANTS
 ---@field backgroundPattern any -- BackgroundPattern object
 ---@field STATE string -- Current state key
 ---@field STATES table<string, string> -- Enum of all state keys
@@ -338,6 +350,9 @@ G={
     }
 }
 
+for i,difficulty in ipairs(G.CONSTANTS.DIFFICULTIES) do
+    G[difficulty]=i
+end
 
 StageManager=require"stages.stageManager"
 
@@ -484,6 +499,7 @@ G.draw=function(self)
         if SKIP_MODE then
             love.graphics.print("SKIP MODE ON", 0, 13)
         end
+        love.graphics.print('Events: '..#Event.objects,0,26)
     end
     shove.endLayer()
 end

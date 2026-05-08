@@ -4,7 +4,7 @@ local midboss=BossManager.BossSegment{
     key='1-mid',
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
-        local pos,dir=geometry:rThetaGo(geometry:init().pos,200,G.runInfo.player.viewDirection-math.pi/2)
+        local pos,dir=geometry:rThetaGo(geometry:init().pos,100,G.runInfo.player.viewDirection-math.pi/2)
         return pos
     end,
     rounds={
@@ -14,10 +14,44 @@ local midboss=BossManager.BossSegment{
                 time=1200,
                 hp=1800,
                 func=function(self, boss)
+                    local num=21
+                    local eventFunc=function(self)
+                        local cir=self.obj
+                        local i,j=cir.i,cir.j
+                        local index=cir.index
+                        local edge=math.abs(i-math.floor(num/2))
+                        wait(30)
+                        local speedRef=cir.kinematicState.speed
+                        for i=1,30 do
+                            cir.kinematicState.speed=cir.kinematicState.speed*0.8
+                        end
+                        wait(30)
+                        if index<3 then
+                            cir.kinematicState.dir=math.eval(cir.kinematicState.dir,1.1)+math.pi
+                            cir.kinematicState.speed=speedRef*2
+                            cir.lifeFrame=cir.frame+60
+                            return
+                        end
+                        local sign=math.sign(i-num/2+0.01)
+                        if edge%3<2 then
+                            BulletSpawner.wrapFogEffect({fogTime=10,kinematicState=copyTable(cir.kinematicState),sprite=BulletSprites.fog.purple},function()end)
+                            cir.kinematicState.dir=cir.kinematicState.dir-math.pi*(0.5)*cir.flip*math.mod2Sign(edge%3)
+                            cir:changeSprite(BulletSprites.knife.purple)
+                            cir.kinematicState.speed=speedRef/2*(0.9+0.3*math.sin(index/2))
+                            Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/2},duration=240}
+                        else
+                            cir:changeSprite(BulletSprites.stone.purple)
+                            cir.kinematicState.dir=cir.kinematicState.dir--sign*math.pi/8*flip
+                            cir.kinematicState.speed=speedRef/2
+                            if DIFF()==G.EASY then
+                                cir.lifeFrame=cir.frame+60
+                            end
+                            -- Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/2},duration=120}
+                        end
+                    end
                     for j=1,6 do
                         local flip=math.mod2Sign(j)
-                        local angle=G.runInfo.geometry:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.1)
-                        local num=21
+                        local angle=G.runInfo.geometry:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.2)
                         for i=1,num do
                             local dangle=math.pi/num*1*(i-num/2-i%3)*flip
                             local ovalangle=dangle-math.pi/4*flip
@@ -25,38 +59,13 @@ local midboss=BossManager.BossSegment{
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
                             local spawner=BulletSpawner{
                                 kinematicState={pos=pos,dir=dir,speed=0},
-                                period=1,firstPeriod=30,lifeFrame=60,bulletNumber=2,bulletSpeed=90,range=math.pi*2,bulletSize=1,angle=dir,bulletSprite=BulletSprites.ellipse.gray,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={
+                                period=1,firstPeriod=30,lifeFrame=DSWITCH{38,40,50,55},bulletNumber=2,bulletSpeed=90,range=math.pi*2,bulletSize=1,angle=dir,bulletSprite=BulletSprites.ellipse.gray,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={
                                     function(cir,args,self)
-                                        local index=self.spawnTimes
+                                        cir.index=self.spawnTimes
                                         self.bulletSpeed=self.bulletSpeed+10
-                                        Event{obj=cir,action=function()
-                                            local edge=math.abs(i-math.floor(num/2))
-                                            wait(30)
-                                            local speedRef=cir.kinematicState.speed
-                                            for i=1,30 do
-                                                cir.kinematicState.speed=cir.kinematicState.speed*0.8
-                                            end
-                                            wait(30)
-                                            if index<5 then
-                                                cir.kinematicState.dir=math.eval(cir.kinematicState.dir,1.1)+math.pi
-                                                cir.kinematicState.speed=speedRef*2
-                                                cir.lifeFrame=cir.frame+90
-                                                return
-                                            end
-                                            local sign=math.sign(i-num/2+0.01)
-                                            if edge%3<2 then
-                                                BulletSpawner.wrapFogEffect({fogTime=10,kinematicState=copyTable(cir.kinematicState),sprite=BulletSprites.fog.purple},function()end)
-                                                cir.kinematicState.dir=cir.kinematicState.dir-math.pi*(0.5)*flip*math.mod2Sign(edge%3)
-                                                cir:changeSprite(BulletSprites.knife.purple)
-                                                cir.kinematicState.speed=speedRef/4*(0.5+0.3*math.sin(index/2))
-                                                Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/4},duration=120}
-                                            else
-                                                cir:changeSprite(BulletSprites.stone.purple)
-                                                cir.kinematicState.dir=cir.kinematicState.dir--sign*math.pi/8*flip
-                                                cir.kinematicState.speed=speedRef/4
-                                                -- Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/2},duration=120}
-                                            end
-                                        end}
+                                        cir.i,cir.j=i,j
+                                        cir.flip=flip
+                                        Event{obj=cir,action=eventFunc}
                                     end
                                 }
                             }
@@ -235,11 +244,11 @@ local finalBoss=BossManager.BossSegment{
                 hp=3000,
                 func=function(self, boss)
                     local spawner=BulletSpawner{kinematicState=copyTable(boss.kinematicState),
-                        period=600,firstPeriod=20,lifeFrame=4400,bulletNumber=1,bulletSpeed=-30,bulletSize=4,angle='0+999',bulletSprite=BulletSprites.giant.red,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeIn(30,true),Action.FadeOut(30,true),function(self)
+                        period=600,firstPeriod=20,lifeFrame=4400,bulletNumber=1,bulletSpeed=-30,bulletSize=1,angle='0+999',bulletSprite=BulletSprites.giant.red,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeIn(30,true),Action.FadeOut(30,true),function(self)
                             -- self.kinematicState.dir=self.kinematicState.dir+0.01
                         end},bulletEvents={
                             function(cir,args,self)
-                                GeoLaser{kinematicState=cir.kinematicState,sprite=BulletSprites.laser.red,size=16,lifeFrame=500,extraUpdate={Action.ZoomIn(40),Action.FadeIn(40,true),Action.ZoomOut(20)}}:bindState(cir)
+                                GeoLaser{kinematicState=cir.kinematicState,sprite=BulletSprites.laser.red,size=1,rayAngle=0.15,lifeFrame=500,extraUpdate={GeoLaser.presetActions.laserZoomIn(40),Action.FadeIn(40,true),GeoLaser.presetActions.laserZoomOut(20)}}:bindState(cir)
                             end
                         }
                     }

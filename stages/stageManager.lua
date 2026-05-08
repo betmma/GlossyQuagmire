@@ -13,6 +13,7 @@ provide a function to display stage title text
 
 ---@class Segment
 ---@field key string stage practice will be able to start from any segment, and segments will be listed. names like '1-1' '1-mid' '2-5A' are enough and do not need localization.
+---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this segment. for testing middle segments. only for dev testing.
 ---@field type SegmentType
 ---@field init fun(self,segmentFuncArgs)|nil when jumping to later segment like in practice mode, init of all previous segments will be called while func of previous segments will be skipped, so init should include things like setting player border, while func should include things like spawning bullets.
 ---@field skip fun(self,segmentFuncArgs)|nil only called when it's skipped. called after init()
@@ -51,7 +52,7 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
     segmentFuncArgs=segmentFuncArgs or {}
     if not skipToSegmentKey then
         if DEV_MODE and SKIP_MODE then
-            skipToSegmentKey=self.currentStageData.segments[#self.currentStageData.segments].key -- skip to the end of the stage for testing, but not the last segment which is usually the ending
+            skipToSegmentKey=self.currentStageData.segments[#self.currentStageData.segments].key -- skip to the end of the stage for testing
         else
             skipToSegmentKey=self.currentStageData.segments[1].key -- first segment equals to not skipping any
         end
@@ -69,6 +70,9 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
             if not reachedSkipSegment then
                 if segment.skip then
                     segment:skip(segmentFuncArgs)
+                end
+                if segment.SKIP_INCLUDE then
+                    segment:func(segmentFuncArgs)
                 end
             else
                 segment:func(segmentFuncArgs)
@@ -172,5 +176,38 @@ function StageManager:buildSpellcardCollection()
     end
 end
 StageManager:buildSpellcardCollection()
+
+-- for conveniently picking numbers or paths based on difficulty
+---@return integer
+DIFF=function()
+    local difficulty=G.runInfo.difficulty
+    return G[difficulty]--[[@as integer]] -- luals ???
+end
+
+---@alias ENHLValue number|'<'|'>'
+---@param ENHLValues {[1]:ENHLValue, [2]:ENHLValue, [3]:ENHLValue, [4]:ENHLValue} normal use: 4 elements mapping to easy normal hard lunatic. '<' means refering to the value of the previous difficulty, and '>' means refering to the next difficulty. 
+---@return number
+DSWITCH=function(ENHLValues)
+    local diff=DIFF()
+    local count=0
+    local value=ENHLValues[diff]
+    while value=='<' or value=='>' do
+        count=count+1
+        if count>#ENHLValues then
+            error('infinite loop in DSWITCH with values '..pprint(ENHLValues))
+        end
+        if value=='<' then
+            diff=diff-1
+        elseif value=='>' then
+            diff=diff+1
+        end
+        if diff<1 or diff>#ENHLValues then
+            error('difficulty out of range in DSWITCH with values '..pprint(ENHLValues))
+        end
+        value=ENHLValues[diff]
+    end
+    ---@cast value number
+    return value
+end
 
 return StageManager

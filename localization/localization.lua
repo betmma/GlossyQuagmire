@@ -41,11 +41,18 @@ return {
                 },
             },
         },
-        ['kotoba-star'] = {
+        ['kotoba-pupil'] = {
             EASY = {
                 name = {
-                    en_us = 'Star Sign "Dazzling Fame"',
-                    zh_cn = '明星「耀世之名」',
+                    en_us = 'Pupil Sign "Gazes of the Students"',
+                    zh_cn = '神瞳「目光如炬」',
+                },
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Pupil Sign "Gazes of the Disciples"',
+                    zh_cn = '神瞳「目光如电」',
                 }
             }
         }

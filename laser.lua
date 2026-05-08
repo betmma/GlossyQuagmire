@@ -1,4 +1,4 @@
---[[geodesic laser: area between two straight rays perpendicular to the diameter of a circle:
+--[[geodesic laser: area between two straight rays perpendicular to the diameter of a circle (the angle can change with rayAngle):
 |--->
 .
 |--->
@@ -10,16 +10,20 @@
 ---@field capNum number|nil the number of points to add to the end of the laser to make it look more rounded. default 16.
 ---@class GeoLaser:Bullet
 ---@field getRays fun(self:GeoLaser):GeoLaserRays Calculates the positions and directions of the rays that define the laser's area.
+---@field rayAngle number extra angle added to the rays. positive value means wider
 ---@field meshBudget GeoLaserMeshBudget
+---@overload fun(args:GeoLaserArgs):GeoLaser
 local GeoLaser=Bullet:extend()
 
 ---@class GeoLaserArgs:BulletArgs
 ---@field meshBudget GeoLaserMeshBudget|nil parameters that control the density and appearance of the laser's mesh. 
+---@field rayAngle number|nil extra angle added to the rays. positive value means wider, default 0.
 function GeoLaser:new(args)
     args.invincible=args.invincible~=false
     args.forceMesh=true
-    GeoLaser.super.new(self, args)
     self.meshBudget=args.meshBudget or {}
+    self.rayAngle=args.rayAngle or 0
+    GeoLaser.super.new(self, args)
 end
 
 ---@param pos Position
@@ -58,7 +62,8 @@ function GeoLaser:getRays()
     local getRay=function(radius,i)
         local rayDir=direction+math.pi/2*i
         local rayEnd,rayDir2=G.runInfo.geometry:rThetaGo(pos,radius,rayDir)
-        rayDir2=rayDir2-math.pi/2*i
+        local extraAngle=self.rayAngle*radius/hitboxRadius -- hitbox radius tilts self.rayAngle, border tilts more (but tilting same also has another style of look)
+        rayDir2=rayDir2-(math.pi/2-extraAngle)*i
         local pos2, _=G.runInfo.geometry:rThetaGo(rayEnd,radius*2,rayDir2)
         return {pos=rayEnd,dir=rayDir2,pos2=pos2}
     end
@@ -139,5 +144,56 @@ function GeoLaser:shrinkAndRemove()
     self.lifeFrame=self.frame+20
     self.extraUpdate[#self.extraUpdate+1] = Action.ZoomOut(20)
 end
+
+local lazerZoomIn=function(self,params)
+    local zoomFrame=params.zoomFrame or 30
+    local targetSize=params.targetSize or self.zoomInTargetSize
+    local targetAngle=params.targetRayAngle or self.targetRayAngle
+    if self.frame<=zoomFrame then
+        self.size=targetSize*self.frame/zoomFrame
+        self.rayAngle=targetAngle*self.frame/zoomFrame
+    end
+end
+
+local lazerZoomInInit=function(self,params)
+    self.zoomInTargetSize=self.size
+    self.size=0
+    self.targetRayAngle=self.rayAngle
+    self.rayAngle=0
+end
+
+--- laser size and rayAngle grows from 0 in [self.zoomFrame] frames.
+--- @param zoomFrame integer number of frames for the zoom animation, default 30
+--- @param targetSize number|nil target size for the zoom animation, default self.size
+--- @param targetRayAngle number|nil target rayAngle for the zoom animation, default self.rayAngle
+--- @return Action
+local function LaserZoomIn(zoomFrame,targetSize,targetRayAngle)
+    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize,targetRayAngle=targetRayAngle},func=lazerZoomIn,init=lazerZoomInInit}
+end
+
+local laserZoomOut=function(self,params)
+    local zoomFrame=params.zoomFrame or 30
+    local initialSize=self.sizeReference or self.size
+    local initialRayAngle=self.rayAngleReference or self.rayAngle
+    if self.frame+zoomFrame>=self.lifeFrame then
+        self.sizeReference=self.sizeReference or initialSize
+        self.rayAngleReference=self.rayAngleReference or initialRayAngle
+        self.size=initialSize*math.max(0,self.lifeFrame - self.frame)/zoomFrame
+        self.rayAngle=initialRayAngle*math.max(0,self.lifeFrame - self.frame)/zoomFrame
+    end
+end
+
+--- laser size and rayAngle shrinks to 0 in the last [self.zoomFrame] frames of its life.
+--- @param zoomFrame integer number of frames for the zoom out animation, default 30
+--- @return Action
+local function LaserZoomOut(zoomFrame)
+    return {isAction=true,params={zoomFrame=zoomFrame},func=laserZoomOut}
+end
+
+GeoLaser.presetActions={
+    laserZoomIn=LaserZoomIn,
+    laserZoomOut=LaserZoomOut
+}
+
 
 return GeoLaser

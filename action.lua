@@ -40,7 +40,9 @@ end
 
 local fadeInInit=function(self,params)
     self.spriteTransparency=0
-    self.safe=true
+    if params.setSafe then
+       self.safe=true
+    end
 end
 
 ---@param fadeFrame integer number of frames for the fade in animation, default 30

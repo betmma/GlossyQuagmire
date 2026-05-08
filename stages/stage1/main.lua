@@ -11,9 +11,9 @@ local function smallFairyFunc(basePos,flip,r,shooting)
             local ratio=1-2*self.frame/self.lifeFrame
             self.kinematicState.dir=G.runInfo.geometry:to(self.kinematicState.pos,basePos)+math.pi*(0.5-ratio*0.3)*sign
         end},dropItems={powerSmall=1}}
-        if shooting~=false then
+        if shooting~=false and DIFF()>=G.HARD then
             BulletSpawner{
-                period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.5,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false
+                period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.5,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false,fogEffect=true,fogTime=20,
             }:bindState(fairy)
         end
     end
@@ -39,24 +39,32 @@ return{
                 local kstate={pos=pos2,dir=dir2,speed=160}
                 local kstate2={pos=pos3,dir=dir3,speed=160}
                 for i=1,10 do
+                    local canShoot=(DIFF()==G.NORMAL and i%2==0) or DIFF()>=G.HARD
                     local fairy=Enemy{kinematicState=copyTable(kstate),maxhp=10,sprite=Asset.fairySprites.small.red,lifeFrame=300,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1}}
-                    BulletSpawner{
-                        period=30,firstPeriod=i*3+30,lifeFrame=270,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round.red,bulletLifeFrame=600,visible=false
-                    }:bindState(fairy)
+                    if canShoot then
+                        BulletSpawner{
+                            period=DSWITCH{120,120,60,30},firstPeriod=i*3+30,lifeFrame=270,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round.red,bulletLifeFrame=600,visible=false
+                        }:bindState(fairy)
+                    end
                     wait(15)
                     fairy=Enemy{kinematicState=copyTable(kstate2),maxhp=10,sprite=Asset.fairySprites.small.orange,lifeFrame=300,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1}}
-                    BulletSpawner{
-                        period=60,firstPeriod=i*3+30,lifeFrame=270,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round.orange,bulletLifeFrame=600,visible=false
-                    }:bindState(fairy)
+                    if canShoot then
+                        BulletSpawner{
+                            period=DSWITCH{120,120,60,30},firstPeriod=i*3+30,lifeFrame=270,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round.orange,bulletLifeFrame=600,visible=false
+                        }:bindState(fairy)
+                    end
                 end
                 wait(60)
                 for i=1,20 do
                     local flag=i%4<=1
                     local pos3,dir3=G.runInfo.geometry:rThetaGo(pos1,400,dir1+math.mod2Sign(i)*0.6)
                     local fairy=Enemy{kinematicState={pos=copyTable(pos3),dir=dir3+math.pi,speed=160},maxhp=10,sprite=Asset.fairySprites.small[flag and 'blue' or 'green'],lifeFrame=300,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=flag and 1 or 0, point=flag and 0 or 1}}
-                    BulletSpawner{
-                        period=30,firstPeriod=i*3+30,lifeFrame=210,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round[flag and 'blue' or 'green'],bulletLifeFrame=600,visible=false
-                    }:bindState(fairy)
+                    local canShoot=(DIFF()==G.NORMAL and i%2==0) or DIFF()>=G.HARD
+                    if canShoot then
+                        BulletSpawner{
+                            period=DSWITCH{120,120,60,30},firstPeriod=i*3+30,lifeFrame=210,bulletNumber=1,bulletSpeed=150,bulletSize=1,angle='player',bulletSprite=BulletSprites.round[flag and 'blue' or 'green'],bulletLifeFrame=600,visible=false
+                        }:bindState(fairy)
+                    end
                     wait(15)
                 end
                 wait(60)
@@ -80,7 +88,7 @@ return{
                         end
                     end},dropItems={powerSmall=10,point=5}}
                     BulletSpawner{
-                        period=25,firstPeriod=50,lifeFrame=500,bulletNumber=100,bulletSpeed=150,bulletSize=1,visible=false,range=math.pi*1.8,angle=0,bulletSprite=BulletSprites.rice.red,bulletLifeFrame=600,bulletEvents={
+                        period=DSWITCH{100,75,50,25},firstPeriod=50,lifeFrame=500,bulletNumber=100,bulletSpeed=150,bulletSize=1,visible=false,range=math.pi*DSWITCH{1.7,1.75,1.8,1.85},angle=0,bulletSprite=BulletSprites.rice.red,bulletLifeFrame=600,bulletEvents={
                             function(cir,args,self)
                                 cir.kinematicState.dir=cir.kinematicState.dir+largeFairy.kinematicState.dir+math.pi/2
                                 local index=args.index
@@ -127,7 +135,7 @@ return{
                                 cir.spriteTransparency=0
                                 local index=args.index
                                 if not cores[index] or math.abs(cores[index].frame-cir.frame)>20 then -- the j=1 spawner could have died so the first spawner finding current core doesnt exist should create one. and, every index has its own core so cores is a table
-                                    cores[index]=Bullet{kinematicState={pos=copyTable(bigFairy.kinematicState.pos),dir=cir.kinematicState.dir,speed=150},sprite=Asset.bulletSprites.round[color],lifeFrame=600,safe=true,invincible=true,spriteTransparency=0,extraUpdate=function(self)
+                                    cores[index]=Bullet{kinematicState={pos=copyTable(bigFairy.kinematicState.pos),dir=cir.kinematicState.dir,speed=DSWITCH{60,100,150,180}},sprite=Asset.bulletSprites.round[color],lifeFrame=600,safe=true,invincible=true,spriteTransparency=0,extraUpdate=function(self)
                                         self.kinematicState.speed=self.kinematicState.speed+1
                                     end}
                                 end
@@ -158,7 +166,7 @@ return{
                                 self.kinematicState.dir=dir+math.pi/2
                             end},dropItems={powerSmall=1}}
                             local spawner=BulletSpawner{
-                                period=60,firstPeriod=120-j*5,lifeFrame=540-j*5,bulletNumber=4,bulletSpeed=0,bulletSize=1,angle='0+999',bulletSprite=BulletSprites.round[color],bulletLifeFrame=600,visible=false,bulletEvents={bulletevent
+                                period=DSWITCH{120,90,60,40},firstPeriod=120-j*5,lifeFrame=540-j*5,bulletNumber=4,bulletSpeed=0,bulletSize=1,angle='0+999',bulletSprite=BulletSprites.round[color],bulletLifeFrame=600,visible=false,bulletEvents={bulletevent
                                 }
                             }
                             spawner:bindState(smallFairy)
@@ -180,6 +188,34 @@ return{
                 local basePos=G.runInfo.geometry:init().pos
                 local colors={{1,0.1,0.1},{0.1,1,0.1},{0.1,0.1,1},{1,0.1,1}}
                 local count=0
+                local function bulletUpdate(self)
+                    self.count=self.count or DSWITCH{1,1,2,-1}
+                    local delta=DSWITCH{1,1,1,2}
+                    if self.frame%8==7 and self.count<DSWITCH{3,3,5,5} then
+                        self.count=self.count+delta
+                        for i=-1,1,2 do
+                            local numRef=self.count
+                            local follower=Bullet{kinematicState=copyTable(self.kinematicState),sprite=BulletSprites.rim.white,lifeFrame=900,spriteTransparency=0.5,spriteColor={1,1,1,1},extraUpdate={
+                                function(cirF)
+                                    if self.removed then
+                                        if not cirF.flag then
+                                            cirF.flag=true
+                                            cirF.kinematicState.dir=math.eval(math.pi,1)+self.kinematicState.dir
+                                        end
+                                        return
+                                    end
+                                    cirF.spriteTransparency=math.clamp(cirF.spriteTransparency+0.05,0,1)
+                                    if cirF.frame>100 then
+                                        cirF.spriteColor=math.lerpTable(cirF.spriteColor,self.shade,0.02)
+                                    end
+                                    cirF.kinematicState.dir=self.kinematicState.dir
+                                    local smooth=math.clamp(cirF.frame/8,0,1)
+                                    cirF.kinematicState.pos=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,10*i*math.max(0.01,numRef+smooth*delta-1),self.kinematicState.dir+math.pi*(1/2))
+                                end
+                            }}
+                        end
+                    end
+                end
                 local function wallFairy(angle,sign)
                     sign=sign or 1
                     local color=colors[count%4+1]
@@ -188,43 +224,18 @@ return{
                     local pos2,dir2=G.runInfo.geometry:rThetaGo(pos,-600,dir+math.pi/2*sign)
                     local fairy=Enemy{kinematicState={pos=pos2,dir=dir2,speed=600},maxhp=120,sprite=Asset.fairySprites.medium.black,lifeFrame=120,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=2}}
                     BulletSpawner{
-                        period=2,firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=100,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=500,visible=false,bulletEvents={
+                        period=DSWITCH{4,3,2,2},firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=100,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=800,visible=false,bulletEvents={
                             function(cir,args,self)
                                 cir.safe=true
                                 cir.spriteTransparency=0
-                                cir.kinematicState.speed=cir.kinematicState.speed+50*(self.spawnTimes%4)
+                                cir.kinematicState.speed=cir.kinematicState.speed+20*(self.spawnTimes%4)
                                 Event.EaseEvent{
                                     obj=cir,easeObj=cir.kinematicState,duration=80,aims={speed=-200},progressFunc=Event.sineBackProgressFunc
                                 }
                                 cir.kinematicState.dir=fairy.kinematicState.dir+math.pi/2*sign-0.1*(self.spawnTimes%4)*sign
-                                cir.shade=math.interpolateTable({1,1,1},color,(self.spawnTimes%4+0.5)/4)
+                                cir.shade=math.interpolateTable({1,1,1},color,(self.spawnTimes%4+0.5)/6)
                             end
-                        },bulletExtraUpdate={function(self)
-                            if self.frame%8==7 and self.frame<40 then
-                                self.count=(self.count or -1)+1
-                                for i=-1,1,2 do
-                                    local numRef=self.count
-                                    local follower=Bullet{kinematicState=copyTable(self.kinematicState),sprite=BulletSprites.rim.white,lifeFrame=900,spriteTransparency=0.5,spriteColor={1,1,1,1},extraUpdate={
-                                        function(cirF)
-                                            if self.removed then
-                                                if not cirF.flag then
-                                                    cirF.flag=true
-                                                    cirF.kinematicState.dir=math.eval(math.pi,1)+self.kinematicState.dir
-                                                end
-                                                return
-                                            end
-                                            cirF.spriteTransparency=math.clamp(cirF.spriteTransparency+0.05,0,1)
-                                            if cirF.frame>100 then
-                                                cirF.spriteColor=math.lerpTable(cirF.spriteColor,self.shade,0.02)
-                                            end
-                                            cirF.kinematicState.dir=self.kinematicState.dir
-                                            local smooth=math.clamp(cirF.frame/8,0,1)
-                                            cirF.kinematicState.pos=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,10*i*math.max(0.01,numRef+smooth-1),self.kinematicState.dir+math.pi*(1/2))
-                                        end
-                                    }}
-                                end
-                            end
-                        end}
+                        },bulletExtraUpdate={bulletUpdate}
                     }:bindState(fairy)
                 end
                 Event{action=function()
@@ -232,14 +243,16 @@ return{
                 end}
                 wait(60)
                 wallFairy(0)
+                wait(30)
                 wallFairy(0,-1)
-                wait(100)
+                wait(70)
                 wallFairy(math.pi)
+                wait(30)
                 wallFairy(math.pi,-1)
-                wait(200)
+                wait(170)
                 local angle=math.eval(0,999)
                 Event{action=function()
-                    wait(120)
+                    wait(60)
                     smallFairyFunc(basePos,true,200,false)
                 end}
                 for i=1,4 do
