@@ -412,6 +412,7 @@ function makeDynamicUIObjs()
         bossStars:clearStars()
         setRemainingTimeText(nil)
         spellcardNameText:setText('',true)
+        spellcardNameText.transparency=0
         spellcardBonusHistoryText:setText('',true)
         hpBar.hpRatio=0
     end

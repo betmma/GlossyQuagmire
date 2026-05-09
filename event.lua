@@ -6,7 +6,7 @@ local Event = GameObject:extend()
 
 Event.Event = Event
 
----@class EventArgs
+---@class EventArgs:strict
 ---@field obj GameObject|nil the object that the event is attached to.
 ---@field action fun(self:Event)|nil the function to be executed. it will be wrapped in a coroutine.
 ---@field afterFunc function|nil the function to be executed after the action is done. not useful in basic Event, but can be used in LoopEvent and EaseEvent.

@@ -119,10 +119,8 @@ local finalBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{
-            SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
-            SKIP_INCLUDE=true,
                 key='1-boss-non-1',
                 time=1500,
                 hp=2000,
@@ -191,10 +189,8 @@ local finalBoss=BossManager.BossSegment{
             },
             require 'stages.stage1.spellcards.swallow',
         }},
-        BossManager.BossRound{
-            SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
-            SKIP_INCLUDE=true,
                 key='1-boss-non-2',
                 time=1500,
                 hp=2000,
@@ -252,23 +248,7 @@ local finalBoss=BossManager.BossSegment{
                     end
                 end
             },
-            BossManager.SpellcardPhase{
-                key='test',
-                bonusScore=10000,
-                time=4500,
-                hp=3000,
-                func=function(self, boss)
-                    local spawner=BulletSpawner{kinematicState=copyTable(boss.kinematicState),
-                        period=600,firstPeriod=20,lifeFrame=4400,bulletNumber=1,bulletSpeed=-30,bulletSize=1,angle='0+999',bulletSprite=BulletSprites.giant.red,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeIn(30,true),Action.FadeOut(30,true),function(self)
-                            -- self.kinematicState.dir=self.kinematicState.dir+0.01
-                        end},bulletEvents={
-                            function(cir,args,self)
-                                GeoLaser{kinematicState=cir.kinematicState,sprite=BulletSprites.laser.red,size=1,rayAngle=0.15,lifeFrame=500,extraUpdate={GeoLaser.presetActions.laserZoomIn(40),Action.FadeIn(40,true),GeoLaser.presetActions.laserZoomOut(20)}}:bindState(cir)
-                            end
-                        }
-                    }
-                end
-            }
+            require 'stages.stage1.spellcards.pupil',
         }},
     }
 }
