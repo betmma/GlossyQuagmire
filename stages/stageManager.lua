@@ -210,4 +210,6 @@ DSWITCH=function(ENHLValues)
     return value
 end
 
+require 'stages.danmakuFuncs'
+
 return StageManager

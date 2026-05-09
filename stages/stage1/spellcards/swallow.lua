@@ -1,5 +1,6 @@
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
+            SKIP_INCLUDE=true,
     key='kotoba-swallow',
     bonusScore=10000,
     time=1800,
@@ -7,11 +8,14 @@ return BossManager.SpellcardPhase{
     func=function(self,boss)
         local bossPos=boss.kinematicState.pos
         local base=G.runInfo.geometry:init().pos
-        local bossAim=G.runInfo.geometry:rThetaGo(base,200,G.runInfo.player.viewDirection-math.pi/2)
-        local aim=G.runInfo.geometry:rThetaGo(base,200,G.runInfo.player.viewDirection+math.pi/2)
         ---@type Player
         local player=G.runInfo.player
-        local mouthBase=Bullet{kinematicState={pos=copyTable(aim),speed=0,dir=player.viewDirection},sprite=BulletSprites.scale.red,invincible=true,safe=true,lifeFrame=1800,spriteTransparency=0}
+        local aim=copyTable(player.kinematicState.pos)
+        local dist=G.runInfo.geometry:distance(base,aim)
+        if dist>350 then
+            aim=G.runInfo.geometry:rThetaGo(base,350,G.runInfo.geometry:to(base,aim))
+        end
+        local mouthBase=Bullet{kinematicState={pos=copyTable(player.kinematicState.pos),speed=0,dir=player.viewDirection},sprite=BulletSprites.scale.red,invincible=true,safe=true,lifeFrame=1800,spriteTransparency=0}
         mouthBase.openness=1
         local xmax=400
         local y=0
@@ -23,7 +27,7 @@ return BossManager.SpellcardPhase{
             end
             local angle=self.i/50*math.pi/2
             local x=math.sin(angle)*xmax
-            y=(mouthBase.openness+0.1)*400+0.001
+            y=(mouthBase.openness+DSWITCH{'>',0.2,0.1,'<'})*400+0.001
             local pos1,dir1=G.runInfo.geometry:rThetaGo(mouthBase.kinematicState.pos,x,mouthBase.kinematicState.dir)
             dir1=dir1-self.side*math.pi/2
             local targetPos,targetDir=G.runInfo.geometry:rThetaGo(pos1,y,dir1)
@@ -90,7 +94,7 @@ return BossManager.SpellcardPhase{
             if distx<xmax and math.abs(disty-y)<20 then
                 self:remove()
                 local dir=math.eval(0,999)
-                local spawner=BulletSpawner{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},period=3,lifeFrame=7,bulletNumber=6,bulletSpeed=20,range=math.pi*2,angle=dir,bulletSprite=BulletSprites.ellipse.black,bulletLifeFrame=600,highlight=true,bulletEvents={function(cir,args)
+                local spawner=BulletSpawner{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},period=3,lifeFrame=7,bulletNumber=DSWITCH{2,3,4,6},bulletSpeed=20,range=math.pi*2,angle=dir,bulletSprite=BulletSprites.ellipse.black,bulletLifeFrame=600,highlight=true,bulletEvents={function(cir,args)
                     cir.forceQuad=true
                 end},bulletExtraUpdate={speedup}}
                 Event{obj=spawner,action=function()

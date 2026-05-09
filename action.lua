@@ -109,6 +109,20 @@ Action.AppearingHint=function(size,duration)
     return {isAction=true,params={size=size,duration=duration},func=appearingHint}
 end
 
+local trail=function(self,params)
+    local lifeFrame=params.lifeFrame or 30
+    local period=params.period or 2
+    if self.frame%period==0 then
+        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
+    end
+end
+
+--- leave a fading and shrinking trail behind.
+--- @param lifeFrame integer|nil number of frames for the trail bullets to fade out and shrink, default 30
+--- @param period integer|nil how many frames between each trail bullet, default 2
+Action.Trail=function(lifeFrame,period)
+    return {isAction=true,params={lifeFrame=lifeFrame,period=period},func=trail}
+end
 
 local actionPack=function(self,params)
     for k,action in ipairs(params) do

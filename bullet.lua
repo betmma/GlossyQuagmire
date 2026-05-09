@@ -35,6 +35,7 @@ local Bullet = Shape:extend()
 ---@field damage number|nil Amount of damage dealt to player on hit. Default is 1.
 ---@field grazed boolean|nil Whether this bullet has already triggered a graze event. Default is false.
 ---@field baseGrazeValue number|nil The amount added to graze stats. Default is 1.
+---@field highlight boolean|nil If true, uses the highlight sprite batch. Default is false.
 ---@field batch love.SpriteBatch|nil The sprite batch used for standard drawing. Default is BulletBatch or Asset.bulletHighlightBatch if highlight is true.
 ---@field meshBatch MeshBatch|nil The mesh batch used for complex/deformed drawing. Default is Asset.bigBulletMeshes.
 ---@field forceQuad boolean|nil If true, forces simple quad drawing even if geometry suggests mesh. Default is false.

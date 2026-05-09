@@ -123,6 +123,7 @@ function BossRound:new(args)
                     end
                 end
             end
+            wait(120)
         end
     else
         self.func=args.func
@@ -268,7 +269,7 @@ function BossPhase:run(boss)
         boss:die()
     end
     DynamicUIObjs.hpBar:increasePhase() -- move to next phase in hp bar
-    wait(30) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
+    wait(60) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
 end
 
 ---@class NonSpellPhaseArgs:BossPhaseBaseArgs
