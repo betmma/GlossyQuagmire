@@ -115,13 +115,12 @@ function Bullet:draw()
     end
     color[4]=(color[4]or 1)*self.spriteTransparency
     self:drawQuad{
-        quad=self.sprite.quad,
+        sprite=self.sprite,
         rotation=self.kinematicState.dir+math.pi/2+(self.spriteExtraDirection or 0),
         zoom=self.size,
         normalBatch=(not self.forceMesh)and self.batch or nil,
         meshBatch=(not self.forceQuad)and self.meshBatch or nil,
         color=color,
-        isSquare=self.sprite.data.isSquare
     }
 end
 

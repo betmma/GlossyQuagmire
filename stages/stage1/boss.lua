@@ -119,7 +119,7 @@ local finalBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{phases={
+        BossManager.BossRound{SKIP_INCLUDE=true,phases={
             BossManager.NonSpellPhase{
                 key='1-boss-non-1',
                 time=1500,

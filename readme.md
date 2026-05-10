@@ -2,13 +2,9 @@ This game is a touhou fan-game.
 It's in very early stage now.
 
 ### Todo
-#### Bug
-CenterX and CenterY in spriteData are not used in Shape.drawQuad and every draw function.
-
 #### Code
 Add func to calculate the orientation to make a sprite face upward in final rendering.
 Background
-Death bombing
 
 #### System
 ~Shot type system~

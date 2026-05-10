@@ -69,20 +69,28 @@ function Shape:getHitboxRadius()
     return self.hitboxRadius or size
 end
 
----@class DrawQuadArgs
----@field quad love.Quad
+---@class DrawQuadArgsBase:strict
 ---@field rotation number
 ---@field zoom number
 ---@field normalBatch love.SpriteBatch|nil
 ---@field meshBatch MeshBatch|nil
 ---@field color number[]|nil
 ---@field kinematicState KinematicState|nil if provided, will be used to determine the position and whether to draw as quad or mesh. if not provided, use self.kinematicState.
+
+---@class DrawQuadArgsQuad:DrawQuadArgsBase
+---@field quad love.Quad
 ---@field isSquare boolean|nil
 
----@param args DrawQuadArgs
+---@class DrawQuadArgsSprite:DrawQuadArgsBase
+---@field sprite Sprite
+
+---@alias DrawQuadArgs DrawQuadArgsQuad|DrawQuadArgsSprite
+
+---@param args DrawQuadArgs -- can send either quad or sprite. only sprite can pass centerX and centerY to simpleDrawQuad.
 function Shape:drawQuad(args)
     -- Destructure arguments for easier access
-    local quad        = args.quad
+    local sprite      = args.sprite
+    local quad        = sprite and sprite.quad or args.quad
     local rotation    = args.rotation
     local zoom        = args.zoom
     local normalBatch = args.normalBatch
@@ -125,14 +133,19 @@ function Shape:drawQuad(args)
                 if screenPos.flip then
                     sizeX=sizeX*-1
                 end
-                self:simpleDrawQuad(quad,w,h,screenPos,rotationWithScreen,sizeX,sizeY,normalBatch)
+                local ox,oy=w/2,h/2
+                if sprite then
+                    ox,oy=sprite.data.centerX, sprite.data.centerY
+                end
+                self:simpleDrawQuad(quad,w,h,screenPos,rotationWithScreen,sizeX,sizeY,normalBatch,ox,oy)
             end
         end
     else
         if not meshBatch then
             error('Shape:drawQuad: tries to mesh draw with meshBatch = nil')
         end
-        self:meshDrawQuad(kinematicState.pos,w*sizeRatio,h*sizeRatio,rotation,quad,color,meshBatch,suggestedSideNum,args.isSquare)
+        local isSquare=(sprite and sprite.data.isSquare or args.isSquare)--[[@as boolean|nil]]
+        self:meshDrawQuad(kinematicState.pos,w*sizeRatio,h*sizeRatio,rotation,quad,color,meshBatch,suggestedSideNum,isSquare)
     end
 end
 
@@ -144,8 +157,10 @@ end
 ---@param sizeX number
 ---@param sizeY number
 ---@param normalBatch love.SpriteBatch
-function Shape:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeX,sizeY,normalBatch)
-    normalBatch:add(quad,screenPos.x,screenPos.y,rotation,sizeX,sizeY,w/2,h/2)
+---@param ox number
+---@param oy number
+function Shape:simpleDrawQuad(quad,w,h,screenPos,rotation,sizeX,sizeY,normalBatch,ox,oy)
+    normalBatch:add(quad,screenPos.x,screenPos.y,rotation,sizeX,sizeY,ox,oy)
 end
 
 ---@param pos Position
