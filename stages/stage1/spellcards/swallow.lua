@@ -1,6 +1,7 @@
+---@diagnostic disable: inject-field
+
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
-            SKIP_INCLUDE=true,
     key='kotoba-swallow',
     bonusScore=10000,
     time=1800,

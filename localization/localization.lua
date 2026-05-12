@@ -55,6 +55,14 @@ return {
                     zh_cn = '神瞳「目光如电」',
                 }
             }
+        },
+        ['kotoba-lead'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Lead Sign "Follow the Heavy Signs"',
+                    zh_cn = '铅制「沉重路标」',
+                },
+            }
         }
     },
     levelData = {

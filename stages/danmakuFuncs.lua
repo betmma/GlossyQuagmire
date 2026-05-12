@@ -25,3 +25,27 @@ function DanmakuFuncs.moveToInTime(shape, targetPos, duration, progressFunc, upd
         end
     end}
 end
+
+---add an extraUpdate function to [shape] to make it orbit around [centerObj] with radius and angle determined by [rtheta]. it will not set position if centerObj is removed.
+---@param shape Shape
+---@param centerObj Shape
+---@param rtheta {r:number, theta:number, absolute:boolean?}|fun(self:Shape, centerObj:Shape): {r:number, theta:number, absolute:boolean?}
+---@param onCenterRemoved fun(self:Shape)|nil a function to be called when the centerObj is removed. can choose to remove the shape or do something else. if nil does nothing
+function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
+---@diagnostic disable-next-line: inject-field
+    shape.centerObj=centerObj
+    shape.extraUpdate[#shape.extraUpdate+1] = function(self, dt)
+        if centerObj.removed then
+            if not self.calledOnCenterRemoved then
+                if onCenterRemoved then
+                    onCenterRemoved(self)
+                end
+                self.calledOnCenterRemoved=true
+            end
+            return
+        end
+        local rthetanew=type(rtheta)=="function" and rtheta(self, centerObj) or rtheta
+        local centerPos=centerObj.kinematicState.pos
+        self.kinematicState.pos,self.kinematicState.dir=G.runInfo.geometry:rThetaGo(centerPos,rthetanew.r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
+    end
+end

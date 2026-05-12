@@ -185,6 +185,9 @@ return {
                             if diff==chosenDifficulty then
                                 diffOptions:switchOption(base,true,true)
                             end
+                        else
+                            local base=UI.Base{width=500,height=40,disabled=true}
+                            diffOptions:addOption(base)
                         end
                     end
                 end

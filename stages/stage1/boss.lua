@@ -119,7 +119,7 @@ local finalBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
                 key='1-boss-non-1',
                 time=1500,
@@ -250,6 +250,9 @@ local finalBoss=BossManager.BossSegment{
             },
             require 'stages.stage1.spellcards.pupil',
         }},
+        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+            require 'stages.stage1.spellcards.lead',
+        }}
     }
 }
 ---@type BossSegment[]

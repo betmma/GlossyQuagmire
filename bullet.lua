@@ -42,6 +42,7 @@ local Bullet = Shape:extend()
 ---@field forceMesh boolean|nil If true, forces mesh drawing. Default is false.
 ---@field spriteTransparency number|nil Alpha multiplier (0-1). Default is 1.
 ---@field extraUpdate ExtraUpdate|function|nil Additional update functions or actions to execute each frame.
+---@field events fun(self:Bullet, args:BulletArgs)[]|nil List of event functions to call on initialization, with signature fun(self:Bullet, args:BulletArgs).
 function Bullet:new(args)
     Bullet.super.new(self, args)
     self.size = args.size or 1

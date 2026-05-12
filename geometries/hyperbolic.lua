@@ -164,6 +164,9 @@ end
 
 function Hyperbolic:to(position,target)
     local x1,y1,x2,y2=position.x,position.y,target.x,target.y
+    if not x1 or not y1 or not x2 or not y2 then
+        error("Invalid position or target in Hyperbolic:to. position: "..pprint(position)..", target: "..pprint(target))
+    end
     if math.abs(x1-x2)<Hyperbolic.EPS then -- vertical 
         return y1<y2 and math.pi/2 or -math.pi/2
     end
