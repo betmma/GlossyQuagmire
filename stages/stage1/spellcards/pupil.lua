@@ -1,6 +1,6 @@
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
-    key='kotoba-pupil',
+    key='kotoba-pupil',SKIP_INCLUDE=true,
     bonusScore=10000,
     time=1800,
     hp=2400,

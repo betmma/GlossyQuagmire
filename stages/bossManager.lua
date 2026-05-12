@@ -13,6 +13,7 @@
 local BossSegment=Object:extend()
 
 function BossSegment:new(args)
+    self.SKIP_INCLUDE=args.SKIP_INCLUDE
     self.key=args.key
     self.type='boss'
     self.bossName=args.bossName
@@ -123,7 +124,7 @@ function BossRound:new(args)
                     end
                 end
             end
-            wait(120)
+            wait(60)
         end
     else
         self.func=args.func

@@ -2,7 +2,7 @@
 
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
-    key='kotoba-swallow',
+    key='kotoba-swallow',SKIP_INCLUDE=true,
     bonusScore=10000,
     time=1800,
     hp=2400,

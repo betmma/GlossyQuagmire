@@ -57,7 +57,9 @@ local midboss=BossManager.BossSegment{
                             local ovalangle=dangle-math.pi/4*flip
                             local r=((math.sin(ovalangle)*80)^2+(math.cos(ovalangle)*120)^2)^0.5
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
-                            local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=200,extraUpdate={Action.Trail(30,3)}}
+                            for k=-1,1,2 do
+                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=200,extraUpdate={Action.Trail(30,3)}}
+                            end
                             local spawner=BulletSpawner{
                                 kinematicState={pos=pos,dir=dir,speed=0},
                                 period=1,firstPeriod=30,lifeFrame=DSWITCH{38,40,50,55},bulletNumber=2,bulletSpeed=90,range=math.pi*2,bulletSize=1,angle=dir,bulletSprite=BulletSprites.ellipse.gray,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={
@@ -250,7 +252,7 @@ local finalBoss=BossManager.BossSegment{
             },
             require 'stages.stage1.spellcards.pupil',
         }},
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             require 'stages.stage1.spellcards.lead',
         }}
     }

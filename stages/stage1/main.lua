@@ -123,7 +123,7 @@ return{
                         local r=math.eval(300,100)
                         local angle=math.pi/2*i+math.eval(0,math.pi/4)
                         local pos,dir=G.runInfo.geometry:rThetaGo(basePos,r,angle)
-                        local bigFairy=Enemy{kinematicState={pos=pos,dir=dir,speed=0},maxhp=400,sprite=Asset.fairySprites.large[color],lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                        local bigFairy=Enemy{kinematicState={pos=pos,dir=dir,speed=0},maxhp=200,sprite=Asset.fairySprites.large[color],lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
                             local pos,dir=G.runInfo.geometry:rThetaGo(basePos,r*(0.6+0.4*math.cos(self.frame/300)),angle+self.frame/300*math.mod2Sign(i))
                             self.kinematicState.pos=pos
                             self.kinematicState.dir=dir+math.pi/2

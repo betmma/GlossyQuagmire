@@ -1,3 +1,4 @@
+---@diagnostic disable: inject-field
 local function lineOrbit(base,pos1,pos2,gap,includePos1,includePos2,bulletArgs)
     local r,theta=G.runInfo.geometry:rThetaTo(pos1,pos2)
     local num=math.ceil(r/gap)
