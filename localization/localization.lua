@@ -569,6 +569,20 @@ return {
                 },
             }
         },
+        PAUSE = {
+            paused = {
+                en_us = 'Paused',
+                zh_cn = '已暂停',
+            },
+            resume = {
+                en_us = 'Resume',
+                zh_cn = '继续游戏',
+            },
+            exit = {
+                en_us = 'Exit',
+                zh_cn = '退出游戏'
+            }
+        },
 
         -- below are from previous game
         NEXT_SCENE = {

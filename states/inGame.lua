@@ -131,11 +131,9 @@ return {
         -- local fairy=Enemy{kinematicState={pos=fairyPos,speed=0,dir=0},maxhp=100,sprite=Asset.fairySprites.small.red}
     end,
     enter=function(self)
-        GameObject:removeAll()
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
         base.frame=0
-        G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
-        DynamicUIObjs.reset()
+        G.runInfo.exitToState=G.runInfo.exitToState or G.STATES.CHOOSE_PLAYER
     end,
     update=function(self,dt)
         base:updateHierarchy()
@@ -159,6 +157,10 @@ return {
             GameObject:removeAll()
             G:reloadUI()
         end
+        if isPressed('escape') then
+            SFX:play('select')
+            G:switchState(G.STATES.PAUSE)
+        end
     end,
     draw=G.CONSTANTS.DRAW,
     drawText=function(self)
@@ -166,11 +168,11 @@ return {
         if love.keyboard.isDown('f2') then
             return
         end
-        if isPressed('escape') then
-            SFX:play('select')
-            EventManager.post(EventManager.EVENTS.LEAVE_GAME)
-            self:switchState(G.runInfo.exitToState or G.STATES.CHOOSE_PLAYER)
-        end
+        -- if isPressed('escape') then
+        --     SFX:play('select')
+        --     EventManager.post(EventManager.EVENTS.LEAVE_GAME)
+        --     self:switchState(G.runInfo.exitToState)
+        -- end
         base:drawTextHierarchy()
     end
 }

@@ -29,7 +29,7 @@
 ---@overload fun(args?:UIBaseArgs):UIBase
 local UIBase=Object:extend()
 
----@class UIBaseArgs
+---@class UIBaseArgs:strict
 ---@field x? number
 ---@field y? number
 ---@field width? number

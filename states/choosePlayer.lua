@@ -84,8 +84,8 @@ return {
                                 G:resetRunInfo()
                                 G.runInfo.practice=false
                                 SFX:play('select',true)
-                                StageManager:load('stage1')
                                 G:switchState(G.STATES.IN_GAME)
+                                StageManager:load('stage1')
                             end
                         end
                     },

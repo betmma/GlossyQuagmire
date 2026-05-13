@@ -83,6 +83,9 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
         end
     end
     self.currentCoroutine=coroutine.create(func)
+    GameObject:removeAll()
+    G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
+    DynamicUIObjs.reset()
 end
 
 function StageManager:update(dt)

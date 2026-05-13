@@ -240,13 +240,13 @@ return {
                         G.runInfo.difficulty=diff
                         G.runInfo.playerType=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]
                         G.runInfo.shotType=shotType
-                        StageManager:load(spellcardData.stage,spellcardData.segmentKey,true,function ()
-                            G:switchState(G.STATES.SPELL_PRACTICE) -- after adding replay, should goto save replay state
-                        end,{practicePhase=item.phaseKey})
                         G:resetRunInfo(0,0)
                         G.runInfo.practice=true
                         G.runInfo.exitToState=G.STATES.SPELL_PRACTICE
                         G:switchState(G.STATES.IN_GAME)
+                        StageManager:load(spellcardData.stage,spellcardData.segmentKey,true,function ()
+                            G:switchState(G.STATES.SPELL_PRACTICE) -- after adding replay, should goto save replay state
+                        end,{practicePhase=item.phaseKey})
                     end}}
                 horizontalOptions:addOption(enterGame)
                 return horizontalOptions

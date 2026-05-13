@@ -1,7 +1,7 @@
 BackgroundPattern=require"backgroundPattern"
 G={
     ---@class G.CONSTANTS
-    ---@field DRAW fun(self)
+    ---@field DRAW fun(self, uiToDrawBatch?: STATE)
     ---@field FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader}
     ---@field USE_FOREGROUND_SHADER fun(key: string, args: table)
     ---@field DIFFICULTIES DIFFICULTY[]
@@ -16,7 +16,7 @@ G={
     ---@field PLAYER_TO_SHOT_TYPES table<PLAYER, SHOT_TYPE[]>
     ---@field STAGE_TO_DIFFICULTIES table<StageKey, DIFFICULTY[]>
     CONSTANTS={
-        DRAW=function(self)
+        DRAW=function(self,uiToDrawBatch)
             local colorRef={love.graphics.getColor()}
             Asset.foregroundBatch:setColor(colorRef[1],colorRef[2],colorRef[3],self.foregroundTransparency)
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
@@ -24,8 +24,9 @@ G={
                 Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
             end
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
-            if self.currentUI.base then
-                self.currentUI.base:drawHierarchy() -- UI elements that need batches. currently only UI.Image.
+            local ui=uiToDrawBatch and self.UIDEF[uiToDrawBatch] or self.currentUI
+            if ui.base then
+                ui.base:drawHierarchy() -- UI elements that need batches. currently only UI.Image.
             end
             Asset:flushBatches()
             Asset:drawBatches()
@@ -135,8 +136,7 @@ local geometries=require"geometries.geometryBase"
 ---@field runInfo runInfo
 ---@field CONSTANTS G.CONSTANTS
 ---@field backgroundPattern any -- BackgroundPattern object
----@field STATE string -- Current state key
----@field STATES table<string, string> -- Enum of all state keys
+---@field STATE STATE -- Current state key
 ---@field UIDEF table<string, UIState> -- State definitions
 ---@field currentUI UIState -- Shortcut to UIDEF[STATE]
 ---@field save Save
@@ -213,7 +213,7 @@ G={
         -- NICKNAMES='NICKNAMES',
         OPTIONS='OPTIONS',
         IN_GAME='IN_GAME',
-        -- PAUSE='PAUSE',
+        PAUSE='PAUSE',
         -- GAME_END='GAME_END',
         -- SAVE_REPLAY='SAVE_REPLAY',
         -- SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
@@ -296,7 +296,7 @@ G={
                 transitionState='TRANSITION_IMAGE',
             }
         },
-        IN_GAME={
+        PAUSE={
             CHOOSE_PLAYER={
                 transitionState='TRANSITION_IMAGE',
             },
