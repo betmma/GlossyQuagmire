@@ -4,10 +4,6 @@ wave can simply be a coroutine. bosses should have their own structure, and thei
 complex behaviours:
 different routes (a y branching point in the middle of the stage, leading to different second half of the stage)
 extra wave after mid-boss to sync stage (concrete code in the extra wave is not executed if mid-boss is alive, but wait functions need to proceed)
-
-additional things to include in stageManager:
-provide a function to display stage title text
-
 ]]
 ---@alias SegmentType 'midStage'|'boss'
 
@@ -23,11 +19,15 @@ provide a function to display stage title text
 ---@field init fun() to initialize the stage, like setting player border.
 ---@field segments Segment[]
 
+---@alias StageManagerCallback 'nextStage'|'end'
+
 
 ---@class StageManager
 ---@field currentStageData OneStageData
 ---@field currentCoroutine thread
----@field callback function|nil to be called after stage is finished
+---@field callback StageManagerCallback what to do after stage is finished
+---@field previousStagesData fullGameReplayOneStageData[] to build full game replay data
+---@field args {item: StageKey, skipToSegmentKey: string|nil, onlyRunOneSegment: boolean|nil, segmentFuncArgs: BossSegmentFuncArgs|nil} to build stage / spell practice replay data
 local StageManager={}
 
 ---@type table<StageKey,OneStageData>
@@ -44,11 +44,12 @@ loadStageData()
 ---@param item StageKey
 ---@param skipToSegmentKey string|nil if not nil, will skip all segments before the segment with this key. used for stage practice to jump directly to a segment.
 ---@param onlyRunOneSegment boolean|nil if true, will only run the segment with key [skipToSegmentKey]. used for spellcard practice on midboss that would otherwise be followed with second half of the stage
----@param callback function|nil to be called after stage is finished. like run next stage for full game
+---@param callback StageManagerCallback|nil to be called after stage is finished. like run next stage for full game
 ---@param segmentFuncArgs BossSegmentFuncArgs|nil if not nil, will be passed to segment func as args when calling segment:func(args). used for spellcard practice to pass specific phase to func to jump directly to a phase.
-function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, segmentFuncArgs)
+---@param nextStaging boolean|nil true when called by nextStage callback. wont reset previousStagesData
+function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, segmentFuncArgs, nextStaging)
     self.currentStageData=StageData[item]
-    self.callback=callback
+    self.callback=callback or 'end'
     segmentFuncArgs=segmentFuncArgs or {}
     if not skipToSegmentKey then
         if DEV_MODE and SKIP_MODE then
@@ -86,6 +87,45 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
     GameObject:removeAll()
     G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
     DynamicUIObjs.reset()
+    if G.runInfo.replay then
+        if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+            local replayData=G.runInfo.replay.data
+            ---@cast replayData fullGameReplayData
+            local stagesData=replayData.stages
+            for i,stageData in ipairs(stagesData) do
+                if stageData.stage==item then
+                    G.runInfo.seed=stageData.seed
+                    G.runInfo.player.keyRecord=stageData.keyRecord
+                    G.runInfo.player:setReplaying()
+                    if i>1 then -- get data from previous stage
+                        local lastStageData=stagesData[i-1]
+                        G.runInfo.score=lastStageData.score
+                        G.runInfo.lives=lastStageData.lives
+                        G.runInfo.bombs=lastStageData.bombs
+                        G.runInfo.power=lastStageData.power
+                        G.runInfo.grazes=lastStageData.grazes
+                    end
+                end
+            end
+        else
+            local replayData=G.runInfo.replay.data
+            ---@cast replayData stagePracticeReplayData|spellPracticeReplayData
+            G.runInfo.seed=replayData.seed
+            G.runInfo.player.keyRecord=replayData.keyRecord
+            G.runInfo.player:setReplaying()
+        end
+    else
+        G.runInfo.seed=math.floor(os.time()+os.clock()*1337)
+    end
+    if not nextStaging then
+        self.previousStagesData={}
+    end
+    self.args={
+        item=item,
+        skipToSegmentKey=skipToSegmentKey,
+        onlyRunOneSegment=onlyRunOneSegment,
+        segmentFuncArgs=segmentFuncArgs
+    }
 end
 
 function StageManager:update(dt)
@@ -94,9 +134,39 @@ function StageManager:update(dt)
         if not success then
             error(message)
         end
-    elseif self.callback then
-        self.callback()
-        self.callback=nil
+        return
+    end
+    -- below only runs when self.currentCoroutine ends
+    if self.callback=='nextStage' then
+        self.previousStagesData[#self.previousStagesData+1] = {
+            stageKey=self.args.item,
+            keyRecord=G.runInfo.player.keyRecord,
+            seed=G.runInfo.seed,
+            score=G.runInfo.score,
+            lives=G.runInfo.lives,
+            bombs=G.runInfo.bombs,
+            power=G.runInfo.power,
+            grazes=G.runInfo.grazes
+        }
+        -- find next stage
+        local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty]
+        local currentStageIndex=-1
+        for i,stageKey in ipairs(stages) do
+            if stageKey==self.args.item then
+                currentStageIndex=i
+                break
+            end
+        end
+        local nextStageKey=stages[currentStageIndex+1]
+        if not nextStageKey then
+            self.callback='end'
+        else
+            -- todo: need an image transition during switching stage
+            self:load(nextStageKey,nil,nil,'nextStage',nil) -- wont need skip for full game
+        end
+    end
+    if self.callback=='end' then
+        G:switchState(G.runInfo.exitToState)
     end
 end
 
@@ -120,10 +190,12 @@ end
 ---@class SpellcardCollection to store all spellcards for spellcard practice and history
 ---@field all SpellcardCollectionItem[] flat table of all spellcards
 ---@field byStage table<StageKey, SpellcardCollectionItemCombineDifficulty[]> spellcards grouped by stage
+---@field byPhaseKeyAndDiff table<string, table<DIFFICULTY,integer>> difficulty to ID in SpellcardCollection.all, indexed by phase key. used for replay info line
 ---@type SpellcardCollection
 SpellcardCollection={
     all={},
     byStage={},
+    byPhaseKeyAndDiff={},
 }
 
 function StageManager:buildSpellcardCollection()
@@ -165,6 +237,7 @@ function StageManager:buildSpellcardCollection()
                         difficulties = diffToID,
                         players = phase.players,
                     }
+                    SpellcardCollection.byPhaseKeyAndDiff[phase.key] = diffToID
                     if not SpellcardCollection.byStage[stageKey] then
                         SpellcardCollection.byStage[stageKey] = {}
                     end

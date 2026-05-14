@@ -16,7 +16,7 @@
     and does not inherently know about game loops, updating, or drawing.
     Think of it as the blueprint for making blueprints.
 
-  - 'DynamicObject' extends 'Object'. It is specifically designed for entities
+  - 'GameObject' extends 'Object'. It is specifically designed for entities
     that need to be updated each frame (move, animate),
     and drawn on screen. It introduces methods like :update, :draw, :remove
     and their collective counterparts (:updateAll, :drawAll).
@@ -133,9 +133,7 @@ end
 function GameObject:update(dt)
 end
 
-function GameObject:updateAll(dt) 
-  -- why Object:updateAll can't update all things
-  -- it's because I overrode Shape:updateAll so cls call didn't get to Circle, Player, etc. fixed
+function GameObject:updateAll(dt)
   for key, obj in pairs(self.objects) do
     if not obj.removed then
       obj:update(dt)

@@ -79,11 +79,8 @@ return {
                                     SFX:play('cancel',true)
                                     return
                                 end
-                                G.runInfo.playerType=player
-                                G.runInfo.shotType=selectedShotType
-                                G:resetRunInfo()
-                                G.runInfo.practice=false
                                 SFX:play('select',true)
+                                G:resetRunInfo(G.CONSTANTS.GAME_TYPES.FULL_GAME,G.runInfo.difficulty,selectedShotType,G.STATES.CHOOSE_PLAYER) -- difficulty is already set in chooseDifficulty
                                 G:switchState(G.STATES.IN_GAME)
                                 StageManager:load('stage1')
                             end

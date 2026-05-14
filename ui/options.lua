@@ -16,13 +16,14 @@ local UIOptions=UI.Base:extend()
 ---@class UIOptionsArgs:UIBaseArgs
 ---@field loopable boolean|nil whether to loop around when switching options. default true.
 ---@field container UIBase|nil the options container. usually an arranger to arrange the options
+---@field arrange nil|fun(self,index:integer):number,number
 ---@field cursor UICursor|nil the cursor to indicate the current option. if not provided, a default UICursor will be used.
 ---@field keysToDirections table<love.KeyConstant, Direction>|nil the keys to directions mapping. default to arrow keys.
 
 function UIOptions:new(args)
     UI.Base.new(self,args)
     self.loopable=args.loopable~=false
-    self.container=args.container or UI.Base()
+    self.container=args.container or (args.arrange and UI.Arranger{arrange=args.arrange}) or UI.Base()
     self:child(self.container)
     self.cursor=args.cursor or UI.Cursor()
     self.keysToDirections=args.keysToDirections or {

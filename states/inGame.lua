@@ -67,9 +67,9 @@ return {
                 })
                 if key=='lives' or key=='bombs' then -- draw item icons
                     ---@cast key 'lives'|'bombs'
-                    rightBase=rightSide:child(UI.Base{x=120,y=y,height=16,extraUpdates={getAlignToForegroundExtraUpdate(120)}})
+                    local rightBase=rightSide:child(UI.Base{x=120,y=y,height=16,extraUpdates={getAlignToForegroundExtraUpdate(120)}})
                     for idx=1,8 do -- display up to 8 lives/bombs
-                        icon=rightBase:child(UI.Image{
+                        local icon=rightBase:child(UI.Image{
                             batch=Asset.itemUIBatch,quad=getLifeOrBombMeterSprite(key,idx).quad,
                             x=(idx-1)*16,y=8,sx=0.5,sy=0.5,
                             extraUpdates={function(self)

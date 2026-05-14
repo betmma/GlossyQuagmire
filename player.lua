@@ -67,7 +67,6 @@ function Player:new(args)
     self.key2Value={up=1,right=2,down=4,left=8,lshift=16,z=32,x=64,c=128}
     self.keyIsDown=love.keyboard.isDown
     self.keyIsPressed=isPressed -- check if current frame is the first frame that key be pressed down. only used for switching hyperbolic model (C key)
-    self.realCreatedTime=os.date('%Y-%m-%d %H:%M:%S')
 end
 
 

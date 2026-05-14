@@ -82,6 +82,14 @@ G={
         },
         ---@alias StageKey 'stage1'|'stage2'|'stage3'|'stage4'|'stage5'|'stage6'|'stageEX'
         STAGE_KEYS={'stage1','stage2','stage3','stage4','stage5','stage6','stageEX'},
+        ---@type table<DIFFICULTY, StageKey[]> what stages and in which order for a difficulty
+        DIFFICULTIES_TO_STAGES={
+            EASY={'stage1','stage2','stage3','stage4','stage5','stage6'},
+            NORMAL={'stage1','stage2','stage3','stage4','stage5','stage6'},
+            HARD={'stage1','stage2','stage3','stage4','stage5','stage6'},
+            LUNATIC={'stage1','stage2','stage3','stage4','stage5','stage6'},
+            EXTRA={'stageEX'},
+        },
         ---@alias PLAYER 'REIMU'|'MARISA'|'KOTOBA'
         PLAYERS={'REIMU','MARISA','KOTOBA'},
         PLAYERS_DATA={
@@ -101,24 +109,32 @@ G={
             KOTOBAA='KOTOBA',
             KOTOBAB='KOTOBA',
         },
-        ---@type table<PLAYER, SHOT_TYPE[]>
-        PLAYER_TO_SHOT_TYPES={
-            REIMU={'REIMUA','REIMUB'},
-            MARISA={'MARISAA','MARISAB'},
-            KOTOBA={'KOTOBAA','KOTOBAB'},
-        },
+        ---@enum GAME_TYPE
+        GAME_TYPES={
+            FULL_GAME='full_game',
+            STAGE_PRACTICE='stage_practice',
+            SPELL_PRACTICE='spell_practice'
+        }
     },
 }
 ---@type table<StageKey, DIFFICULTY[]>
-G.CONSTANTS.STAGE_TO_DIFFICULTIES={
-    stage1=G.CONSTANTS.REGULAR_DIFFICULTIES,
-    stage2=G.CONSTANTS.REGULAR_DIFFICULTIES,
-    stage3=G.CONSTANTS.REGULAR_DIFFICULTIES,
-    stage4=G.CONSTANTS.REGULAR_DIFFICULTIES,
-    stage5=G.CONSTANTS.REGULAR_DIFFICULTIES,
-    stage6=G.CONSTANTS.REGULAR_DIFFICULTIES,
-    stageEX=G.CONSTANTS.EXTRA_DIFFICULTIES,
-}
+G.CONSTANTS.STAGE_TO_DIFFICULTIES={}
+for difficulty, stages in pairs(G.CONSTANTS.DIFFICULTIES_TO_STAGES) do
+    for _, stage in ipairs(stages) do
+        if not G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage] then
+            G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage] = {}
+        end
+        table.insert(G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage], difficulty)
+    end
+end
+---@type table<PLAYER, SHOT_TYPE[]>
+G.CONSTANTS.PLAYER_TO_SHOT_TYPES={}
+for shotType, player in pairs(G.CONSTANTS.SHOT_TYPE_TO_PLAYER) do
+    if not G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player] then
+        G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player] = {}
+    end
+    table.insert(G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player], shotType)
+end
 local geometries=require"geometries.geometryBase"
 ---@class UIState
 ---@field init? fun(self: G)
@@ -151,7 +167,7 @@ G={
     backgroundPattern=BackgroundPattern.MainMenuTesselation(),
     switchState=function(self,state)
         if state==nil then
-            error("Switch state to nil")
+            error("Switch state to nil. Probably misspelled or forgot to add to G.STATES")
         end
         if not self.UIDEF[state] then
             error("State "..state.." not defined")
@@ -217,7 +233,7 @@ G={
         -- GAME_END='GAME_END',
         -- SAVE_REPLAY='SAVE_REPLAY',
         -- SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
-        -- LOAD_REPLAY='LOAD_REPLAY',
+        LOAD_REPLAY='LOAD_REPLAY',
         -- ENDING='ENDING', -- ending screen after beating the game
         TRANSITION_SLIDE='TRANSITION_SLIDE', -- a state that slides the screen. Draw both last state and next state, while update is only called for next state
         TRANSITION_IMAGE='TRANSITION_IMAGE', -- an image that covers the screen and fades
@@ -315,9 +331,11 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, stage: integer, geometry: GeometryBase, player:Player|nil, practice: boolean, exitToState: STATE|nil}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player|nil, exitToState: STATE|nil, replay:replayBase|nil}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
+        gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
+        seed=0,
         difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[1],
         playerType=G.CONSTANTS.PLAYERS[1],
         shotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[G.CONSTANTS.PLAYERS[1]][1],
@@ -327,23 +345,35 @@ G={
         bombs=3,
         power=0,
         grazes=0,
-        stage=1,
         geometry=geometries.Hyperbolic,
         player=nil,
-        practice=false,
-        exitToState=nil -- defaults to G.STATES.CHOOSE_PLAYER
+        exitToState=nil, -- defaults to G.STATES.CHOOSE_PLAYER
+        replay=nil
     },
-    resetRunInfo=function(self,lives,bombs)
+    ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays
+    ---@param self G
+    ---@param gameType GAME_TYPE
+    ---@param difficulty DIFFICULTY
+    ---@param shotType SHOT_TYPE
+    ---@param exitToState STATE
+    ---@param lives? integer
+    ---@param bombs? integer
+    ---@param replay? replayBase
+    resetRunInfo=function(self,gameType,difficulty,shotType,exitToState,lives,bombs,replay)
+        self.runInfo.gameType=gameType
+        self.runInfo.difficulty=difficulty
+        self.runInfo.shotType=shotType
+        self.runInfo.playerType=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]
+        self.runInfo.exitToState=exitToState
         self.runInfo.lives=lives or 2
         self.runInfo.bombs=bombs or 3
         self.runInfo.power=0
         self.runInfo.score=0
         self.runInfo.grazes=0
+        self.runInfo.replay=replay
     end,
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
     frame=0,
-    ---@type replayData|nil
-    replay=nil,
 
     currentUI={},
     UIDEF={

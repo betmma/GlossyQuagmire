@@ -77,20 +77,25 @@ function UIText:setText(text)
 end
 
 function UIText:drawText()
-    local x,y=self:getXY()
     local colorref={love.graphics.getColor()}
     SetFont(self.fontSize,self.fontName)
     love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*colorref[4])
+    local args=self:getDrawTextArgs()
+    self:boldWrap(unpack(args))
+    -- love.graphics.rectangle("line",x,y,self.width,self.height) -- for debugging
+    love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
+    UI.Base.draw(self)
+end
+
+function UIText:getDrawTextArgs()
+    local x,y=self:getXY()
     local args={love.graphics.print,self.text or '',x,y}
     if self.align then
         args[1]=love.graphics.printf
         table.insert(args,self.width)
         table.insert(args,self.align)
     end
-    self:boldWrap(unpack(args))
-    -- love.graphics.rectangle("line",x,y,self.width,self.height) -- for debugging
-    love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
-    UI.Base.draw(self)
+    return args
 end
 
 function UIText:boldWrap(func,text,x,y,...)
@@ -106,5 +111,67 @@ function UIText:boldWrap(func,text,x,y,...)
     end
     func(text,x,y,...)
 end
+
+---@class UIMonoText:UIText
+---@field charWidth number
+---@field lastTextObj any
+---@field lastText string
+---@overload fun(args:UIMonoTextArgs):UIMonoText
+local UIMonoText=UIText:extend()
+
+---@class UIMonoTextArgs:UITextArgs
+---@field charWidth number
+
+function UIMonoText:new(args)
+    self.charWidth=args.charWidth
+    UIMonoText.super.new(self,args)
+end
+
+function UIMonoText:setText(text)
+    UIMonoText.super.setText(self,text)
+    if self.autoSize then
+        self.width=self.charWidth*#self.text
+    end
+end
+
+function UIMonoText:getDrawTextArgs()
+    local x,y=self:getXY()
+    local textObj
+    if self.text==self.lastText then
+        textObj=self.lastTextObj
+    else
+        textObj=self:getTextObj()
+        self.lastTextObj=textObj
+        self.lastText=self.text
+    end
+    return {love.graphics.draw,textObj,x,y}
+end
+
+function UIMonoText:getTextObj()
+    local font=SetFont(self.fontSize,self.fontName)
+    local t = love.graphics.newText(font)
+    local col, row = 0, 0
+    local lineH = font:getHeight()
+
+    for index = 1,#self.text do
+        local ch=self.text:sub(index,index)
+        if ch == "\n" then
+            col = 0
+            row = row + 1
+        else
+            -- center the proportional glyph inside the fixed cell
+            local w = font:getWidth(ch)
+            local x = col * self.charWidth + (self.charWidth - w) / 2
+            local y = row * lineH
+
+            t:add(ch, x, y)
+            col = col + 1
+        end
+    end
+
+    return t
+end
+
+UIText.MonoText=UIMonoText
 
 return UIText
