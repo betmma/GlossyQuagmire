@@ -32,6 +32,7 @@ local Bullet = Shape:extend()
 ---@field spriteColor rgbaColor|nil RGBA table for tinting the sprite.
 ---@field safe boolean|nil If true, the bullet will not damage the player. Default is false.
 ---@field invincible boolean|nil If true, normal shockwaves won't remove this bullet. Default is false.
+---@field fromPlayer boolean|nil Another flag to exclude from shockwave's remove. Note that this flag does not make the bullet damage enemies. enemies loop through PlayerShot.objects.
 ---@field damage number|nil Amount of damage dealt to player on hit. Default is 1.
 ---@field grazed boolean|nil Whether this bullet has already triggered a graze event. Default is false.
 ---@field baseGrazeValue number|nil The amount added to graze stats. Default is 1.
@@ -66,7 +67,7 @@ function Bullet:new(args)
     end
     -- safe means won't hit player 
     self.safe=args.safe or false
-    self.fromPlayer=false
+    self.fromPlayer=args.fromPlayer or false
     -- invincible means won't be removed by normal shockwave (win shockwave can)
     self.invincible=args.invincible or false
 

@@ -302,7 +302,7 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
         end
     elseif existingOptions<powerLevel then
         for i=existingOptions,powerLevel do
-            local newOption=Bullet{kinematicState={pos=playerState.pos,dir=0,speed=0},sprite=self.optionSprite,lifeFrame=99999,safe=true,invincible=true,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes}
+            local newOption=Bullet{kinematicState={pos=playerState.pos,dir=0,speed=0},sprite=self.optionSprite,lifeFrame=99999,safe=true,invincible=true,fromPlayer=true,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes}
             newOption.spriteRotationSpeed=0.1
             table.insert(options, newOption)
         end
