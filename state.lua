@@ -176,7 +176,7 @@ local geometries=require"geometries.geometryBase"
 ---@field sceneTempObjs any[]
 G={
     backgroundPattern=BackgroundPattern.MainMenuTesselation(),
-    switchState=function(self,state)
+    switchState=function(self,state,overrideTransition)
         if state==nil then
             error("Switch state to nil. Probably misspelled or forgot to add to G.STATES")
         end
@@ -192,6 +192,13 @@ G={
 
         -- check if there is transition data between current state and the state to switch to
         local transitionData=self.transitionData[lastState]
+        if overrideTransition~=nil then
+            if next(overrideTransition) then
+                transitionData={[state]=overrideTransition}
+            else
+                transitionData=nil
+            end
+        end
         if transitionData and transitionData[state] then
             local args=copyTable(transitionData[state])
             local transitionState=args.transitionState or self.STATES.TRANSITION_SLIDE

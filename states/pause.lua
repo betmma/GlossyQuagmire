@@ -29,6 +29,7 @@ return {
             {key='restart',func=function()
                 SFX:play('select',true)
                 EventManager.post(EventManager.EVENTS.LEAVE_GAME)
+                G:switchState(G.STATES.IN_GAME,{})
                 G:restart()
             end},
             {key='exit',func=function()
