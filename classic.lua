@@ -25,6 +25,7 @@
 ---@class Object
 ---@description The fundamental base class for creating other classes.
 ---@field public objects table<number, Object> List of instances created directly from this class.
+---@field private untrack boolean if true, does not add to objects on __call
 ---@field public subclasses table<number, Object> List of direct subclasses created using `:extend()`.
 ---@field public super table | nil The parent class this class was extended from.
 local Object = {}
@@ -43,8 +44,10 @@ end
 --- Creates a new class that inherits from this class (`self`).
 ---@generic Class:Object
 ---@param self Class
+---@param untrack boolean|nil whether not adding instances to .objects
 ---@return table Class An new class table that inherits from `self`. Use `---@class NewClassName : Object` in your code when using this.
-function Object:extend()
+function Object:extend(untrack)
+  ---@cast self Object
   local cls = {}
   for k, v in pairs(self) do
     if k:find("__") == 1 then
@@ -55,6 +58,7 @@ function Object:extend()
   cls.super = self
   cls.objects = {} -- Add a table to store objects of this class
   cls.subclasses = {}
+  cls.untrack = untrack or self.untrack
   setmetatable(cls, self)
   table.insert(self.subclasses,cls)
   return cls
@@ -100,9 +104,12 @@ end
 ---@param ... any Arguments to be passed to the instance's `:new()` method.
 ---@return Class
 function Object:__call(...)
+  ---@cast self Object
   local obj = setmetatable({}, self)
   obj:new(...)
-  table.insert(self.objects, obj)
+  if not self.untrack then
+    table.insert(self.objects, obj)
+  end
   return obj
 end
 

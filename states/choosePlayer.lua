@@ -82,7 +82,7 @@ return {
                                 SFX:play('select',true)
                                 G:resetRunInfo(G.CONSTANTS.GAME_TYPES.FULL_GAME,G.runInfo.difficulty,selectedShotType,G.STATES.CHOOSE_PLAYER) -- difficulty is already set in chooseDifficulty
                                 G:switchState(G.STATES.IN_GAME)
-                                StageManager:load('stage1')
+                                StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty][1])
                             end
                         end
                     },

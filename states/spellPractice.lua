@@ -237,7 +237,7 @@ return {
                             return
                         end
                         SFX:play('select',true)
-                        G:resetRunInfo(G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE,diff,shotType,G.STATES.SPELL_PRACTICE,0,0)
+                        G:resetRunInfo(G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE,diff,shotType,G.STATES.SPELL_PRACTICE)
                         G:switchState(G.STATES.IN_GAME)
                         StageManager:load(spellcardData.stage,spellcardData.segmentKey,true,'end',{practicePhase=item.phaseKey})
                     end}}

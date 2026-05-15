@@ -578,6 +578,10 @@ return {
                 en_us = 'Resume',
                 zh_cn = '继续游戏',
             },
+            restart = {
+                en_us = 'Restart',
+                zh_cn = '重新开始'
+            },
             exit = {
                 en_us = 'Exit',
                 zh_cn = '退出游戏'

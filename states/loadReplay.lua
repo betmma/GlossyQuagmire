@@ -32,7 +32,7 @@ return {
                 for slot=num*(optionIndex-1)+1,optionIndex*num do
                     local replayLine=UI.Text.MonoText{
                         text='',updateText=function ()
-                            return ReplayManager:getDisplayLine(slot)
+                            return ReplayManager:getDisplayLineAtSlot(slot)
                         end,color={1,1,1,1},autoSize=true,charWidth=charWidth,
                         events={
                             [UI.EVENTS.FOCUS]=function(_)

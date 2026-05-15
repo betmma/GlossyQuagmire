@@ -107,7 +107,7 @@ end
 ---@field toSaveFormat fun(self: replayBase):table transform to save format, mainly: replace keyRecord with more compact hex strings and add hash value. replayBase.toSaveFormat is only for subclasses with keyRecord in self.data and should not be used on replayBase
 ---@field fromSaveFormat fun(self: replayBase, data: table): replayBase|nil takes save format and tries to load. if hash doesnt match returns nil, otherwise returns an instance like new()
 ---@overload fun(data: replayDataBase): replayBase
-local replayBase=Object:extend()
+local replayBase=Object:extend(true)
 function replayBase:new(data)
     self.data=data
 end
@@ -350,11 +350,13 @@ local GAME_TYPE_TO_REPLAY_CLASS={
 }
 
 ---@class ReplayManager:strict
----@field replays replayBase[]
+---@field private replays replayBase[]
 ---@field private readDataAtSlot fun(self:ReplayManager, slot: integer): replayBase read from disk
 ---@field readAllReplays fun(self:ReplayManager) read all replays from disk to ReplayManager.replays, called at launch and entering save / load replay menus, not at switch pages in save / load replay menus
----@field saveToSlot fun(self:ReplayManager, slot: integer, name: string) 
----@field getDisplayLine fun(self:ReplayManager, slot: integer): string call ReplayManager.replays[slot]:getDisplayLine, doesnt read from disk
+---@field getPendingReplay fun(self:ReplayManager, name: string): replayBase in save replay enter name menu, to generate the pending replay for this run
+---@field saveToSlot fun(self:ReplayManager, slot: integer, name: string)
+---@field getDisplayLineOfReplay fun(self:ReplayManager, replay:replayBase): string concat No.aaa with replay:getDisplayLine
+---@field getDisplayLineAtSlot fun(self:ReplayManager, slot: integer): string pass ReplayManager.replays[slot] to getDisplayLineOfReplay, doesnt read from disk
 ---@field runReplayAtSlot fun(self:ReplayManager, slot: integer, startStage: StageKey|nil): boolean returns whether replay is running (isn't empty)
 local replayManager={}
 replayManager.replays={}
@@ -384,27 +386,32 @@ function replayManager:readDataAtSlot(slot)
 end
 
 function replayManager:readAllReplays()
-    -- remove all .objects (.objects aren't needed for these classes but modifying classic.lua doesn't seem good)
-    for i,subclass in ipairs(replayBase.subclasses) do
-        subclass.objects={}
-    end
     for i=1,self.PAGES*self.REPLAY_NUM_PER_PAGE do
         self.replays[i]=self:readDataAtSlot(i)
     end
 end
 
-function replayManager:saveToSlot(slot, name)
+function replayManager:getPendingReplay(name)
     local gameType=G.runInfo.gameType
     local replayClass=GAME_TYPE_TO_REPLAY_CLASS[gameType]
     local replay=replayClass:getReplayFromCurrentGame(name)
+    return replay
+end
+
+function replayManager:saveToSlot(slot, name)
+    local replay=self:getPendingReplay(name)
     self.replays[slot]=replay
     local toSaveData=replay:toSaveFormat()
     love.filesystem.write(savePath(slot), lume.serialize(toSaveData))
 end
 
-function replayManager:getDisplayLine(slot)
-    local slotText=string.format("No.%03d", slot)
-    return slotText..self.replays[slot]:getDisplayLine()
+function replayManager:getDisplayLineOfReplay(replay)
+    local slotText=string.format("No.%03d", replay.data.slot)
+    return slotText..replay:getDisplayLine()
+end
+
+function replayManager:getDisplayLineAtSlot(slot)
+    return self:getDisplayLineOfReplay(self.replays[slot])
 end
 
 function replayManager:runReplayAtSlot(slot,stageKey)
@@ -415,12 +422,12 @@ function replayManager:runReplayAtSlot(slot,stageKey)
     local gameType=replay.data.type
     if gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
         ---@cast replay fullGameReplay
-        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,nil,nil,replay)
+        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay)
         G:switchState(G.STATES.IN_GAME)
-        StageManager:load(stageKey or 'stage1')
+        StageManager:load(stageKey or G.CONSTANTS.DIFFICULTIES_TO_STAGES[replay.data.difficulty][1])
     elseif gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE then
         ---@cast replay spellPracticeReplay
-        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,0,0,replay)
+        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay)
         G:switchState(G.STATES.IN_GAME)
         local spellKey=replay.data.spellcardKey
         local spellID=SpellcardCollection.byPhaseKeyAndDiff[spellKey][replay.data.difficulty]
@@ -428,9 +435,9 @@ function replayManager:runReplayAtSlot(slot,stageKey)
         StageManager:load(spellcardData.stage,spellcardData.segmentKey,true,'end',{practicePhase=spellcardData.phaseKey})
     elseif gameType==G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE then
         ---@cast replay stagePracticeReplay
-        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,8,8,replay)
+        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay)
         G:switchState(G.STATES.IN_GAME)
-        StageManager:load(replay.data.stage,replay.data.segmentKey,false,'end') -- todo: need to align with stage practice after it's implemented. like onlyRunOneSegment could be true or false
+        StageManager:load(replay.data.stage,replay.data.segmentKey,replay.data.onlyRunOneSegment,'end')
     end
     return true
 end

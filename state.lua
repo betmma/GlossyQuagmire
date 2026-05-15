@@ -111,10 +111,20 @@ G={
         },
         ---@enum GAME_TYPE
         GAME_TYPES={
-            FULL_GAME='full_game',
-            STAGE_PRACTICE='stage_practice',
-            SPELL_PRACTICE='spell_practice'
-        }
+            FULL_GAME='FULL_GAME',
+            STAGE_PRACTICE='STAGE_PRACTICE',
+            SPELL_PRACTICE='SPELL_PRACTICE'
+        },
+        ---@type table<GAME_TYPE,{lives:integer,bombs:integer}>
+        START_LIVES_AND_BOMBS={
+            FULL_GAME={lives=2,bombs=3},
+            STAGE_PRACTICE={lives=8,bombs=8},
+            SPELL_PRACTICE={lives=0,bombs=0}
+        },
+        ---@type table<StageKey,integer>
+        PRACTICE_START_POWER={
+            stage1=0,stage2=200,stage3=400,stage4=400,stage5=400,stage6=400,stageEX=400
+        },
     },
 }
 ---@type table<StageKey, DIFFICULTY[]>
@@ -356,21 +366,31 @@ G={
     ---@param difficulty DIFFICULTY
     ---@param shotType SHOT_TYPE
     ---@param exitToState STATE
-    ---@param lives? integer
-    ---@param bombs? integer
     ---@param replay? replayBase
-    resetRunInfo=function(self,gameType,difficulty,shotType,exitToState,lives,bombs,replay)
+    resetRunInfo=function(self,gameType,difficulty,shotType,exitToState,replay)
         self.runInfo.gameType=gameType
         self.runInfo.difficulty=difficulty
         self.runInfo.shotType=shotType
         self.runInfo.playerType=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]
         self.runInfo.exitToState=exitToState
-        self.runInfo.lives=lives or 2
-        self.runInfo.bombs=bombs or 3
+        local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[gameType]
+        self.runInfo.lives=startResources.lives
+        self.runInfo.bombs=startResources.bombs
         self.runInfo.power=0
         self.runInfo.score=0
         self.runInfo.grazes=0
         self.runInfo.replay=replay
+    end,
+    ---@param self G
+    restart=function(self)
+        self:resetRunInfo(self.runInfo.gameType, self.runInfo.difficulty, self.runInfo.shotType, self.runInfo.exitToState, self.runInfo.replay)
+        self:switchState(self.STATES.IN_GAME)
+        if self.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+            StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[self.runInfo.difficulty][1])
+        else
+            local args=StageManager.args
+            StageManager:load(args.item,args.skipToSegmentKey,args.onlyRunOneSegment,'end',args.segmentFuncArgs)
+        end
     end,
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
     frame=0,

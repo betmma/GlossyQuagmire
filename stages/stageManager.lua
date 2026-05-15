@@ -21,7 +21,6 @@ extra wave after mid-boss to sync stage (concrete code in the extra wave is not 
 
 ---@alias StageManagerCallback 'nextStage'|'end'
 
-
 ---@class StageManager
 ---@field currentStageData OneStageData
 ---@field currentCoroutine thread
@@ -116,6 +115,9 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
         end
     else
         G.runInfo.seed=math.floor(os.time()+os.clock()*1337)
+    end
+    if G.runInfo.gameType~=G.CONSTANTS.GAME_TYPES.FULL_GAME then
+        G.runInfo.power=G.CONSTANTS.PRACTICE_START_POWER[item]
     end
     if not nextStaging then
         self.previousStagesData={}

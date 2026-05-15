@@ -29,7 +29,7 @@ return{
         {
             key='1-1',
             type='midStage',
-            func=function()
+            func=function() -- 15s
                 DynamicUIObjs.showSoundtrack()
                 wait(30)
                 local basePos=G.runInfo.geometry:init().pos
@@ -75,7 +75,7 @@ return{
         {
             key='1-2',
             type='midStage',
-            func=function()
+            func=function() -- 22s
                 local basePos=G.runInfo.geometry:init().pos
                 local function largeFairyFunc(flip)
                     local sign=flip and -1 or 1
@@ -110,7 +110,7 @@ return{
                 wait(300)
             end
         },
-        bosses[1],
+        bosses[1], -- 20s
         {
             key='1-3',
             type='midStage',

@@ -31,6 +31,10 @@ return {
                 base.resumeFrame=base.frame
                 -- SFX:play
             end},
+            {key='restart',func=function()
+                if base.resumeFrame~=nil then return end
+                G:restart()
+            end},
             {key='exit',func=function()
                 if base.resumeFrame~=nil then return end
                 EventManager.post(EventManager.EVENTS.LEAVE_GAME)

@@ -307,7 +307,7 @@ function SpellcardPhase:new(args)
 end
 
 function SpellcardPhase:getBonusHistoryText()
-    local historyType=G.runInfo.practice and 'practice' or 'ingame'
+    local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
     local historyTable=G.save.spellcardHistory[self.key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
     local bonusText=self.failedBonus and 'FAILED' or string.format('%07d', math.floor(self.currentBonus))
     return string.format('HISTORY %d/%d  BONUS %s', historyTable.passes, historyTable.tries, bonusText)
@@ -354,7 +354,7 @@ function SpellcardPhase:run(boss)
 end
 
 local function spellcardBonusCallbackAddToHistory(key, success)
-    local historyType=G.runInfo.practice and 'practice' or 'ingame'
+    local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
     local historyTable=G.save.spellcardHistory[key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
     historyTable.unlocked=true
     historyTable.tries=historyTable.tries+1
