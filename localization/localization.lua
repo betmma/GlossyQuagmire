@@ -587,6 +587,28 @@ return {
                 zh_cn = '退出游戏'
             }
         },
+        GAME_END = {
+            failed = {
+                en_us = 'Devastated',
+                zh_cn = '满身疮痍'
+            },
+            practiceEnd = {
+                en_us = 'Practice End',
+                zh_cn = '练习结束'
+            },
+            saveReplay = {
+                en_us = 'Save Replay',
+                zh_cn = '保存录像'
+            },
+            restart = {
+                en_us = 'Try Again',
+                zh_cn = '重新开始'
+            },
+            exit = {
+                en_us = 'Exit',
+                zh_cn = '退出'
+            }
+        },
 
         -- below are from previous game
         NEXT_SCENE = {

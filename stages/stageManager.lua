@@ -168,7 +168,7 @@ function StageManager:update(dt)
         end
     end
     if self.callback=='end' then
-        G:switchState(G.runInfo.exitToState)
+        G:switchState(G.STATES.GAME_END)
     end
 end
 

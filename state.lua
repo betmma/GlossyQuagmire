@@ -193,23 +193,24 @@ G={
         -- check if there is transition data between current state and the state to switch to
         local transitionData=self.transitionData[lastState]
         if transitionData and transitionData[state] then
-            local data=transitionData[state]
-            local transitionState=data.transitionState or self.STATES.TRANSITION_SLIDE
-            local args={nextState=state,lastState=lastState}
+            local args=copyTable(transitionData[state])
+            local transitionState=args.transitionState or self.STATES.TRANSITION_SLIDE
+            args.nextState=state
+            args.lastState=lastState
             if transitionState==self.STATES.TRANSITION_SLIDE then
-                local slideDirection=data.slideDirection
-                local slideRatio=data.slideRatio or 0.15
-                local slideFrame=data.slideFrame or 300
-                args.slideDirection=slideDirection
-                args.slideRatio=slideRatio
-                args.transitionFrame=slideFrame
+                args.slideRatio=args.slideRatio or 0.15
+                args.duration=args.duration or 300
             elseif transitionState==self.STATES.TRANSITION_IMAGE then
-                local image=data.image
-                local thershold=data.thershold or 0.5
-                local frame=data.fadeFrame or 60
-                args.image=image
-                args.thershold=thershold
-                args.transitionFrame=frame
+                args.thershold=args.thershold or 0.5
+                args.duration=args.duration or 60
+            elseif transitionState==self.STATES.TRANSITION_FADE then
+                for i,key in ipairs({'from','to'}) do
+                    args[key]=args[key] or {}
+                    args[key].progressFunc=args[key].progressFunc or function(x)return x end
+                    args[key].duration=args[key].duration or 0
+                    args[key].target=args[key].target or 'fade'
+                    args[key].doUpdate=args[key].doUpdate~=false
+                end
             end
             self.STATE=transitionState
             self.currentUI=self.UIDEF[self.STATE]
@@ -241,13 +242,14 @@ G={
         OPTIONS='OPTIONS',
         IN_GAME='IN_GAME',
         PAUSE='PAUSE',
-        -- GAME_END='GAME_END',
-        -- SAVE_REPLAY='SAVE_REPLAY',
+        GAME_END='GAME_END',
+        SAVE_REPLAY='SAVE_REPLAY',
         -- SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
         LOAD_REPLAY='LOAD_REPLAY',
         -- ENDING='ENDING', -- ending screen after beating the game
         TRANSITION_SLIDE='TRANSITION_SLIDE', -- a state that slides the screen. Draw both last state and next state, while update is only called for next state
         TRANSITION_IMAGE='TRANSITION_IMAGE', -- an image that covers the screen and fades
+        TRANSITION_FADE='TRANSITION_FADE', -- fade out/in certain ui object 
     },
     STATE=...,
     transitionData={ -- transitionData[STATE1][STATE2] is the transition data from STATE1 to STATE2. like, if transitionData[MAIN_MENU][CHOOSE_LEVELS].slideDirection='up', then when switching from MAIN_MENU to CHOOSE_LEVELS, the texts of both states will slide up.
@@ -292,6 +294,24 @@ G={
         GAME_END={
             ENDING={
                 transitionState='TRANSITION_IMAGE'
+            },
+            CHOOSE_PLAYER={
+                transitionState='TRANSITION_IMAGE',
+            },
+            SPELL_PRACTICE={
+                transitionState='TRANSITION_IMAGE',
+            },
+            SAVE_REPLAY={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
+            },
+        },
+        SAVE_REPLAY={
+            GAME_END={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
             }
         },
         ENDING={
@@ -330,6 +350,11 @@ G={
             SPELL_PRACTICE={
                 transitionState='TRANSITION_IMAGE',
             },
+            IN_GAME={
+                transitionState='TRANSITION_FADE',
+                from={duration=30,target='fade',doUpdate=true},
+                to={}
+            }
         },
         LOAD_REPLAY={
             MAIN_MENU={
@@ -339,6 +364,22 @@ G={
                 transitionState='TRANSITION_IMAGE',
             }
         },
+        IN_GAME={
+            -- for restart to have transition effect (pause-restart switches to IN_GAME then call G:restart that switches to IN_GAME again)
+            IN_GAME={
+                transitionState='TRANSITION_IMAGE',
+            },
+            PAUSE={
+                transitionState='TRANSITION_FADE',
+                from={doUpdate=false},
+                to={duration=10,progressFunc=Event.sineOProgressFunc,target='fade'}
+            },
+            GAME_END={
+                transitionState='TRANSITION_FADE',
+                from={},
+                to={duration=10,progressFunc=Event.sineOProgressFunc,target='fadeAll'}
+            },
+        }
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.

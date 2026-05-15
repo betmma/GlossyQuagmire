@@ -89,6 +89,8 @@ function Charge:update(dt)
         if particle.frame>=self.particleFrame then
             goto continue
         end
+        G.runInfo.geometry:update(particle.kinematicState,dt)
+        particle.kinematicState.speed=particle.kinematicState.speed*0.95
         ::continue::
     end
     if self.frame==self.animationFrame then
@@ -101,8 +103,6 @@ function Charge:draw(dt)
         if particle.frame>=self.particleFrame then
             goto continue
         end
-        G.runInfo.geometry:update(particle.kinematicState,dt)
-        particle.kinematicState.speed=particle.kinematicState.speed*0.95
         self:drawQuad{
             kinematicState=particle.kinematicState,
             quad=self.sprite.quad,

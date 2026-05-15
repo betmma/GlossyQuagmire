@@ -1,20 +1,24 @@
 local G=...
-
+---@class _pauseBase:UIBase
 local base=UI.Base()
 local chosenSlot=1
 local charWidth=10
 return {
     base=base,
     init=function(self)
-        local titleText=base:child(
+        local overlay1=UI.Panel{parent=base,x=0,y=0,width=WINDOW_WIDTH,height=WINDOW_HEIGHT,fillColor={1,1,1,0.5},edgeWidth=0}
+        local overlay2=UI.Panel{parent=base,x=0,y=0,width=WINDOW_WIDTH,height=WINDOW_HEIGHT,fillColor={0,0,0,0.5},edgeWidth=0}
+        transBase=UI.Base{parent=base}
+        base.fade=transBase
+        local titleText=transBase:child(
             UI.Text{
-                text=Localize{'ui','MAIN_MENU',"REPLAY"},
+                text=Localize{'ui','GAME_END',"saveReplay"},
                 fontSize=48,color={1,1,1,1},
                 x=100,y=30,
             }
         )
         local replaysSwitcher=UI.Switcher{
-            x=(WINDOW_WIDTH-charWidth*ReplayManager.OVERALL_WIDTH)/2,y=70,parent=base,arrange=function (self, index)
+            x=(WINDOW_WIDTH-charWidth*ReplayManager.OVERALL_WIDTH)/2,y=70,parent=transBase,arrange=function (self, index)
                 return index*800,0
             end,
             optionConstructor=function(self, optionIndex)
@@ -39,12 +43,8 @@ return {
                                 chosenSlot=slot
                             end,
                             [UI.EVENTS.SELECT]=function(_)
-                                local canRun=ReplayManager:runReplayAtSlot(slot)
-                                if canRun then
-                                    SFX:play('select')
-                                else
-                                    SFX:play('cancel',true)
-                                end
+                                SFX:play('select')
+                                -- save replay enter name state
                             end,
                     },}
                     rows:addOption(replayLine)
@@ -57,22 +57,24 @@ return {
         }
     end,
     enter=function(self)
-        self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
+        base.frame=0
     end,
     chosen=1,
     update=function(self,dt)
         self.backgroundPattern:update(dt)
+        base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
             SFX:play('select')
-            self:switchState(self.STATES.MAIN_MENU)
-            return
+            G:switchState(G.STATES.GAME_END)
         end
-        base:updateHierarchy()
     end,
     options={},
     draw=function(self)
+        G.CONSTANTS.DRAW(self,'IN_GAME') -- gameplay graphics as background. need to pass IN_GAME or :drawHierarchy() will be called on current state PAUSE instead of IN_GAME, and lives and bombs ui sprites will be missing
+        base:drawHierarchy() -- should have nothing to draw, as it would be below half transparent overlay. if needed can change draw order in some way??
     end,
     drawText=function(self)
-        base:drawTextHierarchy()
-    end,
+        G.UIDEF.IN_GAME.drawText(G) -- gameplay texts
+        base:drawTextHierarchy() -- will add a half transparent overlay before drawing pause ui
+    end
 }

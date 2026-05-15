@@ -3,7 +3,7 @@ return {
     enter=function(self,transitionArgs)
         transitionArgs.startFrame=self.frame
         self.currentUI.transitionArgs=transitionArgs
-        self.currentUI.transitionFrame=0
+        self.currentUI.duration=0
         self.currentUI.complete=false
             transitionArgs.aimDxy={DirectionName2Dxy(transitionArgs.slideDirection)}
             transitionArgs.aimDxy={transitionArgs.aimDxy[1]*WINDOW_WIDTH,transitionArgs.aimDxy[2]*WINDOW_HEIGHT}
@@ -16,8 +16,8 @@ return {
     end,
     update=function(self,dt)
         local args=self.currentUI.transitionArgs
-        self.currentUI.transitionFrame=self.currentUI.transitionFrame+1
-        if self.currentUI.transitionFrame>=args.transitionFrame or self.currentUI.complete==true then
+        self.currentUI.duration=self.currentUI.duration+1
+        if self.currentUI.duration>=args.duration or self.currentUI.complete==true then
             -- doesn't call switchState directly, because switchState will call nextState:enter, which has been called in TRANSITION:enter.
             self.STATE=args.nextState
             self.currentUI=self.UIDEF[self.STATE]

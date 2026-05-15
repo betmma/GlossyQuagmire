@@ -6,20 +6,20 @@ return {
         transitionArgs.shader=transitionArgs.shader or love.graphics.newShader("shaders/transitionImage.glsl")
         transitionArgs.thershold=transitionArgs.thershold or 0.3
         self.currentUI.transitionArgs=transitionArgs
-        self.currentUI.transitionFrame=0
+        self.currentUI.duration=0
         self.currentUI.complete=false
     end,
     update=function(self,dt)
         -- in this transition no need to consider interrupt because no state's update is called, so no new transition is possible.
         local args=self.currentUI.transitionArgs
-        self.currentUI.transitionFrame=self.currentUI.transitionFrame+1
-        if self.currentUI.transitionFrame*2>=args.transitionFrame and self.currentUI.transitionFrame*2-2<args.transitionFrame then -- half point, execute nextState:enter()
+        self.currentUI.duration=self.currentUI.duration+1
+        if self.currentUI.duration*2>=args.duration and self.currentUI.duration*2-2<args.duration then -- half point, execute nextState:enter()
             local currentUI=self.currentUI
             self.currentUI=self.UIDEF[args.nextState]
             self.currentUI.enter(self,args.lastState)
             self.currentUI=currentUI
         end
-        if self.currentUI.transitionFrame>=args.transitionFrame or self.currentUI.complete==true then 
+        if self.currentUI.duration>=args.duration or self.currentUI.complete==true then 
             self.STATE=args.nextState
             self.currentUI=self.UIDEF[self.STATE]
             self.currentUI.complete=true
@@ -27,7 +27,7 @@ return {
     end,
     draw=function(self)
         local args=self.currentUI.transitionArgs
-        local ratio=self.currentUI.transitionFrame/args.transitionFrame
+        local ratio=self.currentUI.duration/args.duration
 
         local currentUI=self.currentUI
         if ratio<0.5 then
@@ -41,7 +41,7 @@ return {
     end,
     drawText=function(self)
         local args=self.currentUI.transitionArgs
-        local progress=0.0001+self.currentUI.transitionFrame/args.transitionFrame
+        local progress=0.0001+self.currentUI.duration/args.duration
 
         local currentUI=self.currentUI
         if progress<0.5 then
