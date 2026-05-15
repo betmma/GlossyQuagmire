@@ -129,7 +129,8 @@ G={
 }
 ---@type table<StageKey, DIFFICULTY[]>
 G.CONSTANTS.STAGE_TO_DIFFICULTIES={}
-for difficulty, stages in pairs(G.CONSTANTS.DIFFICULTIES_TO_STAGES) do
+for i, difficulty in ipairs(G.CONSTANTS.DIFFICULTIES) do
+    local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[difficulty]
     for _, stage in ipairs(stages) do
         if not G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage] then
             G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage] = {}

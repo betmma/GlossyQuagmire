@@ -355,7 +355,7 @@ local GAME_TYPE_TO_REPLAY_CLASS={
 ---@field readAllReplays fun(self:ReplayManager) read all replays from disk to ReplayManager.replays, called at launch and entering save / load replay menus, not at switch pages in save / load replay menus
 ---@field getPendingReplay fun(self:ReplayManager, name: string): replayBase in save replay enter name menu, to generate the pending replay for this run
 ---@field saveToSlot fun(self:ReplayManager, slot: integer, name: string)
----@field getDisplayLineOfReplay fun(self:ReplayManager, replay:replayBase): string concat No.aaa with replay:getDisplayLine
+---@field getDisplayLineOfReplay fun(self:ReplayManager, replay:replayBase, slot:integer): string concat No.aaa with replay:getDisplayLine
 ---@field getDisplayLineAtSlot fun(self:ReplayManager, slot: integer): string pass ReplayManager.replays[slot] to getDisplayLineOfReplay, doesnt read from disk
 ---@field runReplayAtSlot fun(self:ReplayManager, slot: integer, startStage: StageKey|nil): boolean returns whether replay is running (isn't empty)
 local replayManager={}
@@ -405,13 +405,13 @@ function replayManager:saveToSlot(slot, name)
     love.filesystem.write(savePath(slot), lume.serialize(toSaveData))
 end
 
-function replayManager:getDisplayLineOfReplay(replay)
-    local slotText=string.format("No.%03d", replay.data.slot)
+function replayManager:getDisplayLineOfReplay(replay,slot)
+    local slotText=string.format("No.%03d", slot)
     return slotText..replay:getDisplayLine()
 end
 
 function replayManager:getDisplayLineAtSlot(slot)
-    return self:getDisplayLineOfReplay(self.replays[slot])
+    return self:getDisplayLineOfReplay(self.replays[slot], slot)
 end
 
 function replayManager:runReplayAtSlot(slot,stageKey)
