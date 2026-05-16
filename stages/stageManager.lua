@@ -92,7 +92,7 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
             ---@cast replayData fullGameReplayData
             local stagesData=replayData.stages
             for i,stageData in ipairs(stagesData) do
-                if stageData.stage==item then
+                if stageData.stageKey==item then
                     G.runInfo.seed=stageData.seed
                     G.runInfo.player.keyRecord=stageData.keyRecord
                     G.runInfo.player:setReplaying()
@@ -116,6 +116,7 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
     else
         G.runInfo.seed=math.floor(os.time()+os.clock()*1337)
     end
+    math.randomseed(G.runInfo.seed)
     if G.runInfo.gameType~=G.CONSTANTS.GAME_TYPES.FULL_GAME then
         G.runInfo.power=G.CONSTANTS.PRACTICE_START_POWER[item]
     end
@@ -160,11 +161,11 @@ function StageManager:update(dt)
             end
         end
         local nextStageKey=stages[currentStageIndex+1]
-        if not nextStageKey then
+        if not nextStageKey or not StageData[nextStageKey] then
             self.callback='end'
         else
             -- todo: need an image transition during switching stage
-            self:load(nextStageKey,nil,nil,'nextStage',nil) -- wont need skip for full game
+            self:load(nextStageKey,nil,nil,'nextStage',nil,true) -- wont need skip for full game
         end
     end
     if self.callback=='end' then

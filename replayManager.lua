@@ -335,7 +335,7 @@ function spellPracticeReplay:getReplayFromCurrentGame(name)
         keyRecord=G.runInfo.player.keyRecord,
         seed=G.runInfo.seed,
         score=G.runInfo.score,
-        spellcardKey=SpellcardCollection.byPhaseKeyAndDiff[StageManager.args.segmentFuncArgs.practicePhase][G.runInfo.difficulty],
+        spellcardKey=StageManager.args.segmentFuncArgs.practicePhase,
     }
 end
 
@@ -354,7 +354,7 @@ local GAME_TYPE_TO_REPLAY_CLASS={
 ---@field private readDataAtSlot fun(self:ReplayManager, slot: integer): replayBase read from disk
 ---@field readAllReplays fun(self:ReplayManager) read all replays from disk to ReplayManager.replays, called at launch and entering save / load replay menus, not at switch pages in save / load replay menus
 ---@field getPendingReplay fun(self:ReplayManager, name: string): replayBase in save replay enter name menu, to generate the pending replay for this run
----@field saveToSlot fun(self:ReplayManager, slot: integer, name: string)
+---@field saveToSlot fun(self:ReplayManager, replay:replayBase, slot: integer)
 ---@field getDisplayLineOfReplay fun(self:ReplayManager, replay:replayBase, slot:integer): string concat No.aaa with replay:getDisplayLine
 ---@field getDisplayLineAtSlot fun(self:ReplayManager, slot: integer): string pass ReplayManager.replays[slot] to getDisplayLineOfReplay, doesnt read from disk
 ---@field runReplayAtSlot fun(self:ReplayManager, slot: integer, startStage: StageKey|nil): boolean returns whether replay is running (isn't empty)
@@ -363,6 +363,7 @@ replayManager.replays={}
 replayManager.REPLAY_NUM_PER_PAGE=25
 replayManager.PAGES=8
 replayManager.OVERALL_WIDTH=replayBase.OVERALL_WIDTH
+replayManager.MAX_NAME_LENGTH=replayBase.MAX_NAME_LENGTH
 
 local dir='replay'
 love.filesystem.createDirectory(dir)
@@ -377,9 +378,12 @@ function replayManager:readDataAtSlot(slot)
         return emptyReplay()
     end
     local data = lume.deserialize(file)
-    local replayClass=GAME_TYPE_TO_REPLAY_CLASS[data.replayType]
-    local valid,replay=replayClass:fromSaveFormat(data)
-    if not valid then
+    local replayClass=GAME_TYPE_TO_REPLAY_CLASS[data.type]
+    if not replayClass then
+        error("Unknown replay type: " .. (data.type or 'nil').."\nData: "..pprint(data))
+    end
+    local replay=replayClass:fromSaveFormat(data)
+    if not replay then
         return emptyReplay()
     end
     return replay
@@ -388,6 +392,9 @@ end
 function replayManager:readAllReplays()
     for i=1,self.PAGES*self.REPLAY_NUM_PER_PAGE do
         self.replays[i]=self:readDataAtSlot(i)
+        if self.replays[i]==nil then
+            error("Failed to read replay at slot " .. i)
+        end
     end
 end
 
@@ -398,15 +405,14 @@ function replayManager:getPendingReplay(name)
     return replay
 end
 
-function replayManager:saveToSlot(slot, name)
-    local replay=self:getPendingReplay(name)
+function replayManager:saveToSlot(replay, slot)
     self.replays[slot]=replay
     local toSaveData=replay:toSaveFormat()
     love.filesystem.write(savePath(slot), lume.serialize(toSaveData))
 end
 
 function replayManager:getDisplayLineOfReplay(replay,slot)
-    local slotText=string.format("No.%03d", slot)
+    local slotText=string.format("No.%03d ", slot)
     return slotText..replay:getDisplayLine()
 end
 
@@ -424,7 +430,7 @@ function replayManager:runReplayAtSlot(slot,stageKey)
         ---@cast replay fullGameReplay
         G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay)
         G:switchState(G.STATES.IN_GAME)
-        StageManager:load(stageKey or G.CONSTANTS.DIFFICULTIES_TO_STAGES[replay.data.difficulty][1])
+        StageManager:load(stageKey or G.CONSTANTS.DIFFICULTIES_TO_STAGES[replay.data.difficulty][1],nil,nil,'nextStage')
     elseif gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE then
         ---@cast replay spellPracticeReplay
         G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay)

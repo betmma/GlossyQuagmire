@@ -1,11 +1,11 @@
 ---@class _pauseBase:UIBase
 local base=UI.Base()
-local transBase
+local playingReplay
 return {
     base=base,
     init=function(self)
         -- entering from IN_GAME, fade in for everything including overlays
-        transBase=UI.Base{parent=base}
+        local transBase=UI.Base{parent=base}
         base.fadeAll=transBase
         local overlay1=UI.Panel{parent=transBase,x=0,y=0,width=WINDOW_WIDTH,height=WINDOW_HEIGHT,fillColor={1,1,1,0.5},edgeWidth=0}
         local overlay2=UI.Panel{parent=transBase,x=0,y=0,width=WINDOW_WIDTH,height=WINDOW_HEIGHT,fillColor={0,0,0,0.5},edgeWidth=0}
@@ -18,7 +18,15 @@ return {
             text='',
             fontSize=48,color={1,1,1,1},
             x=0,y=30,parent=xBase,updateText=function (self)
-                return Localize{'ui','GAME_END',G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and 'failed' or 'practiceEnd'} -- change based on gameType (lose, practice ends ...)
+                local key
+                if playingReplay then
+                    key='replayEnd'
+                elseif G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+                    key='failed'
+                else
+                    key='practiceEnd'
+                end
+                return Localize{'ui','GAME_END',key} -- change based on gameType (lose, practice ends ...)
             end
         }
         local optionsUI=UI.Options{
@@ -29,6 +37,10 @@ return {
         }
         local options={
             {key='saveReplay',func=function()
+                if playingReplay then
+                    SFX:play('cancel',true)
+                    return
+                end
                 SFX:play('select',true)
                 G:switchState(G.STATES.SAVE_REPLAY)
             end},
@@ -44,18 +56,26 @@ return {
         }
         for i,option in ipairs(options) do
             optionsUI:addOption(UI.Text{
-                text=Localize{'ui','GAME_END',option.key},fontSize=24,color={1,1,1,1},autoSize=true,
+                text='',fontSize=24,color={1,1,1,1},autoSize=true,
+                updateText=function (self)
+                    return Localize{'ui','GAME_END',option.key,playingReplay and 'playingReplay' or 'normal'}
+                end,
                 events={
                     [UI.EVENTS.SELECT]=option.func
-                }
+                },
+                extraUpdates={function (self)
+                    if option.key=='saveReplay' then
+                        self.transparency=playingReplay and 0.5 or 1
+                    end
+                end}
             })
         end
     end,
     enter=function(self,lastState)
         base.frame=0
-        -- if transBase and lastState==G.STATES.IN_GAME then
-        --     transBase.extraUpdates[1](transBase) -- without this the first frame in pause menu would have old transparency
-        -- end
+        playingReplay=G.runInfo.replay~=nil
+        G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
+        base:updateHierarchy() -- simple way to deal with the one-frame delay due to extraUpdate using base.frame to update positions
     end,
     update=function(self,dt)
         base:updateHierarchy()

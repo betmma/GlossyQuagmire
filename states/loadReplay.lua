@@ -33,7 +33,7 @@ return {
                     local replayLine=UI.Text.MonoText{
                         text='',updateText=function ()
                             return ReplayManager:getDisplayLineAtSlot(slot)
-                        end,color={1,1,1,1},autoSize=true,charWidth=charWidth,
+                        end,color={1,1,1,1},autoSize=true,charWidth=charWidth,fontName=Fonts.en_us,
                         events={
                             [UI.EVENTS.FOCUS]=function(_)
                                 chosenSlot=slot

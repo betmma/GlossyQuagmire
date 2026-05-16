@@ -251,7 +251,7 @@ G={
         PAUSE='PAUSE',
         GAME_END='GAME_END',
         SAVE_REPLAY='SAVE_REPLAY',
-        -- SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
+        SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
         LOAD_REPLAY='LOAD_REPLAY',
         -- ENDING='ENDING', -- ending screen after beating the game
         TRANSITION_SLIDE='TRANSITION_SLIDE', -- a state that slides the screen. Draw both last state and next state, while update is only called for next state
@@ -308,6 +308,9 @@ G={
             SPELL_PRACTICE={
                 transitionState='TRANSITION_IMAGE',
             },
+            LOAD_REPLAY={
+                transitionState='TRANSITION_IMAGE',
+            },
             SAVE_REPLAY={
                 transitionState='TRANSITION_FADE',
                 from={duration=10},
@@ -319,7 +322,19 @@ G={
                 transitionState='TRANSITION_FADE',
                 from={duration=10},
                 to={duration=10}
-            }
+            },
+            SAVE_REPLAY_ENTER_NAME={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10,target='fadeWithoutReplayLine'}
+            },
+        },
+        SAVE_REPLAY_ENTER_NAME={
+            SAVE_REPLAY={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
+            },
         },
         ENDING={
             MAIN_MENU={
@@ -390,7 +405,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player|nil, exitToState: STATE|nil, replay:replayBase|nil}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player|nil, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
@@ -407,7 +422,8 @@ G={
         geometry=geometries.Hyperbolic,
         player=nil,
         exitToState=nil, -- defaults to G.STATES.CHOOSE_PLAYER
-        replay=nil
+        replay=nil,
+        pendingReplay=nil,
     },
     ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays
     ---@param self G
@@ -465,7 +481,7 @@ end
 ---@field options {master_volume: integer, music_volume: integer, sfx_volume: integer, language: string, resolution: {width: integer, height: integer}}
 ---@field defaultName string
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
----@field spellcardHistory table<string, table<DIFFICULTY, table<SHOT_TYPE, table<spellcardHistoryKey, {cleared: boolean, unlocked: boolean, passes: integer, tries: integer}>>>>>
+---@field spellcardHistory table<string, table<DIFFICULTY, {unlocked:boolean, [SHOT_TYPE]: table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>}>>>
 ---@field extraUnlock {[string]: boolean} -- secret level unlocks, format not decided
 ---@field musicUnlock {[string]: boolean}
 ---@field nicknameUnlock {[string]: boolean}

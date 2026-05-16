@@ -12,7 +12,7 @@ return {
         base.fade=transBase
         local titleText=transBase:child(
             UI.Text{
-                text=Localize{'ui','GAME_END',"saveReplay"},
+                text=Localize{'ui','GAME_END',"saveReplay",'normal'},
                 fontSize=48,color={1,1,1,1},
                 x=100,y=30,
             }
@@ -37,14 +37,15 @@ return {
                     local replayLine=UI.Text.MonoText{
                         text='',updateText=function ()
                             return ReplayManager:getDisplayLineAtSlot(slot)
-                        end,color={1,1,1,1},autoSize=true,charWidth=charWidth,
+                        end,color={1,1,1,1},autoSize=true,charWidth=charWidth,fontName=Fonts.en_us,
                         events={
                             [UI.EVENTS.FOCUS]=function(_)
                                 chosenSlot=slot
+                                G.UIDEF.SAVE_REPLAY.chosenSlot=slot -- saveReplayEnterName needs this
                             end,
                             [UI.EVENTS.SELECT]=function(_)
                                 SFX:play('select')
-                                -- save replay enter name state
+                                G:switchState(G.STATES.SAVE_REPLAY_ENTER_NAME)
                             end,
                     },}
                     rows:addOption(replayLine)

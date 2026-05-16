@@ -319,23 +319,27 @@ function SpellcardPhase:update(boss)
     DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText(),true)
 end
 
+local cancelBonus=function()
+    SpellcardPhase.failedBonus=true
+end
+
+EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
+EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
+
 function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
-    self.failedBonus=false  
-    local cancelBonus=function()
-        self.failedBonus=true
-    end
-    EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus, EventManager.EVENTS.LEAVE_GAME)
-    EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus, EventManager.EVENTS.LEAVE_GAME)
+    self.failedBonus=false
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
         wait(90)
         DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText())
     end}
+    local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
+    local historyTable=G.save.spellcardHistory[self.key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
+    G.save.spellcardHistory[self.key][G.runInfo.difficulty].unlocked=true
+    historyTable.tries=historyTable.tries+1
     BossPhase.run(self, boss)
-    EventManager.removeListener(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
-    EventManager.removeListener(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
     if self.remainingFrames==0 and not self.isTimeout then
         self.failedBonus=true
@@ -354,10 +358,11 @@ function SpellcardPhase:run(boss)
 end
 
 local function spellcardBonusCallbackAddToHistory(key, success)
+    if G.runInfo.replay then
+        return
+    end
     local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
     local historyTable=G.save.spellcardHistory[key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
-    historyTable.unlocked=true
-    historyTable.tries=historyTable.tries+1
     if success then
         historyTable.cleared=true
         historyTable.passes=historyTable.passes+1

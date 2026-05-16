@@ -143,13 +143,13 @@ SaveManager.defaultSaveData=DefaultRoot{
             local oneSCData=spellcardHistory[value.phaseKey]
             oneSCData[value.difficulty]=oneSCData[value.difficulty] or {}
             local oneDiffData=oneSCData[value.difficulty]
+            oneDiffData.unlocked=oneDiffData.unlocked or false
             for player,_ in pairs(value.players) do
                 for _,shotType in ipairs(G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player]) do
                     oneDiffData[shotType]=oneDiffData[shotType] or {}
                     for _,type in ipairs({'ingame','practice'}) do
                         oneDiffData[shotType][type]=oneDiffData[shotType][type] or {
                             cleared=false,
-                            unlocked=false,
                             passes=0,
                             tries=0,
                         }

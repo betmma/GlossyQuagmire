@@ -161,7 +161,7 @@ return {
                             local historyTable=G.save.spellcardHistory[item.phaseKey][diff][shotType]
                             if historyTable.practice.cleared or historyTable.ingame.cleared then
                                 status=3
-                            elseif not historyTable.ingame.unlocked then
+                            elseif not G.save.spellcardHistory[item.phaseKey][diff].unlocked then
                                 status=1
                             end
                             local color=({{0.5,0.5,0.5,1},{1,1,1,1},{0.75,0.75,1,1}})[status]
@@ -231,8 +231,7 @@ return {
                         local diff=difficultyOptions.cursor.parent--[[@as SpellPracticeDifficultyOption]].difficulty
                         local id=item.difficulties[diff]
                         local spellcardData=SpellcardCollection.all[id]
-                        local historyTable=G.save.spellcardHistory[item.phaseKey][diff][shotType]
-                        if not historyTable.ingame.unlocked then
+                        if not G.save.spellcardHistory[item.phaseKey][diff].unlocked then
                             SFX:play('cancel',true)
                             return
                         end

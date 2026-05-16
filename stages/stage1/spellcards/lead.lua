@@ -149,7 +149,7 @@ return BossManager.SpellcardPhase{
                 SFX:play('enemyPowerfulShot',true)
                 wait(20)
             end
-            wait(DSWITCH{300,260,230,200})
+            wait(DSWITCH{300,260,230,230})
         end
     end
 }

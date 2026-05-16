@@ -1,7 +1,11 @@
 local function halfway(self,args)
+    local target=self.UIDEF[args.lastState].base[args.from.target]
+    if target then
+        target.transparency=1 -- restore alpha
+    end
     local currentUI=self.currentUI
     self.currentUI=self.UIDEF[args.nextState]
-    self.currentUI.enter(self,args.lastState)
+    self.currentUI.enter(self,args.nextState)
     self.currentUI=currentUI
     self.currentUI.halfway=true
 end

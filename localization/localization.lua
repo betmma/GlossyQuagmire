@@ -592,21 +592,41 @@ return {
                 en_us = 'Devastated',
                 zh_cn = '满身疮痍'
             },
+            replayEnd = {
+                en_us = 'Replay End',
+                zh_cn = '录像结束'
+            },
             practiceEnd = {
                 en_us = 'Practice End',
                 zh_cn = '练习结束'
             },
             saveReplay = {
-                en_us = 'Save Replay',
-                zh_cn = '保存录像'
+                __default__= {
+                    en_us = 'Save Replay',
+                    zh_cn = '保存录像'
+                },
             },
             restart = {
-                en_us = 'Try Again',
-                zh_cn = '重新开始'
+                normal = {
+                    en_us = 'Try Again',
+                    zh_cn = '重新开始'
+                },
+                playingReplay = {
+                    en_us = 'Watch Again',
+                    zh_cn = '再看一遍'
+                }
             },
             exit = {
-                en_us = 'Exit',
-                zh_cn = '退出'
+                __default__= {
+                    en_us = 'Exit',
+                    zh_cn = '退出'
+                }
+            }
+        },
+        SAVE_REPLAY_ENTER_NAME={
+            enterName = {
+                en_us = 'Enter Name',
+                zh_cn = '输入名字'
             }
         },
 
