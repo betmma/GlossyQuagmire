@@ -738,6 +738,16 @@ return {
                 zh_cn = '标题画面的主题曲。\n氛围与《蓬莱传说》相似：柔和而怀旧，就像说书人开始讲一个过去的故事。结局已经为人所知，却仍被主角的愿望所感动。',
             },
         },
+        level1 = {
+            name = {
+                en_us = 'Electronic Hub',
+                zh_cn = '短路旅行枢纽',
+            },
+            description = {
+                en_us = 'Stage 1\'s theme.\nSimple pentatonic melodies. Energetic feeling in the beginning of the journey. The Hyperbolic Domain is too electronic because Kotoba thought of the networking meaning of "hub" (^^;',
+                zh_cn = '1面的主题曲。\n简单的五声调式旋律。旅途开始时的活力。双曲域过于电子工程化了，这是因为言波想到了“短路”的双关含义。听起来很危险呢(^^;'
+            }
+        },
         level2b = {
             name = {
                 en_us = 'Foxtrot Towards the Beyond',

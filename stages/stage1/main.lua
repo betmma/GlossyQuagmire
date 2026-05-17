@@ -24,6 +24,7 @@ return{
     init=function()
         local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
         G.runInfo.player.border=border
+        G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)
     end,
     segments={
         {
@@ -115,7 +116,7 @@ return{
             key='1-3',
             type='midStage',
             --[[large fairy has small fairies rounding. small fairies shoot small bullets forming a circle (rounding a hidden center)]]
-            func=function()
+            func=function() -- 17s
                 local basePos=G.runInfo.geometry:init().pos
                 for i=1,4 do
                     local color=({'red','green','blue','purple'})[i]
@@ -178,13 +179,13 @@ return{
                     end}
                     wait(150)
                 end
-                wait(500)
+                wait(520)
             end
         },
         {
             key='1-4',
             type='midStage',
-            func=function()
+            func=function() -- 16s
                 local basePos=G.runInfo.geometry:init().pos
                 local colors={{1,0.1,0.1},{0.1,1,0.1},{0.1,0.1,1},{1,0.1,1}}
                 local count=0
@@ -259,7 +260,7 @@ return{
                     wallFairy(angle-math.pi/2*i)
                     wait(60)
                 end
-                wait(400)
+                wait(360)
             end
         },
         bosses[2]

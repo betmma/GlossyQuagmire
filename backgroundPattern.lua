@@ -263,210 +263,181 @@ function MainMenuTesselation:draw()
 end
 BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 
--- -- love2d draws a white rectangle then shader draws pattern.
--- local Shader=BackgroundPattern:extend()
--- ---@class ShaderBackground
--- ---@class love.Shader
--- ---@class ShaderBackgroundArgs
--- ---@field shader love.Shader the shader to use for drawing the background
--- ---@field paramSendFunction fun(self:ShaderBackground,shader:love.Shader):nil a function to send parameters to the shader, called in Shader:draw()
+-- love2d draws a white rectangle then shader draws pattern.
+local Shader=BackgroundPattern:extend()
+---@class ShaderBackground
+---@class love.Shader
+---@class ShaderBackgroundArgs
+---@field shader love.Shader the shader to use for drawing the background
+---@field paramSendFunction fun(self:ShaderBackground,shader:love.Shader):nil a function to send parameters to the shader, called in Shader:draw()
 
--- ---@param args ShaderBackgroundArgs
--- function Shader:new(args)
---     Shader.super.new(self,args)
---     args=args or {}
---     self.shader=args.shader
---     self.frame=0
---     self.paramSendFunction=args.paramSendFunction or function(self,shader) end
---     self.color={1,1,1}
---     self.lightColor={1,1,1}
---     self.darkColor={0.5,0.5,0.5}
---     self.autoDark=false -- if true, color will be lerped to darkColor when not G.preWin (enemy exists, during spellcard) (for very bright shaders)
--- end
--- function Shader:update(dt)
---     self.frame=self.frame+1
---     if self.autoDark then
---         local ratio=0.02
---         if G.preWin then
---             self.color={self.color[1]*(1-ratio)+self.lightColor[1]*ratio,self.color[2]*(1-ratio)+self.lightColor[2]*ratio,self.color[3]*(1-ratio)+self.lightColor[3]*ratio}
---         else
---             self.color={self.color[1]*(1-ratio)+self.darkColor[1]*ratio,self.color[2]*(1-ratio)+self.darkColor[2]*ratio,self.color[3]*(1-ratio)+self.darkColor[3]*ratio}
---         end
---     end
--- end
--- function Shader:draw()
---     local colorref={love.graphics.getColor()}
---     love.graphics.setColor(self.color[1],self.color[2],self.color[3])
---     -- love.graphics.rectangle('fill',0,0,800,600)
---     love.graphics.setShader(self.shader)
---     self:paramSendFunction(self.shader) -- send parameters to shader
---     local translateX,translateY,scale=G:followModeTransform(true)
---     love.graphics.rectangle('fill',-translateX/scale,-translateY/scale,800/scale,600/scale)
---     love.graphics.setShader()
---     love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
--- end
+---@param args ShaderBackgroundArgs
+function Shader:new(args)
+    Shader.super.new(self,args)
+    args=args or {}
+    self.shader=args.shader
+    self.frame=0
+    self.paramSendFunction=args.paramSendFunction or function(self,shader) end
+    self.color={1,1,1}
+    self.lightColor={1,1,1}
+    self.darkColor={0.5,0.5,0.5}
+    self.autoDark=false -- if true, color will be lerped to darkColor when not G.preWin (enemy exists, during spellcard) (for very bright shaders)
+end
+function Shader:update(dt)
+    self.frame=self.frame+1
+    if self.autoDark then
+        local ratio=0.02
+        if G.preWin then
+            self.color={self.color[1]*(1-ratio)+self.lightColor[1]*ratio,self.color[2]*(1-ratio)+self.lightColor[2]*ratio,self.color[3]*(1-ratio)+self.lightColor[3]*ratio}
+        else
+            self.color={self.color[1]*(1-ratio)+self.darkColor[1]*ratio,self.color[2]*(1-ratio)+self.darkColor[2]*ratio,self.color[3]*(1-ratio)+self.darkColor[3]*ratio}
+        end
+    end
+end
+function Shader:draw()
+    local colorref={love.graphics.getColor()}
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3])
+    -- love.graphics.rectangle('fill',0,0,800,600)
+    love.graphics.setShader(self.shader)
+    self:paramSendFunction(self.shader) -- send parameters to shader
+    local translateX,translateY,scale=0,0,1
+    love.graphics.rectangle('fill',-translateX/scale,-translateY/scale,800/scale,600/scale)
+    love.graphics.setShader()
+    love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
+end
 
--- BackgroundPattern.Shader=Shader
+BackgroundPattern.Shader=Shader
 
--- local build_lorentz_mat4=require('import.H3math').build_lorentz_mat4
--- -- tessellation on H^2 is calculated similar to main menu tessellation: calculate schwarz triangle vertices and send this fundamental triangle to shader. after flip, flip count and barycenter coordinates are used to calculate color and height.
--- -- due to high computation cost, this could only fit ending / credits
--- local H3TerrainShader=ShaderScan:load_shader('shaders/backgrounds/H3Terrain2.glsl')
--- local H3Terrain=Shader:extend()
--- function H3Terrain:new()
---     H3Terrain.super.new(self)
---     self.autoDark=true
---     self.shader=H3TerrainShader
---     self.cam_translation={0,1.5,0.5}
---     self.cam_pitch=-0.9
---     self.cam_yaw=0
---     self.cam_roll=0
---     self.camMoveRange={0.3,0.0}
---     self.camMoveSpeed=0.2
---     self.p,self.q,self.r=3,6,6
---     local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{0,ShapeF.axisY+100-1},0)
---     local length01=ShapeF.distance(V0[1],V0[2],V1[1],V1[2])
---     local length02=ShapeF.distance(V0[1],V0[2],V2[1],V2[2])
---     local length12=ShapeF.distance(V1[1],V1[2],V2[1],V2[2])
---     self.tesseLoopLength=length01*2 -- based on pqr, the loop length has many possibilities. other possible values include (L01+L02+L12)*2, (L01+L02)*2
---     self.tesseDistance=0.01 -- distance of tessellation moved along the path. not camera
---     self.tesseMoveSpeed=0.3
---     local autoMove=false
---     self.paramSendFunction=function(self,shader)
---         local l=length01-self.tesseDistance
---         local x,y,dir=ShapeF.rThetaGoT(0,ShapeF.axisY+1,l,0)
---         -- dir=dir+(l>0 and math.pi or 0)
---         local V0,V1,V2=ShapeF.schwarzTriangleVertices(self.p,self.q,self.r,{x,y},dir)
---         local axisY=ShapeF.axisY
---         V0[2]=V0[2]-axisY
---         V1[2]=V1[2]-axisY
---         V2[2]=V2[2]-axisY
---         shader:send("V0", V0)
---         shader:send("V1", V1)
---         shader:send("V2", V2)
---         shader:send("time", self.frame/60*1.8)
---         local trans=self.cam_translation or {0,0,0}
---         if autoMove then
---             trans[3]=math.cos(self.frame/200)*-0.5+1.5
---         end
---         shader:send("cam_translation", trans)
---         local pitch=self.cam_pitch or 0
---         if autoMove then
---             pitch=math.cos(self.frame/200)*-0.3-0.3
---         end
---         shader:send("cam_pitch", pitch)
---         shader:send("cam_yaw", self.cam_yaw or 0)
---         local roll=self.cam_roll or 0
---         shader:send("cam_roll", roll)
---     end
--- end
--- H3Terrain.update=function(self,dt)
---     H3Terrain.super.update(self,dt)
---     local xRange,yRange=self.camMoveRange[1],self.camMoveRange[2]
---     if not self.camMoveCenter then
---         self.camMoveCenter={self.cam_translation[1],self.cam_translation[2]}
---     end
---     local xCenter,yCenter=self.camMoveCenter[1],self.camMoveCenter[2]
---     local xyStep=self.camMoveSpeed*dt
---     self.tesseDistance=(self.tesseDistance+self.tesseMoveSpeed/(1+self.cam_translation[1]^2))%(self.tesseLoopLength)
---     self.frame=self.frame+1
---     local keyIsDown=love.keyboard.isDown
---     if keyIsDown("n") then
---         self.cam_pitch = self.cam_pitch - dt
---     end
---     if keyIsDown("m") then
---         self.cam_pitch = self.cam_pitch + dt
---     end
---     if keyIsDown("h") then
---         self.cam_yaw = self.cam_yaw - dt
---     end
---     if keyIsDown("j") then
---         self.cam_yaw = self.cam_yaw + dt
---     end
---     if keyIsDown("y") then
---         self.cam_roll = self.cam_roll - dt
---     end
---     if keyIsDown("u") then
---         self.cam_roll = self.cam_roll + dt
---     end
---     if keyIsDown("i") then
---         self.cam_translation[3] = self.cam_translation[3] + dt
---     end
---     if keyIsDown("k") then
---         self.cam_translation[3] = self.cam_translation[3] - dt
---     end
---     if Player.objects[1] then
---         keyIsDown=Player.objects[1].keyIsDown -- nmhjyuik aren't recorded in player, so these keys use love.keyboard.isDown. arrow keys use player to restore in replay
---     end
---     if keyIsDown("right") then
---         self.cam_translation[1] = math.clamp(self.cam_translation[1] + xyStep,-xRange+xCenter,xRange+xCenter)
---     end
---     if keyIsDown("left") then
---         self.cam_translation[1] = math.clamp(self.cam_translation[1] - xyStep,-xRange+xCenter,xRange+xCenter)
---     end
---     if keyIsDown("up") then
---         self.cam_translation[2] = math.clamp(self.cam_translation[2] - xyStep,-yRange+yCenter,yRange+yCenter)
---     end
---     if keyIsDown("down") then
---         self.cam_translation[2] = math.clamp(self.cam_translation[2] + xyStep,-yRange+yCenter,yRange+yCenter)
---     end
--- end
--- BackgroundPattern.H3Terrain=H3Terrain
+local build_lorentz_mat4=require('import.H3math').build_lorentz_mat4
+local WalkerShader=Shader:extend()
+function WalkerShader:new()
+    WalkerShader.super.new(self)
+    self.autoDark=false
+    self.cam_translation={0,1.5,0.5}
+    self.cam_pitch=-0.9
+    self.cam_yaw=0
+    self.cam_roll=0
+    self.camMoveRange={0.3,0.0}
+    self.camMoveSpeed=0.2
+    self.paramSendFunction=function(self,shader)
+        shader:send("time", self.frame/60)
+        local trans=self.cam_translation or {0,0,0}
+        shader:send("cam_translation", trans)
+        local pitch=self.cam_pitch or 0
+        shader:send("cam_pitch", pitch)
+        shader:send("cam_yaw", self.cam_yaw or 0)
+        local roll=self.cam_roll or 0
+        shader:send("cam_roll", roll)
+    end
+end
+WalkerShader.update=function(self,dt)
+    WalkerShader.super.update(self,dt)
+    local xRange,yRange=self.camMoveRange[1],self.camMoveRange[2]
+    if not self.camMoveCenter then
+        self.camMoveCenter={self.cam_translation[1],self.cam_translation[2]}
+    end
+    local xCenter,yCenter=self.camMoveCenter[1],self.camMoveCenter[2]
+    local xyStep=self.camMoveSpeed*dt
+    self.frame=self.frame+1
+    local keyIsDown=love.keyboard.isDown
+    if keyIsDown("n") then
+        self.cam_pitch = self.cam_pitch - dt
+    end
+    if keyIsDown("m") then
+        self.cam_pitch = self.cam_pitch + dt
+    end
+    if keyIsDown("h") then
+        self.cam_yaw = self.cam_yaw - dt
+    end
+    if keyIsDown("j") then
+        self.cam_yaw = self.cam_yaw + dt
+    end
+    if keyIsDown("y") then
+        self.cam_roll = self.cam_roll - dt
+    end
+    if keyIsDown("u") then
+        self.cam_roll = self.cam_roll + dt
+    end
+    if keyIsDown("i") then
+        self.cam_translation[3] = self.cam_translation[3] + dt
+    end
+    if keyIsDown("k") then
+        self.cam_translation[3] = self.cam_translation[3] - dt
+    end
+    if G.runInfo.player then
+        keyIsDown=G.runInfo.player.keyIsDown -- nmhjyuik aren't recorded in player, so these keys use love.keyboard.isDown. arrow keys use player to restore in replay
+    end
+    if keyIsDown("right") then
+        self.cam_translation[1] = math.clamp(self.cam_translation[1] - xyStep,-xRange+xCenter,xRange+xCenter)
+    end
+    if keyIsDown("left") then
+        self.cam_translation[1] = math.clamp(self.cam_translation[1] + xyStep,-xRange+xCenter,xRange+xCenter)
+    end
+    if keyIsDown("up") then
+        self.cam_translation[2] = math.clamp(self.cam_translation[2] - xyStep,-yRange+yCenter,yRange+yCenter)
+    end
+    if keyIsDown("down") then
+        self.cam_translation[2] = math.clamp(self.cam_translation[2] + xyStep,-yRange+yCenter,yRange+yCenter)
+    end
+end
+BackgroundPattern.H3Terrain=WalkerShader
 
 
--- local honeycombShader=ShaderScan:load_shader('shaders/backgrounds/honeycomb.glsl')
--- local Honeycomb=H3Terrain:extend()
--- function Honeycomb:new(args)
---     Honeycomb.super.new(self,args)
---     self.shader=honeycombShader
---     self.inverse=args and args.inverse or false
---     if not self.inverse then
---         self.darkColor={0.3,0.3,0.3}
---     end
---     self.cam_translation={0.0001,0.4,0.3} -- when inverse, y=0.4 to avoid moving into ball at origin
---     self.cam_pitch=self.inverse and -math.pi/2 or 0
---     self.cam_yaw=-math.pi/2
---     self.camMoveRange={0.45,0.0}
---     self.autoMove=true
---     self.autoForwardSpeed=0.15
---     self.autoForwardWrap=1.06 -- currently should be distance from center to center of a side. 
---     self.autoForwardValue=self.cam_translation[3]
---     self.manualForwardOffset=0.0
---     self.manualForwardLimit=0.3
---     self.reflectCount=0
---     self.paramSendFunction=function(self,shader)
---         shader:send("time", self.frame/60)
---         local trans=self.cam_translation
---         local pitch,yaw,roll=self.cam_pitch,self.cam_yaw,self.cam_roll
---         local changed=self.inverse and {trans[3], trans[1], trans[2]} or {trans[3], trans[2], trans[1]} -- auto move component must be first. rest two order is to let fixed component moving away from ball at origin or edge
---         local mat4=build_lorentz_mat4(pitch, yaw, roll, changed)
---         shader:send("cam_mat4", mat4)
---         shader:send("inverse",self.inverse)
---         shader:send("SHELL_RATIO",self.inverse and 2 or 0.5)
---         shader:send("reflect_count",self.reflectCount)
---     end
--- end
+local honeycombShader=ShaderScan:load_shader('shaders/backgrounds/honeycomb.glsl')
+local Honeycomb=WalkerShader:extend()
+function Honeycomb:new(args)
+    Honeycomb.super.new(self,args)
+    self.shader=honeycombShader
+    self.inverse=args and args.inverse or false
+    if not self.inverse then
+        self.darkColor={0.3,0.3,0.3}
+    end
+    self.cam_translation={0.0001,0.4,0.3} -- when inverse, y=0.4 to avoid moving into ball at origin
+    self.cam_pitch=self.inverse and -math.pi/2 or 0
+    self.cam_yaw=math.pi/2
+    self.camMoveRange={0.45,0.0}
+    self.autoMove=true
+    self.autoForwardSpeed=0.15
+    self.autoForwardWrap=1.06 -- currently should be distance from center to center of a side. 
+    self.autoForwardValue=self.cam_translation[3]
+    self.manualForwardOffset=0.0
+    self.manualForwardLimit=0.3
+    self.reflectCount=0
+    self.paramSendFunction=function(self,shader)
+        shader:send("time", self.frame/60)
+        local screenCenter=G.geometries.Hyperbolic.viewConfig.screenCenter
+        shader:send("screenCenter",{screenCenter.x,screenCenter.y})
+        local trans=self.cam_translation
+        local pitch,yaw,roll=self.cam_pitch,self.cam_yaw,self.cam_roll
+        local changed=self.inverse and {trans[3], trans[1], trans[2]} or {trans[3], trans[2], trans[1]} -- auto move component must be first. rest two order is to let fixed component moving away from ball at origin or edge
+        local mat4=build_lorentz_mat4(pitch, yaw, roll, changed)
+        shader:send("cam_mat4", mat4)
+        shader:send("inverse",self.inverse)
+        shader:send("SHELL_RATIO",self.inverse and 2 or 0.5)
+        shader:send("reflect_count",self.reflectCount)
+    end
+end
 
--- function Honeycomb:update(dt)
---     Honeycomb.super.update(self,dt)
---     if not self.autoMove then
---         return
---     end
---     local wrap = self.autoForwardWrap
---     local manualOffset = math.clamp(self.cam_translation[3] - self.autoForwardValue, -self.manualForwardLimit, self.manualForwardLimit)
---     self.manualForwardOffset = manualOffset
---     self.autoForwardValue = self.autoForwardValue + (self.autoForwardSpeed or 0.0) * dt
---     local span = wrap * 2.0
---     if self.autoForwardValue > wrap then
---         self.autoForwardValue = self.autoForwardValue - span
---         self.reflectCount = self.reflectCount + 1
---     elseif self.autoForwardValue < -wrap then
---         self.autoForwardValue = self.autoForwardValue + span
---         self.reflectCount = self.reflectCount + 1
---     end
---     self.cam_translation[3] = self.autoForwardValue + self.manualForwardOffset
--- end
+function Honeycomb:update(dt)
+    Honeycomb.super.update(self,dt)
+    if not self.autoMove then
+        return
+    end
+    local wrap = self.autoForwardWrap
+    local manualOffset = math.clamp(self.cam_translation[3] - self.autoForwardValue, -self.manualForwardLimit, self.manualForwardLimit)
+    self.manualForwardOffset = manualOffset
+    self.autoForwardValue = self.autoForwardValue + (self.autoForwardSpeed or 0.0) * dt
+    local span = wrap * 2.0
+    if self.autoForwardValue > wrap then
+        self.autoForwardValue = self.autoForwardValue - span
+        self.reflectCount = self.reflectCount + 1
+    elseif self.autoForwardValue < -wrap then
+        self.autoForwardValue = self.autoForwardValue + span
+        self.reflectCount = self.reflectCount + 1
+    end
+    self.cam_translation[3] = self.autoForwardValue + self.manualForwardOffset
+end
 
--- BackgroundPattern.Honeycomb=Honeycomb
+BackgroundPattern.Honeycomb=Honeycomb
 
 return BackgroundPattern

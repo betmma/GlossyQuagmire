@@ -88,7 +88,6 @@ return {
     end,
     chosen=1,
     update=function(self,dt)
-        self.backgroundPattern:update(dt)
         base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
             SFX:play('select')

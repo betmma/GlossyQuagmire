@@ -55,7 +55,7 @@ return {
             if args.from.doUpdate then
                 local currentUI=self.currentUI
                 self.currentUI=self.UIDEF[args.lastState]
-                self.currentUI.update(self)
+                self.currentUI.update(self,dt)
                 self.currentUI=currentUI
             end
         else
@@ -67,7 +67,7 @@ return {
             if args.to.doUpdate then
                 local currentUI=self.currentUI
                 self.currentUI=self.UIDEF[args.nextState]
-                self.currentUI.update(self)
+                self.currentUI.update(self,dt)
                 self.currentUI=currentUI
             end
         end

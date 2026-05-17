@@ -79,7 +79,7 @@ function UIOptions:switchOptionOnDirection(direction)
     local options=self.container.children
     local currentOption=self.cursor.parent
     ---@cast currentOption UIBase
-    local x,y=self.cursor:getCenterXY()
+    local x,y=self.cursor.parent:getCenterXY()
     local DEFAULT_SCORE_ABS=50000
     local bestScore,bestOption=-DEFAULT_SCORE_ABS,currentOption
     local dirx,diry=DirectionName2Dxy(direction)
@@ -96,12 +96,13 @@ function UIOptions:switchOptionOnDirection(direction)
         if math.angleDiff(angle,math.pi/2)<math.pi/30 then
             angle=math.pi/2
         end
-        local angleDeduction=5/math.clamp(math.abs(math.cos(angle)),1/DEFAULT_SCORE_ABS,1)
+        local cos=math.clamp(math.abs(math.cos(angle)),1/DEFAULT_SCORE_ABS,1)
+        local angleDeduction=5/cos
         score=score-angleDeduction
         if angle>math.pi*0.49 then
             if self.loopable then -- backwards is acceptable (better than -DEFAULT_SCORE_ABS) but worse than forewards
                 score=score-DEFAULT_SCORE_ABS/2
-                score=score+distance*4 -- when backwards, prefer farther nodes for looping
+                score=score+distance*(2+cos*cos) -- when backwards, prefer farther nodes for looping
             else
                 score=score-DEFAULT_SCORE_ABS*2 -- don't go backwards (worse than staying still)
             end
