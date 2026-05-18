@@ -79,7 +79,7 @@ end
 
 function Charge:update(dt)
     self.frame=self.frame+1
-    local direction=math.eval(0,999)
+    local direction=math.pseudoRandom(self.frame)*999
     if self.frame+self.particleFrame<self.animationFrame then
         local pos,dir2=G.runInfo.geometry:rThetaGo(self.obj.kinematicState.pos,100,direction)
         table.insert(self.particles,{frame=0,kinematicState={pos=pos,dir=dir2+math.pi,speed=self.particleSpeed}})

@@ -193,7 +193,7 @@ return{
                 local function bulletUpdate(self)
                     self.count=self.count or DSWITCH{1,1,2,-1}
                     local delta=DSWITCH{1,1,1,2}
-                    if self.frame%8==7 and self.count<DSWITCH{3,3,5,5} then
+                    if self.frame%8==7 and self.count<DSWITCH{3,3,5,4} then
                         self.count=self.count+delta
                         for i=-1,1,2 do
                             local numRef=self.count

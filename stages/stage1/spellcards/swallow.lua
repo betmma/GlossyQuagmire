@@ -34,11 +34,10 @@ return BossManager.SpellcardPhase{
             local targetPos,targetDir=G.runInfo.geometry:rThetaGo(pos1,y,dir1)
             targetDir=targetDir-math.pi
             self.kinematicState.pos,self.kinematicState.dir=targetPos,targetDir
-            Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=BulletSprites.scale.red,size=2,invincible=true,safe=true,highlight=true,lifeFrame=5,extraUpdate={Action.FadeOut(5,false)}} -- visual trail
         end
         for i=-50,50 do
             for side=-1,1,2 do
-                local teeth=Bullet{kinematicState=copyTable(mouthBase.kinematicState),sprite=BulletSprites.scale.red,size=2,invincible=true,safe=false,highlight=true,lifeFrame=1800,spriteTransparency=0,extraUpdate={teethUpdate,Action.FadeIn(60,true)}}
+                local teeth=Bullet{kinematicState=copyTable(mouthBase.kinematicState),sprite=BulletSprites.scale.red,size=2,invincible=true,safe=false,highlight=true,lifeFrame=1800,spriteTransparency=0,extraUpdate={teethUpdate,Action.FadeIn(60,true),Action.Trail(5,2)}}
                 teeth.i=i
                 teeth.side=side
             end

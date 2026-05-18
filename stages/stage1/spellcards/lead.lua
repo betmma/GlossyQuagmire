@@ -99,8 +99,8 @@ local function signCore(cir,boss,r0,dangle)
     end
     local finalTheta=-mock.theta*side+theta0
     local warningPos,warningDir=G.runInfo.geometry:rThetaGo(pos,r0,finalTheta)
-    Bullet{kinematicState={pos=warningPos,dir=warningDir,speed=0},sprite=BulletSprites.explosion.red,size=2,invincible=true,safe=true,spriteColor={0.4,0.4,0.4,0.3},lifeFrame=life,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
-    Bullet{kinematicState={pos=warningPos,dir=warningDir-math.pi/2*side,speed=0},sprite=BulletSprites.arrow.red,size=5,invincible=true,safe=true,spriteColor={1,0.2,0.2,0.3},lifeFrame=life,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
+    Bullet{kinematicState={pos=warningPos,dir=warningDir,speed=0},sprite=BulletSprites.explosion.red,size=2,invincible=true,safe=true,spriteColor={0.4,0.4,0.4,0.6},lifeFrame=life,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
+    Bullet{kinematicState={pos=warningPos,dir=warningDir-math.pi/2*side,speed=0},sprite=BulletSprites.arrow.red,size=5,invincible=true,safe=true,spriteColor={1,0.2,0.2,0.6},lifeFrame=life,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
     local rthetaFunc=function(self,boss)
         r=self.r0*(1-0.5^(self.frame/60))
         thetaFunc(self)
@@ -114,7 +114,7 @@ local function signCore(cir,boss,r0,dangle)
     Event.Event{obj=cir,action=function()
         while 1 do
             if r>spawnedChains*gap then
-                local chain=Bullet{sprite=BulletSprites.rimDark.gray,size=1,invincible=true,safe=true,spriteTransparency=0.3,lifeFrame=life-cir.frame,extraUpdate={Action.FadeIn(30,true),Action.FadeOut(20,true)}}
+                local chain=Bullet{sprite=BulletSprites.rimDark.gray,size=1,invincible=true,safe=true,spriteTransparency=0.3,lifeFrame=life-cir.frame,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
                 local num=spawnedChains
                 DanmakuFuncs.orbitBind(chain,boss,function()
                     local rChain=gap*num

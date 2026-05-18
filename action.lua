@@ -13,15 +13,21 @@ local fadeOut=function(self,params)
         if params.setSafe then
             self.safe=true
         end
-        self.spriteTransparency=(self.lifeFrame - self.frame)/fadeFrame
+        self.spriteTransparency=(self.lifeFrame - self.frame)/fadeFrame*(params.fadeOutTransparency or 1)
+    else
+        params.fadeOutTransparency=self.spriteTransparency
     end
+end
+
+local fadeOutInit=function(self,params)
+    params.fadeOutTransparency=self.spriteTransparency
 end
 
 ---@param fadeFrame integer number of frames for the fade out animation, default 30
 ---@param setSafe boolean whether to set the bullet safe when start fading out, default false
 --- @return Action
 Action.FadeOut=function(fadeFrame,setSafe)
-    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe},func=fadeOut}
+    return {isAction=true,params={fadeFrame=fadeFrame,setSafe=setSafe},func=fadeOut,init=fadeOutInit}
 end
 
 local fadeIn=function(self,params)
@@ -113,7 +119,7 @@ local trail=function(self,params)
     local lifeFrame=params.lifeFrame or 30
     local period=params.period or 2
     if self.frame%period==0 then
-        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
+        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
     end
 end
 

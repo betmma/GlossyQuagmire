@@ -14,7 +14,7 @@ local midboss=BossManager.BossSegment{
                 time=1200,
                 hp=1800,
                 func=function(self, boss)
-                    local num=21
+                    local num=12
                     local eventFunc=function(self)
                         local cir=self.obj
                         local i,j=cir.i,cir.j
@@ -33,7 +33,7 @@ local midboss=BossManager.BossSegment{
                             return
                         end
                         local sign=math.sign(i-num/2+0.01)
-                        if edge%3<2 then
+                        if i%3<2 then
                             BulletSpawner.wrapFogEffect({fogTime=10,kinematicState=copyTable(cir.kinematicState),sprite=BulletSprites.fog.purple},function()end)
                             cir.kinematicState.dir=cir.kinematicState.dir-math.pi*(0.5)*cir.flip*math.mod2Sign(edge%3)
                             cir:changeSprite(BulletSprites.knife.purple)
@@ -52,13 +52,13 @@ local midboss=BossManager.BossSegment{
                     for j=1,6 do
                         local flip=math.mod2Sign(j)
                         local angle=G.runInfo.geometry:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.2)
-                        for i=1,num do
-                            local dangle=math.pi/num*1*(i-num/2-i%3)*flip
-                            local ovalangle=dangle-math.pi/4*flip
+                        for i=0,num-1 do
+                            local dangle=math.pi/num*0.5*(i-num/2-i%3)*flip
+                            local ovalangle=dangle-math.pi/2*flip
                             local r=((math.sin(ovalangle)*80)^2+(math.cos(ovalangle)*120)^2)^0.5
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
                             for k=-1,1,2 do
-                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=200,extraUpdate={Action.Trail(30,3)}}
+                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=100,extraUpdate={Action.Trail(30,3)}}
                             end
                             local spawner=BulletSpawner{
                                 kinematicState={pos=pos,dir=dir,speed=0},
@@ -251,10 +251,8 @@ local finalBoss=BossManager.BossSegment{
                 end
             },
             require 'stages.stage1.spellcards.pupil',
-        }},
-        BossManager.BossRound{phases={
             require 'stages.stage1.spellcards.lead',
-        }}
+        }},
     }
 }
 ---@type BossSegment[]

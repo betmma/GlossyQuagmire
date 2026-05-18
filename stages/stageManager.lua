@@ -71,7 +71,7 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
                 if segment.skip then
                     segment:skip(segmentFuncArgs)
                 end
-                if segment.SKIP_INCLUDE then
+                if segment.SKIP_INCLUDE and SKIP_MODE then
                     segment:func(segmentFuncArgs)
                 end
             else
@@ -85,6 +85,7 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
     self.currentCoroutine=coroutine.create(func)
     GameObject:removeAll()
     G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
+    ShotTypes[G.runInfo.shotType]:reset()
     DynamicUIObjs.reset()
     if G.runInfo.replay then
         if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
@@ -131,6 +132,20 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
     }
 end
 
+-- is called when finishing a stage in StageManager:update, and called in gameEnd for dying in middle of a stage.
+function StageManager:addStageData()
+    self.previousStagesData[#self.previousStagesData+1] = {
+        stageKey=self.args.item,
+        keyRecord=G.runInfo.player.keyRecord,
+        seed=G.runInfo.seed,
+        score=G.runInfo.score,
+        lives=G.runInfo.lives,
+        bombs=G.runInfo.bombs,
+        power=G.runInfo.power,
+        grazes=G.runInfo.grazes
+    }
+end
+
 function StageManager:update(dt)
     if self.currentCoroutine and coroutine.status(self.currentCoroutine)~='dead' then
         local success, message=coroutine.resume(self.currentCoroutine)
@@ -141,16 +156,7 @@ function StageManager:update(dt)
     end
     -- below only runs when self.currentCoroutine ends
     if self.callback=='nextStage' then
-        self.previousStagesData[#self.previousStagesData+1] = {
-            stageKey=self.args.item,
-            keyRecord=G.runInfo.player.keyRecord,
-            seed=G.runInfo.seed,
-            score=G.runInfo.score,
-            lives=G.runInfo.lives,
-            bombs=G.runInfo.bombs,
-            power=G.runInfo.power,
-            grazes=G.runInfo.grazes
-        }
+        self:addStageData()
         -- find next stage
         local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty]
         local currentStageIndex=-1

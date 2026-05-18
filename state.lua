@@ -569,7 +569,7 @@ G.update=function(self,dt)
     self.currentUI=self.UIDEF[self.STATE]
     NoticeManager:update()
     -- replay speed control
-    if G.runInfo.replay then
+    if G.runInfo.replay and G.STATE==G.STATES.IN_GAME then
         if love.keyboard.isDown('lalt') then -- +2x
             self.currentUI.update(self,dt)
             self.currentUI.update(self,dt)
@@ -611,10 +611,11 @@ G.draw=function(self)
     if DEV_MODE and not love.keyboard.isDown('f5') then
         SetFont(12)
         love.graphics.print("FPS: "..love.timer.getFPS(), 0, 0)
+        love.graphics.print('Events: '..#Event.objects,0,13)
+        love.graphics.print('Bullets: '..#Bullet.objects,0,26)
         if SKIP_MODE then
-            love.graphics.print("SKIP MODE ON", 0, 13)
+            love.graphics.print("SKIP MODE ON", 0, 39)
         end
-        love.graphics.print('Events: '..#Event.objects,0,26)
     end
     shove.endLayer()
 end

@@ -5,7 +5,7 @@ local function halfway(self,args)
     end
     local currentUI=self.currentUI
     self.currentUI=self.UIDEF[args.nextState]
-    self.currentUI.enter(self,args.nextState)
+    self.currentUI.enter(self,args.lastState)
     self.currentUI=currentUI
     self.currentUI.halfway=true
 end

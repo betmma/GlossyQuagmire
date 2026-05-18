@@ -118,11 +118,12 @@ function BossRound:new(args)
                     if DEV_MODE and SKIP_MODE then -- skip to the last phase for testing. note that the hp bar will be wrong as it is based on all phases but it's for dev testing so doesnt matter
                         if i==#self.phases or phase.SKIP_INCLUDE then
                             phase:run(boss)
-                        end      
+                        end
                     else
                         phase:run(boss)
                     end
                 end
+                wait(60) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
             end
             wait(60)
         end
@@ -270,7 +271,6 @@ function BossPhase:run(boss)
         boss:die()
     end
     DynamicUIObjs.hpBar:increasePhase() -- move to next phase in hp bar
-    wait(60) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
 end
 
 ---@class NonSpellPhaseArgs:BossPhaseBaseArgs

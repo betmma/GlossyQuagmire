@@ -132,7 +132,7 @@ function GameObject:removeAll()
   for i =#self.objects,1,-1 do
     table.remove(self.objects, i)
   end
-  for key, cls in pairs(self.subclasses) do
+  for key, cls in ipairs(self.subclasses) do
       cls:removeAll()
   end
 end
@@ -141,12 +141,12 @@ function GameObject:update(dt)
 end
 
 function GameObject:updateAll(dt)
-  for key, obj in pairs(self.objects) do
+  for key, obj in ipairs(self.objects) do
     if not obj.removed then
       obj:update(dt)
     end
   end
-  for key, cls in pairs(self.subclasses) do
+  for key, cls in ipairs(self.subclasses) do
       cls:updateAll(dt)
   end
   local nextObjects={}
@@ -162,12 +162,12 @@ function GameObject:draw()
 end
 
 function GameObject:drawAll()
-  for key, obj in pairs(self.objects) do
+  for key, obj in ipairs(self.objects) do
     if not obj.removed and not obj.notRespondToDrawAll then
       obj:draw()
     end
   end
-  for key, cls in pairs(self.subclasses) do
+  for key, cls in ipairs(self.subclasses) do
       cls:drawAll()
   end
 end
@@ -177,12 +177,12 @@ function GameObject:drawText()
 end
 
 function GameObject:drawTextAll()
-  for key, obj in pairs(self.objects) do
+  for key, obj in ipairs(self.objects) do
     if not obj.removed then
       obj:drawText()
     end
   end
-  for key, cls in pairs(self.subclasses) do
+  for key, cls in ipairs(self.subclasses) do
       cls:drawTextAll()
   end
 end

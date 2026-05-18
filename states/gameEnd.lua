@@ -74,7 +74,13 @@ return {
     enter=function(self,lastState)
         base.frame=0
         playingReplay=G.runInfo.replay~=nil
-        G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
+        -- if player dies during a stage, stageManager:update part after stage coroutine ends wont be executed which includes adding current stage keyrecords and things into replay source data.
+        if lastState==G.STATES.IN_GAME and not playingReplay then
+            if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.item then
+                StageManager:addStageData()
+            end
+            G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
+        end
         base:updateHierarchy() -- simple way to deal with the one-frame delay due to extraUpdate using base.frame to update positions
     end,
     update=function(self,dt)

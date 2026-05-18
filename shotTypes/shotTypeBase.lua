@@ -233,6 +233,10 @@ function ShootingPattern:new(args)
     self.frame=0
 end
 
+function ShootingPattern:reset()
+    self.frame=0
+end
+
 function ShootingPattern:update(dt)
     self.frame=self.frame+1
     if self.frame>=self.frequency then
@@ -282,6 +286,18 @@ function ShotType:new(args)
     self.optionArrangement=args.optionArrangement
     self.optionShot=args.optionShot
     self.spellcard=args.spellcard
+end
+
+function ShotType:reset()
+    for i,shot in ipairs(self.mainShot) do
+        shot:reset()
+    end
+    for i,shot in ipairs(self.optionShot.focused) do
+        shot:reset()
+    end
+    for i,shot in ipairs(self.optionShot.unfocused) do
+        shot:reset()
+    end
 end
 
 function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, dt, options, optionTransparency)

@@ -106,6 +106,8 @@ function Player:update(dt)
     self.immobileFrame=math.max(0,self.immobileFrame-1)
     if self.immobileFrame<=0 and not self.duringDeathbombWindow then
         self:moveUpdate(dt)
+    else
+        self.frame=self.frame+1 -- moveUpdate -> Shape.update that increases self.frame. need to compensate for skipping moveUpdate so during replay self.frame is correct
     end
 
     -- handle invincible time from hit
