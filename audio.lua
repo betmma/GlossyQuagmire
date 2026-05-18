@@ -65,6 +65,16 @@ function AudioSystem:play(name,restart,overrideVolume)
     self.currentAudio=name
     EventManager.post(EventManager.EVENTS.PLAY_AUDIO,self,name)
 end
+
+--- get the current time of the currently playing audio. if not playing returns 0
+---@return number
+function AudioSystem:tell()
+    if self.currentAudio then
+        return self.data[self.currentAudio]:tell()
+    end
+    return 0
+end
+
 --- set master volume of all audios (0-1 range)
 --- @param volume number
 function AudioSystem:setVolume(volume)
@@ -93,7 +103,7 @@ sfx:setAudioVolume('notice',3)
 sfx:setAudioVolume('cancel',2)
 sfx:setAudioVolume('extend',2)
 ---@type AudioSystem
-local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
+local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'level1','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
 --- @type {sfx:AudioSystem,bgm:AudioSystem}
 local Audio={
     sfx=sfx,

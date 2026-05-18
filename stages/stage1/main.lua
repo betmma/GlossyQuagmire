@@ -31,6 +31,7 @@ return{
             key='1-1',
             type='midStage',
             func=function() -- 15s
+                BGM:play('level1')
                 DynamicUIObjs.showSoundtrack()
                 wait(30)
                 local basePos=G.runInfo.geometry:init().pos

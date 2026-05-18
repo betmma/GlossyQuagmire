@@ -397,14 +397,26 @@ function Honeycomb:new(args)
     self.cam_yaw=math.pi/2
     self.camMoveRange={0.45,0.0}
     self.autoMove=true
-    self.autoForwardSpeed=0.15
+    self.autoForwardSpeed=0.25
     self.autoForwardWrap=1.06 -- currently should be distance from center to center of a side. 
     self.autoForwardValue=self.cam_translation[3]
     self.manualForwardOffset=0.0
     self.manualForwardLimit=0.3
     self.reflectCount=0
     self.paramSendFunction=function(self,shader)
-        shader:send("time", self.frame/60)
+        local time=self.frame/60
+        local lightsOn=true
+        if BGM.currentAudio=='level1' then
+            time=BGM:tell()
+            -- 24 bars, 150 bpm -> 38.4s, to 48 bars -> 76.8s. dunno why there's delay
+            local delay=0.03
+            local time2=time-delay
+            if time2>38.4 and time2<76.8 and (time2-38.4)%0.8>0.4 then
+                lightsOn=false
+            end
+        end
+        shader:send("neon_lights_on",lightsOn)
+        shader:send("time", time)
         local screenCenter=G.geometries.Hyperbolic.viewConfig.screenCenter
         shader:send("screenCenter",{screenCenter.x,screenCenter.y})
         local trans=self.cam_translation

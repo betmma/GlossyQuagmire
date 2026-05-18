@@ -10,13 +10,18 @@ uniform vec2 screenCenter;
 
 uniform float SHELL_RATIO; // 0.38 for small gap at edge
 uniform int reflect_count; // times of camera reflection. flip coords in shade to keep continuity
+uniform bool neon_lights_on;
 const float MAX_HYP_DIST = 9.5;
-const float STEP_MIN = 0.02;
-const float STEP_MAX = 0.9;
+const float STEP_MIN = 0.08;
+const float STEP_MAX = 9.9;
 const float STEP_FACTOR = 0.99;
 
 
 vec3 honeycomb_shade(vec4 pos, vec4 dir, float travel, float time);
+
+float atanh1(float x) {
+    return 0.5 * log((1.0 + x) / max(1.0 - x, 0.000001));
+}
 
 vec3 rayMarch(vec4 cam_pos_H, vec4 ray_dir_H, float time, out bool hit_terrain) {
     float CELL_SHELL_DIST = SHELL_RATIO * CELL_INRADIUS + (1.0-SHELL_RATIO) * CELL_CIRCUMRADIUS;
@@ -27,7 +32,7 @@ vec3 rayMarch(vec4 cam_pos_H, vec4 ray_dir_H, float time, out bool hit_terrain) 
 
     vec3 accum = vec3(0.08, 0.09, 0.14);
     float travel = 0.0;
-    for (int step = 0; step < 48; ++step) {
+    for (int step = 0; step < 36; ++step) {
         float shellDist = acosh1(max(pos.w, 1.0));
         if (!inverse && shellDist >= CELL_SHELL_DIST || inverse && shellDist <= CELL_SHELL_DIST) {
             break;
@@ -35,7 +40,8 @@ vec3 rayMarch(vec4 cam_pos_H, vec4 ray_dir_H, float time, out bool hit_terrain) 
 
         float nearest = 1e9;
         for (int i = 0; i < FACE_COUNT; ++i) {
-            nearest = min(nearest, plane_signed(pos, getFaceNormal(i)));
+            vec4 faceNormal = getFaceNormal(i);
+            nearest = min(nearest, plane_signed(pos, faceNormal));
         }
         nearest = max(nearest, 0.0);
         float nearestDist = asinh1(nearest);
@@ -44,54 +50,39 @@ vec3 rayMarch(vec4 cam_pos_H, vec4 ray_dir_H, float time, out bool hit_terrain) 
         dt = min(dt, abs(CELL_SHELL_DIST - shellDist));
 
 
-        float remaining = dt;
-        for (int guard = 0; guard < 1; ++guard) {
-            vec4 trialPos;
-            vec4 trialDir;
-            geodesic_step(pos, dir, remaining, trialPos, trialDir);
-            int hitFace = -1;
-            float hitT = remaining;
-            for (int i = 0; i < FACE_COUNT; ++i) {
-                float s0 = plane_signed(pos, getFaceNormal(i));
-                float s1 = plane_signed(trialPos, getFaceNormal(i));
-                if (s1 < 0.0) {
-                    float low = 0.0;
-                    float high = remaining;
-                    for (int iter = 0; iter < 2; ++iter) {
-                        float mid = 0.5 * (low + high);
-                        vec4 midPos;
-                        vec4 midDir;
-                        geodesic_step(pos, dir, mid, midPos, midDir);
-                        float smid = plane_signed(midPos, getFaceNormal(i));
-                        if (smid > 0.0) {
-                            low = mid;
-                        } else {
-                            high = mid;
-                        }
-                    }
-                    if (high < hitT) {
-                        hitT = high;
+        vec4 trialPos;
+        vec4 trialDir;
+        geodesic_step(pos, dir, dt, trialPos, trialDir);
+        int hitFace = -1;
+        float hitT = dt;
+        for (int i = 0; i < FACE_COUNT; ++i) {
+            vec4 faceNormal = getFaceNormal(i);
+            float s1 = plane_signed(trialPos, faceNormal);
+            if (s1 < 0.0) {
+                float s0 = plane_signed(pos, faceNormal);
+                float sd = plane_signed(dir, faceNormal);
+                float ratio = -s0 / min(sd, -0.000001);
+                if (ratio >= 0.0 && ratio < 0.999999) {
+                    float crossingT = atanh1(ratio);
+                    if (crossingT < hitT) {
+                        hitT = crossingT;
                         hitFace = i;
                     }
                 }
             }
-            if (hitFace != -1) {
-                vec4 hitPos;
-                vec4 hitDir;
-                geodesic_step(pos, dir, hitT, hitPos, hitDir);
-                pos = reflect_plane(hitPos, getFaceNormal(hitFace));
-                dir = reflect_plane(hitDir, getFaceNormal(hitFace));
-                renormalize_state(pos, dir);
-                remaining -= hitT;
-            } else {
-                pos = trialPos;
-                dir = trialDir;
-                renormalize_state(pos, dir);
-                remaining = 0.0;
-            }
-            if(remaining <= 0.0005){
-                break;
-            }
+        }
+        if (hitFace != -1) {
+            vec4 hitPos;
+            vec4 hitDir;
+            vec4 faceNormal = getFaceNormal(hitFace);
+            geodesic_step(pos, dir, hitT, hitPos, hitDir);
+            pos = reflect_plane(hitPos, faceNormal);
+            dir = reflect_plane(hitDir, faceNormal);
+            renormalize_state(pos, dir);
+        } else {
+            pos = trialPos;
+            dir = trialDir;
+            renormalize_state(pos, dir);
         }
         travel += dt;
         if (travel >= MAX_HYP_DIST) break;
@@ -117,65 +108,110 @@ vec3 hsv2rgb(vec3 c) {
     return c.z * mix(vec3(1.0), clamp(p-1.0, 0.0, 1.0), c.y);
 }
 
-// Unit vector from latitude theta in [-pi/2, pi/2], longitude phi in [-pi, pi]
-vec3 sphDir(float theta, float phi) {
-    float ct = cos(theta), st = sin(theta);
-    float cp = cos(phi),   sp = sin(phi);
-    return vec3(ct*cp, st, ct*sp);
+float neonSegmentMask(vec2 p, vec2 a, vec2 b, float width, float soft) {
+    vec2 pa = p - a;
+    vec2 ba = b - a;
+    float h = clamp(dot(pa, ba) / max(dot(ba, ba), 0.000001), 0.0, 1.0);
+    float d = length(pa - ba * h);
+    return 1.0 - smoothstep(width, width + soft, d);
 }
 
-// Environment “lights”: a few colored beams sweeping direction space
-vec3 envLights(vec3 r, float time){
-    vec3 col = vec3(0.0); 
-    for(int i=0;i<6;i++){
-        float ph = time*0.65 + float(i)*2.13;
-        vec3 L = normalize(vec3(cos(ph+5.1*float(i)), sin(ph*1.3+1.7*float(i)), cos(ph*0.7-2.3*float(i))));
-        float tight = pow(max(dot(r, L), 0.0), 18.0); // sharp specular lobe
-        vec3 hue = hsv2rgb(vec3(fract(0.2*float(i) + time*0.11), 0.85, 1.0));
-        col += hue * tight * 6.0;
+vec3 getRoutePointDir(int index) {
+    if (index == 0) return vec3(-1.000000000000, 0.000000000000, 0.000000000000);
+    if (index == 1) return vec3(-0.934172358963, 0.000000000000, -0.356822089773);
+    if (index == 2) return vec3(-0.809016994375, -0.309016994375, -0.500000000000);
+    if (index == 3) return vec3(-0.577350269190, -0.577350269190, -0.577350269190);
+    if (index == 4) return vec3(-0.309016994375, -0.500000000000, -0.809016994375);
+    if (index == 5) return vec3(0.000000000000, -0.356822089773, -0.934172358963);
+    if (index == 6) return vec3(0.309016994375, -0.500000000000, -0.809016994375);
+    if (index == 7) return vec3(0.577350269190, -0.577350269190, -0.577350269190);
+    if (index == 8) return vec3(0.809016994375, -0.309016994375, -0.500000000000);
+    if (index == 9) return vec3(0.934172358963, 0.000000000000, -0.356822089773);
+    return vec3(1.000000000000, 0.000000000000, 0.000000000000);
+}
+
+int getRouteFace(int index) {
+    if (index == 0) return 2;
+    if (index == 1) return 1;
+    if (index == 2) return 0;
+    if (index == 3) return 8;
+    return 9;
+}
+
+float routeBand(float dist, float width, float soft) {
+    return 1.0 - smoothstep(width, width + soft, dist);
+}
+
+float neonGlowBand(float dist, float width, float glowWidth) {
+    return 1.0 - smoothstep(width, glowWidth, dist);
+}
+
+float positiveRouteAngle(float a) {
+    if (a < 0.0) {
+        a += 2.0 * PI;
     }
-    return col;
+    return a;
 }
 
-// Longitude/latitude faceting with AA grout lines
-// N: unit direction on sphere
-// meridians: number of φ bins (vertical slices)
-// parallels: number of θ bins (horizontal bands)
-// grout: edge half-width in cell units (0..0.5)
-void geoFacet(vec3 N, float meridians, float parallels, float grout,
-              out vec3 facetN, out vec2 tileUV, out float edgeMask)
-{
-    // spherical coordinates
-    float phi   = atan(N.z, N.x);                       // [-pi, pi]
-    float theta = asin(clamp(N.y, -1.0, 1.0));          // [-pi/2, pi/2]
-
-    // normalized [0,1] for hashing / color animation
-    float u = (phi + PI) / (2.0*PI);
-    float v = (theta + 0.5*PI) / PI;
-    tileUV = vec2(u, v);
-
-    // facet center angles
-    float iu = floor(u * meridians);
-    float iv = floor(v * parallels);
-    float uc = (iu + 0.5) / meridians;
-    float vc = (iv + 0.5) / parallels;
-    float phi_c   = uc * (2.0*PI) - PI;
-    float theta_c = vc * PI - 0.5*PI;
-
-    // flat facet normal is the center direction
-    facetN = sphDir(theta_c, phi_c);
-
-    // AA edge mask along nearest meridian/parallel
-    vec2 cell = vec2(u*meridians, v*parallels);
-    vec2 frac = fract(cell);
-    vec2 distToEdge = min(frac, 1.0 - frac);
-    vec2 aa = 0.5 / vec2(meridians, parallels); // replaced fwidth
-    float edgeU = 1.0 - smoothstep(grout - aa.x, grout + aa.x, distToEdge.x);
-    float edgeV = 1.0 - smoothstep(grout - aa.y, grout + aa.y, distToEdge.y);
-    edgeMask = max(edgeU, edgeV);                       // 1 at edges, 0 in tile interior
+float hollowArrowMask(vec2 p, float stroke, float soft) {
+    float top = neonSegmentMask(p, vec2(-0.130, 0.040), vec2(0.000, 0.040), stroke, soft);
+    float bottom = neonSegmentMask(p, vec2(-0.130, -0.040), vec2(0.000, -0.040), stroke, soft);
+    float tail = neonSegmentMask(p, vec2(-0.130, -0.040), vec2(-0.130, 0.040), stroke, soft);
+    float headA = neonSegmentMask(p, vec2(0.000, 0.085), vec2(0.135, 0.000), stroke, soft);
+    float headB = neonSegmentMask(p, vec2(0.000, -0.085), vec2(0.135, 0.000), stroke, soft);
+    float neckA = neonSegmentMask(p, vec2(0.000, 0.085), vec2(0.000, 0.040), stroke, soft);
+    float neckB = neonSegmentMask(p, vec2(0.000, -0.085), vec2(0.000, -0.040), stroke, soft);
+    return clamp(max(max(max(top, bottom), max(tail, headA)), max(max(headB, neckA), neckB)), 0.0, 1.0);
 }
 
-// -------------------- Disco-ball shading replacement ----------------------
+void routeMasks(vec3 n, vec3 a, vec3 m, vec3 b, int routeFace, float shellScale,
+                out float routeDist, out float arrow, out float arrowGlow,
+                out float connector, out float connectorGlow) {
+    vec3 planeN = normalize(getFaceNormal(routeFace).xyz);
+    float planeK = 0.5 * (dot(planeN, a) + dot(planeN, b));
+    vec3 circleCenter = planeN * planeK;
+    float circleRadius = sqrt(max(1.0 - planeK * planeK, 0.000001));
+    vec3 axisU = normalize(a - circleCenter);
+    vec3 axisV = normalize(cross(planeN, axisU));
+    vec3 flatM = m - circleCenter;
+    flatM -= planeN * dot(flatM, planeN);
+    float angleM = positiveRouteAngle(atan(dot(flatM, axisV), dot(flatM, axisU)));
+    float angleB = positiveRouteAngle(atan(dot(b - circleCenter, axisV), dot(b - circleCenter, axisU)));
+    vec3 flat_ = n - circleCenter;
+    flat_ -= planeN * dot(flat_, planeN);
+    vec3 q = circleCenter + circleRadius * normalize(flat_);
+    float angleQ = positiveRouteAngle(atan(dot(q - circleCenter, axisV), dot(q - circleCenter, axisU)));
+    float onArc = 0.0;
+    if (angleM <= angleB) {
+        onArc = step(0.0, angleQ) * step(angleQ, angleB);
+    } else {
+        onArc = 1.0 - step(0.0, angleQ) * step(angleQ, angleB);
+    }
+    float arcDist = length(n - q);
+    float endDist = min(length(n - a), length(n - b));
+    routeDist = mix(endDist, arcDist, onArc) * shellScale;
+
+    vec3 arcPoint = normalize(circleCenter + circleRadius * normalize(flatM));
+    vec3 forward = normalize(cross(planeN, arcPoint - circleCenter));
+    if (dot(forward, b - a) < 0.0) {
+        forward = -forward;
+    }
+    vec3 side = normalize(cross(m, forward));
+    forward = normalize(cross(side, m));
+    vec3 offset = n - m;
+    vec2 p = vec2(dot(offset, forward), dot(offset, side)) * shellScale;
+    float arrowFootprint = 1.0 - smoothstep(0.160, 0.240, length(offset) * shellScale);
+    float arrowGlowFootprint = 1.0 - smoothstep(0.200, 0.380, length(offset) * shellScale);
+    arrow = hollowArrowMask(p, 0.005, 0.005) * arrowFootprint;
+    arrowGlow = hollowArrowMask(p, 0.050, 0.110) * arrowGlowFootprint;
+
+    float arcSide = dot(arcPoint - m, side);
+    float sideSign = arcSide < 0.0 ? -1.0 : 1.0;
+    float connectorFootprint = 1.0 - smoothstep(0.160, 0.280, length(offset) * shellScale);
+    connector = neonSegmentMask(p, vec2(0.000, sideSign * 0.092), vec2(0.000, sideSign * 0.155), 0.008, 0.012) * connectorFootprint;
+    connectorGlow = neonSegmentMask(p, vec2(0.000, sideSign * 0.092), vec2(0.000, sideSign * 0.155), 0.040, 0.090) * connectorFootprint;
+}
+
 
 vec3 honeycomb_shade(vec4 pos, vec4 dir, float travel, float time) {
     float CELL_SHELL_DIST = SHELL_RATIO * CELL_INRADIUS + (1.0-SHELL_RATIO) * CELL_CIRCUMRADIUS;
@@ -191,11 +227,11 @@ vec3 honeycomb_shade(vec4 pos, vec4 dir, float travel, float time) {
     bool outsideShell = (!inverse && d < CELL_SHELL_DIST - 0.001) ||
                         ( inverse && d > CELL_SHELL_DIST + 0.001);
     if (outsideShell) {
-        return vec3(0.1, 0.1, 0.1) * exp(-decay*travel);
+        return vec3(0.045, 0.055, 0.075) * exp(-decay*travel);
     }
 
     // Euclidean normal of the shell from your hyperbolic embedding
-    float sh = max(sinh(d), 1e-5);
+    float sh = max(sinh(d), 0.00001);
     float ch = cosh(d);
     vec3 N_euclid = normalize(pos.xyz / sh * ch);
 
@@ -203,57 +239,50 @@ vec3 honeycomb_shade(vec4 pos, vec4 dir, float travel, float time) {
     float Lsigned = dot(dir, vec4(N_euclid, sh));
     if (inverse) Lsigned = -Lsigned;
 
-    // Spherical faceting parameters
-    const float MERIDIANS = 64.0;   // vertical lines (φ)
-    const float PARALLELS = 32.0;   // horizontal lines (θ)
-    const float GROUT     = 0.05;   // AA half-width in cell units
-
-    // Compute facet normal and edge mask
-    vec3 facetN; vec2 tileUV; float edgeMask;
-    geoFacet(N_euclid, MERIDIANS, PARALLELS, GROUT, facetN, tileUV, edgeMask);
-
-    // View and reflection for mirror tiles
-    vec3 V = normalize(-dir.xyz);
-    vec3 R = reflect(-V, facetN);
-
-    // Mirror env with Fresnel for spicy glints
-    vec3 env = envLights(R, time);
-    float F = pow(1.0 - max(dot(V, facetN), 0.0), 5.0);
-    vec3 mirrorCol = env * (1.2*(0.08 + 0.92*F));
-
-    // Base tile visibility + subtle hue wobble so it never dies in darkness
-    vec3 tileBase = vec3(0.10)*0.5*(1.0+Lsigned);
-    float hueShift = 0.08*sin(time*0.7) + 0.04*sin(3.0*time + tileUV.x*2.0);
-    vec3 wobble = hsv2rgb(vec3(hueShift, 0.12, 1.0));
-
-    // Sparkles: random tiles twinkle
-    float sparkleSeed = hash11(tileUV*vec2(37.3, 91.7));
-    float sparkleHit  = step(0.08, sparkleSeed);
-    float sparkle = sparkleHit *
-                    pow(max(dot(R, normalize(vec3(0.3,0.8,0.5))), 0.0), 80.0) *
-                    (0.7 + 0.3*sin(time*22.0 + sparkleSeed*6.2831853));
-    vec3 sparkleCol = vec3(1.6) * sparkle;
-
-    // Grout color and mixing along edges (edgeMask=1 at lines)
-    vec3 groutCol = vec3(0.20, 0.18, 0.16);
-
-    // Final tile color
-    vec3 tileCol = (tileBase + mirrorCol + sparkleCol) * wobble;
-
-    vec3 color = mix(tileCol, groutCol, edgeMask);
-
-    // Gentle rim so the silhouette always reads
-    float rim = pow(1.0 - max(dot(facetN, V), 0.0), 2.0);
-    color += vec3(0.25) * rim;
-
-    // Modest attenuation so it doesn’t vanish with long travel
-    color *= exp(-decay * travel);
-
-    return color;
+    float shellScale = max(sinh(d), 0.00001);
+    float arrows = 0.0;
+    float arrowGlow = 0.0;
+    float circuits = 0.0;
+    float circuitGlow = 0.0;
+    float connectors = 0.0;
+    float connectorGlow = 0.0;
+    for (int i = 0; i < 5; ++i) {
+        int routeIndex = i * 2;
+        vec3 routeA = getRoutePointDir(routeIndex);
+        vec3 routeM = getRoutePointDir(routeIndex + 1);
+        vec3 routeB = getRoutePointDir(routeIndex + 2);
+        int routeFace = getRouteFace(i);
+        float routeDist;
+        float routeArrow;
+        float routeArrowGlow;
+        float routeConnector;
+        float routeConnectorGlow;
+        routeMasks(N_euclid, routeA, routeM, routeB, routeFace, shellScale,
+                   routeDist, routeArrow, routeArrowGlow, routeConnector, routeConnectorGlow);
+        circuits = max(circuits, routeBand(routeDist, 0.006, 0.014));
+        circuitGlow = max(circuitGlow, neonGlowBand(routeDist, 0.006, 0.110));
+        connectors = max(connectors, routeConnector);
+        connectorGlow = max(connectorGlow, routeConnectorGlow);
+        arrows = max(arrows, routeArrow);
+        arrowGlow = max(arrowGlow, routeArrowGlow);
+    }
+    vec3 V_neon = normalize(-dir.xyz);
+    float rim = pow(1.0 - max(dot(N_euclid, V_neon), 0.0), 2.0);
+    float facing = clamp(Lsigned, 0.0, 10.0);
+    float lightLevel = neon_lights_on ? 1.0 : 0.24;
+    float pulse = neon_lights_on ? (0.86 + 0.14 * sin((time - 0.05) * 5.0 * 3.141)) : 0.35;
+    vec3 arrowColor = vec3(1.0, 0.18, 0.72);
+    vec3 circuitColor = hsv2rgb(vec3(fract(0.30 + 0.06 * sin(time * 0.31)), 0.74, 1.0));
+    vec3 base = vec3(0.025, 0.035, 0.050) + vec3(0.045, 0.055, 0.070) * facing;
+    vec3 coreGlow = arrowColor * arrows * 2.70 + circuitColor * (circuits * 1.05 + connectors * 1.10);
+    vec3 haloGlow = arrowColor * arrowGlow * 0.70 + circuitColor * (circuitGlow * 0.32 + connectorGlow * 0.38);
+    vec3 glow = coreGlow + haloGlow;
+    vec3 neonColor = base + glow * lightLevel * pulse;
+    neonColor += vec3(0.08, 0.12, 0.16) * rim;
+    neonColor += glow * glow * lightLevel * 0.28;
+    neonColor *= exp(-decay * travel);
+    return neonColor;
 }
-
-
-
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
     vec2 uv = (screen_coords.xy - screenCenter) / love_ScreenSize.xy;
