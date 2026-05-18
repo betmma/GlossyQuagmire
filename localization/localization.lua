@@ -463,6 +463,10 @@ return {
                 en_us = 'BGM: {bgm}', -- this font doesnt have the eighth note symbol
                 zh_cn = '♪ {bgm}',
             },
+            replaying = {
+                en_us = 'Replaying',
+                zh_cn = '回放中',
+            },
             ---@enum (key) NoticeKey
             notices = {
                 getSpellCardBonus = {
@@ -678,10 +682,6 @@ return {
         timeout = { -- the spell card type is timeout
             en_us = 'T I M E O U T',
             zh_cn = '耐 久',
-        },
-        replaying = {
-            en_us = 'Replaying',
-            zh_cn = '回放中',
         },
         nicknameGet = {
             en_us = 'Get nickname:',

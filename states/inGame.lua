@@ -95,40 +95,30 @@ return {
                 end
             end
         end
-        -- for test
-        -- local spawnerPos=G.runInfo.geometry:rThetaGo(G.runInfo.player.kinematicState.pos,100,-math.pi/2)
-        -- local spawner=BulletSpawner{
-        --     kinematicState={pos=spawnerPos,speed=0,dir=0},period=616,firstPeriod=9993,lifeFrame=9999,bulletNumber=8,bulletSpeed=50,bulletSize=5,angle=0,range=math.pi*4,bulletSprite=BulletSprites.arrow.blue,bulletLifeFrame=600,bulletEvents={
-        --         function(cir,args,self)
-        --             if args.index==1 then
-        --                 self.angle=self.angle+math.pi/48
-        --             end
-        --             local index=args.index
-        --             cir.kinematicState.speed=140+math.ceil(index/20)*10
-        --             Event.Event{
-        --                 obj=cir,action=function()
-        --                     wait(60)
-        --                     local sign=math.mod2Sign(math.ceil(index/4))
-        --                     -- cir.kinematicState.dir=cir.kinematicState.dir+sign*math.pi/3
-        --                     local scale=math.clamp(self.frame/600,0.1,1.2)
-        --                     cir.kinematicState.dir=cir.kinematicState.dir+sign*math.eval(scale,scale-0.1)
-        --                     cir:changeSpriteColor(sign>0 and 'red' or 'green')
-        --                     -- wait(120)
-        --                     -- cir.kinematicState.dir=cir.kinematicState.dir-sign*math.pi/3
-        --                     -- cir:changeSpriteColor('blue')
-        --                     -- for i=1,120 do
-        --                     --     cir.kinematicState.dir=cir.kinematicState.dir-math.pi/720*sign
-        --                     --     wait(1)
-        --                     -- end
-        --                 end
-        --             }
-        --         end
-        --     }
-        -- }
-        -- Effect.Charge{obj=spawner}
-        -- local boss=Boss{kinematicState={pos=spawnerPos,speed=0,dir=0},maxhp=5000,sprite=Asset.boss.flandre}
-        -- local fairyPos=G.runInfo.geometry:rThetaGo(spawnerPos,150,math.pi/4)
-        -- local fairy=Enemy{kinematicState={pos=fairyPos,speed=0,dir=0},maxhp=100,sprite=Asset.fairySprites.small.red}
+        -- replaying text
+        local replayingText=UI.Text{
+            text='',x=10,y=580,color={1,1,1,1},parent=base,
+            updateText=function (self)
+                if not G.runInfo.replay then
+                    return ''
+                end
+                local text=Localize{'ui','IN_GAME','replaying'}
+                local speed=1
+                if love.keyboard.isDown('lalt') then
+                    speed=speed+2
+                end
+                if love.keyboard.isDown('lctrl') then
+                    speed=speed+1
+                end
+                if love.keyboard.isDown('lshift') then
+                    speed=speed-0.5
+                end
+                if speed~=1 then
+                    text=text..' ['..speed..'x]'
+                end
+                return text
+            end
+        }
     end,
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)

@@ -319,8 +319,10 @@ function SpellcardPhase:update(boss)
     DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText(),true)
 end
 
+local currentSpellcardPhase
 local cancelBonus=function()
-    SpellcardPhase.failedBonus=true
+    if not currentSpellcardPhase then return end
+    currentSpellcardPhase.failedBonus=true
 end
 
 EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
@@ -329,16 +331,19 @@ EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
 function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
     self.failedBonus=false
+    currentSpellcardPhase=self
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
         wait(90)
         DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText())
     end}
-    local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
-    local historyTable=G.save.spellcardHistory[self.key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
-    G.save.spellcardHistory[self.key][G.runInfo.difficulty].unlocked=true
-    historyTable.tries=historyTable.tries+1
+    if not G.runInfo.replay then
+        local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
+        local historyTable=G.save.spellcardHistory[self.key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
+        G.save.spellcardHistory[self.key][G.runInfo.difficulty].unlocked=true
+        historyTable.tries=historyTable.tries+1
+    end
     BossPhase.run(self, boss)
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
     if self.remainingFrames==0 and not self.isTimeout then

@@ -569,7 +569,7 @@ G.update=function(self,dt)
     self.currentUI=self.UIDEF[self.STATE]
     NoticeManager:update()
     -- replay speed control
-    if G.replay then
+    if G.runInfo.replay then
         if love.keyboard.isDown('lalt') then -- +2x
             self.currentUI.update(self,dt)
             self.currentUI.update(self,dt)
