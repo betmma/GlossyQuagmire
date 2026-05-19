@@ -112,7 +112,7 @@ local addFollow=function(boss)
         event:remove()
     end,EventManager.EVENTS.FINISH_BOSS_PHASE)
 end
-local finalBoss=BossManager.BossSegment{
+local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     bossName='kotoba',
     key='1-boss',
     getBossSpawnPos=function(self)
@@ -121,8 +121,8 @@ local finalBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{phases={
-            BossManager.NonSpellPhase{
+        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='1-boss-non-1',
                 time=1500,
                 hp=2000,
@@ -131,9 +131,9 @@ local finalBoss=BossManager.BossSegment{
                     for j=1,6 do
                         local flip=math.mod2Sign(j)
                         local angle=G.runInfo.geometry:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.1)
-                        local num=21
+                        local num=18
                         for i=1,num do
-                            local dangle=math.pi/num*1*(i-num/2-0.5-(i-1)%3)*flip
+                            local dangle=math.pi/num*0.8*(i-num/2-0.5-(i-1)%3)*flip
                             local ovalangle=dangle-math.pi/4*flip
                             local r=((math.sin(ovalangle)*80)^2+(math.cos(ovalangle)*120)^2)^0.5
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
@@ -228,7 +228,7 @@ local finalBoss=BossManager.BossSegment{
                                                 BulletSpawner.wrapFogEffect({fogTime=10,kinematicState=copyTable(cir.kinematicState),sprite=BulletSprites.fog.purple},function()end)
                                                 cir.kinematicState.dir=cir.kinematicState.dir-math.pi*(0.95)*flip*math.mod2Sign(edge%3)
                                                 cir:changeSprite(BulletSprites.knife.purple)
-                                                local div=DSWITCH{4,3,'<','<'}
+                                                local div=4
                                                 cir.kinematicState.speed=speedRef/div*(0.5+0.3*math.sin(index/2))
                                                 Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/div},duration=120}
                                             else

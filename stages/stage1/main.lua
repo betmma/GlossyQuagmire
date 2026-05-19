@@ -226,7 +226,7 @@ return{
                     local pos2,dir2=G.runInfo.geometry:rThetaGo(pos,-600,dir+math.pi/2*sign)
                     local fairy=Enemy{kinematicState={pos=pos2,dir=dir2,speed=600},maxhp=120,sprite=Asset.fairySprites.medium.black,lifeFrame=120,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=2}}
                     BulletSpawner{
-                        period=DSWITCH{4,3,2,2},firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=100,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=800,visible=false,bulletEvents={
+                        period=DSWITCH{4,3,3,3},firstPeriod=30,lifeFrame=80,bulletNumber=1,bulletSpeed=100,bulletSize=1,angle=0,bulletSprite=BulletSprites.rim.white,bulletLifeFrame=800,visible=false,bulletEvents={
                             function(cir,args,self)
                                 cir.safe=true
                                 cir.spriteTransparency=0

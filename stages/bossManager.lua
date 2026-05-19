@@ -1,4 +1,5 @@
 ---@class BossSegmentArgs
+---@field SKIP_INCLUDE boolean|nil
 ---@field key string like "1-mid"
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field getBossSpawnPos fun(self):Position

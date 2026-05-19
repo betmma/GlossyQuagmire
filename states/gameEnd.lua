@@ -22,7 +22,11 @@ return {
                 if playingReplay then
                     key='replayEnd'
                 elseif G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
-                    key='failed'
+                    if G.runInfo.lives<0 then
+                        key='failed'
+                    else
+                        key='cleared'
+                    end
                 else
                     key='practiceEnd'
                 end

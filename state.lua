@@ -140,7 +140,8 @@ for i, difficulty in ipairs(G.CONSTANTS.DIFFICULTIES) do
 end
 ---@type table<PLAYER, SHOT_TYPE[]>
 G.CONSTANTS.PLAYER_TO_SHOT_TYPES={}
-for shotType, player in pairs(G.CONSTANTS.SHOT_TYPE_TO_PLAYER) do
+for i, shotType in ipairs(G.CONSTANTS.SHOT_TYPES) do
+    local player=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]
     if not G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player] then
         G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player] = {}
     end

@@ -13,8 +13,8 @@ return BossManager.SpellcardPhase{
         local player=G.runInfo.player
         local aim=copyTable(player.kinematicState.pos)
         local dist=G.runInfo.geometry:distance(base,aim)
-        if dist>350 then
-            aim=G.runInfo.geometry:rThetaGo(base,350,G.runInfo.geometry:to(base,aim))
+        if dist>300 then
+            aim=G.runInfo.geometry:rThetaGo(base,300,G.runInfo.geometry:to(base,aim))
         end
         local mouthBase=Bullet{kinematicState={pos=copyTable(player.kinematicState.pos),speed=0,dir=player.viewDirection},sprite=BulletSprites.scale.red,invincible=true,safe=true,lifeFrame=1800,spriteTransparency=0}
         mouthBase.openness=1

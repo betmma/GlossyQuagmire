@@ -596,6 +596,10 @@ return {
                 en_us = 'Devastated',
                 zh_cn = '满身疮痍'
             },
+            cleared = {
+                en_us = 'Cleared',
+                zh_cn = '成功通关'
+            },
             replayEnd = {
                 en_us = 'Replay End',
                 zh_cn = '录像结束'

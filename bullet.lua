@@ -179,7 +179,7 @@ function Bullet:checkHitPlayer()
         ---@cast player Player
         local dis=G.runInfo.geometry:distance(player.kinematicState.pos,self.kinematicState.pos)
         local radi=player.radius+selfRadius
-        if dis<radi+player.radius*player.grazeRadiusFactor and not self.grazed and self.grazeValue then
+        if dis<radi*player.grazeRadiusFactor and not self.grazed and self.grazeValue then
             EventManager.post(EventManager.EVENTS.PLAYER_GRAZE,player,self:grazeValue())
             self.grazed=true
         end

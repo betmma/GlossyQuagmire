@@ -21,7 +21,7 @@ return BossManager.SpellcardPhase{
                     local dir=cir.kinematicState.dir
                     local edge=G.runInfo.geometry:rThetaGo(G.runInfo.geometry:init().pos,380,dir)
                     DanmakuFuncs.moveToInTime(cir, edge, math.eval(180,15), Event.sineIOProgressFunc, false)
-                    GeoLaser{kinematicState=cir.kinematicState,sprite=BulletSprites.laser.orange,size=1,rayAngle=0,spriteTransparency=0.3,safe=true,invincible=true,lifeFrame=time+120,meshBudget={capNum=3},extraUpdate={GeoLaser.presetActions.laserZoomIn(time),GeoLaser.presetActions.laserZoomOut(20),function(self)
+                    GeoLaser{kinematicState=cir.kinematicState,sprite=BulletSprites.laser.orange,size=1,rayAngle=0,spriteTransparency=0.3,safe=true,invincible=true,lifeFrame=time+120,meshBudget={capNum=3,step=100,num=16},extraUpdate={GeoLaser.presetActions.laserZoomIn(time),GeoLaser.presetActions.laserZoomOut(20),function(self)
                         if self.frame==time+50 then
                             Event.EaseEvent{obj=self,duration=20,aims={size=0.1},progressFunc=Event.sineBackProgressFunc}
                         end
@@ -42,9 +42,9 @@ return BossManager.SpellcardPhase{
                             range=range+math.eval(0,0.2)
                         end
                         if DIFF()>=G.NORMAL then
-                            local warningSpawner=BulletSpawner{kinematicState={pos=copyTable(pos),dir=dir,speed=0},period=1,lifeFrame=1,bulletNumber=4,bulletSpeed=250,range=range,angle=angle,bulletSprite=BulletSprites.flame.white,bulletLifeFrame=120,highlight=true,bulletExtraUpdate={Action.Trail(30,5)},bulletEvents={function(cir,args)
+                            local warningSpawner=BulletSpawner{kinematicState={pos=copyTable(pos),dir=dir,speed=0},period=1,lifeFrame=1,bulletNumber=4,bulletSpeed=250,range=range,angle=angle,bulletSprite=BulletSprites.flame.white,bulletLifeFrame=120,highlight=true,bulletExtraUpdate={Action.Trail(10,5)},bulletEvents={function(cir,args)
                                 cir.safe=true
-                                cir.spriteColor={1,0.1,0.1,0.3}
+                                cir.spriteColor={1,0.1,0.1,0.5}
                             end}}
                         end
                         wait(60)
