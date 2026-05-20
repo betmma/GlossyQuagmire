@@ -103,7 +103,7 @@ sfx:setAudioVolume('notice',3)
 sfx:setAudioVolume('cancel',2)
 sfx:setAudioVolume('extend',2)
 ---@type AudioSystem
-local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'level1','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
+local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
 --- @type {sfx:AudioSystem,bgm:AudioSystem}
 local Audio={
     sfx=sfx,

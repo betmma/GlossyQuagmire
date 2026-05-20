@@ -121,8 +121,8 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
         return pos
     end,
     rounds={
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
-            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
+        BossManager.BossRound{phases={
+            BossManager.NonSpellPhase{
                 key='1-boss-non-1',
                 time=1500,
                 hp=2000,
@@ -191,8 +191,8 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
             },
             require 'stages.stage1.spellcards.swallow',
         }},
-        BossManager.BossRound{phases={
-            BossManager.NonSpellPhase{
+        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='1-boss-non-2',
                 time=1500,
                 hp=2000,
@@ -229,7 +229,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
                                                 cir.kinematicState.dir=cir.kinematicState.dir-math.pi*(0.95)*flip*math.mod2Sign(edge%3)
                                                 cir:changeSprite(BulletSprites.knife.purple)
                                                 local div=4
-                                                cir.kinematicState.speed=speedRef/div*(0.5+0.3*math.sin(index/2))
+                                                cir.kinematicState.speed=speedRef/div*(0.5+0.5*math.sin(index/2))
                                                 Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/div},duration=120}
                                             else
                                                 cir:changeSprite(BulletSprites.stone.purple)

@@ -58,6 +58,7 @@ return {
     end,
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
+        BGM:play('title')
     end,
     chosen=1,
     update=function(self,dt)

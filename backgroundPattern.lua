@@ -409,7 +409,7 @@ function Honeycomb:new(args)
         if BGM.currentAudio=='level1' then
             time=BGM:tell()
             -- 24 bars, 150 bpm -> 38.4s, to 48 bars -> 76.8s. dunno why there's delay
-            local delay=0.03
+            local delay=0.0
             local time2=time-delay
             if time2>38.4 and time2<76.8 and (time2-38.4)%0.8>0.4 then
                 lightsOn=false
