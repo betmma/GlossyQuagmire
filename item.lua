@@ -136,6 +136,8 @@ local function gainScore(amount)
     end
     G.runInfo.score=newScore
     G.runInfo.hiScore=math.max(G.runInfo.hiScore,G.runInfo.score)
+    local highScoreTable,key=G:getHighScoreTableAndKey()
+    highScoreTable[key]=math.max(highScoreTable[key], G.runInfo.score)
 end
 
 EventManager.listenTo(EventManager.EVENTS.GAIN_SCORE, gainScore)

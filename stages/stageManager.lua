@@ -26,7 +26,7 @@ extra wave after mid-boss to sync stage (concrete code in the extra wave is not 
 ---@field currentCoroutine thread
 ---@field callback StageManagerCallback what to do after stage is finished
 ---@field previousStagesData fullGameReplayOneStageData[] to build full game replay data
----@field args {item: StageKey, skipToSegmentKey: string|nil, onlyRunOneSegment: boolean|nil, segmentFuncArgs: BossSegmentFuncArgs|nil} to build stage / spell practice replay data
+---@field args {stageKey: StageKey, skipToSegmentKey: string|nil, onlyRunOneSegment: boolean|nil, segmentFuncArgs: BossSegmentFuncArgs|nil} to build stage / spell practice replay data
 local StageManager={}
 
 ---@type table<StageKey,OneStageData>
@@ -40,14 +40,14 @@ end
 require 'stages.bossManager'
 loadStageData()
 
----@param item StageKey
+---@param stageKey StageKey
 ---@param skipToSegmentKey string|nil if not nil, will skip all segments before the segment with this key. used for stage practice to jump directly to a segment.
 ---@param onlyRunOneSegment boolean|nil if true, will only run the segment with key [skipToSegmentKey]. used for spellcard practice on midboss that would otherwise be followed with second half of the stage
 ---@param callback StageManagerCallback|nil to be called after stage is finished. like run next stage for full game
 ---@param segmentFuncArgs BossSegmentFuncArgs|nil if not nil, will be passed to segment func as args when calling segment:func(args). used for spellcard practice to pass specific phase to func to jump directly to a phase.
 ---@param nextStaging boolean|nil true when called by nextStage callback. wont reset previousStagesData
-function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, segmentFuncArgs, nextStaging)
-    self.currentStageData=StageData[item]
+function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callback, segmentFuncArgs, nextStaging)
+    self.currentStageData=StageData[stageKey]
     self.callback=callback or 'end'
     segmentFuncArgs=segmentFuncArgs or {}
     if not skipToSegmentKey then
@@ -93,7 +93,7 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
             ---@cast replayData fullGameReplayData
             local stagesData=replayData.stages
             for i,stageData in ipairs(stagesData) do
-                if stageData.stageKey==item then
+                if stageData.stageKey==stageKey then
                     G.runInfo.seed=stageData.seed
                     G.runInfo.player.keyRecord=stageData.keyRecord
                     G.runInfo.player:setReplaying()
@@ -117,15 +117,17 @@ function StageManager:load(item, skipToSegmentKey, onlyRunOneSegment, callback, 
     else
         G.runInfo.seed=math.floor(os.time()+os.clock()*1337)
     end
+    local highScoreTable,key=G:getHighScoreTableAndKey()
+    G.runInfo.hiScore=highScoreTable[key]
     math.randomseed(G.runInfo.seed)
     if G.runInfo.gameType~=G.CONSTANTS.GAME_TYPES.FULL_GAME then
-        G.runInfo.power=G.CONSTANTS.PRACTICE_START_POWER[item]
+        G.runInfo.power=G.CONSTANTS.PRACTICE_START_POWER[stageKey]
     end
     if not nextStaging then
         self.previousStagesData={}
     end
     self.args={
-        item=item,
+        stageKey=stageKey,
         skipToSegmentKey=skipToSegmentKey,
         onlyRunOneSegment=onlyRunOneSegment,
         segmentFuncArgs=segmentFuncArgs
@@ -135,7 +137,7 @@ end
 -- is called when finishing a stage in StageManager:update, and called in gameEnd for dying in middle of a stage.
 function StageManager:addStageData()
     self.previousStagesData[#self.previousStagesData+1] = {
-        stageKey=self.args.item,
+        stageKey=self.args.stageKey,
         keyRecord=G.runInfo.player.keyRecord,
         seed=G.runInfo.seed,
         score=G.runInfo.score,
@@ -161,7 +163,7 @@ function StageManager:update(dt)
         local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty]
         local currentStageIndex=-1
         for i,stageKey in ipairs(stages) do
-            if stageKey==self.args.item then
+            if stageKey==self.args.stageKey then
                 currentStageIndex=i
                 break
             end

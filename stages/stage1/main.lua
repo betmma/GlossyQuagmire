@@ -22,9 +22,11 @@ local bosses=require('stages.stage1.boss')
 ---@type OneStageData
 return{
     init=function()
-        local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
-        G.runInfo.player.border=border
-        G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)
+        if G.runInfo.geometry==G.geometries.Hyperbolic then
+            local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
+            G.runInfo.player.border=border
+            G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)
+        end
     end,
     segments={
         {

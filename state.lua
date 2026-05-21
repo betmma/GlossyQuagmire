@@ -455,8 +455,20 @@ G={
             StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[self.runInfo.difficulty][1])
         else
             local args=StageManager.args
-            StageManager:load(args.item,args.skipToSegmentKey,args.onlyRunOneSegment,'end',args.segmentFuncArgs)
+            StageManager:load(args.stageKey,args.skipToSegmentKey,args.onlyRunOneSegment,'end',args.segmentFuncArgs)
         end
+    end,
+    getHighScoreTableAndKey=function(self)
+        local highScoreTable={}
+        local key=G.runInfo.shotType
+        if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE then -- do not have saved highscore for spell practice
+            highScoreTable[key]=0
+        elseif G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+            highScoreTable=G.save.highScores[G.runInfo.gameType][G.runInfo.difficulty]
+        elseif G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE then
+            highScoreTable=G.save.highScores[G.runInfo.gameType][StageManager.args.stageKey][G.runInfo.difficulty]
+        end
+        return highScoreTable, key
     end,
     foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE,args={}}, -- is auto updated in G.CONSTANTS.USE_FOREGROUND_SHADER. change it does nothing, only for reference for in game HUD to adjust position
     frame=0,
@@ -483,6 +495,7 @@ end
 ---@field defaultName string
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
 ---@field spellcardHistory table<string, table<DIFFICULTY, {unlocked:boolean, [SHOT_TYPE]: table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>}>>>
+---@field highScores {FULL_GAME: table<DIFFICULTY, table<SHOT_TYPE, integer>>, STAGE_PRACTICE: table<StageKey,table<DIFFICULTY, table<SHOT_TYPE, integer>>>}
 ---@field extraUnlock {[string]: boolean} -- secret level unlocks, format not decided
 ---@field musicUnlock {[string]: boolean}
 ---@field nicknameUnlock {[string]: boolean}
@@ -496,6 +509,10 @@ G.save={
         playTimeInLevel=0,
     },
     spellcardHistory={},
+    highScores={
+        FULL_GAME={},
+        STAGE_PRACTICE={}
+    },
     extraUnlock={
     }, -- secret level unlocks, format not decided
     musicUnlock={},

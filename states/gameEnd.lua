@@ -80,7 +80,7 @@ return {
         playingReplay=G.runInfo.replay~=nil
         -- if player dies during a stage, stageManager:update part after stage coroutine ends wont be executed which includes adding current stage keyrecords and things into replay source data.
         if lastState==G.STATES.IN_GAME and not playingReplay then
-            if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.item then
+            if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.stageKey then
                 StageManager:addStageData()
             end
             G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)

@@ -296,7 +296,7 @@ function stagePracticeReplay:getReplayFromCurrentGame(name)
     return stagePracticeReplay{
         difficulty=data.difficulty,shotType=data.shotType,time=data.time,version=data.version,type=data.type,
         name=name,
-        stage=StageManager.args.item,
+        stage=StageManager.args.stageKey,
         keyRecord=G.runInfo.player.keyRecord,
         seed=G.runInfo.seed,
         score=G.runInfo.score,

@@ -158,6 +158,28 @@ SaveManager.defaultSaveData=DefaultRoot{
             end
         end
     end),
+    highScores=AlwaysFunction(function(otherTable,key)
+        otherTable[key]=otherTable[key] or {}
+        local highScores=otherTable[key]
+        local fullGame=G.CONSTANTS.GAME_TYPES.FULL_GAME
+        local stagePractice=G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE
+        highScores[fullGame]=highScores[fullGame] or {}
+        highScores[stagePractice]=highScores[stagePractice] or {}
+        local function addDiffAndShotType(table,difficulties)
+            for i, difficulty in ipairs(difficulties) do
+                table[difficulty]=table[difficulty] or {}
+                for j, shotType in ipairs(G.CONSTANTS.SHOT_TYPES) do
+                    table[difficulty][shotType]=table[difficulty][shotType] or 0
+                end
+            end
+        end
+        addDiffAndShotType(highScores[fullGame], G.CONSTANTS.DIFFICULTIES)
+        for i,stageKey in ipairs(G.CONSTANTS.STAGE_KEYS) do
+            highScores[stagePractice][stageKey]=highScores[stagePractice][stageKey] or {}
+            local difficulties=G.CONSTANTS.STAGE_TO_DIFFICULTIES[stageKey]
+            addDiffAndShotType(highScores[stagePractice][stageKey], difficulties)
+        end
+    end),
     extraUnlock={
     },
     musicUnlock={
