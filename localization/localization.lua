@@ -415,6 +415,78 @@ return {
                             zh_cn = '有着神秘图案的巨大符札',
                         },
                     }
+                },
+                MARISAA = {
+                    title = {
+                        en_us = 'High Power Type',
+                        zh_cn = '高威力型',
+                    },
+                    focusedShot = {
+                        title = {
+                            en_us = 'Illusion Laser',
+                            zh_cn = '幻影激光',
+                        },
+                        description = {
+                            en_us = 'Converging forward',
+                            zh_cn = '前方汇聚',
+                        }
+                    },
+                    unfocusedShot = {
+                        title = {
+                            en_us = 'Refraction Laser',
+                            zh_cn = '折射激光',
+                        },
+                        description = {
+                            en_us = 'Branching shot',
+                            zh_cn = '分叉攻击',
+                        }
+                    },
+                    spellCard = {
+                        title = {
+                            en_us = 'Not Decided Yet',
+                            zh_cn = '尚未决定',
+                        },
+                        description = {
+                            en_us = 'WIP :P',
+                            zh_cn = '开发中 :P',
+                        },
+                    },
+                },
+                MARISAB = {
+                    title = {
+                        en_us = 'All-Around Type',
+                        zh_cn = '全方位型',
+                    },
+                    focusedShot = {
+                        title = {
+                            en_us = 'Comet Burst',
+                            zh_cn = '彗星爆弹',
+                        },
+                        description = {
+                            en_us = 'Forward wide shot',
+                            zh_cn = '前方广范围射击',
+                        }
+                    },
+                    unfocusedShot = {
+                        title = {
+                            en_us = 'Nebula Burst',
+                            zh_cn = '星云爆弹',
+                        },
+                        description = {
+                            en_us = 'All-Around shot',
+                            zh_cn = '全方位射击',
+                        }
+                    },
+                    spellCard = {
+                        title = {
+                            en_us = 'Not Decided Yet',
+                            zh_cn = '尚未决定',
+                        },
+                        description = {
+                            en_us = 'WIP :P',
+                            zh_cn = '开发中 :P',
+                        },
+                    },
                 }
             }
         },

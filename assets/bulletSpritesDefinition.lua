@@ -252,7 +252,7 @@ spectrum{
     unit=gifSingle{sizeX=16,sizeY=32,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(0,-32),name='explosive'},
     colors={'blue','green'},
     offsetFunc=simpleOffsetFunc(16,0),
-    baseX=0+16*22,baseY=baseY+64+48,
+    baseX=0+16*22,baseY=baseY+64+32,
 }:addToAsset()
 
 ----------------------------------------- Player sprites (also player.png)
@@ -270,12 +270,12 @@ spectrum{
     unit=movingSingle{sizeX=sizeX,sizeY=sizeY,name='player',data={
         normal={frameCount=8,offsetX=0,offsetY=0,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
         moveTransition={
-            left={frameCount=4,offsetX=0,offsetY=sizeY,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
-            right={frameCount=4,offsetX=0,offsetY=sizeY*2,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+            left={frameCount=2,offsetX=0,offsetY=sizeY,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+            right={frameCount=2,offsetX=0,offsetY=sizeY*2,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
         },
         moving={
-            left={frameCount=4,offsetX=sizeX*4,offsetY=sizeY,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
-            right={frameCount=4,offsetX=sizeX*4,offsetY=sizeY*2,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+            left={frameCount=6,offsetX=sizeX*2,offsetY=sizeY,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
+            right={frameCount=6,offsetX=sizeX*2,offsetY=sizeY*2,frameOffsetFunc=simpleOffsetFunc(sizeX,0)},
         },
         frameTime={normal=8,moveTransition=2,moving=8},
     }},

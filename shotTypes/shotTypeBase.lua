@@ -218,6 +218,10 @@ local ShootingPattern=Object:extend()
 ---@field angle number|string
 ---@field isHoming boolean|nil
 ---@field homingMode HOMING_MODE|nil
+---@field homingArg number|nil
+---@field transformShootState nil|fun(self: ShootingPattern, shooter: KinematicState): KinematicState
+---@field fadeIn boolean|nil
+---@field extraUpdate function|nil
 
 function ShootingPattern:new(args)
     self.sprite=args.sprite
@@ -230,6 +234,8 @@ function ShootingPattern:new(args)
     self.homingMode=args.homingMode
     self.homingArg=args.homingArg
     self.transformShootState=args.transformShootState or function(self, shooter) return shooter end
+    self.fadeIn=args.fadeIn~=false
+    self.extraUpdate=args.extraUpdate
     self.frame=0
 end
 
@@ -251,7 +257,10 @@ function ShootingPattern:shoot(shooter, powerLevel)
     local direction=shootState.dir
     direction=direction+math.eval(self.angle)
     local useMesh=useMesh[self.sprite.data.key]
-    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(1,false)},forceQuad=not useMesh}
+    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={self.fadeIn and Action.FadeIn(1,false) or nil},forceQuad=not useMesh}
+    if self.extraUpdate then
+        bullet.extraUpdate[#bullet.extraUpdate+1] = self.extraUpdate
+    end
     if self.isHoming then
         addHoming(bullet, self.homingMode, self.homingArg)
     end
@@ -433,7 +442,7 @@ local ShotTypes={
                     optionAngle=math.pi*2/powerLevel*(i-1)+frame*math.pi/25
                 end
                 local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
-                optionAngle2=optionAngle2-optionAngle -- let it face upward
+                optionAngle2=optionAngle2-optionAngle -- let it face upward (bullets move upward)
                 table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
             end
             return returnStates
@@ -472,7 +481,7 @@ ShotTypes.REIMUB=ShotType{
                 end
                 local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
                 if isFocused then 
-                    optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters
+                    optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters (bullets move away from center, not upward)
                 end
                 table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
             end
@@ -493,5 +502,112 @@ ShotTypes.REIMUB=ShotType{
     }}},
     spellcard=reimuSpellcard
 }
+
+ShotTypes.MARISAA=ShotType{
+    mainShot=buildMainShot{
+        size=1,
+        sprite=Asset.playerShotSprites.explosive.green,
+        damage=function(self, powerLevel) return 10-powerLevel end
+    },
+    optionSprite=Asset.playerShotSprites.hakkero.green,
+    optionArrangement=function(powerLevel, isFocused, playerState, frame)
+        local radius=30
+        local angle=playerState.dir
+        ---@type KinematicState[]
+        local returnStates={}
+        for i=1,powerLevel do
+            local optionAngle
+            if isFocused then
+                optionAngle=math.pi/9*(i-powerLevel/2-0.5)
+            else
+                optionAngle=math.pi/4*(i-powerLevel/2-0.5)
+            end
+            local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
+            if isFocused then 
+                optionAngle2=optionAngle2-optionAngle*1.2 -- let it face inward
+            else
+                optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters (away from center, not upward)
+            end
+            table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
+        end
+        return returnStates
+    end,
+    optionShot={focused={ShootingPattern{
+        sprite=Asset.playerShotSprites.laser,
+        frequency=2,
+        damage=function(self, powerLevel) return 2 end, -- straight shot similar to reimu b but with higher dps (note freq is 4x of reimu b) due to laser smaller than big amulet
+        angle=0,
+        size=1.5,fadeIn=false
+    }}, unfocused={ShootingPattern{
+        sprite=Asset.playerShotSprites.laser,
+        frequency=2,
+        damage=function(self, powerLevel) return 2 end,
+        angle=0,
+        size=1.5,fadeIn=false,extraUpdate=function(self)
+            if self.frame==15 then
+                self.kinematicState.dir=self.kinematicState.dir+math.pi/2
+            end
+        end
+        },ShootingPattern{
+        sprite=Asset.playerShotSprites.laser,
+        frequency=2,
+        damage=function(self, powerLevel) return 2 end,
+        angle=0,
+        size=1.5,fadeIn=false,extraUpdate=function(self)
+            if self.frame==15 then
+                self.kinematicState.dir=self.kinematicState.dir-math.pi/2
+            end
+        end
+    }}},
+    spellcard=reimuSpellcard
+}
+
+local marisabOption=function(angle,damage,freq)
+    local func=damage
+    if type(damage)=="number" then
+        func=function(self, powerLevel) return damage end
+    end
+    return ShootingPattern{
+        sprite=Asset.playerShotSprites.explosive.blue,
+        frequency=freq or 8,
+        damage=func,
+        angle=angle,
+        size=1.5
+    }
+end
+local marisabOptionUnfocusedDmg=function(self, powerLevel)
+    local values={10,7,6,5}
+    return values[powerLevel] or 5
+end
+local mOUD=marisabOptionUnfocusedDmg
+ShotTypes.MARISAB=ShotType{
+    mainShot=ShotTypes.MARISAA.mainShot,
+    optionSprite=Asset.playerShotSprites.hakkero.cyan,
+    optionArrangement=function(powerLevel, isFocused, playerState, frame)
+        local radius=30
+        local angle=playerState.dir
+        ---@type KinematicState[]
+        local returnStates={}
+        for i=1,powerLevel do
+            local optionAngle
+            if isFocused then
+                optionAngle=math.pi/9*(i-powerLevel/2-0.5)
+            else
+                optionAngle=math.pi*2/powerLevel*(i-1)+frame*math.pi/25
+            end
+            local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
+            if isFocused then 
+                optionAngle2=optionAngle2-optionAngle -- let it face upward (bullets move upward)
+            end
+            table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
+        end
+        return returnStates
+    end,
+    optionShot={focused={marisabOption(-0.2,2),marisabOption(0,2),marisabOption(0.2,2),},
+    unfocused={marisabOption(-0.2,mOUD,4),marisabOption(0,mOUD,4),marisabOption(0.2,mOUD,4),}},
+    spellcard=reimuSpellcard
+}
+
+-- ShotTypes.KOTOBAA=ShotTypes.MARISAA
 
 return ShotTypes
