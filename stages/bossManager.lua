@@ -333,6 +333,7 @@ function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
     self.failedBonus=false
     currentSpellcardPhase=self
+    G.backgroundPattern.darking=true
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
@@ -359,6 +360,7 @@ function SpellcardPhase:run(boss)
         -- show bonus failed text
         DynamicUIObjs.showNotice('spellCardBonusFailed')
     end
+    G.backgroundPattern.darking=false
     DynamicUIObjs.spellcardNameText:setText('')
     DynamicUIObjs.spellcardBonusHistoryText:setText('')
 end

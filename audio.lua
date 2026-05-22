@@ -3,6 +3,7 @@
 ---@field fileSuffix string suffix of audio files, default is .wav
 ---@field looping boolean if true, the audio will loop
 ---@field unique boolean if true, only one audio in this system can be played at a time
+---@field smooth boolean if true, the audio will be smoothly faded in/out when starting/stopping
 ---@field defaultAudio string if the audio is not found, this audio will be played instead
 ---@field fileNames string[] list of audio file names in the folder
 ---@field data table<string,love.Source> table that stores audio sources
@@ -16,6 +17,7 @@ function AudioSystem:new(args)
     self.fileSuffix=args.fileSuffix or '.wav'
     self.looping=args.looping or false
     self.unique=args.unique or false
+    self.smooth=args.smooth or false
     self.defaultAudio=args.defaultAudio
     self.data={}
     self.audioVolumes={}
@@ -55,15 +57,48 @@ function AudioSystem:play(name,restart,overrideVolume)
         end
     end
     if self.unique==true and self.currentAudio and self.currentAudio~=name then
-        love.audio.stop(self.data[self.currentAudio])
+        self:_stop(self.currentAudio)
     end
     if restart==true then
-        love.audio.stop(self.data[name])
+        self:_stop(name)
     end
     self.data[name]:setVolume(self.currentVolume*self.volumeCoeff*(overrideVolume or self.audioVolumes[name]))
-    self.data[name]:play()
+    self:_play(name)
     self.currentAudio=name
     EventManager.post(EventManager.EVENTS.PLAY_AUDIO,self,name)
+end
+
+function AudioSystem:_stop(name)
+    if not self.smooth then
+        love.audio.stop(self.data[name])
+        return
+    end
+    Event.UIEvent{action=function()
+        local volume=self.data[name]:getVolume()
+        for i=1,30 do
+            self.data[name]:setVolume(volume*(1-i/30))
+            wait()
+        end
+        love.audio.stop(self.data[name])
+    end}
+end
+
+function AudioSystem:_play(name)
+    if not self.smooth then
+        self.data[name]:play()
+        return
+    end
+    if self.currentAudio==name then
+        return
+    end
+    Event.UIEvent{action=function()
+        self.data[name]:play()
+        local volume=self.data[name]:getVolume()
+        for i=1,30 do
+            self.data[name]:setVolume(volume*i/30)
+            wait()
+        end
+    end}
 end
 
 --- get the current time of the currently playing audio. if not playing returns 0
@@ -103,7 +138,7 @@ sfx:setAudioVolume('notice',3)
 sfx:setAudioVolume('cancel',2)
 sfx:setAudioVolume('extend',2)
 ---@type AudioSystem
-local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
+local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level2b'},volumeCoeff=1,looping=true,unique=true,smooth=true,defaultAudio='level2b',loadType='stream'}
 --- @type {sfx:AudioSystem,bgm:AudioSystem}
 local Audio={
     sfx=sfx,

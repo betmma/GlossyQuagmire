@@ -281,16 +281,16 @@ function Shader:new(args)
     self.color={1,1,1}
     self.lightColor={1,1,1}
     self.darkColor={0.5,0.5,0.5}
-    self.autoDark=false -- if true, color will be lerped to darkColor when not G.preWin (enemy exists, during spellcard) (for very bright shaders)
+    self.autoDark=true -- if true, color will be lerped to darkColor when self.darking=true (managed by bossManager, during spellcard) (for very bright shaders)
 end
 function Shader:update(dt)
     self.frame=self.frame+1
     if self.autoDark then
         local ratio=0.02
-        if G.preWin then
-            self.color={self.color[1]*(1-ratio)+self.lightColor[1]*ratio,self.color[2]*(1-ratio)+self.lightColor[2]*ratio,self.color[3]*(1-ratio)+self.lightColor[3]*ratio}
+        if self.darking then
+            self.color=math.lerpTable(self.color,self.darkColor,ratio)
         else
-            self.color={self.color[1]*(1-ratio)+self.darkColor[1]*ratio,self.color[2]*(1-ratio)+self.darkColor[2]*ratio,self.color[3]*(1-ratio)+self.darkColor[3]*ratio}
+            self.color=math.lerpTable(self.color,self.lightColor,ratio)
         end
     end
 end
@@ -312,7 +312,7 @@ local build_lorentz_mat4=require('import.H3math').build_lorentz_mat4
 local WalkerShader=Shader:extend()
 function WalkerShader:new()
     WalkerShader.super.new(self)
-    self.autoDark=false
+    self.autoDark=true
     self.cam_translation={0,1.5,0.5}
     self.cam_pitch=-0.9
     self.cam_yaw=0

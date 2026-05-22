@@ -586,6 +586,9 @@ G.update=function(self,dt)
     self.frame=self.frame+1
     self.currentUI=self.UIDEF[self.STATE]
     NoticeManager:update()
+    if G.STATE~=G.STATES.IN_GAME then -- for events to work in menus
+        Event.UIEvent:updateAll(dt)
+    end
     -- replay speed control
     if G.runInfo.replay and G.STATE==G.STATES.IN_GAME then
         if love.keyboard.isDown('lalt') then -- +2x

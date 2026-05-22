@@ -7,15 +7,12 @@ Add func to calculate the orientation to make a sprite face upward in final rend
 Background
 
 #### System
-~Shot type system~
-Level control logic
-Boss progress logic
-Player spellcard
-Border class
+Dialogue
+Player Score
+Spellcard Background
 Many remaining menus
 
 #### Resource
-life, bomb, power sprites
 player and player shot sprites
 enemy sprites
 
