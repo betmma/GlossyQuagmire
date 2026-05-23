@@ -503,6 +503,31 @@ ShotTypes.REIMUB=ShotType{
     spellcard=reimuSpellcard
 }
 
+
+---@type PlayerSpellcardFunc
+local function marisaSpellcardFunc(playerState, isFocused)
+    Event{obj=G.runInfo.player,action=function()
+        for i=1,80 do
+            if i%5==0 then
+                local num=math.floor(i/5)
+                local colors=BulletSprites.shockwave.blue.data.possibleColors or {'red'}
+                local color=colors[num%#colors+1]
+                Effect.Shockwave{kinematicState=playerState,lifeFrame=100,radius=1,growSpeed=0.15,spriteTransparency=0.5,color=color,canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
+            end
+            local dirBase=G.runInfo.player.viewDirection-math.pi/2+math.mod2Sign(i)*0.2*(i%5/5)
+            local star=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=900, dir=dirBase},sprite=BulletSprites.bigStar.blue,size=0,damage=3,lifeFrame=30,batch=Asset.bulletBatch,meshBatch=Asset.bigBulletMeshes,extraUpdate={Action.FadeIn(3,false),Action.ZoomIn(8,2),Action.Trail(9,2)}}
+            star.i=i
+            star:changeSpriteColor()
+            star.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. it will keep damaging
+            end
+            star.spriteRotationSpeed=math.pi/5
+            wait(3)
+        end
+    end}
+end
+
+local marisaSpellcard={duration=300, canShoot=true, func=marisaSpellcardFunc}
+
 ShotTypes.MARISAA=ShotType{
     mainShot=buildMainShot{
         size=1,
@@ -559,7 +584,7 @@ ShotTypes.MARISAA=ShotType{
             end
         end
     }}},
-    spellcard=reimuSpellcard
+    spellcard=marisaSpellcard
 }
 
 local marisabOption=function(angle,damage,freq)
@@ -605,7 +630,7 @@ ShotTypes.MARISAB=ShotType{
     end,
     optionShot={focused={marisabOption(-0.2,2),marisabOption(0,2),marisabOption(0.2,2),},
     unfocused={marisabOption(-0.2,mOUD,4),marisabOption(0,mOUD,4),marisabOption(0.2,mOUD,4),}},
-    spellcard=reimuSpellcard
+    spellcard=marisaSpellcard
 }
 
 -- ShotTypes.KOTOBAA=ShotTypes.MARISAA

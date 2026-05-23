@@ -120,8 +120,10 @@ return {
             end
         }
     end,
-    enter=function(self)
-        self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
+    enter=function(self,lastState)
+        if lastState~=G.STATES.PAUSE then
+            self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
+        end
         base.frame=0
         G.runInfo.exitToState=G.runInfo.exitToState or G.STATES.CHOOSE_PLAYER
     end,

@@ -654,7 +654,7 @@ G._drawBatches=function(self)
     self.currentUI.draw(self)
 end
 G.useCanvas=function(self)
-    return self.STATE==self.STATES.IN_GAME and self.runInfo.geometry.hasPixelShader
+    return self.runInfo.geometry.hasPixelShader
 end
 -- remove all objects in the scene
 G.removeAll=function(self)

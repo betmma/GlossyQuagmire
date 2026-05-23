@@ -443,12 +443,12 @@ return {
                     },
                     spellCard = {
                         title = {
-                            en_us = 'Not Decided Yet',
-                            zh_cn = '尚未决定',
+                            en_us = 'Star Sign "Meteor Spark"',
+                            zh_cn = '星符「流星火花」',
                         },
                         description = {
-                            en_us = 'WIP :P',
-                            zh_cn = '开发中 :P',
+                            en_us = 'Many piercing stars',
+                            zh_cn = '许多能穿透的星星',
                         },
                     },
                 },
@@ -479,12 +479,12 @@ return {
                     },
                     spellCard = {
                         title = {
-                            en_us = 'Not Decided Yet',
-                            zh_cn = '尚未决定',
+                            en_us = 'Star Sign "Meteor Spark"',
+                            zh_cn = '星符「流星火花」',
                         },
                         description = {
-                            en_us = 'WIP :P',
-                            zh_cn = '开发中 :P',
+                            en_us = 'Many piercing stars',
+                            zh_cn = '许多能穿透的星星',
                         },
                     },
                 }

@@ -119,7 +119,7 @@ local trail=function(self,params)
     local lifeFrame=params.lifeFrame or 30
     local period=params.period or 2
     if self.frame%period==0 then
-        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
+        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,invincible=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
     end
 end
 
