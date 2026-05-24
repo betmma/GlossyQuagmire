@@ -585,6 +585,7 @@ G.update=function(self,dt)
     end
     self.frame=self.frame+1
     self.currentUI=self.UIDEF[self.STATE]
+    BGM:update()
     NoticeManager:update()
     if G.STATE~=G.STATES.IN_GAME then -- for events to work in menus
         Event.UIEvent:updateAll(dt)

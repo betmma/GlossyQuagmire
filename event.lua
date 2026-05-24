@@ -4,7 +4,7 @@
 ---@overload fun(args:EventArgs):Event
 local Event = GameObject:extend()
 
--- just make a subclass so in non IN_GAME state G.update can update these events without updating normal events in game (exit from a game events wont be cleared; only do that when entering a game)
+-- just make a subclass so in non IN_GAME state G.update can update these events without updating normal events in game (exit from a game events wont be cleared; only do that when entering a game) however currently not used
 ---@class UI_Event:Event
 Event.UIEvent=Event:extend()
 

@@ -3,7 +3,6 @@
 ---@field fileSuffix string suffix of audio files, default is .wav
 ---@field looping boolean if true, the audio will loop
 ---@field unique boolean if true, only one audio in this system can be played at a time
----@field smooth boolean if true, the audio will be smoothly faded in/out when starting/stopping
 ---@field defaultAudio string if the audio is not found, this audio will be played instead
 ---@field fileNames string[] list of audio file names in the folder
 ---@field data table<string,love.Source> table that stores audio sources
@@ -17,7 +16,6 @@ function AudioSystem:new(args)
     self.fileSuffix=args.fileSuffix or '.wav'
     self.looping=args.looping or false
     self.unique=args.unique or false
-    self.smooth=args.smooth or false
     self.defaultAudio=args.defaultAudio
     self.data={}
     self.audioVolumes={}
@@ -69,36 +67,11 @@ function AudioSystem:play(name,restart,overrideVolume)
 end
 
 function AudioSystem:_stop(name)
-    if not self.smooth then
-        love.audio.stop(self.data[name])
-        return
-    end
-    Event.UIEvent{action=function()
-        local volume=self.data[name]:getVolume()
-        for i=1,30 do
-            self.data[name]:setVolume(volume*(1-i/30))
-            wait()
-        end
-        love.audio.stop(self.data[name])
-    end}
+    love.audio.stop(self.data[name])
 end
 
 function AudioSystem:_play(name)
-    if not self.smooth then
-        self.data[name]:play()
-        return
-    end
-    if self.currentAudio==name then
-        return
-    end
-    Event.UIEvent{action=function()
-        self.data[name]:play()
-        local volume=self.data[name]:getVolume()
-        for i=1,30 do
-            self.data[name]:setVolume(volume*i/30)
-            wait()
-        end
-    end}
+    self.data[name]:play()
 end
 
 --- get the current time of the currently playing audio. if not playing returns 0
@@ -126,6 +99,41 @@ function AudioSystem:setAudioVolume(name,volume)
     volume=math.clamp(volume,0,1/self.volumeCoeff)
     self.audioVolumes[name]=volume
 end
+
+---@class SmoothAudioSystem:AudioSystem the audio will be smoothly faded in/out when starting/stopping
+---@field smoothData table<string,{volumeRef:number,smoothRatio:number,playing:boolean}>
+local SmoothAudioSystem=AudioSystem:extend()
+function SmoothAudioSystem:new(args)
+    AudioSystem.new(self,args)
+    self.smoothData={}
+    for name,_ in pairs(self.data) do
+        self.smoothData[name]={volumeRef=0,smoothRatio=0,playing=false}
+    end
+end
+
+function SmoothAudioSystem:_play(name)
+    self.smoothData[name].volumeRef=self.data[name]:getVolume()
+    self.smoothData[name].playing=true
+end
+
+function SmoothAudioSystem:_stop(name)
+    love.audio.stop(self.data[name])
+    self.smoothData[name].playing=false
+end
+
+function SmoothAudioSystem:update()
+    for name,smoothData in pairs(self.smoothData) do
+        smoothData.smoothRatio=math.clamp(smoothData.smoothRatio+1/30*(smoothData.playing and 1 or -1),0,1)
+        self.data[name]:setVolume(smoothData.volumeRef*smoothData.smoothRatio)
+        if smoothData.smoothRatio==0 and self.data[name]:isPlaying() then
+            self.data[name]:stop()
+        end
+        if smoothData.smoothRatio>0 and not self.data[name]:isPlaying() then
+            self.data[name]:play()
+        end
+    end
+end
+
 ---@type AudioSystem
 local sfx=AudioSystem{folder='sfx',fileSuffix='.wav',fileNames={'select','graze','damage','playerHit','kill','cancel','timeout','enemyShot','enemyCharge','enemyPowerfulShot','start.mp3','stop.mp3','hit','hit2','koto.mp3','sticky.mp3','notice.mp3','extend.mp3'},volumeCoeff=0.35}
 --[[ start and stop are used for izayoi's time stop effects. start should be played 30 frames before time stop starts, and stop should be played 20 frames before time stop ends. ]]
@@ -137,9 +145,9 @@ sfx:setAudioVolume('stop',3)
 sfx:setAudioVolume('notice',3)
 sfx:setAudioVolume('cancel',2)
 sfx:setAudioVolume('extend',2)
----@type AudioSystem
-local bgm=AudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level2b'},volumeCoeff=1,looping=true,unique=true,smooth=true,defaultAudio='level2b',loadType='stream'}
---- @type {sfx:AudioSystem,bgm:AudioSystem}
+---@type SmoothAudioSystem
+local bgm=SmoothAudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level1b','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
+--- @type {sfx:AudioSystem,bgm:SmoothAudioSystem}
 local Audio={
     sfx=sfx,
     bgm=bgm

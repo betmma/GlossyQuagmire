@@ -4,6 +4,7 @@
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field getBossSpawnPos fun(self):Position
 ---@field rounds BossRound[]
+---@field init fun(self):nil
 
 ---@class BossSegment:Segment a segment that can be called by StageManager, which contains multiple boss rounds. (would also include dialogues in the future)
 ---@field type 'boss'
@@ -20,6 +21,7 @@ function BossSegment:new(args)
     self.bossName=args.bossName
     self.getBossSpawnPos=args.getBossSpawnPos
     self.rounds=args.rounds
+    self.init=args.init
 end
 
 local BossRound -- forward declare for BossSegment func

@@ -821,7 +821,17 @@ return {
             },
             description = {
                 en_us = 'Stage 1\'s theme.\nSimple pentatonic melodies. Energetic feeling in the beginning of the journey. The Hyperbolic Domain is too electronic because Kotoba thought of the networking meaning of "hub" (^^;',
-                zh_cn = '1面的主题曲。\n简单的五声调式旋律。旅途开始时的活力。双曲域过于电子工程化了，这是因为言波想到了“短路”的双关含义。听起来很危险呢(^^;'
+                zh_cn = '第一面的主题曲。\n简单的五声调式旋律。旅途开始时的活力。双曲域过于电子工程化了，这是因为言波想到了“短路”的双关含义。听上去很危险呢(^^;'
+            }
+        },
+        level1b = {
+            name = {
+                en_us = 'Materialized Malapropism',
+                zh_cn = '具现飞白'
+            },
+            description = {
+                en_us = 'Kotoba Kyokuwa\'s theme.\nUnnecessarily rapid and dark for stage 1 huh? If this trend continues, player would be exhausted before facing the real challenges.',
+                zh_cn = '曲话言波的主题曲。\n用于一面，是不是过于快速和黑暗了？如果继续这样下去，玩家在面对真正的挑战之前就会精疲力尽了吧。'
             }
         },
         level2b = {
@@ -841,7 +851,7 @@ return {
             },
             description = {
                 en_us = 'Stage 5\'s theme.\nThe intro is repeated call and response, like sending and receiving radio signals. The title seems not related to the story? Just regard the flying protagonist as a radio signal (^^;',
-                zh_cn = '5面的主题曲。\n前奏是重复的对唱，就像发送和接收无线电信号一样。这个曲名似乎与故事无关？就把飞行的主角当作无线电信号吧(^^;',
+                zh_cn = '第五面的主题曲。\n前奏是重复的对唱，就像发送和接收无线电信号一样。这个曲名似乎与故事无关？就把飞行的主角当作无线电信号吧(^^;',
             }
         }
     },

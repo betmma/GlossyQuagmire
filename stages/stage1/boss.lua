@@ -115,6 +115,10 @@ end
 local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     bossName='kotoba',
     key='1-boss',
+    init=function()
+        BGM:play('level1b')
+        DynamicUIObjs.showSoundtrack()
+    end,
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
         local pos,dir=geometry:rThetaGo(geometry:init().pos,200,G.runInfo.player.viewDirection-math.pi/2)
