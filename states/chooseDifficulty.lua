@@ -7,7 +7,7 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
     // edge fade effect
     vec2 coords=vec2(pixel_coords.x-xywh.x, pixel_coords.y-xywh.y)/xywh.zw;
     float centerness=1.0-abs(coords.x-0.5)*2.0;
-    float alphaMultiplier=smoothstep(0,0.5,centerness);
+    float alphaMultiplier=smoothstep(0.0,0.5,centerness);
     return colorBase*vec4(1.0,1.0,1.0,alphaMultiplier);
 }
 ]]

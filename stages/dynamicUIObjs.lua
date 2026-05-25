@@ -449,7 +449,7 @@ function makeDynamicUIObjs()
         float center=xywh.z-50.0;
         float coord=(pixel_coords.x-xywh.x-center)/50.0;
         float awayFromCenter=abs(coord);
-        float alphaMultiplier=1-awayFromCenter*awayFromCenter;
+        float alphaMultiplier=1.0-awayFromCenter*awayFromCenter;
         return colorBase*vec4(1.0,1.0,1.0,alphaMultiplier);
     }
     ]]
