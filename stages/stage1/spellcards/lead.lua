@@ -136,6 +136,7 @@ return BossManager.SpellcardPhase{
     bonusScore=10000,
     time=2400,
     hp=2400,
+    dropItems={point=15,powerSmall=10},
     func=function(self,boss)
         for i=1,16 do
             local aimPos=G.runInfo.geometry:rThetaGo(G.runInfo.player.kinematicState.pos,math.eval(250,50),G.runInfo.player.viewDirection-math.pi/2)

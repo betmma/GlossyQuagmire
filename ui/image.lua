@@ -20,6 +20,7 @@ function UIImage:draw()
     UIImage.super.draw(self)
     if self.batch and self.quad then
         local x,y=self:getXY()
+        self.batch:setColor(love.graphics.getColor())
         self.batch:add(self.quad,x,y,self.r,self.sx,self.sy)
     end
 end

@@ -161,10 +161,13 @@ function UIBase:updateHierarchy()
 end
 
 function UIBase:drawHierarchy()
+    local colorRef={love.graphics.getColor()}
+    love.graphics.setColor(colorRef[1],colorRef[2],colorRef[3],self.transparency*colorRef[4])
     self:draw()
     for i, child in ipairs(self.children) do
         child:drawHierarchy()
     end
+    love.graphics.setColor(colorRef[1],colorRef[2],colorRef[3],colorRef[4])
 end
 
 function UIBase:drawTextHierarchy()

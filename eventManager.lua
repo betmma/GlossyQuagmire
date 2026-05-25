@@ -5,6 +5,9 @@ EventManager.EVENTS={
     PLAY_AUDIO='playAudio',
     PLAYER_HIT='playerHit',
     GAIN_SCORE='gainScore',
+    PICK_ITEM='pickItem',
+    RELOAD_UI='reloadUI',
+    PLAYER_PRESS_C='playerPressC',
     SPELLCARD_BONUS='spellcardBonus',
     FINISH_BOSS_PHASE='finishBossPhase',
     -- when player uses bomb

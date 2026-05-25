@@ -21,6 +21,7 @@ G={
             Asset.foregroundBatch:setColor(colorRef[1],colorRef[2],colorRef[3],self.foregroundTransparency)
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
             if G.foregroundShaderData.shader~=G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
+                Asset.titleBatch:setColor(1,1,1,1)
                 Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
             end
             GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
@@ -531,6 +532,7 @@ G:loadData()
 G.language=G.save.options.language--'zh_cn'--'en_us'--
 
 G.reloadUI=function(self)
+    EventManager.post(EventManager.EVENTS.RELOAD_UI)
     for state,stateDef in pairs(self.UIDEF) do
         stateDef.inited=false
         stateDef.reloaded=true

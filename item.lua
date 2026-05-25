@@ -45,17 +45,29 @@ end
 
 function Item:update(dt)
     local player=G.runInfo.player
+    local newGrazes=0
+    if self.grazeRef then
+        newGrazes=G.runInfo.grazes-self.grazeRef
+    end
+    self.grazeRef=G.runInfo.grazes
+    self.lifeFrame=self.lifeFrame+newGrazes
     if player then
         local distance=G.runInfo.geometry:distance(self.kinematicState.pos,player.kinematicState.pos)
         local hitboxRadius=self:getHitboxRadius()+player:getHitboxRadius()
+        local speedAim=newGrazes*350
         if distance<hitboxRadius*8 then
-            self.kinematicState.dir=G.runInfo.geometry:to(self.kinematicState.pos,player.kinematicState.pos)
-            self.kinematicState.speed=math.lerp(self.kinematicState.speed,200,0.1)
-        else
-            self.kinematicState.speed=math.lerp(self.kinematicState.speed,0,0.1)
+            speedAim=speedAim+200
         end
+        if self.frame<20 then
+            speedAim=0
+        end
+        if speedAim>0 then
+            self.kinematicState.dir=G.runInfo.geometry:to(self.kinematicState.pos,player.kinematicState.pos)
+        end
+        self.kinematicState.speed=math.lerp(self.kinematicState.speed,speedAim,0.1)
         if distance<hitboxRadius*4 then
             self:picked()
+            EventManager.post(EventManager.EVENTS.PICK_ITEM, self.type)
             self:remove()
         end
     end
@@ -134,6 +146,7 @@ local function gainScore(amount)
         DynamicUIObjs.showNotice('hiscore')
         SFX:play('extend',true)
     end
+    SFX:play('select',true)
     G.runInfo.score=newScore
     G.runInfo.hiScore=math.max(G.runInfo.hiScore,G.runInfo.score)
     local highScoreTable,key=G:getHighScoreTableAndKey()

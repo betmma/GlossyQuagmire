@@ -118,6 +118,10 @@ function Player:update(dt)
 
     self:calculateMovingTransitionSprite()
     self:calculateFocusPointTransparency()
+
+    if self.keyIsDown(KEYS.SPECIAL) then
+        EventManager.post(EventManager.EVENTS.PLAYER_PRESS_C)
+    end
 end
 
 
@@ -287,7 +291,7 @@ function Player:displayKeysPressed()
         SetFont(10,Fonts.zh_cn)
         love.graphics.print(keysText[key].text,x+3+keysText[key].offset[1],y+2+keysText[key].offset[2])
     end
-    love.graphics.setColor(color[1],color[2],color[3])
+    love.graphics.setColor(color[1],color[2],color[3],color[4])
 end
 
 

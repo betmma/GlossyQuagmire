@@ -10,7 +10,7 @@ local function smallFairyFunc(basePos,flip,r,shooting)
         local fairy=Enemy{kinematicState={pos=pos2,dir=dir2+math.pi,speed=200},maxhp=10,sprite=Asset.fairySprites.small.orange,lifeFrame=300,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
             local ratio=1-2*self.frame/self.lifeFrame
             self.kinematicState.dir=G.runInfo.geometry:to(self.kinematicState.pos,basePos)+math.pi*(0.5-ratio*0.3)*sign
-        end},dropItems={powerSmall=1}}
+        end},dropItems={powerSmall=1,point=(i%DSWITCH{10,6,4,3}==0) and 1 or 0}}
         if shooting~=false and DIFF()>=G.HARD then
             BulletSpawner{
                 period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.5,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false,fogEffect=true,fogTime=20,

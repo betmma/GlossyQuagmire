@@ -297,8 +297,8 @@ function Boss:dieEffect()
     Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=25,radius=20,growSpeed=1.7,spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
     for itemType,num in pairs(self.dropItems) do
         for i=1,num do
-            local angle=G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.3)
-            local speed=math.eval(400,200)
+            local angle=G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)+(math.pseudoRandom(i)*2-1)*0.3
+            local speed=math.eval(1600,800)
             local kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed}
             Item{kinematicState=kinematicState,type=itemType}
         end

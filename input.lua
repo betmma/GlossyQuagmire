@@ -4,6 +4,7 @@ KEYS={
     SLOW='lshift',
     SELECT='z',
     CANCEL='x',
+    SPECIAL='c',
     DIRECTIONS={
         UP='up',
         DOWN='down',

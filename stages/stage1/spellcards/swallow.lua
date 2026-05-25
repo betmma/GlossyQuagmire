@@ -6,6 +6,7 @@ return BossManager.SpellcardPhase{
     bonusScore=10000,
     time=1800,
     hp=2400,
+    dropItems={point=15,powerSmall=10},
     func=function(self,boss)
         local bossPos=boss.kinematicState.pos
         local base=G.runInfo.geometry:init().pos

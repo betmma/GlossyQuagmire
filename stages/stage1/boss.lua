@@ -13,6 +13,7 @@ local midboss=BossManager.BossSegment{
                 key='1-mid-non-1',
                 time=1200,
                 hp=1800,
+                dropItems={point=15,powerSmall=10},
                 func=function(self, boss)
                     local num=12
                     local eventFunc=function(self)

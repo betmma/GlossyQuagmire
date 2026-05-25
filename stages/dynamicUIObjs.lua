@@ -340,6 +340,140 @@ function makeDynamicUIObjs()
         end
     end
 
+    local itemComboData={combo=0,duration=0,remainingFrames=0,active=false}
+    local baseWidth=50
+    local remainingFrameMax=60
+    local bonuses={{value=20,items={bombPiece=1}},{value=40,items={lifePiece=1}},{value=80,items={bomb=1}},{value=150,items={life=1}},{value=250,items={life=2}}}
+    local function durationBonus()
+        return 1+itemComboData.duration/30
+    end
+    local function totalValue()
+        return itemComboData.combo*durationBonus()
+    end
+    local function pickItem()
+        if not itemComboData.active then
+            itemComboData.active=true
+            itemComboData.combo=0
+            itemComboData.duration=0
+        end
+        itemComboData.combo=itemComboData.combo+1
+        itemComboData.remainingFrames=remainingFrameMax
+    end
+    EventManager.listenTo(EventManager.EVENTS.PICK_ITEM, pickItem,EventManager.EVENTS.RELOAD_UI)
+    local function spawnBonus()
+        local value=totalValue()
+        itemComboData.active=false
+        local bonusIndex=0
+        for index, bonus in ipairs(bonuses) do
+            if value >= bonus.value then
+                bonusIndex=index
+            else
+                break
+            end
+        end
+        if bonusIndex==0 then
+            return
+        end
+        local bonus=bonuses[bonusIndex]
+        local player=G.runInfo.player
+        if not player then
+            return
+        end
+        SFX:play('notice',true)
+        local pos,dir=G.runInfo.geometry:rThetaGo(player.kinematicState.pos,80,player.viewDirection-math.pi/2)
+        for key, count in pairs(bonus.items) do
+            for i=1,count do
+                local kinematicState={pos=copyTable(pos),dir=dir,speed=math.eval(300,100)}
+                Item{kinematicState=kinematicState,type=key}
+            end
+        end
+    end
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_PRESS_C,spawnBonus,EventManager.EVENTS.RELOAD_UI)
+    local itemComboArea=UI.Base{parent=dynamicObjs,transparency=0,extraUpdates={
+    strategy(
+        function(self, centerXY, radius)
+            self.x,self.y=centerXY[1],centerXY[2]+radius-30
+        end,
+        function(self, xywh)
+            self.x,self.y=xywh[1]+baseWidth+5,xywh[2]+xywh[4]-30
+        end
+    ),function(self)
+        self.transparency=math.lerpCondition(self.transparency,itemComboData.active,1,0,0.1)
+        if itemComboData.active then
+            itemComboData.duration=itemComboData.duration+1/60
+            itemComboData.remainingFrames=itemComboData.remainingFrames-1
+            if itemComboData.remainingFrames==0 then
+                spawnBonus()
+            end
+        end
+        if DEV_MODE then
+            if love.keyboard.isDown(']') then
+                itemComboData.combo=itemComboData.combo+1
+            elseif love.keyboard.isDown('[') then
+                itemComboData.combo=math.max(0,itemComboData.combo-1)
+            end
+        end
+    end}}
+    local comboColors={{amount=0,color={0,0,0,1},suffix='',size=14},{amount=20,color={1,1,0,1},suffix='!',size=15},{amount=40,color={1,0.6,0,1},suffix='?!',size=16},{amount=80,color={1,0,0,1},suffix='!!',size=18}}
+    local itemComboText=UI.Text{parent=itemComboArea,y=-20,x=-10,align='right',color={0,0,0,1},text='',updateText=function (self)
+        local combo=itemComboData.combo
+        local text='x'..combo
+        local finalIndex=1
+        for index, value in ipairs(comboColors) do
+            if combo >= value.amount then
+                finalIndex=index
+            else
+                break
+            end
+        end
+        self.color=comboColors[finalIndex].color
+        self.fontSize=comboColors[finalIndex].size
+        text=text..comboColors[finalIndex].suffix
+        return text
+    end}
+    local itemMultipleSignText=UI.Text{parent=itemComboArea,y=-20,x=0,align='center',color={1,1,1,1},text='x'}
+    local itemComboTimeText=UI.Text{parent=itemComboArea,y=-20,x=10,align='left',color={1,1,1,1},text='',updateText=function (self)
+        return string.format("%.2f", durationBonus())
+    end}
+    local itemComboRemainingTime=UI.Panel{parent=itemComboArea,x=-baseWidth,y=-3,width=0,height=2,edgeColor={1,1,0,0},fillColor={1,1,0,1},extraUpdates={function(self)
+        local ratio=itemComboData.remainingFrames/remainingFrameMax
+        self.width=baseWidth*2*ratio
+    end}}
+    local itemComboBar=UI.Panel{parent=itemComboArea,x=-1,y=-1,width=2,height=6,edgeColor={1,1,1,0}} -- vertical bar
+    local panelShaderCode=[[
+    extern vec4 xywh; // x,y,width,height of the panel
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
+    {
+        vec4 colorBase=Texel(texture, texture_coords)*color;
+        // edge fade effect
+        float center=xywh.z-50.0;
+        float coord=(pixel_coords.x-xywh.x-center)/50.0;
+        float awayFromCenter=abs(coord);
+        float alphaMultiplier=1-awayFromCenter*awayFromCenter;
+        return colorBase*vec4(1.0,1.0,1.0,alphaMultiplier);
+    }
+    ]]
+    local panelShader=love.graphics.newShader(panelShaderCode)
+    local itemComboProgress=UI.Panel{parent=itemComboArea,x=0,y=1,width=0,height=3,edgeColor={1,1,1,0},shader=panelShader,extraUpdates={function(self)
+        local value=totalValue()
+        self.x=-math.clamp(value,0,baseWidth)
+        self.width=baseWidth-self.x
+    end}}
+    for index, bonus in ipairs(bonuses) do
+        local bonusIndicatorBase=UI.Base{parent=itemComboArea,x=0,y=1,extraUpdates={function (self)
+            self.x=bonus.value-totalValue()
+            self.transparency=math.clamp(1-(self.x/baseWidth)^2,0,1)
+        end}}
+        local itemCount=0
+        for item,count in pairs(bonus.items) do
+            local sprite=Asset.itemSprites[item].indicator
+            for i=1,count do
+                local bonusIndicator=UI.Image{parent=bonusIndicatorBase,batch=Asset.itemUIBatch,quad=sprite.quad,x=-sprite.data.centerX,y=itemCount*sprite.data.sizeY/2}
+                itemCount=itemCount+1
+            end
+        end
+    end
+
     ----- below are high-level functions to return
 
     local function showStageTitle(stageKey)
@@ -415,6 +549,8 @@ function makeDynamicUIObjs()
         spellcardNameText.transparency=0
         spellcardBonusHistoryText:setText('',true)
         hpBar.hpRatio=0
+        itemComboArea.transparency=0
+        itemComboData.active=false
     end
 
     ---@class DynamicObjs
