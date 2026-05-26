@@ -4,6 +4,8 @@
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field getBossSpawnPos fun(self):Position
 ---@field rounds BossRound[]
+---@field beforeDialogueKey? fun():string
+---@field afterDialogueKey? fun():string
 ---@field init? fun(self):nil
 
 ---@class BossSegment:Segment a segment that can be called by StageManager, which contains multiple boss rounds. (would also include dialogues in the future)
@@ -11,6 +13,9 @@
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field getBossSpawnPos fun(self):Position
 ---@field rounds BossRound[]
+---@field beforeDialogueKey? fun():string it's a function so can route to different dialogue based on shot type or difficulty
+---@field afterDialogueKey? fun():string
+---@field init? fun(self):nil
 ---@overload fun(args:BossSegmentArgs):BossSegment
 local BossSegment=Object:extend()
 
@@ -21,6 +26,8 @@ function BossSegment:new(args)
     self.bossName=args.bossName
     self.getBossSpawnPos=args.getBossSpawnPos
     self.rounds=args.rounds
+    self.beforeDialogueKey=args.beforeDialogueKey
+    self.afterDialogueKey=args.afterDialogueKey
     self.init=args.init
 end
 
@@ -63,6 +70,11 @@ function BossSegment:func(args)
     }
     
     -- after dialogues are implemented, could add something before the rounds
+    if self.beforeDialogueKey and not args.practicePhase then
+        DialogueController{key=self.beforeDialogueKey()}:block()
+        wait(30)
+    end
+
     for i, round in ipairs(roundsToRun) do
         if DEV_MODE and SKIP_MODE then -- skip to the last round for testing
             if i==#roundsToRun or round.SKIP_INCLUDE then
@@ -73,13 +85,17 @@ function BossSegment:func(args)
         end
         DynamicUIObjs.bossStars:removeStar()
     end
-    -- after battle dialogue could be added here
     boss.revivable=false
     boss.invincible=false
     boss.dropItems={}
     boss:die()
     DynamicUIObjs.bossNameText:setText('')
     wait(60)
+    -- after battle dialogue could be added here
+    if self.afterDialogueKey and not args.practicePhase then
+        DialogueController{key=self.afterDialogueKey()}:block()
+        wait(30)
+    end
 end
 
 ---@class BossRoundArgsDefault

@@ -1,4 +1,4 @@
-VERSION="0.2.0.1"
+VERSION="0.2.1"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 CANVAS_WIDTH, CANVAS_HEIGHT = 3000, 1500
 GAME_NAME="Glossy Quagmire"
@@ -44,7 +44,7 @@ function love.load()
     Effect=require"effect"
     Border=require"border"
     -- LevelData = require "levelData"
-    -- DialogueController=require"localization.dialogue"
+    DialogueController=require"localization.dialogue"
     require"state"
     ---@type G
     G=G

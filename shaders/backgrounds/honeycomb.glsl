@@ -272,7 +272,7 @@ vec3 honeycomb_shade(vec4 pos, vec4 dir, float travel, float time) {
     float lightLevel = neon_lights_on ? 1.0 : 0.24;
     float pulse = neon_lights_on ? (0.86 + 0.14 * sin((time - 0.05) * 5.0 * 3.141)) : 0.35;
     vec3 arrowColor = vec3(1.0, 0.18, 0.72);
-    vec3 circuitColor = hsv2rgb(vec3(fract(0.30 + 0.06 * sin(time * 0.31)), 0.74, 1.0));
+    vec3 circuitColor = hsv2rgb(vec3(fract(0.60 + 0.06 * sin(time * 0.31)), 0.74, 1.0));
     vec3 base = vec3(0.025, 0.035, 0.050) + vec3(0.045, 0.055, 0.070) * facing;
     vec3 coreGlow = arrowColor * arrows * 2.70 + circuitColor * (circuits * 1.05 + connectors * 1.10);
     vec3 haloGlow = arrowColor * arrowGlow * 0.70 + circuitColor * (circuitGlow * 0.32 + connectorGlow * 0.38);

@@ -2,7 +2,7 @@ This game is a touhou fan-game.
 It's in very early stage now.
 
 ### Game System
-Collect items consecutively to keep combo. Combo count × (1 + Combo duration / 20) is the Combo score and decides what bonus you get.
+Collect items consecutively to keep combo. Combo count × (1 + Combo duration / 30) is the Combo score and decides what bonus you get.
 
 ### Todo
 #### Code

@@ -111,16 +111,8 @@ return {
                 zh_cn = '双关语具现者',
             },
         },
-        kotoba = { -- player names are uppercase, boss names are lowercase
-            name = {
-                en_us = 'Kotoba Kyokuwa',
-                zh_cn = '曲话言波',
-            },
-            nickname = {
-                en_us = 'Pun Materializer',
-                zh_cn = '双关语具现者',
-            },
-        },
+        kotoba = '@ref:KOTOBA', -- player names are uppercase, boss and dialogue names are lowercase
+        reimu = '@ref:REIMU',
     },
     ui = {
         MAIN_MENU={
@@ -857,5 +849,105 @@ return {
     },
     ---@type table<string, NicknameLocalization>
     nickname = {},
-    dialogues = {},
+    dialogues = {
+        REIMUS1BossBefore = {
+            hiKotoba = {
+                en_us = 'Hi Kotoba!',
+                zh_cn = '嗨，言波！',
+            },
+            howsYourWorkHere = {
+                en_us = 'How\'s your work here?',
+                zh_cn = '你在这工作，感觉怎么样呀？',
+            },
+            workIsFine = {
+                en_us = 'Work is fine.',
+                zh_cn = '工作还行。',
+            },
+            haveYouHeardThatMysteriousPlace = {
+                en_us = 'Have you heard about that mysterious place that can be accessed from this travel hub?',
+                zh_cn = '你听说过那个可以从这里进入的神秘地方吗？',
+            },
+            -- sheKnowsIllSkipWork = {
+            --     en_us = '(She knows I\'ll skip work to check that place?)'
+            -- },
+            ughNo = {
+                en_us = 'Ugh, no.',
+                zh_cn = '呃，没有。',
+            },
+            howCanYouNotKnow = {
+                en_us = 'How can you not know about it? That would be a safety issue if you, the manager of here, don\'t know about it.',
+                zh_cn = '你怎么能不知道？如果你身为管理员都不知道的话，那可就是安全问题了。',
+            },
+            ahhhIMeanIKnowBut = {
+                en_us = 'Ahhh! I mean, I have heard about it but don\'t quite remember...',
+                zh_cn = '啊啊！我是说，我听说过，但不太记得了……',
+            },
+            aDanmakuBattleWouldHelpYouRemember = {
+                en_us = 'A danmaku battle would help you remember, right?',
+                zh_cn = '打一场弹幕战会帮助你回忆起来的，对吧？',
+            }
+        },
+        REIMUS1BossAfter = {
+            yeahIRememberNow = {
+                en_us = 'Yeah, I remember now.',
+                zh_cn = '嗯，我现在记起来了。',
+            },
+            soItsThisWay = {
+                en_us = 'So it\'s this way. Bye.',
+                zh_cn = '所以是这条路。拜拜。',
+            }
+        },
+        MARISAS1BossBefore = {
+            wowThisPlaceSoCool = {
+                en_us = 'Wow, this place is sick!',
+                zh_cn = '哇，这个地方太棒了！',
+            },
+            welcomeToHyperbolicDomain = {
+                en_us = 'Welcome to the Hyperbolic Domain, the travel hub of Gensokyo!',
+                zh_cn = '欢迎来到双曲域，幻想乡的交通枢纽！',
+            },
+            ohHi = {
+                en_us = 'Oh hi...',
+                zh_cn = '哦嗨……',
+            },
+            wheresThatPlace = {
+                en_us = 'Where\'s that place? Squeezing my eyes...',
+                zh_cn = '那个地方在哪里？眯着眼睛找找……',
+            },
+            waitThatThievishLook = {
+                en_us = 'Wait, that thievish look... What are you planning?',
+                zh_cn = '等等，这贼眉鼠眼的表情……你在打什么主意？',
+            },
+            iMustStopYouNow = {
+                en_us = 'I must stop you now!',
+                zh_cn = '我必须阻止你了！',
+            }
+        },
+        MARISAS1BossAfter = {
+            youreStrong = {
+                en_us = 'You\'re strong...',
+                zh_cn = '你还挺强的……',
+            },
+            ofCourseIAm = {
+                en_us = 'Of course I am. Ha!',
+                zh_cn = '那当然了。哈哈！',
+            },
+            whatAreYouLookingForHere = {
+                en_us = 'So what are you looking for here?',
+                zh_cn = '所以你在这里找什么？',
+            },
+            thatPlace = {
+                en_us = 'That place that can be accessed from this travel hub. I heard it\'s really cool!',
+                zh_cn = '那个可以从双曲域进入的地方。我听说那里很棒！',
+            },
+            thisWay = {
+                en_us = 'It\'s this way. See the sign on the wall?',
+                zh_cn = '就在这条路上。看到墙上的标志了吗？',
+            },
+            shouldTellMeInTheBeginning = {
+                en_us = 'You should tell me in the beginning, you know?',
+                zh_cn = '你应该一开始就告诉我的，知道吧？',
+            }
+        }
+    },
 }
