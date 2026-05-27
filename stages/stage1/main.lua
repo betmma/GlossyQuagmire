@@ -13,7 +13,7 @@ local function smallFairyFunc(basePos,flip,r,shooting)
         end},dropItems={powerSmall=1,point=(i%DSWITCH{10,6,4,3}==0) and 1 or 0}}
         if shooting~=false and DIFF()>=G.HARD then
             BulletSpawner{
-                period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.5,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false,fogEffect=true,fogTime=20,
+                period=60,firstPeriod=120,lifeFrame=270,bulletNumber=2,bulletSpeed=150,range=math.pi*0.25,bulletSize=1,angle='player',bulletSprite=BulletSprites.rim.orange,bulletLifeFrame=600,visible=false,fogEffect=true,fogTime=20,
             }:bindState(fairy)
         end
     end

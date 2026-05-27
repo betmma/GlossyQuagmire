@@ -123,8 +123,11 @@ end
 
 function SmoothAudioSystem:update()
     for name,smoothData in pairs(self.smoothData) do
+        local smoothRatio=smoothData.smoothRatio
         smoothData.smoothRatio=math.clamp(smoothData.smoothRatio+1/30*(smoothData.playing and 1 or -1),0,1)
-        self.data[name]:setVolume(smoothData.volumeRef*smoothData.smoothRatio)
+        if smoothData.smoothRatio~=smoothRatio then
+            self.data[name]:setVolume(smoothData.volumeRef*smoothData.smoothRatio)
+        end
         if smoothData.smoothRatio==0 and self.data[name]:isPlaying() then
             self.data[name]:stop()
         end

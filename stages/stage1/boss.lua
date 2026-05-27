@@ -208,6 +208,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
                 time=1500,
                 hp=2000,
                 func=function(self, boss)
+                    addFollow(boss)
                     for j=1,6 do
                         local flip=math.mod2Sign(j)
                         local angle=G.runInfo.geometry:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.eval(0,0.1)
