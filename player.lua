@@ -66,7 +66,7 @@ function Player:new(args)
     end
     self.key2Value={up=1,right=2,down=4,left=8,lshift=16,z=32,x=64,c=128}
     self.keyIsDown=love.keyboard.isDown
-    self.keyIsPressed=isPressed -- check if current frame is the first frame that key be pressed down. only used for switching hyperbolic model (C key)
+    self.keyIsPressed=isPressed -- check if current frame is the first frame that key be pressed down. used for switching hyperbolic model (C key and dev control) and advancing dialogue (Z key)
 end
 
 
@@ -103,6 +103,14 @@ function Player:update(dt)
     end
     self:calculateShoot()
 
+    if self.keyIsPressed(KEYS.SPECIAL) then
+        EventManager.post(EventManager.EVENTS.PLAYER_PRESS_C)
+    end
+
+    if self.keyIsPressed(KEYS.SELECT) then
+        EventManager.post(EventManager.EVENTS.PLAYER_PRESS_Z)
+    end
+
     self.immobileFrame=math.max(0,self.immobileFrame-1)
     if self.immobileFrame<=0 and not self.duringDeathbombWindow then
         self:moveUpdate(dt)
@@ -118,10 +126,6 @@ function Player:update(dt)
 
     self:calculateMovingTransitionSprite()
     self:calculateFocusPointTransparency()
-
-    if self.keyIsDown(KEYS.SPECIAL) then
-        EventManager.post(EventManager.EVENTS.PLAYER_PRESS_C)
-    end
 end
 
 
@@ -319,7 +323,7 @@ function Player:hitEffect(damage)
     damage=damage or 1
     self.hitFrame=self.frame
     G.runInfo.lives=G.runInfo.lives-damage
-    G.runInfo.power=math.max(0,G.runInfo.power-100)
+    G.runInfo.power=math.max(0,G.runInfo.power-50)
     G.runInfo.bombs=math.max(3,G.runInfo.bombs)
     ---@type DropItems
     local dropItems={powerSmall=20}

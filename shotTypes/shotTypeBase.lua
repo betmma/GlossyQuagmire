@@ -458,7 +458,7 @@ local ShotTypes={
         }}, unfocused={ShootingPattern{
             sprite=Asset.playerShotSprites.burst.orange,
             frequency=5,
-            damage=function(self, powerLevel) return 3 end,
+            damage=function(self, powerLevel) return 4 end,
             angle=0,
         }}},
         spellcard=reimuSpellcard
@@ -540,19 +540,23 @@ ShotTypes.MARISAA=ShotType{
         local angle=playerState.dir
         ---@type KinematicState[]
         local returnStates={}
+        if isFocused then -- evenly scatter on the line radius distance to player
+            local pos1,dir1=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle)
+            dir1=dir1+math.pi/2
+            local posAim=G.runInfo.geometry:rThetaGo(playerState.pos, 250, angle)
+            for i=1,powerLevel do
+                local distance=40*(i-powerLevel/2-0.5)
+                local optionPos=G.runInfo.geometry:rThetaGo(pos1, distance, dir1)
+                local optionAngle=G.runInfo.geometry:to(optionPos, posAim)
+                table.insert(returnStates,{pos=optionPos, dir=optionAngle, speed=0})
+            end
+            return returnStates
+        end
         for i=1,powerLevel do
             local optionAngle
-            if isFocused then
-                optionAngle=math.pi/9*(i-powerLevel/2-0.5)
-            else
-                optionAngle=math.pi/4*(i-powerLevel/2-0.5)
-            end
+            optionAngle=math.pi/4*(i-powerLevel/2-0.5)
             local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
-            if isFocused then 
-                optionAngle2=optionAngle2-optionAngle*1.2 -- let it face inward
-            else
-                optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters (away from center, not upward)
-            end
+            optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters (away from center, not upward)
             table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
         end
         return returnStates
@@ -566,7 +570,7 @@ ShotTypes.MARISAA=ShotType{
     }}, unfocused={ShootingPattern{
         sprite=Asset.playerShotSprites.laser,
         frequency=2,
-        damage=function(self, powerLevel) return 2 end,
+        damage=function(self, powerLevel) return 1.5 end,
         angle=0,
         size=1.5,fadeIn=false,extraUpdate=function(self)
             if self.frame==15 then
@@ -576,7 +580,7 @@ ShotTypes.MARISAA=ShotType{
         },ShootingPattern{
         sprite=Asset.playerShotSprites.laser,
         frequency=2,
-        damage=function(self, powerLevel) return 2 end,
+        damage=function(self, powerLevel) return 1.5 end,
         angle=0,
         size=1.5,fadeIn=false,extraUpdate=function(self)
             if self.frame==15 then
@@ -629,7 +633,7 @@ ShotTypes.MARISAB=ShotType{
         return returnStates
     end,
     optionShot={focused={marisabOption(-0.2,2),marisabOption(0,2),marisabOption(0.2,2),},
-    unfocused={marisabOption(-0.2,mOUD,4),marisabOption(0,mOUD,4),marisabOption(0.2,mOUD,4),}},
+    unfocused={marisabOption(-0.2,mOUD,6),marisabOption(0,mOUD,6),marisabOption(0.2,mOUD,6),}},
     spellcard=marisaSpellcard
 }
 

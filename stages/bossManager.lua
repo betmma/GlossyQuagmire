@@ -266,6 +266,7 @@ function BossPhase:run(boss)
     DynamicUIObjs.setRemainingTimeText(self.time/60)
     boss.maxhp=self.hp
     boss.hp=boss.maxhp
+    boss:addHPProtection(60,5)
     boss.invincible=false
     boss.dropItems=self.dropItems -- update drop items for the phase, which will be dropped after clearing the phase.
     local task=coroutine.create(self.func)

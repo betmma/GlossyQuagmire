@@ -72,6 +72,13 @@ function DialogueController:new(args)
     
     ---@type table<string,activeCharacter>
     self.activeCharacters={} -- list of characters that have appeared in this dialogue. once appeared, their portrait will stay on screen (changing transparency based on who is speaking)
+
+    self.playerZCallback=function() -- why dont in DialogueController:update directly read player.keyIsPressed? because DialogueController:update could be called after player:update, while player:update bumps player.frame by 1. so in replay player.keyIsPressed call in DialogueController:update could see 1 frame later than the calls in player.update. so let player emit an event in player.update to prevent this issue.
+        if self.timeSinceLastAutoAdvance>0.5 then -- > 0.5 check to avoid unintended advance after an auto advance
+            self:advanceDialogue()
+        end
+    end
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_PRESS_Z,self.playerZCallback)
 end
 
 function DialogueController:block()
@@ -84,6 +91,7 @@ function DialogueController:update(dt)
     if self.removing then
         self.transparency=math.max(self.transparency-1/30,0)
         if self.transparency==0 then
+            EventManager.removeListener(EventManager.EVENTS.PLAYER_PRESS_Z,self.playerZCallback)
             self:remove()
         end
     else
@@ -92,8 +100,11 @@ function DialogueController:update(dt)
 
     self.timeSinceLastAdvance=self.timeSinceLastAdvance+dt
     self.timeSinceLastAutoAdvance=self.timeSinceLastAutoAdvance+dt
-    if self.timeSinceLastAdvance>=self.autoAdvanceTime or (isPressed('z') and self.timeSinceLastAutoAdvance>0.5) or love.keyboard.isDown('lctrl') then -- press z or hold left ctrl to advance. > 0.5 check to avoid unintended advance after an auto advance
-        self:advanceDialogue()
+    local player=G.runInfo.player
+    if player then
+        if self.timeSinceLastAdvance>=self.autoAdvanceTime then -- or love.keyboard.isDown('lctrl') then -- press z or hold left ctrl to advance. lctrl isn't in player's replay record keys so cannot add now. and adding lctrl would exceed 8 keys and also need to change replayManager's serialize (currently 8 keys -> 2 hex chars) ughh
+            self:advanceDialogue()
+        end
     end
     if self.removed then
         return

@@ -8,6 +8,7 @@ EventManager.EVENTS={
     PICK_ITEM='pickItem',
     RELOAD_UI='reloadUI',
     PLAYER_PRESS_C='playerPressC',
+    PLAYER_PRESS_Z='playerPressZ',
     SPELLCARD_BONUS='spellcardBonus',
     FINISH_BOSS_PHASE='finishBossPhase',
     -- when player uses bomb
