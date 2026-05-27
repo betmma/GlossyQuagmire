@@ -97,7 +97,9 @@ return{
                                 cir.kinematicState.dir=cir.kinematicState.dir+largeFairy.kinematicState.dir+math.pi/2
                                 local index=args.index
                                 cir.kinematicState.dir=cir.kinematicState.dir+math.pi*0.05*(index>50 and 1 or -1)
-                                cir.kinematicState.speed=cir.kinematicState.speed*(1+math.abs(math.sin(index/100*math.pi*2)))
+                                local ratio=(1+math.abs(math.sin(index/100*math.pi*2)*2))
+                                cir.kinematicState.speed=cir.kinematicState.speed*ratio
+                                cir.lifeFrame=cir.lifeFrame/ratio -- reduce lifeFrame to reduce bullet count (this place can reach 2000 before. now it's 1000)
                             end
                         }
                     }:bindState(largeFairy)

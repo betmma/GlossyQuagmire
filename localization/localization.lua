@@ -490,14 +490,14 @@ return {
             STAGE_TITLE = {
                 stage1 = {
                     main = {
-                        en_us = 'test',
-                        zh_cn = '测试',
+                        en_us = 'Twisted Twig',
+                        zh_cn = '纠葛的枝梢',
                     },
                     small = {
                         en_us = 'STAGE 1   Hyperbolic Domain',
                         zh_cn = 'STAGE 1   双曲域',
                     }
-                }
+                },
             },
             hiScore = {
                 en_us = 'Hi-Score',

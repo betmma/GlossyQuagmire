@@ -59,7 +59,7 @@ local midboss=BossManager.BossSegment{
                             local r=((math.sin(ovalangle)*80)^2+(math.cos(ovalangle)*120)^2)^0.5
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
                             for k=-1,1,2 do
-                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=100,extraUpdate={Action.Trail(30,3)}}
+                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=50,extraUpdate={Action.Trail(30,3)}}
                             end
                             local spawner=BulletSpawner{
                                 kinematicState={pos=pos,dir=dir,speed=0},

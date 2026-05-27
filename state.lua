@@ -632,9 +632,9 @@ G.draw=function(self)
     shove.endLayer()
     shove.beginLayer('text')
     self:drawText()
+    SetFont(12)
+    love.graphics.print("FPS: "..love.timer.getFPS(), 0, 0)
     if DEV_MODE and not love.keyboard.isDown('f5') then
-        SetFont(12)
-        love.graphics.print("FPS: "..love.timer.getFPS(), 0, 0)
         love.graphics.print('Events: '..#Event.objects,0,13)
         love.graphics.print('Bullets: '..#Bullet.objects,0,26)
         if SKIP_MODE then
