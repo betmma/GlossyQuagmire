@@ -54,7 +54,7 @@ function Item:update(dt)
     if player then
         local distance=G.runInfo.geometry:distance(self.kinematicState.pos,player.kinematicState.pos)
         local hitboxRadius=self:getHitboxRadius()+player:getHitboxRadius()
-        local speedAim=newGrazes*350
+        local speedAim=newGrazes*500
         if distance<hitboxRadius*8 then
             speedAim=speedAim+200
         end

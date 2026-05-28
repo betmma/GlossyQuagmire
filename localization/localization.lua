@@ -113,6 +113,7 @@ return {
         },
         kotoba = '@ref:KOTOBA', -- player names are uppercase, boss and dialogue names are lowercase
         reimu = '@ref:REIMU',
+        marisa = '@ref:MARISA',
     },
     ui = {
         MAIN_MENU={
@@ -498,6 +499,16 @@ return {
                         zh_cn = 'STAGE 1   双曲域',
                     }
                 },
+                stage2 = {
+                    main = {
+                        en_us = 'Scurrying through the Gorge',
+                        zh_cn = '疾走于绝壁之间',
+                    },
+                    small = {
+                        en_us = 'STAGE 2   Secret Path',
+                        zh_cn = 'STAGE 2   秘密道路',
+                    }
+                }
             },
             hiScore = {
                 en_us = 'Hi-Score',

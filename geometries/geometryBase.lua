@@ -114,4 +114,10 @@ local geometries={
 ---@type Spherical
     Spherical=love.filesystem.load("geometries/spherical.lua")(GeometryBase),
 }
+---@type MovingHyperbolic
+geometries.MovingHyperbolic=love.filesystem.load("geometries/movingHyperbolic.lua")(geometries.Hyperbolic)
+
+for key, value in pairs(geometries) do
+    value.name=key
+end
 return geometries

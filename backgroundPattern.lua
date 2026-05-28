@@ -417,7 +417,7 @@ function Honeycomb:new(args)
         end
         shader:send("neon_lights_on",lightsOn)
         shader:send("time", time)
-        local screenCenter=G.geometries.Hyperbolic.viewConfig.screenCenter
+        local screenCenter=G.runInfo.geometry.viewConfig.screenCenter
         shader:send("screenCenter",{screenCenter.x,screenCenter.y})
         local trans=self.cam_translation
         local pitch,yaw,roll=self.cam_pitch,self.cam_yaw,self.cam_roll

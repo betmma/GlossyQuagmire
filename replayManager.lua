@@ -210,6 +210,7 @@ end
 
 ---@class fullGameReplayOneStageData:strict
 ---@field stageKey StageKey
+---@field geometry string reserved for future use when same stage can be in different geometries
 ---@field keyRecord integer[] The key record of the replay.
 ---@field seed number The seed used for RNG.
 ---@field score integer The score at the end of the stage.
@@ -274,6 +275,7 @@ end
 
 ---@class stagePracticeReplayData:replayDataBase
 ---@field keyRecord integer[] The key record of the replay.
+---@field geometry string
 ---@field seed number The seed used for RNG.
 ---@field score integer
 ---@field stage StageKey
@@ -295,6 +297,7 @@ function stagePracticeReplay:getReplayFromCurrentGame(name)
     local data=self:getBasicReplayDataFromCurrentGame()
     return stagePracticeReplay{
         difficulty=data.difficulty,shotType=data.shotType,time=data.time,version=data.version,type=data.type,
+        geometry=G.runInfo.geometry.name,
         name=name,
         stage=StageManager.args.stageKey,
         keyRecord=G.runInfo.player.keyRecord,
@@ -311,6 +314,7 @@ end
 
 ---@class spellPracticeReplayData:replayDataBase
 ---@field keyRecord integer[] The key record of the replay.
+---@field geometry string
 ---@field score integer
 ---@field seed number The seed used for RNG.
 ---@field spellcardKey string The key of the spellcard being practiced.
@@ -335,6 +339,7 @@ function spellPracticeReplay:getReplayFromCurrentGame(name)
         keyRecord=G.runInfo.player.keyRecord,
         seed=G.runInfo.seed,
         score=G.runInfo.score,
+        geometry=G.runInfo.geometry.name,
         spellcardKey=StageManager.args.segmentFuncArgs.practicePhase,
     }
 end

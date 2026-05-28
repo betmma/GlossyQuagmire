@@ -1,4 +1,6 @@
 BackgroundPattern=require"backgroundPattern"
+-- ENHL have same order of stages so combine them
+local normalStageOrder={'stage2','stage1','stage3','stage4','stage5','stage6'}
 G={
     ---@class G.CONSTANTS
     ---@field DRAW fun(self, uiToDrawBatch?: STATE)
@@ -85,10 +87,10 @@ G={
         STAGE_KEYS={'stage1','stage2','stage3','stage4','stage5','stage6','stageEX'},
         ---@type table<DIFFICULTY, StageKey[]> what stages and in which order for a difficulty
         DIFFICULTIES_TO_STAGES={
-            EASY={'stage1','stage2','stage3','stage4','stage5','stage6'},
-            NORMAL={'stage1','stage2','stage3','stage4','stage5','stage6'},
-            HARD={'stage1','stage2','stage3','stage4','stage5','stage6'},
-            LUNATIC={'stage1','stage2','stage3','stage4','stage5','stage6'},
+            EASY=normalStageOrder,
+            NORMAL=normalStageOrder,
+            HARD=normalStageOrder,
+            LUNATIC=normalStageOrder,
             EXTRA={'stageEX'},
         },
         ---@alias PLAYER 'REIMU'|'MARISA'|'KOTOBA'
@@ -126,6 +128,10 @@ G={
         PRACTICE_START_POWER={
             stage1=0,stage2=200,stage3=400,stage4=400,stage5=400,stage6=400,stageEX=400
         },
+        ---@type table<StageKey, string>
+        STAGE_TO_DEFAULT_GEOMETRY_NAME={
+            stage1='Hyperbolic',stage2='MovingHyperbolic'
+        }
     },
 }
 ---@type table<StageKey, DIFFICULTY[]>
@@ -427,7 +433,7 @@ G={
         replay=nil,
         pendingReplay=nil,
     },
-    ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays
+    ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays. it only handles things that persist between stages. things that only matter in a single stage should be initialized in StageManager:load.
     ---@param self G
     ---@param gameType GAME_TYPE
     ---@param difficulty DIFFICULTY
@@ -443,7 +449,7 @@ G={
         local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[gameType]
         self.runInfo.lives=startResources.lives
         self.runInfo.bombs=startResources.bombs
-        self.runInfo.power=0
+        self.runInfo.power=200 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
         self.runInfo.score=0
         self.runInfo.grazes=0
         self.runInfo.replay=replay

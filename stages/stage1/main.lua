@@ -22,7 +22,7 @@ local bosses=require('stages.stage1.boss')
 ---@type OneStageData
 return{
     init=function()
-        if G.runInfo.geometry==G.geometries.Hyperbolic then
+        if G.runInfo.geometry~=G.geometries.Spherical then
             local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)

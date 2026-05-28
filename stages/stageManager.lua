@@ -31,7 +31,7 @@ local StageManager={}
 
 ---@type table<StageKey,OneStageData>
 local StageData={}
-local currentStageKeys={'stage1',} -- currently existing stages.
+local currentStageKeys={'stage1','stage2'} -- currently existing stages.
 local function loadStageData()
     for _,stageKey in pairs(currentStageKeys) do
         StageData[stageKey]=require('stages.'..stageKey..'.main')
@@ -84,8 +84,6 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
     end
     self.currentCoroutine=coroutine.create(func)
     GameObject:removeAll()
-    G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
-    ShotTypes[G.runInfo.shotType]:reset()
     DynamicUIObjs.reset()
     if G.runInfo.replay then
         if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
@@ -97,6 +95,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                     G.runInfo.seed=stageData.seed
                     G.runInfo.player.keyRecord=stageData.keyRecord
                     G.runInfo.player:setReplaying()
+                    G.runInfo.geometry=G.geometries[stageData.geometry]
                     if i>1 then -- get data from previous stage
                         local lastStageData=stagesData[i-1]
                         G.runInfo.score=lastStageData.score
@@ -113,10 +112,14 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
             G.runInfo.seed=replayData.seed
             G.runInfo.player.keyRecord=replayData.keyRecord
             G.runInfo.player:setReplaying()
+            G.runInfo.geometry=G.geometries[replayData.geometry]
         end
     else
         G.runInfo.seed=math.floor(os.time()+os.clock()*1337)
+        G.runInfo.geometry=G.geometries[G.CONSTANTS.STAGE_TO_DEFAULT_GEOMETRY_NAME[stageKey] or 'Hyperbolic']
     end
+    G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
+    ShotTypes[G.runInfo.shotType]:reset()
     local highScoreTable,key=G:getHighScoreTableAndKey()
     G.runInfo.hiScore=highScoreTable[key]
     math.randomseed(G.runInfo.seed)
@@ -138,6 +141,7 @@ end
 function StageManager:addStageData()
     self.previousStagesData[#self.previousStagesData+1] = {
         stageKey=self.args.stageKey,
+        geometry=G.runInfo.geometry.name,
         keyRecord=G.runInfo.player.keyRecord,
         seed=G.runInfo.seed,
         score=G.runInfo.score,

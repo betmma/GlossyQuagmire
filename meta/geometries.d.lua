@@ -57,6 +57,7 @@
 ---@alias def.GeometryBase.zoomFactorToScreen fun(self:GeometryBase,position:Position):number[]
 
 ---@class GeometryBase:Object base class for all geometries. is actually euclidean geometry as an example (and also because lua annotation doesnt support abstract classes). should not be instantiated as only its methods are used.
+---@field name string same as the key in geometries, for saving to replay data.
 ---@field init def.GeometryBase.init
 ---@field update def.GeometryBase.update
 ---@field rThetaGo def.GeometryBase.rThetaGo

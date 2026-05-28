@@ -234,7 +234,9 @@ function Player:moveUpdate(dt)
 
     -- limit player in border
     self:limitInBorder()
-    self:updateViewDirection(kinematicStateRef,self.kinematicState)
+    if G.runInfo.geometry.viewConfig.following then
+        self:updateViewDirection(kinematicStateRef,self.kinematicState)
+    end
 end
 
 

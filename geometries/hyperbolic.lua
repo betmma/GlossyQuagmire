@@ -127,7 +127,7 @@ function Hyperbolic:update(state,dt)
     dt=dt or (1/60)
     local metric=(state.pos.y-Hyperbolic.axisY)/Hyperbolic.curvature
     local moveDistance=state.speed*dt*metric
-    if state.speed*dt<2 then
+    if state.speed*dt<5 then
         state.pos.x=state.pos.x+moveDistance*math.cos(state.dir)
         state.pos.y=state.pos.y+moveDistance*math.sin(state.dir)
         local moveRadius=(state.pos.y-Hyperbolic.axisY)/math.cos(state.dir)
@@ -234,8 +234,8 @@ Hyperbolic.hyperbolicRotateShader=ShaderScan:load_shader("shaders/hyperbolicRota
 function Hyperbolic:applyVertexShader(viewer)
     local shader=Hyperbolic.hyperbolicRotateShader
     love.graphics.setShader(shader)
-    local center={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y}
-    if Hyperbolic.viewConfig.following then
+    local center={self.viewConfig.screenCenter.x,self.viewConfig.screenCenter.y}
+    if self.viewConfig.following then
         shader:send("player_pos", {viewer.kinematicState.pos.x, viewer.kinematicState.pos.y})
         shader:send("rotation_angle",-viewer.viewDirection)
     else
@@ -244,16 +244,16 @@ function Hyperbolic:applyVertexShader(viewer)
     end
     shader:send("aim_pos", center)
     shader:send("shape_axis_y", Hyperbolic.axisY)
-    shader:send("hyperbolic_model", Hyperbolic.viewConfig.hyperbolicModel)
-    shader:send("r_factor", Hyperbolic.viewConfig.diskRadiusBase[Hyperbolic.viewConfig.hyperbolicModel] or 1)
+    shader:send("hyperbolic_model", self.viewConfig.hyperbolicModel)
+    shader:send("r_factor", self.viewConfig.diskRadiusBase[self.viewConfig.hyperbolicModel] or 1)
 end
 
 function Hyperbolic:applyForegroundShader()
-    if Hyperbolic.viewConfig.hyperbolicModel==Hyperbolic.HYPERBOLIC_MODELS.UHP then
+    if self.viewConfig.hyperbolicModel==Hyperbolic.HYPERBOLIC_MODELS.UHP then
         G.CONSTANTS.USE_FOREGROUND_SHADER('RECTANGLE',{xywh={20,20,480,560}})
     else
-        local radius=Hyperbolic.viewConfig.diskRadiusBase[Hyperbolic.viewConfig.hyperbolicModel]*WINDOW_HEIGHT*0.5
-        G.CONSTANTS.USE_FOREGROUND_SHADER('CIRCLE',{centerXY={Hyperbolic.viewConfig.screenCenter.x,Hyperbolic.viewConfig.screenCenter.y},radius=radius})
+        local radius=self.viewConfig.diskRadiusBase[self.viewConfig.hyperbolicModel]*WINDOW_HEIGHT*0.5
+        G.CONSTANTS.USE_FOREGROUND_SHADER('CIRCLE',{centerXY={self.viewConfig.screenCenter.x,self.viewConfig.screenCenter.y},radius=radius})
     end
 
 end
