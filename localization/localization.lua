@@ -501,7 +501,7 @@ return {
                 },
                 stage2 = {
                     main = {
-                        en_us = 'Scurrying through the Gorge',
+                        en_us = 'Scurrying in the Gorge',
                         zh_cn = '疾走于绝壁之间',
                     },
                     small = {

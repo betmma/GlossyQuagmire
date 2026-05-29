@@ -21,6 +21,7 @@ return{
         elseif G.runInfo.geometry==G.geometries.MovingHyperbolic then
             local border=Border.XYBorder{minx=20,maxx=500,miny=20,maxy=560}
             G.runInfo.player.border=border
+            G:replaceBackgroundPatternIfNot(BackgroundPattern.Planes)
         else
         end
         BGM:play('level1')
@@ -33,7 +34,7 @@ return{
             key='2-1',
             type='midStage',
             func=function()
-                wait(30)
+                wait(30000)
                 local basePos=G.runInfo.geometry:init().pos
                 local pos1,dir1=G.runInfo.geometry:rThetaGo(basePos,300,-math.pi/2)
                 dir1=dir1+math.pi/2
