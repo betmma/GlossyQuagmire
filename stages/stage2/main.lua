@@ -4,10 +4,14 @@ local function setZoomSpeed(value,duration)
     end
     if duration==0 then
         G.runInfo.geometry.viewConfig.zoomRatio=math.exp(value)
+        G.backgroundPattern.autoForwardSpeed=value*60
         return
     end
     Event.EaseEvent{
         easeObj=G.runInfo.geometry.viewConfig,aims={zoomRatio=math.exp(value)},duration=duration
+    }
+    Event.EaseEvent{
+        easeObj=G.backgroundPattern,aims={autoForwardSpeed=value*60},duration=duration
     }
 end
 
@@ -34,7 +38,7 @@ return{
             key='2-1',
             type='midStage',
             func=function()
-                wait(30000)
+                wait(30)
                 local basePos=G.runInfo.geometry:init().pos
                 local pos1,dir1=G.runInfo.geometry:rThetaGo(basePos,300,-math.pi/2)
                 dir1=dir1+math.pi/2

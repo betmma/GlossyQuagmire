@@ -459,7 +459,7 @@ G={
         self:resetRunInfo(self.runInfo.gameType, self.runInfo.difficulty, self.runInfo.shotType, self.runInfo.exitToState, self.runInfo.replay)
         self:switchState(self.STATES.IN_GAME)
         if self.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
-            StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[self.runInfo.difficulty][1])
+            StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[self.runInfo.difficulty][1],nil,nil,'nextStage')
         else
             local args=StageManager.args
             StageManager:load(args.stageKey,args.skipToSegmentKey,args.onlyRunOneSegment,'end',args.segmentFuncArgs)

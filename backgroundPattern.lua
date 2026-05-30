@@ -314,7 +314,7 @@ function WalkerShader:new()
     WalkerShader.super.new(self)
     self.autoDark=true
     self.cam_translation={0,1.5,0.5}
-    self.cam_pitch=-0.9
+    self.cam_pitch=0
     self.cam_yaw=0
     self.cam_roll=0
     self.camMoveRange={0.3,0.0}
@@ -454,20 +454,22 @@ BackgroundPattern.Honeycomb=Honeycomb
 
 local planesShader=ShaderScan:load_shader('shaders/backgrounds/planes.glsl')
 local Planes=WalkerShader:extend()
+local MIRROR_OFFSET=4.61
 function Planes:new(args)
     Planes.super.new(self,args)
     self.shader=planesShader
-    self.cam_translation={0.0001,0,0} 
-    self.cam_pitch=0
+    self.cam_translation={0.0001,0.4,3.0001}
+    -- self.cam_pitch=math.pi/2
     self.cam_yaw=math.pi/2
-    self.camMoveSpeed=1
-    self.camMoveRange={1.45,12.0}
-    self.autoMove=false
+    -- self.cam_roll=math.pi/20
+    self.camMoveSpeed=0.25
+    self.camMoveRange={0.0,0.0}
+    self.autoMove=true
     self.autoForwardSpeed=0.25
-    self.autoForwardWrap=3.06 
+    self.autoForwardWrap=MIRROR_OFFSET
     self.autoForwardValue=self.cam_translation[3]
     self.manualForwardOffset=0.0
-    self.manualForwardLimit=0.3
+    self.reflectCount=0
     self.paramSendFunction=function(self,shader)
         local screenCenter=G.runInfo.geometry.viewConfig.screenCenter
         shader:send("screenCenter",{screenCenter.x,screenCenter.y})
@@ -476,6 +478,7 @@ function Planes:new(args)
         local changed={trans[3], trans[2], trans[1]} -- auto move component must be first.
         local mat4=build_lorentz_mat4(pitch, yaw, roll, changed)
         shader:send("cam_mat4", mat4)
+        shader:send("reflect_count",self.reflectCount)
     end
 end
 
@@ -485,16 +488,16 @@ function Planes:update(dt)
         return
     end
     local wrap = self.autoForwardWrap
-    local manualOffset = math.clamp(self.cam_translation[3] - self.autoForwardValue, -self.manualForwardLimit, self.manualForwardLimit)
+    local manualOffset = self.cam_translation[3] - self.autoForwardValue
     self.manualForwardOffset = manualOffset
     self.autoForwardValue = self.autoForwardValue + (self.autoForwardSpeed or 0.0) * dt
     local span = wrap * 2.0
     if self.autoForwardValue > wrap then
         self.autoForwardValue = self.autoForwardValue - span
-        -- self.reflectCount = self.reflectCount + 1
+        self.reflectCount = self.reflectCount + 1
     elseif self.autoForwardValue < -wrap then
         self.autoForwardValue = self.autoForwardValue + span
-        -- self.reflectCount = self.reflectCount + 1
+        self.reflectCount = self.reflectCount + 1
     end
     self.cam_translation[3] = self.autoForwardValue + self.manualForwardOffset
 end

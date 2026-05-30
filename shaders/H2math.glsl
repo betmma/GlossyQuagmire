@@ -175,14 +175,6 @@ vec3 get_hyperbolic_barycentric_coords(vec2 P, vec2 V0, vec2 V1, vec2 V2) {
 
     float total_area_V0V1V2 = get_hyperbolic_triangle_area(V0, V1, V2);
 
-    // If the fundamental triangle is degenerate (e.g., collinear vertices, very small area),
-    // hyperbolic barycentric coordinates are ill-defined or unstable.
-    if (total_area_V0V1V2 < EPSILON * EPSILON) { // Using a small threshold for area
-        // Fallback to Euclidean barycentric coordinates (requires original `get_barycentric_coords` to exist).
-        // Alternatively, return a default like (1/3, 1/3, 1/3) or signal an error.
-        return vec3(1/3, 1/3, 1/3); // Original Euclidean function
-    }
-
     float w0 = area_PV1V2 / total_area_V0V1V2;
     float w1 = area_PV0V2 / total_area_V0V1V2;
     float w2 = area_PV0V1 / total_area_V0V1V2;
