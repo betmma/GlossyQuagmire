@@ -33,6 +33,7 @@ function makeDynamicUIObjs()
         end
         if direct then
             UI.Text.setText(self,text)
+            self.transparency=text~='' and 1 or 0
             return
         end
         if text~='' then

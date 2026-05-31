@@ -85,6 +85,28 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
     self.currentCoroutine=coroutine.create(func)
     GameObject:removeAll()
     DynamicUIObjs.reset()
+    -- set geometry should be before creating player, since player's initial position is determined by geometry:init(). and player's creation should be before player:setReplaying. 
+    if G.runInfo.replay then
+        if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+            local replayData=G.runInfo.replay.data
+            ---@cast replayData fullGameReplayData
+            local stagesData=replayData.stages
+            for i,stageData in ipairs(stagesData) do
+                if stageData.stageKey==stageKey then
+                    G.runInfo.geometry=G.geometries[stageData.geometry]
+                    break
+                end
+            end
+        else
+            local replayData=G.runInfo.replay.data
+            ---@cast replayData stagePracticeReplayData|spellPracticeReplayData
+            G.runInfo.geometry=G.geometries[replayData.geometry]
+        end
+    else
+        G.runInfo.geometry=G.geometries[G.CONSTANTS.STAGE_TO_DEFAULT_GEOMETRY_NAME[stageKey] or 'Hyperbolic']
+    end
+    G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
+    ShotTypes[G.runInfo.shotType]:reset()
     if G.runInfo.replay then
         if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
             local replayData=G.runInfo.replay.data
@@ -95,7 +117,6 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                     G.runInfo.seed=stageData.seed
                     G.runInfo.player.keyRecord=stageData.keyRecord
                     G.runInfo.player:setReplaying()
-                    G.runInfo.geometry=G.geometries[stageData.geometry]
                     if i>1 then -- get data from previous stage
                         local lastStageData=stagesData[i-1]
                         G.runInfo.score=lastStageData.score
@@ -104,6 +125,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                         G.runInfo.power=lastStageData.power
                         G.runInfo.grazes=lastStageData.grazes
                     end
+                    break
                 end
             end
         else
@@ -112,14 +134,10 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
             G.runInfo.seed=replayData.seed
             G.runInfo.player.keyRecord=replayData.keyRecord
             G.runInfo.player:setReplaying()
-            G.runInfo.geometry=G.geometries[replayData.geometry]
         end
     else
         G.runInfo.seed=math.floor(os.time()+os.clock()*1337)
-        G.runInfo.geometry=G.geometries[G.CONSTANTS.STAGE_TO_DEFAULT_GEOMETRY_NAME[stageKey] or 'Hyperbolic']
     end
-    G.runInfo.player=Player{shotType=ShotTypes[G.runInfo.shotType]}
-    ShotTypes[G.runInfo.shotType]:reset()
     local highScoreTable,key=G:getHighScoreTableAndKey()
     G.runInfo.hiScore=highScoreTable[key]
     math.randomseed(G.runInfo.seed)
