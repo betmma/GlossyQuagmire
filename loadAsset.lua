@@ -171,7 +171,7 @@ local bulletImage = love.graphics.newImage( "assets/bullets.png" )
 Asset.bulletImage=bulletImage
 bulletImage:setFilter("nearest", "linear") -- this "linear filter" removes some artifacts if we were to scale the tiles
 
-local hitRadius={laser=3,scale=2.4,rim=2.4,round=4,rice=2.4,kunai=2.4,crystal=2.4,bill=2.8,bullet=2.4,blackrice=2.4,star=4,darkdot=2.4,dot=2.4,bigStar=7,bigRound=8.5,butterfly=7,knife=5,ellipse=7,fog=8.5,heart=7,giant=14,lightRound=14,hollow=2.4,flame=6,orb=6,moon=60,nuke=96,explosion=38,snake=2.4}
+local hitRadius={laser=3,scale=2.4,rim=2.4,round=4,rice=2.4,kunai=2.4,crystal=2.4,bill=2.8,bullet=2.4,blackrice=2.4,star=4,darkdot=2.4,dot=2.4,bigStar=7,bigRound=8.5,butterfly=7,knife=5,ellipse=7,fog=8.5,heart=7,giant=14,lightRound=14,hollow=2.4,flame=6,orb=6,moon=60,nuke=96,explosion=38,snake=2.4,shockwave=64}
 Asset.hitRadius=hitRadius
 
 local fairyImage = love.graphics.newImage( "assets/fairy.png" )
@@ -374,9 +374,9 @@ Asset.titleBatch=love.graphics.newSpriteBatch(titleImage,1,'stream') -- title sc
 -- for boss effects like hexagon and hp bar
 Asset.bossEffectMeshes=MeshBatch(Asset.bulletImage,500)
 Asset.bossMeshes=MeshBatch(Asset.bossImage,5)
-Asset.playerBatch=love.graphics.newSpriteBatch(playerImage, 5,'stream')
 Asset.playerBulletMeshes=MeshBatch(playerImage,200)
 Asset.playerBulletBatch=love.graphics.newSpriteBatch(playerImage, 2000,'stream')
+Asset.playerBatch=love.graphics.newSpriteBatch(playerImage, 5,'stream')
 Asset.fairyBatch=love.graphics.newSpriteBatch(fairyImage,100,'stream')
 Asset.itemBatch=love.graphics.newSpriteBatch(itemImage,100,'stream')
 Asset.bigBulletMeshes=MeshBatch(Asset.bulletImage,1000)
@@ -400,9 +400,9 @@ Asset.Batches={
         batches={
             Asset.bossEffectMeshes,
             Asset.bossMeshes,
-            Asset.playerBatch,
             Asset.playerBulletMeshes,
             Asset.playerBulletBatch,
+            Asset.playerBatch,
             Asset.fairyBatch,
             Asset.itemBatch,
             Asset.bigBulletMeshes,

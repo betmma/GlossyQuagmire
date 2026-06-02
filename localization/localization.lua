@@ -480,6 +480,78 @@ return {
                             zh_cn = '许多能穿透的星星',
                         },
                     },
+                },
+                KOTOBAA = {
+                    title = {
+                        en_us = 'Poker Type',
+                        zh_cn = '扑克型',
+                    },
+                    focusedShot = {
+                        title = {
+                            en_us = 'Straight Flush',
+                            zh_cn = '顺子',
+                        },
+                        description = {
+                            en_us = 'Straight Shot',
+                            zh_cn = '……克敌制胜',
+                        }
+                    },
+                    unfocusedShot = {
+                        title = {
+                            en_us = 'Wild Card',
+                            zh_cn = '散牌',
+                        },
+                        description = {
+                            en_us = 'Wide Shot',
+                            zh_cn = '扑向目标……',
+                        }
+                    },
+                    spellCard = {
+                        title = {
+                            en_us = '"Hyper Ball"',
+                            zh_cn = '「超球」',
+                        },
+                        description = {
+                            en_us = 'Reflect enemy bullets',
+                            zh_cn = '反射敌方子弹',
+                        },
+                    }
+                },
+                KOTOBAB = {
+                    title = {
+                        en_us = 'Stationery Type',
+                        zh_cn = '纸型',
+                    },
+                    focusedShot = {
+                        title = {
+                            en_us = 'Paper Plane',
+                            zh_cn = '纸飞机',
+                        },
+                        description = {
+                            en_us = 'Stationary then flying straight',
+                            zh_cn = '止直至掷',
+                        }
+                    },
+                    unfocusedShot = {
+                        title = {
+                            en_us = 'Sticky Note',
+                            zh_cn = '便签纸',
+                        },
+                        description = {
+                            en_us = 'Flying then stationary',
+                            zh_cn = '掷直至止',
+                        }
+                    },
+                    spellCard = {
+                        title = {
+                            en_us = '"Hyper Ball"',
+                            zh_cn = '「超球」',
+                        },
+                        description = {
+                            en_us = 'Reflect enemy bullets',
+                            zh_cn = '反射敌方子弹',
+                        },
+                    }
                 }
             }
         },

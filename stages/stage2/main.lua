@@ -140,7 +140,7 @@ return{
                     end
                     wait(30)
                 end
-                wait(600)
+                wait(300)
             end
         }
     }

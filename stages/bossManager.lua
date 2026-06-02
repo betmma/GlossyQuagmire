@@ -57,7 +57,7 @@ function BossSegment:func(args)
     wait(60)
     local boss=Boss{
         kinematicState={pos=pos,dir=0,speed=0},
-        sprite=Asset.boss[self.bossName],maxhp=9999,revivable=true
+        sprite=Asset.boss[self.bossName],maxhp=999999,revivable=true
     }
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
     DynamicUIObjs.bossStars:clearStars()

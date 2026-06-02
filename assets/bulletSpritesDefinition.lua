@@ -177,7 +177,7 @@ Asset.shards={dot=Asset.bulletSprites.dot.white,round=Asset.bulletSprites.fog.wh
 ---@alias AssetPlayerShotSpritesCollection { \
 ---amuletMid:BlPuRe, amuletWide:BlPuRe, amuletNarrow:BlPuRe, poker:BlPuRe, \
 ---amuletFade:BlPuRe, pokerFade:BlPuRe, \
----yinyangOrb:BlPuRe, ball:BlPuRe, burst:ReOrPu, hakkero:GrCyPu, laser:Sprite, explosive:BlGr, amuletHuge:Sprite}
+---yinyangOrb:BlPuRe, ball:BlPuRe, burst:ReOrPu, hakkero:GrCyPu, laser:Sprite, explosive:BlGr, amuletHuge:Sprite, beachBall:Sprite, paper:Sprite, paperPlane:Sprite}
 
 ---@type AssetPlayerShotSpritesCollection
 Asset.playerShotSprites={}
@@ -246,6 +246,15 @@ single{
 }:addToAsset()
 gifSingle{
     sizeX=64,sizeY=64,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(64,0),name='amuletHuge',baseX=16*6,baseY=baseY+64,
+}:addToAsset()
+gifSingle{
+    sizeX=64,sizeY=64,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(64,0),name='beachBall',baseX=16*6+64*4+16*2,baseY=baseY+64,
+}:addToAsset()
+gifSingle{
+    sizeX=32,sizeY=32,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(32,0),name='paper',baseX=16*6+64*4+16*2,baseY=baseY,
+}:addToAsset()
+gifSingle{
+    sizeX=32,sizeY=32,frameCount=4,frameTime=10,frameOffsetFunc=simpleOffsetFunc(32,0),name='paperPlane',baseX=16*6+64*4+16*2,baseY=baseY+32,
 }:addToAsset()
 Asset.playerShotSprites.amuletHuge.data.isSquare=true
 spectrum{

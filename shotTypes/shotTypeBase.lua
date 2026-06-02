@@ -19,20 +19,25 @@
     main shot can be considered as a ShootingPattern.
     Option class, including OptionsArrangement (need to handle both focused and unfocused) and 2 ShootingPatterns (one for focused and one for unfocused).
     A ShotType includes a main shot (a ShootingPattern), 1 Option, and a spellcard (need extra design)
-    Reimu main shot: 2 rows of homing bills
+    All main shots: 2 rows of straight bullets
     Reimu A option:
     - unfocused: straight needle
-    - focused: aimed bills, half of them have weaker aiming
+    - focused: aimed bills
     Reimu B option:
-    - unfocused: angle waving large bullets
-    - focused: straight large bullets, large hitbox
-    Marisa main shot: 2 rows of straight bullets
+    - unfocused: spread large amulets, large hitbox
+    - focused: little spread large amulets, large hitbox
     Marisa A option:
-    - unfocused: straight piercing lasers
-    - focused: straight explosive bullets
+    - unfocused: lasers turn 90 degrees after some time
+    - focused: straight focusing lasers
     Marisa B option:
-    - unfocused: 360 degree explosive, auto rotates towards closest enemy
-    - focused: leave options at current position
+    - unfocused: 360 degree explosives
+    - focused: spread explosives
+    Kotoba A option:
+    - unfocused: spread shots that stop and scatter a little
+    - focused: same shots that aimed at forward (mid-range)
+    Kotoba B option:
+    - unfocused: papers that stop and last long time (not very useful :c)
+    - focused: paper planes that move straight forward after a while
 ]]
 ---@enum fadeMode
 local fadeMode={
@@ -54,6 +59,9 @@ local fadeStrategies={
     laser={mode=fadeMode.TRANSPARENT},
     explosive={mode=fadeMode.PLAY_GIF},
     amuletHuge={mode=fadeMode.PLAY_GIF},
+    beachBall={mode=fadeMode.PLAY_GIF},
+    paper={mode=fadeMode.PLAY_GIF},
+    paperPlane={mode=fadeMode.PLAY_GIF},
 }
 
 --- due to player shots move at very high speed and player will not focus on them, only a few will need mesh for high precision.
@@ -81,7 +89,7 @@ function PlayerShot:new(args)
         if data.key=='amuletHuge' then
             self.spriteRotationSpeed=math.pi/10
             self.spriteExtraDirection=math.eval(0,999)
-            self.extraUpdate[1].params.fadeTransparency=0.5
+            self.extraUpdate[2].params.fadeTransparency=0.5
         end
     end
 end
@@ -94,6 +102,10 @@ function PlayerShot:hitEffect(enemy)
     self.safe=true
     self.hasHitEnemy=true
     self.homing=false
+    if not self.fadeStrategy then 
+        self:remove()
+        return
+    end
     if self.fadeStrategy.mode==fadeMode.TRANSPARENT then
         self.extraUpdate=self.extraUpdate or {}
         table.insert(self.extraUpdate,Action.FadeOut(10,false))
@@ -197,6 +209,7 @@ end
 ---@field size number
 ---@field frequency integer
 ---@field damage fun(self: ShootingPattern, powerLevel: integer): number
+---@field lifeFrame integer
 ---@field speed number
 ---@field angle number|string will be fed to math.eval(). can be 'a+b'
 ---@field isHoming boolean whether the bullet is homing. if true, addHoming will be called on the bullet after it's created
@@ -204,8 +217,9 @@ end
 ---@field homingArg number the argument for homingMode. Only works when isHoming is true
 ---@field update fun(self: ShootingPattern, dt: number): boolean whether call shoot
 ---@field frame integer
+---@field shotCount integer
 ---@field transformShootState fun(self: ShootingPattern, shooter: KinematicState): KinematicState get the position and direction to shoot based on shooter state, used for main shot to spawn at front of player instead of center. defaults to returning shooter.
----@field shoot fun(self: ShootingPattern, shooter: KinematicState, powerLevel: integer): nil
+---@field shoot fun(self: ShootingPattern, shooter: KinematicState, powerLevel: integer, optionIndex:integer): nil
 ---@overload fun(args: ShootingPatternArgs): ShootingPattern
 local ShootingPattern=Object:extend()
 
@@ -214,6 +228,7 @@ local ShootingPattern=Object:extend()
 ---@field size number|nil
 ---@field frequency integer|nil
 ---@field damage number|fun(self: ShootingPattern, powerLevel: integer): number
+---@field lifeFrame integer|nil
 ---@field speed number|nil
 ---@field angle number|string
 ---@field isHoming boolean|nil
@@ -228,6 +243,7 @@ function ShootingPattern:new(args)
     self.size=args.size or 1.5
     self.frequency=args.frequency or 3
     self.damage=args.damage
+    self.lifeFrame=args.lifeFrame or 60
     self.speed=args.speed or 1200
     self.angle=args.angle
     self.isHoming=args.isHoming
@@ -237,27 +253,32 @@ function ShootingPattern:new(args)
     self.fadeIn=args.fadeIn~=false
     self.extraUpdate=args.extraUpdate
     self.frame=0
+    self.shotCount=0
 end
 
 function ShootingPattern:reset()
     self.frame=0
+    self.shotCount=0
 end
 
 function ShootingPattern:update(dt)
     self.frame=self.frame+1
     if self.frame>=self.frequency then
         self.frame=0
+        self.shotCount=self.shotCount+1
         return true
     end
     return false
 end
 
-function ShootingPattern:shoot(shooter, powerLevel)
+function ShootingPattern:shoot(shooter, powerLevel, optionIndex)
     local shootState=self:transformShootState(shooter)
     local direction=shootState.dir
     direction=direction+math.eval(self.angle)
     local useMesh=useMesh[self.sprite.data.key]
-    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=60,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={self.fadeIn and Action.FadeIn(1,false) or nil},forceQuad=not useMesh}
+    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=self.lifeFrame,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeOut(2,false),self.fadeIn and Action.FadeIn(1,false) or nil},forceQuad=not useMesh}
+    bullet.shotCount=self.shotCount
+    bullet.optionIndex=optionIndex
     if self.extraUpdate then
         bullet.extraUpdate[#bullet.extraUpdate+1] = self.extraUpdate
     end
@@ -312,9 +333,9 @@ end
 function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, dt, options, optionTransparency)
     -- main shot
     if isShooting then
-        for _, pattern in pairs(self.mainShot) do
+        for i, pattern in ipairs(self.mainShot) do
             if pattern:update(dt) then
-                pattern:shoot(playerState, powerLevel)
+                pattern:shoot(playerState, powerLevel, i)
             end
         end
     end
@@ -336,7 +357,7 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
     if powerLevel==0 then
         return
     end
-    for i, option in pairs(options) do
+    for i, option in ipairs(options) do
         option.spriteTransparency=optionTransparency
     end
     local optionStates=self.optionArrangement(powerLevel, isFocused, playerState, frame)
@@ -350,10 +371,10 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
     end
     if isShooting then
         local optionPatterns=isFocused and self.optionShot.focused or self.optionShot.unfocused
-        for j, pattern in pairs(optionPatterns) do
+        for j, pattern in ipairs(optionPatterns) do
             if pattern:update(dt) then
-                for i, option in pairs(options) do
-                    pattern:shoot(option.kinematicState, powerLevel)
+                for i, option in ipairs(options) do
+                    pattern:shoot(option.kinematicState, powerLevel, i)
                 end
             end
         end
@@ -402,7 +423,7 @@ local function reimuSpellcardFunc(playerState, isFocused)
         local bigAmulet=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0},sprite=Asset.playerShotSprites.amuletHuge,size=0,damage=12,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
             -- create shockwave regularly to clear bullets (ughh lame)
             if self.frame%10==1 then
-                Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=10,radius=self.size,growSpeed=0.3,spriteTransparency=0.5,color='red',canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
+                Effect.Shockwave{kinematicState=self.kinematicState,animationFrame=10,size=self.size/2,growSpeed=0.3,spriteTransparency=0.5,color='red',canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
             end
             if self.frame>265 then
                 self.sprite:countDown() -- start fade out animation when about to end
@@ -512,10 +533,10 @@ local function marisaSpellcardFunc(playerState, isFocused)
                 local num=math.floor(i/5)
                 local colors=BulletSprites.shockwave.blue.data.possibleColors or {'red'}
                 local color=colors[num%#colors+1]
-                Effect.Shockwave{kinematicState=playerState,lifeFrame=100,radius=1,growSpeed=0.15,spriteTransparency=0.5,color=color,canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
+                Effect.Shockwave{kinematicState=copyTable(G.runInfo.player.kinematicState),animationFrame=20,size=1,growSpeed=0.15,spriteTransparency=0.5,color=color,canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
             end
             local dirBase=G.runInfo.player.viewDirection-math.pi/2+math.mod2Sign(i)*0.2*(i%5/5)
-            local star=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=900, dir=dirBase},sprite=BulletSprites.bigStar.blue,size=0,damage=3,lifeFrame=30,batch=Asset.bulletBatch,meshBatch=Asset.bigBulletMeshes,extraUpdate={Action.FadeIn(3,false),Action.ZoomIn(8,2),Action.Trail(9,2)}}
+            local star=PlayerShot{kinematicState={pos=copyTable(G.runInfo.player.kinematicState.pos), speed=900, dir=dirBase},sprite=BulletSprites.bigStar.blue,size=0,damage=3,lifeFrame=30,batch=Asset.bulletBatch,meshBatch=Asset.bigBulletMeshes,extraUpdate={Action.FadeIn(3,false),Action.ZoomIn(8,2),Action.Trail(9,2)}}
             star.i=i
             star:changeSpriteColor()
             star.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. it will keep damaging
@@ -637,6 +658,151 @@ ShotTypes.MARISAB=ShotType{
     spellcard=marisaSpellcard
 }
 
--- ShotTypes.KOTOBAA=ShotTypes.MARISAA
+
+---@type PlayerSpellcardFunc
+local function kotobaSpellcardFunc(playerState, isFocused)
+    Event{obj=G.runInfo.player,action=function()
+        local beachBall=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0},sprite=Asset.playerShotSprites.beachBall,size=0,damage=0,safe=true,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
+            self.kinematicState.pos=G.runInfo.player.kinematicState.pos -- follow player. not using bindState is because its dir will be changed by player's moving direction
+            if self.frame>265 then
+                self.sprite:countDown() -- start fade out animation when about to end
+                self.spriteTransparency=self.spriteTransparency-0.01
+            end
+        end},forceMesh=true}
+        local reflectShockwave=Effect.Shockwave{kinematicState=copyTable(beachBall.kinematicState),animationFrame=300,size=0,growSpeed=0.09,spriteTransparency=0.5,color='red',canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false},effectFunc=function(self,bullet)
+            -- cannot actually reflect and make it damage enemy. create a new PlayerShot bullet instead.
+            if bullet.reflectedFlag then
+                return
+            end
+            bullet.reflectedFlag=true
+            local enemy=findClosestEnemy(bullet)
+            local dir
+            if enemy then
+                dir=G.runInfo.geometry:to(bullet.kinematicState.pos,enemy.kinematicState.pos)
+                local playerShot=PlayerShot{kinematicState={pos=copyTable(bullet.kinematicState.pos), speed=800, dir=dir},sprite=bullet.sprite,size=bullet.size,damage=2,lifeFrame=120,batch=bullet.batch,meshBatch=bullet.meshBatch,extraUpdate={Action.FadeOut(5,false)},forceQuad=bullet.forceQuad,forceMesh=bullet.forceMesh,fromPlayer=true,invincible=true}
+                bullet:remove()
+            else
+                local dirTouch=G.runInfo.geometry:to(bullet.kinematicState.pos, self.kinematicState.pos)+math.pi
+                local bulletDir=math.modClamp(bullet.kinematicState.dir,dirTouch)
+                dir=dirTouch*2-bulletDir
+                bullet.kinematicState.dir=dir
+            end
+        end}
+        reflectShockwave:bindState(G.runInfo.player)
+        beachBall.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. though safe=true means this wont be called
+        end
+        for i=1,180 do
+            wait()
+            beachBall.spriteRotationSpeed=math.pi/3600*i
+            if i==30 then
+                reflectShockwave.growSpeed=0
+            end
+        end
+        wait(60)
+    end}
+end
+
+local kotobaSpellcard={duration=300, canShoot=true, func=kotobaSpellcardFunc}
+
+local kotobaAAimDistance=300
+local scatterExtraUpdate=function(self)
+    if self.frame==0 then
+        self.aim=G.runInfo.geometry:rThetaGo(self.kinematicState.pos, kotobaAAimDistance, self.kinematicState.dir)
+        self.kinematicState.dir=self.kinematicState.dir+math.eval(0,1.5)
+    elseif not self.flag then
+        local aimdir=math.modClamp(G.runInfo.geometry:to(self.kinematicState.pos, self.aim),self.kinematicState.dir)
+        self.kinematicState.dir=math.clamp(aimdir, self.kinematicState.dir-math.pi/10, self.kinematicState.dir+math.pi/10)
+        if G.runInfo.geometry:distance(self.kinematicState.pos, self.aim)<30 then
+            self.flag=true
+        end
+    elseif not self.flag2 then
+        self.kinematicState.dir=self.kinematicState.dir+self.shotCount*1+self.optionIndex*math.pi/4
+        self.kinematicState.speed=400
+        self.flag2=true
+        self.lifeFrame=self.frame+5
+    end
+end
+ShotTypes.KOTOBAA=ShotType{
+    mainShot=buildMainShot{
+        size=1,
+        sprite=Asset.playerShotSprites.poker.purple,
+        damage=function(self, powerLevel) return 10-powerLevel end
+    },
+    optionSprite=Asset.playerShotSprites.ball.purple,
+    optionArrangement=function(powerLevel, isFocused, playerState, frame)
+        local radius=30
+        local angle=playerState.dir
+        ---@type KinematicState[]
+        local returnStates={}
+        if isFocused then -- rotating and aimed at a far point
+            local posAim=G.runInfo.geometry:rThetaGo(playerState.pos, kotobaAAimDistance, angle)
+            for i=1,powerLevel do
+                local optionAngle=math.pi*2/powerLevel*(i-1)+frame*math.pi/25
+                local optionPos,dir1=G.runInfo.geometry:rThetaGo(playerState.pos, radius, optionAngle)
+                local optionAngle=G.runInfo.geometry:to(optionPos, posAim)
+                table.insert(returnStates,{pos=optionPos, dir=optionAngle, speed=0})
+            end
+            return returnStates
+        end
+        for i=1,powerLevel do
+            local optionAngle
+            optionAngle=math.pi/4*(i-powerLevel/2-0.5)
+            local optionPos,optionAngle2=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle+optionAngle)
+            optionAngle2=optionAngle2-optionAngle*0.5 -- still scatters (away from center, not upward)
+            table.insert(returnStates,{pos=optionPos, dir=optionAngle2, speed=0})
+        end
+        return returnStates
+    end,
+    optionShot={focused={ShootingPattern{
+        sprite=Asset.playerShotSprites.poker.blue,
+        frequency=2,
+        damage=function(self, powerLevel) return 3 end,
+        angle=0,
+        size=1,extraUpdate=scatterExtraUpdate
+    }}, unfocused={ShootingPattern{
+        sprite=Asset.playerShotSprites.poker.blue,
+        frequency=2,
+        damage=function(self, powerLevel) return 2 end,
+        angle=0,
+        size=1,extraUpdate=scatterExtraUpdate
+    }}},
+    spellcard=kotobaSpellcard
+}
+
+ShotTypes.KOTOBAB=ShotType{
+    mainShot=ShotTypes.KOTOBAA.mainShot,
+    optionSprite=Asset.playerShotSprites.ball.red,
+    optionArrangement=ShotTypes.KOTOBAA.optionArrangement,
+    optionShot={focused={ShootingPattern{
+        sprite=Asset.playerShotSprites.paperPlane,
+        frequency=6,
+        damage=function(self, powerLevel) return 6 end,
+        angle=0,
+        lifeFrame=180,
+        speed=0,
+        fadeIn=false,
+        size=1,extraUpdate=function (self)
+            if self.frame==0 then
+                self.spriteTransparency=0.2
+            end
+            if self.frame==120 then
+                self.spriteTransparency=1
+                self.kinematicState.speed=1200
+            end
+        end
+    }}, unfocused={ShootingPattern{
+        sprite=Asset.playerShotSprites.paper,
+        frequency=6,
+        damage=function(self, powerLevel) return 7.5 end,
+        angle=0,
+        lifeFrame=600,
+        size=1,extraUpdate=function (self)
+            if self.frame==30 then
+                self.kinematicState.speed=0
+            end
+        end
+    }}},
+    spellcard=kotobaSpellcard
+}
 
 return ShotTypes

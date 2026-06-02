@@ -4,7 +4,7 @@
 ---@field sprite Sprite|GIFSprite The visual representation of the bullet.
 ---@field spriteColor rgbaColor|nil RGBA table for tinting the sprite.
 ---@field safe boolean If true, the bullet will not damage the player.
----@field fromPlayer boolean Whether the bullet originated from the player.
+---@field fromPlayer boolean Another flag to exclude from shockwave's remove. Note that this flag does not make the bullet damage enemies. enemies loop through PlayerShot.objects.
 ---@field invincible boolean If true, normal shockwaves won't remove this bullet.
 ---@field damage number Amount of damage dealt to player on hit. Probably wont be value other than 1.
 ---@field grazed boolean Whether this bullet has already triggered a graze event.
@@ -163,6 +163,10 @@ function Bullet:checkShockwaveRemove()
         (self.safe==false or shockwave.canRemove.safe==true) and
         (self.fromPlayer==false or shockwave.canRemove.fromPlayer==true) and
         G.runInfo.geometry:distance(shockwave.kinematicState.pos,self.kinematicState.pos)<shockwave:getHitboxRadius()+selfRadius then
+            if shockwave.effectFunc then
+                shockwave.effectFunc(shockwave, self)
+                return
+            end
             EventManager.post(EventManager.EVENTS.SHOCKWAVE_REMOVE_BULLET,self,shockwave)
             self:remove()
             self:removeEffect()

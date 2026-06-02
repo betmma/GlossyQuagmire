@@ -43,7 +43,7 @@ function Larger:draw()
     Bullet.draw(self)
 end
 
--- A growing shockwave, that removes touched bullets and activate their :removeEffect
+-- A growing shockwave, that removes touched bullets and activate their :removeEffect. can change to other effect by setting effectFunc(Shockwave, Bullet)
 ---@class Shockwave:Larger
 local Shockwave=Larger:extend()
 Effect.Shockwave=Shockwave
@@ -52,6 +52,7 @@ function Shockwave:new(args)
     args.sprite=args.sprite or Asset.bulletSprites.shockwave[self.color] or Asset.bulletSprites.shockwave.red
     Shockwave.super.new(self, args)
     self.canRemove=args.canRemove or {bullet=true,invincible=false,safe=true}
+    self.effectFunc=args.effectFunc -- default is in bullet class
 end
 
 function Shockwave:update(dt)
