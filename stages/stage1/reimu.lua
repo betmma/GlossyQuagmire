@@ -18,7 +18,7 @@ local midboss=BossManager.BossSegment{
                 func=function(self, boss)
                     local function largeOrb(dir)
                         local largeOrbLife=60
-                        local orb=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),speed=500,dir=dir},sprite=BulletSprites.lightRound.red,lifeFrame=largeOrbLife,}
+                        local orb=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),speed=500,dir=dir},sprite=BulletSprites.largeOrb.red,lifeFrame=largeOrbLife,extraUpdate={Action.FadeOut(10,true)}}
                         local spawner=BulletSpawner{period=8,lifeFrame=largeOrbLife,bulletNumber=DSWITCH{1,2,3,4},range=0,bulletSpeed=100,angle='player',bulletSprite=BulletSprites.bill.red,bulletLifeFrame=600,visible=true,bulletEvents={function(cir,args,self)
                             local waitFrame=orb.lifeFrame-orb.frame
                             local speedRatio=(1+(args.index-1)*0.5)
@@ -44,7 +44,16 @@ local midboss=BossManager.BossSegment{
                             self.kinematicState.speed=self.kinematicState.speed*0.95
                         end}}
                         spawner:bindState(orb)
+                        if DIFF()<=G.NORMAL then
+                            return
+                        end
                         local spawner2=BulletSpawner{period=largeOrbLife-1,lifeFrame=largeOrbLife,bulletNumber=16,range=0,bulletSpeed=70,angle='player',bulletSize=2,bulletSprite=BulletSprites.billDark.red,bulletLifeFrame=600,visible=false,bulletEvents={function(cir,args,self)
+                            if args.index%4>=2 then
+                                cir:changeSprite(BulletSprites.bill.red)
+                            end
+                            if args.index%2==0 then
+                                cir:changeSpriteColor('blue')
+                            end
                             SFX:play('enemyShot')
                             local m,n=args.index%8,math.ceil(args.index/8)
                             cir.kinematicState.speed=cir.kinematicState.speed*(1+m*0.5)

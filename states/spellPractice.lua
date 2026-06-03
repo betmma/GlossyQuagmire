@@ -233,7 +233,9 @@ return {
                         local spellcardData=SpellcardCollection.all[id]
                         if not G.save.spellcardHistory[item.phaseKey][diff].unlocked then
                             SFX:play('cancel')
-                            return
+                            if not DEV_MODE then -- dev mode can bypass not unlocked restriction for testing
+                                return
+                            end
                         end
                         SFX:play('select')
                         G:resetRunInfo(G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE,diff,shotType,G.STATES.SPELL_PRACTICE)

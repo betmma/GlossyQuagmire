@@ -63,6 +63,14 @@ return {
                     zh_cn = '铅制「沉重路标」',
                 },
             }
+        },
+        ['reimu-dream-seal'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Spirit Sign "Dream Seal -Concentrate-"',
+                    zh_cn = '灵符「梦想封印　集」',
+                }
+            }
         }
     },
     levelData = {

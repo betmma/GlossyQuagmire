@@ -149,7 +149,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
             if not segment.difficulties[G.runInfo.difficulty] or not segment.players[G.runInfo.playerType] then -- skip nonmatch segment
                 skipping=true
             end
-            if segment.key==skipToSegmentKey then -- for the intended skipToSegment, still run even if not matching (from spell practice, where can ignore player requirement)
+            if segment.key==skipToSegmentKey then -- for the intended skipToSegment, still run even if not matching (from spell practice, where can ignore player requirement. though build spellcard collection code has spellcard phase.player considered, the boss segment.player is not recorded.)
                 reachedSkipSegment=true
                 skipping=false
             end
