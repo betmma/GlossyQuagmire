@@ -86,11 +86,6 @@ function PlayerShot:new(args)
         if data.isGIF then
             self.sprite--[[@as GIFSprite]]:reset() -- Bullet.new randomizes gif frame. for player shot, we want all bullets to start from the first frame, since it's a fade out animation
         end
-        if data.key=='amuletHuge' then
-            self.spriteRotationSpeed=math.pi/10
-            self.spriteExtraDirection=math.eval(0,999)
-            self.extraUpdate[2].params.fadeTransparency=0.5
-        end
     end
 end
 
@@ -279,6 +274,11 @@ function ShootingPattern:shoot(shooter, powerLevel, optionIndex)
     local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=self.lifeFrame,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeOut(2,false),self.fadeIn and Action.FadeIn(1,false) or nil},forceQuad=not useMesh}
     bullet.shotCount=self.shotCount
     bullet.optionIndex=optionIndex
+    if self.sprite.data.key=='amuletHuge' then
+        bullet.spriteRotationSpeed=math.pi/10
+        bullet.spriteExtraDirection=math.eval(0,999)
+        bullet.extraUpdate[2].params.fadeTransparency=0.5
+    end
     if self.extraUpdate then
         bullet.extraUpdate[#bullet.extraUpdate+1] = self.extraUpdate
     end

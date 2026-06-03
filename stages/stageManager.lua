@@ -4,20 +4,47 @@ wave can simply be a coroutine. bosses should have their own structure, and thei
 complex behaviours:
 different routes (a y branching point in the middle of the stage, leading to different second half of the stage)
 extra wave after mid-boss to sync stage (concrete code in the extra wave is not executed if mid-boss is alive, but wait functions need to proceed)
+
+usages:
+full game: run segments in order. some segments are only for specific difficulty / player (skipped if not matching). a segment can decide the next segment as a branch (based on player's action). a segment can decide stage's end.
+SKIP MODE: dev mode to skip to the end of the stage, but still run segments with SKIP_INCLUDE=true to test certain segments.
+stage practice: jump to specific segment, and only run one segment / keep going like in full game. the skipped segments' init and skip will still be called to make sure the stage is properly set up, but their func will be skipped. cannot jump to a segment with unmatching player or difficulty (as continuing from here will cause error). there is a problem: if the target segment is after a branching point, how to ensure the correct branch is taken when jumping to it?
+spell practice: jump to specific boss segment, and only run the spellcard phase with specific difficulty. less complex as only one segment is run. bossManager does the job to jump to the specific phase.
 ]]
 ---@alias SegmentType 'midStage'|'boss'
+---@alias SegmentKey string
 
----@class Segment
+---@class SegmentRaw:strict
 ---@field key string stage practice will be able to start from any segment, and segments will be listed. names like '1-1' '1-mid' '2-5A' are enough and do not need localization.
 ---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this segment. for testing middle segments. only for dev testing.
 ---@field type SegmentType
 ---@field init fun(self,segmentFuncArgs)|nil when jumping to later segment like in practice mode, init of all previous segments will be called while func of previous segments will be skipped, so init should include things like setting player border, while func should include things like spawning bullets.
 ---@field skip fun(self,segmentFuncArgs)|nil only called when it's skipped. called after init()
----@field func fun(self,segmentFuncArgs) the content of the segment. like spawn some fairies or a boss
+---@field difficulties nil|HasDifficulty
+---@field players nil|HasPlayer
 
----@class OneStageData
+---@class SegmentRawNoNext:SegmentRaw
+---@field func fun(self,segmentFuncArgs):nil the next segment will be the next one in the segments table.
+---@field next nil
+
+---@class SegmentRawWithNext:SegmentRaw
+---@field func fun(self,segmentFuncArgs):SegmentKey the return value must be one of the values in next, which decides the next segment. "end" means end of stage
+---@field next SegmentKey[] list of keys of possible next segments. unless including the next segment, the next segment in the segments table is not considered as a possible segment.
+
+---@class Segment:SegmentRaw
+---@field func fun(self,segmentFuncArgs):nil|SegmentKey the content of the segment. like spawn some fairies or a boss.
+---@field next SegmentKey[]|nil
+---@field difficulties HasDifficulty
+---@field players HasPlayer
+
+---@class OneStageDataRaw the raw data in stages/stageX/main.lua. after loading, StageManager will add other fields and do some processing
 ---@field init fun() to initialize the stage, like setting player border.
+---@field segments (SegmentRawNoNext|SegmentRawWithNext|BossSegment)[]
+
+---@class OneStageData:OneStageDataRaw
 ---@field segments Segment[]
+---@field key2Index table<SegmentKey,integer> to find segment index by its key, used for jumping
+---@field findPathToSegment fun(targetSegmentKey: SegmentKey): SegmentKey[] to find the path of segments from first segment to the target segment, used for jumping. use dfs. if cannot find, throw error.
 
 ---@alias StageManagerCallback 'nextStage'|'end'
 
@@ -26,8 +53,17 @@ extra wave after mid-boss to sync stage (concrete code in the extra wave is not 
 ---@field currentCoroutine thread
 ---@field callback StageManagerCallback what to do after stage is finished
 ---@field previousStagesData fullGameReplayOneStageData[] to build full game replay data
----@field args {stageKey: StageKey, skipToSegmentKey: string|nil, onlyRunOneSegment: boolean|nil, segmentFuncArgs: BossSegmentFuncArgs|nil} to build stage / spell practice replay data
+---@field args {stageKey: StageKey, skipToSegmentKey: SegmentKey|nil, onlyRunOneSegment: boolean|nil, segmentFuncArgs: BossSegmentFuncArgs|nil} to build stage / spell practice replay data
 local StageManager={}
+
+ALL_DIFFICULTIES={}
+for diff,_ in pairs(G.CONSTANTS.DIFFICULTIES_DATA) do
+    ALL_DIFFICULTIES[diff]=true
+end
+ALL_PLAYERS={}
+for player,_ in pairs(G.CONSTANTS.PLAYERS_DATA) do
+    ALL_PLAYERS[player]=true
+end
 
 ---@type table<StageKey,OneStageData>
 local StageData={}
@@ -35,13 +71,50 @@ local currentStageKeys={'stage1','stage2'} -- currently existing stages.
 local function loadStageData()
     for _,stageKey in pairs(currentStageKeys) do
         StageData[stageKey]=require('stages.'..stageKey..'.main')
+        StageData[stageKey].key2Index={}
+        for i,segment in ipairs(StageData[stageKey].segments) do
+            if segment.key=='end' then
+                error('segment key cannot be "end" as it is used to indicate the end of the stage. found in stage '..stageKey)
+            end
+            segment.difficulties=segment.difficulties or ALL_DIFFICULTIES
+            segment.players=segment.players or ALL_PLAYERS
+            StageData[stageKey].key2Index[segment.key]=i
+        end
+        local stageData=StageData[stageKey]
+        local findPathToSegment=function(targetSegmentKey)
+            local visited={}
+            local path={}
+            local function dfs(currentSegmentKey)
+                if visited[currentSegmentKey] then return false end
+                visited[currentSegmentKey]=true
+                table.insert(path,currentSegmentKey)
+                if currentSegmentKey==targetSegmentKey then
+                    return true
+                end
+                local currentSegment=stageData.segments[stageData.key2Index[currentSegmentKey]]
+                local nextSegments=currentSegment.next or {stageData.segments[stageData.key2Index[currentSegmentKey]+1] and stageData.segments[stageData.key2Index[currentSegmentKey]+1].key}
+                for _,nextSegmentKey in ipairs(nextSegments) do
+                    if dfs(nextSegmentKey) then
+                        return true
+                    end
+                end
+                table.remove(path)
+                return false
+            end
+            if not stageData.key2Index[targetSegmentKey] then
+                error('cannot find segment with key '..targetSegmentKey..' in '..stageKey)
+            end
+            dfs(stageData.segments[1].key) -- start from the first segment
+            return path
+        end
+        StageData[stageKey].findPathToSegment=findPathToSegment
     end
 end
 require 'stages.bossManager'
 loadStageData()
 
 ---@param stageKey StageKey
----@param skipToSegmentKey string|nil if not nil, will skip all segments before the segment with this key. used for stage practice to jump directly to a segment.
+---@param skipToSegmentKey SegmentKey|nil if not nil, will skip all segments before the segment with this key. used for stage practice to jump directly to a segment.
 ---@param onlyRunOneSegment boolean|nil if true, will only run the segment with key [skipToSegmentKey]. used for spellcard practice on midboss that would otherwise be followed with second half of the stage
 ---@param callback StageManagerCallback|nil to be called after stage is finished. like run next stage for full game
 ---@param segmentFuncArgs BossSegmentFuncArgs|nil if not nil, will be passed to segment func as args when calling segment:func(args). used for spellcard practice to pass specific phase to func to jump directly to a phase.
@@ -59,25 +132,52 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
     end
     local func=function()
         self.currentStageData.init()
+        local PC=1
         local reachedSkipSegment=false
-        for i,segment in pairs(self.currentStageData.segments) do
+        local pathToSkipSegment=self.currentStageData.findPathToSegment(skipToSegmentKey)
+        local pathIndex=1
+        -- besides PC and func returns next segment key, the skip logic is also there so this looks messy
+        while PC<=#self.currentStageData.segments do
+            local segment=self.currentStageData.segments[PC]
             if segment.init then
                 segment:init(segmentFuncArgs)
             end
-            if segment.key==skipToSegmentKey then
-                reachedSkipSegment=true
+            local skipping=not reachedSkipSegment
+            if segment.SKIP_INCLUDE and SKIP_MODE then -- during skipping, still run SKIP_INCLUDE segment
+                skipping=false
             end
-            if not reachedSkipSegment then
+            if not segment.difficulties[G.runInfo.difficulty] or not segment.players[G.runInfo.playerType] then -- skip nonmatch segment
+                skipping=true
+            end
+            if segment.key==skipToSegmentKey then -- for the intended skipToSegment, still run even if not matching (from spell practice, where can ignore player requirement)
+                reachedSkipSegment=true
+                skipping=false
+            end
+            local funcRet
+            if skipping then
                 if segment.skip then
                     segment:skip(segmentFuncArgs)
                 end
-                if segment.SKIP_INCLUDE and SKIP_MODE then
-                    segment:func(segmentFuncArgs)
-                end
             else
-                segment:func(segmentFuncArgs)
+                funcRet=segment:func(segmentFuncArgs)
                 if onlyRunOneSegment then
                     break
+                end
+            end
+            if not reachedSkipSegment then
+                PC=self.currentStageData.key2Index[pathToSkipSegment[pathIndex+1]]
+                pathIndex=pathIndex+1
+            else
+                if funcRet then
+                    if funcRet=='end' then
+                        break
+                    end
+                    if not self.currentStageData.key2Index[funcRet] then
+                        error('segment '..segment.key..' in stage '..stageKey..' returns invalid next segment key '..funcRet)
+                    end
+                    PC=self.currentStageData.key2Index[funcRet]
+                else
+                    PC=PC+1
                 end
             end
         end

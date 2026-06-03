@@ -1,7 +1,8 @@
 
 local midboss=BossManager.BossSegment{
     bossName='kotoba',
-    key='1-mid',
+    players={REIMU=true,MARISA=true},
+    key='1-mid-kotoba',
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
         local pos,dir=geometry:rThetaGo(geometry:init().pos,100,G.runInfo.player.viewDirection-math.pi/2)
@@ -10,7 +11,7 @@ local midboss=BossManager.BossSegment{
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
-                key='1-mid-non-1',
+                key='1-mid-kotoba-non-1',
                 time=1200,
                 hp=1800,
                 dropItems={point=15,powerSmall=10},
@@ -115,7 +116,8 @@ local addFollow=function(boss)
 end
 local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     bossName='kotoba',
-    key='1-boss',
+    key='1-boss-kotoba',
+    players={REIMU=true,MARISA=true},
     beforeDialogueKey=function ()
         return G.runInfo.playerType..'S1BossBefore'
     end,
@@ -134,7 +136,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
-                key='1-boss-non-1',
+                key='1-boss-kotoba-non-1',
                 time=1500,
                 hp=2000,
                 func=function(self, boss)
@@ -204,7 +206,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
         }},
         BossManager.BossRound{SKIP_INCLUDE=true,phases={
             BossManager.NonSpellPhase{SKIP_INCLUDE=true,
-                key='1-boss-non-2',
+                key='1-boss-kotoba-non-2',
                 time=1500,
                 hp=2000,
                 func=function(self, boss)

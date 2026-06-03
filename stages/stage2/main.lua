@@ -15,7 +15,7 @@ local function setZoomSpeed(value,duration)
     }
 end
 
----@type OneStageData
+---@type OneStageDataRaw
 return{
     init=function()
         if G.runInfo.geometry==G.geometries.Hyperbolic then

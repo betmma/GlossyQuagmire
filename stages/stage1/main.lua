@@ -18,8 +18,8 @@ local function smallFairyFunc(basePos,flip,r,shooting)
         end
     end
 end
-local bosses=require('stages.stage1.boss')
----@type OneStageData
+local kotobaBosses=require('stages.stage1.kotoba')
+---@type OneStageDataRaw
 return{
     init=function()
         if G.runInfo.geometry~=G.geometries.Spherical then
@@ -116,7 +116,8 @@ return{
                 wait(300)
             end
         },
-        bosses[1], -- 20s
+        kotobaBosses[1], -- 20s
+        require('stages.stage1.reimu'), -- 20s
         {
             key='1-3',
             type='midStage',
@@ -268,6 +269,6 @@ return{
                 wait(360)
             end
         },
-        bosses[2]
+        kotobaBosses[2]
     }
 }

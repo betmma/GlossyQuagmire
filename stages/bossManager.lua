@@ -1,4 +1,5 @@
----@class BossSegmentArgs
+---@class BossSegmentArgs:SegmentRaw
+---@field type nil
 ---@field SKIP_INCLUDE boolean|nil
 ---@field key string like "1-mid"
 ---@field bossName string a key to be sent to Localize and to get sprite
@@ -29,6 +30,8 @@ function BossSegment:new(args)
     self.beforeDialogueKey=args.beforeDialogueKey
     self.afterDialogueKey=args.afterDialogueKey
     self.init=args.init
+    self.players=args.players
+    self.difficulties=args.difficulties
 end
 
 local BossRound -- forward declare for BossSegment func
@@ -205,14 +208,6 @@ end
 ---@field update fun(self, boss:Boss) extra update logic to be executed every frame during the phase. like counting down remaining frames, and for spellcard subclass, counting down bonus score.
 local BossPhase=Object:extend()
 
-local ALL_DIFFICULTIES={}
-for diff,_ in pairs(G.CONSTANTS.DIFFICULTIES_DATA) do
-    ALL_DIFFICULTIES[diff]=true
-end
-local ALL_PLAYERS={}
-for player,_ in pairs(G.CONSTANTS.PLAYERS_DATA) do
-    ALL_PLAYERS[player]=true
-end
 ---@class BossPhaseBaseArgs
 ---@field key string
 ---@field time integer

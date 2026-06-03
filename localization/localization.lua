@@ -950,12 +950,9 @@ return {
                 en_us = 'Have you heard about that mysterious place that can be accessed from this travel hub?',
                 zh_cn = '你听说过那个可以从这里进入的神秘地方吗？',
             },
-            -- sheKnowsIllSkipWork = {
-            --     en_us = '(She knows I\'ll skip work to check that place?)'
-            -- },
             ughNo = {
-                en_us = 'Ugh, no.',
-                zh_cn = '呃，没有。',
+                en_us = 'Ugh, no. (She knows I\'ll leave work early to check that place?)',
+                zh_cn = '呃，没有。(她知道我会早退去那个地方？)',
             },
             howCanYouNotKnow = {
                 en_us = 'How can you not know about it? That would be a safety issue if you, the manager of here, don\'t know about it.',
