@@ -10,6 +10,7 @@
 ---@field private volumeCoeff number unchangable base volume coefficient of this audio system, default is 1
 ---@field currentVolume number similar to volumeCoeff but can be changed by player in options menu.
 ---@field currentAudio string name of the currently playing audio
+---@field defaultRestart boolean the default [restart] parameter for play function.
 local AudioSystem=Object:extend()
 function AudioSystem:new(args)
     self.folder=args.folder
@@ -41,12 +42,16 @@ function AudioSystem:new(args)
     self.volumeCoeff=args.volumeCoeff or 1
     -- currentVolume is used for options, while volumeCoeff is unchangable to player
     self.currentVolume=args.currentVolume or 1
+    self.defaultRestart=args.defaultRestart
 end
 --- play a specific audio. When the audio is already playing, if [restart] is true, the audio will be replayed from the beginning, if false it does nothing.
 ---@param name string
 ---@param restart? boolean
 ---@param overrideVolume? number
 function AudioSystem:play(name,restart,overrideVolume)
+    if restart==nil then
+        restart=self.defaultRestart
+    end
     if not self.data[name] then
         if self.defaultAudio then
             name=self.defaultAudio
@@ -138,7 +143,7 @@ function SmoothAudioSystem:update()
 end
 
 ---@type AudioSystem
-local sfx=AudioSystem{folder='sfx',fileSuffix='.wav',fileNames={'select','graze','damage','playerHit','kill','cancel','timeout','enemyShot','enemyCharge','enemyPowerfulShot','start.mp3','stop.mp3','hit','hit2','koto.mp3','sticky.mp3','notice.mp3','extend.mp3'},volumeCoeff=0.35}
+local sfx=AudioSystem{folder='sfx',fileSuffix='.wav',fileNames={'select','graze','damage','playerHit','kill','cancel','timeout','enemyShot','enemyCharge','enemyPowerfulShot','start.mp3','stop.mp3','hit','hit2','koto.mp3','sticky.mp3','notice.mp3','extend.mp3'},volumeCoeff=0.35,defaultRestart=true}
 --[[ start and stop are used for izayoi's time stop effects. start should be played 30 frames before time stop starts, and stop should be played 20 frames before time stop ends. ]]
 sfx:setAudioVolume('enemyShot',3)
 sfx:setAudioVolume('enemyCharge',0.6)
@@ -149,7 +154,7 @@ sfx:setAudioVolume('notice',3)
 sfx:setAudioVolume('cancel',2)
 sfx:setAudioVolume('extend',2)
 ---@type SmoothAudioSystem
-local bgm=SmoothAudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level1b','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream'}
+local bgm=SmoothAudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level1b','level2b'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream',defaultRestart=false}
 --- @type {sfx:AudioSystem,bgm:SmoothAudioSystem}
 local Audio={
     sfx=sfx,

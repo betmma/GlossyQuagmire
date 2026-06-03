@@ -76,10 +76,10 @@ return {
                             if self.focused and isPressed('z') then
                                 local selectedShotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player][self.currentOptionIndex]
                                 if not ShotTypes[selectedShotType] then -- the shot type isn't implemented yet
-                                    SFX:play('cancel',true)
+                                    SFX:play('cancel')
                                     return
                                 end
-                                SFX:play('select',true)
+                                SFX:play('select')
                                 G:resetRunInfo(G.CONSTANTS.GAME_TYPES.FULL_GAME,G.runInfo.difficulty,selectedShotType,G.STATES.CHOOSE_PLAYER) -- difficulty is already set in chooseDifficulty
                                 G:switchState(G.STATES.IN_GAME)
                                 StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty][1],nil,nil,'nextStage')
@@ -140,7 +140,7 @@ return {
     update=function(self,dt)
         self.backgroundPattern:update(dt)
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             self:switchState(self.STATES.CHOOSE_DIFFICULTY)
             return
         end

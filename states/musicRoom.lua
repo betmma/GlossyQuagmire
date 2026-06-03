@@ -62,19 +62,19 @@ return {
                     local musicUnlock=self.save.musicUnlock
                     if isPressed('z') then
                         if not musicUnlock[musicName] then
-                            SFX:play('cancel',true)
+                            SFX:play('cancel')
                             return
                         end
-                        SFX:play('select')
+                        SFX:play('select',false)
                         BGM:play(musicName)
                     end
                     if DEV_MODE then
                         if isPressed('[') then
                             musicUnlock[musicName]=false
-                            SFX:play('cancel',true)
+                            SFX:play('cancel')
                         elseif isPressed(']') then
                             musicUnlock[musicName]=true
-                            SFX:play('select',true)
+                            SFX:play('select')
                         end
                     end
                 end
@@ -116,7 +116,7 @@ return {
     update=function(self,dt)
         self.backgroundPattern:update(dt)
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             self:switchState(self.STATES.MAIN_MENU)
             return
         end

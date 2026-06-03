@@ -42,19 +42,19 @@ return {
         local options={
             {key='saveReplay',func=function()
                 if playingReplay then
-                    SFX:play('cancel',true)
+                    SFX:play('cancel')
                     return
                 end
-                SFX:play('select',true)
+                SFX:play('select')
                 G:switchState(G.STATES.SAVE_REPLAY)
             end},
             {key='restart',func=function()
-                SFX:play('select',true)
+                SFX:play('select')
                 G:switchState(G.STATES.IN_GAME)
                 G:restart()
             end},
             {key='exit',func=function()
-                SFX:play('select',true)
+                SFX:play('select')
                 G:switchState(G.runInfo.exitToState)
             end}
         }

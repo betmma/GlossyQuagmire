@@ -150,7 +150,7 @@ function Player:calculateShoot(dt)
         self.invincibleFrame=self.shotType.spellcard.duration
         self.transparency=0.5 -- make player semi-transparent during bomb invincibility
         G.runInfo.bombs=G.runInfo.bombs-1
-        SFX:play('enemyPowerfulShot',true)
+        SFX:play('enemyPowerfulShot')
         self.shotType.spellcard.func(kinematicState, self.keyIsDown(KEYS.SLOW))
         self.duringBomb=true
         Event{obj=self,action=function()
@@ -311,7 +311,7 @@ end
 -- spawn a white dot to show the graze effect. 
 function Player:grazeEffect(amount)
     amount=amount or 1
-    SFX:play('graze')
+    SFX:play('graze',false)
     G.runInfo.grazes=G.runInfo.grazes+amount
     -- non-random graze effect
     Effect.Larger{kinematicState={pos=copyTable(self.kinematicState.pos),dir=math.pseudoRandom(G.runInfo.grazes,self.frame)*999,speed=100+60*math.pseudoRandom(G.runInfo.grazes,self.frame,2)},sprite=Asset.shards.dot,radius=1.25,growSpeed=0,animationFrame=20}

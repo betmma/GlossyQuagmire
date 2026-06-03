@@ -36,7 +36,7 @@ return {
             local option=UI.Base{width=600,height=50,
                 events={
                     [UI.EVENTS.FOCUS]=function(self)
-                        SFX:play('select')
+                        SFX:play('select',false)
                     end,
                 },
                 extraUpdates={
@@ -172,7 +172,7 @@ return {
         })
         createOption().disabled=true -- empty option for spacing
         createOption(Localize{'ui','MAIN_MENU','EXIT'},nil).events[UI.EVENTS.SELECT]=function(_)
-            SFX:play('select')
+            SFX:play('select',false)
             self:saveData()
             self:switchState(self.STATES.MAIN_MENU)
         end
@@ -185,7 +185,7 @@ return {
         self.backgroundPattern:update(dt)
         base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             self:saveData()
             self:switchState(self.STATES.MAIN_MENU)
         end

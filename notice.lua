@@ -87,12 +87,12 @@ function NoticeManager:update()
     end
     local currentNotice=self.notices[1]
     if not currentNotice.sfxPlayed then
-        SFX:play('notice')
+        SFX:play('notice',false)
         currentNotice.sfxPlayed=true
     end
     if isPressed('z') and not currentNotice.dismissFrame then
         currentNotice.dismissFrame=G.frame
-        SFX:play('select')
+        SFX:play('select',false)
     end
     if currentNotice.dismissFrame then
         local framePassedDismiss=G.frame - currentNotice.dismissFrame

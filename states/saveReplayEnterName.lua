@@ -53,27 +53,27 @@ return {
                             local name=G.runInfo.pendingReplay.data.name
                             if char=='END' then
                                 if #name==0 then
-                                    SFX:play('cancel',true)
+                                    SFX:play('cancel')
                                     return
                                 end
-                                SFX:play('select')
+                                SFX:play('select',false)
                                 ReplayManager:saveToSlot(G.runInfo.pendingReplay,G.UIDEF.SAVE_REPLAY.chosenSlot)
                                 G.save.defaultName=G.runInfo.pendingReplay.data.name
                                 G:saveData()
                                 G:switchState(G.STATES.SAVE_REPLAY)
                             elseif char=='BS' then
                                 if #name==0 then
-                                    SFX:play('cancel',true)
+                                    SFX:play('cancel')
                                     return
                                 end
-                                SFX:play('select')
+                                SFX:play('select',false)
                                 G.runInfo.pendingReplay.data.name = name:sub(1, #name - 1)
                             else -- normal char
                                 if #name>=ReplayManager.MAX_NAME_LENGTH then
-                                    SFX:play('cancel',true)
+                                    SFX:play('cancel')
                                     return
                                 end
-                                SFX:play('select')
+                                SFX:play('select',false)
                                 G.runInfo.pendingReplay.data.name = name .. char
                             end
                         end,
@@ -90,7 +90,7 @@ return {
     update=function(self,dt)
         base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             G:switchState(G.STATES.SAVE_REPLAY)
         end
     end,

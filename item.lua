@@ -101,7 +101,7 @@ end
 
 local function gainPower(amount)
     if G.runInfo.power>=400 then
-        SFX:play('select',true)
+        SFX:play('select')
         return
     end
     local powerBefore=G.runInfo.power
@@ -113,9 +113,9 @@ local function gainPower(amount)
         DynamicUIObjs.showNotice('fullPowerUp')
     end
     if math.floor(powerBefore/100)<math.floor(G.runInfo.power/100) then
-        SFX:play('extend',true)
+        SFX:play('extend')
     else
-        SFX:play('select',true)
+        SFX:play('select')
     end
 end
 
@@ -123,10 +123,10 @@ local function gainLife(amount)
     local livesBefore=G.runInfo.lives
     G.runInfo.lives=roundToFifth(G.runInfo.lives+amount)
     if math.floor(livesBefore)<math.floor(G.runInfo.lives) then
-        SFX:play('extend',true)
+        SFX:play('extend')
         DynamicUIObjs.showNotice('extend')
     else
-        SFX:play('select',true)
+        SFX:play('select')
     end
 end
 
@@ -134,9 +134,9 @@ local function gainBomb(amount)
     local bombsBefore=G.runInfo.bombs
     G.runInfo.bombs=roundToFifth(G.runInfo.bombs+amount)
     if math.floor(bombsBefore)<math.floor(G.runInfo.bombs) then
-        SFX:play('extend',true)
+        SFX:play('extend')
     else
-        SFX:play('select',true)
+        SFX:play('select')
     end
 end
 
@@ -144,9 +144,9 @@ local function gainScore(amount)
     local newScore=G.runInfo.score+amount
     if G.runInfo.score<G.runInfo.hiScore and G.runInfo.hiScore<newScore then -- new hiscore
         DynamicUIObjs.showNotice('hiscore')
-        SFX:play('extend',true)
+        SFX:play('extend')
     end
-    SFX:play('select',true)
+    SFX:play('select')
     G.runInfo.score=newScore
     G.runInfo.hiScore=math.max(G.runInfo.hiScore,G.runInfo.score)
     local highScoreTable,key=G:getHighScoreTableAndKey()

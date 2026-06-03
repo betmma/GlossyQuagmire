@@ -232,10 +232,10 @@ return {
                         local id=item.difficulties[diff]
                         local spellcardData=SpellcardCollection.all[id]
                         if not G.save.spellcardHistory[item.phaseKey][diff].unlocked then
-                            SFX:play('cancel',true)
+                            SFX:play('cancel')
                             return
                         end
-                        SFX:play('select',true)
+                        SFX:play('select')
                         G:resetRunInfo(G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE,diff,shotType,G.STATES.SPELL_PRACTICE)
                         G:switchState(G.STATES.IN_GAME)
                         StageManager:load(spellcardData.stage,spellcardData.segmentKey,true,'end',{practicePhase=item.phaseKey})
@@ -254,7 +254,7 @@ return {
         self.backgroundPattern:update(dt)
         base:updateHierarchy()
         if isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             self:switchState(self.STATES.MAIN_MENU)
         end
     end,

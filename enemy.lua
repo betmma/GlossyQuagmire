@@ -104,7 +104,7 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     if damageSum==0 then
         return
     end
-    SFX:play('damage')
+    SFX:play('damage',false)
     objToReduceHp.hp=objToReduceHp.hp-damageSum*damageFactor/(objToReduceHp.damageResistance or 1)
     if objToReduceHp.hp<0 and not objToReduceHp.removed then
         objToReduceHp:die()
@@ -117,7 +117,7 @@ function Enemy:die()
 end
 
 function Enemy:dieEffect()
-    SFX:play('kill',true)
+    SFX:play('kill')
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
     local shockwaveColor=Asset.spectrum1MapSpectrum2[spriteColor] or 'gray'
     Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
@@ -292,7 +292,7 @@ function Boss:die()
 end
 
 function Boss:dieEffect()
-    SFX:play('kill',true)
+    SFX:play('kill')
     local final=not self.revivable -- final shockwave need to be more juicy
     Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=25,radius=20,growSpeed=1.7,spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
     for itemType,num in pairs(self.dropItems) do

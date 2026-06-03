@@ -75,7 +75,7 @@ function Charge:new(args)
     self.particles={}
     self.animationFrame=args.animationFrame or 120
     self.color=args.color or {1,1,1}
-    SFX:play("enemyCharge",true)
+    SFX:play("enemyCharge")
 end
 
 function Charge:update(dt)

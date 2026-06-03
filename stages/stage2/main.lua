@@ -69,7 +69,7 @@ return{
                     wait(3)
                 end
                 wait(60)
-                SFX:play('enemyCharge',true)
+                SFX:play('enemyCharge')
                 setZoomSpeed(0.005,60)
                 wait(400)
                 DynamicUIObjs.showStageTitle('stage2')

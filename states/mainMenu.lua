@@ -59,10 +59,10 @@ return {
                     events={
                         [UI.EVENTS.SELECT]=function(_)
                             if data.disabled then
-                                SFX:play('cancel',true)
+                                SFX:play('cancel')
                                 return
                             end
-                            SFX:play('select')
+                            SFX:play('select',false)
                             if value=='EXIT' then
                                 self.save.statistics.politeExit=true
                                 self:saveData()
@@ -104,7 +104,7 @@ return {
     end,
     update=function(self,dt)
         if isPressed('f3') then
-            SFX:play('cancel',true)
+            SFX:play('cancel')
             self.backgroundPattern:randomize()
         end
         self.backgroundPattern:update(dt)

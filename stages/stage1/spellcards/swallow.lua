@@ -46,7 +46,7 @@ return BossManager.SpellcardPhase{
         Event{obj=mouthBase,action=function()
             while true do
                 wait(120)
-                SFX:play('enemyCharge',true)
+                SFX:play('enemyCharge')
                 swallowing=true
                 for i=1,60 do
                     local r=i/60
@@ -54,9 +54,9 @@ return BossManager.SpellcardPhase{
                     wait()
                 end
                 swallowing=false
-                SFX:play('enemyCharge',true)
+                SFX:play('enemyCharge')
                 wait(60)
-                SFX:play('enemyPowerfulShot',true)
+                SFX:play('enemyPowerfulShot')
                 Event{obj=mouthBase,action=function()
                     wait(20)
                     local direction=G.runInfo.geometry:to(mouthBase.kinematicState.pos,aim)+math.eval(0,1)

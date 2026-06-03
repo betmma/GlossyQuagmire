@@ -150,7 +150,7 @@ return {
             G:reloadUI()
         end
         if isPressed('escape') then
-            SFX:play('select')
+            SFX:play('select',false)
             G:switchState(G.STATES.PAUSE)
         end
     end,
@@ -161,7 +161,7 @@ return {
             return
         end
         -- if isPressed('escape') then
-        --     SFX:play('select')
+        --     SFX:play('select',false)
         --     EventManager.post(EventManager.EVENTS.LEAVE_GAME)
         --     self:switchState(G.runInfo.exitToState)
         -- end

@@ -44,7 +44,7 @@ return {
                                 G.UIDEF.SAVE_REPLAY.chosenSlot=slot -- saveReplayEnterName needs this
                             end,
                             [UI.EVENTS.SELECT]=function(_)
-                                SFX:play('select')
+                                SFX:play('select',false)
                                 G:switchState(G.STATES.SAVE_REPLAY_ENTER_NAME)
                             end,
                     },}
@@ -64,7 +64,7 @@ return {
     update=function(self,dt)
         base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             G:switchState(G.STATES.GAME_END)
         end
     end,

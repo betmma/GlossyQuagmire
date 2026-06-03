@@ -147,7 +147,7 @@ return BossManager.SpellcardPhase{
                 local core=Bullet{kinematicState=copyTable(boss.kinematicState),sprite=BulletSprites.rim.red,size=2,invincible=true,safe=true,spriteTransparency=0,lifeFrame=life}
                 core.index=i
                 signCore(core,endpoint,50+150*j,math.eval(0,DSWITCH{0,0.1,0.2,0.2}))
-                SFX:play('enemyPowerfulShot',true)
+                SFX:play('enemyPowerfulShot')
                 wait(20)
             end
             wait(DSWITCH{300,260,230,230})

@@ -23,17 +23,17 @@ return {
         }
         local options={
             {key='resume',func=function()
-                SFX:play('select',true)
+                SFX:play('select')
                 G:switchState(G.STATES.IN_GAME)
             end},
             {key='restart',func=function()
-                SFX:play('select',true)
+                SFX:play('select')
                 EventManager.post(EventManager.EVENTS.LEAVE_GAME)
                 G:switchState(G.STATES.IN_GAME,{})
                 G:restart()
             end},
             {key='exit',func=function()
-                SFX:play('select',true)
+                SFX:play('select')
                 EventManager.post(EventManager.EVENTS.LEAVE_GAME)
                 G:switchState(G.runInfo.exitToState)
             end}

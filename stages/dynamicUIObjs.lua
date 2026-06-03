@@ -380,7 +380,7 @@ function makeDynamicUIObjs()
         if not player then
             return
         end
-        SFX:play('notice',true)
+        SFX:play('notice')
         local pos,dir=G.runInfo.geometry:rThetaGo(player.kinematicState.pos,80,player.viewDirection-math.pi/2)
         for key, count in pairs(bonus.items) do
             for i=1,count do

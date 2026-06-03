@@ -41,9 +41,9 @@ return {
                             [UI.EVENTS.SELECT]=function(_)
                                 local canRun=ReplayManager:runReplayAtSlot(slot)
                                 if canRun then
-                                    SFX:play('select')
+                                    SFX:play('select',false)
                                 else
-                                    SFX:play('cancel',true)
+                                    SFX:play('cancel')
                                 end
                             end,
                     },}
@@ -64,7 +64,7 @@ return {
     update=function(self,dt)
         self.backgroundPattern:update(dt)
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             self:switchState(self.STATES.MAIN_MENU)
             return
         end

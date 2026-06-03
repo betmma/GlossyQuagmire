@@ -134,7 +134,7 @@ function DialogueController:update(dt)
 end
 
 function DialogueController:advanceDialogue()
-    SFX:play('select')
+    SFX:play('select',false)
     if self.timeSinceLastAdvance>=self.autoAdvanceTime then
         self.timeSinceLastAutoAdvance=0
     end

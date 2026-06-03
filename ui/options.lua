@@ -127,7 +127,7 @@ function UIOptions:switchOption(option,snap,init)
     option:child(self.cursor,asFirst)
     option:emit(UI.EVENTS.FOCUS,{init=init})
     if not init then
-        SFX:play('select')
+        SFX:play('select',false)
     end
     if snap then
         self.cursor:snap()

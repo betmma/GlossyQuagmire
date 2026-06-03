@@ -140,9 +140,9 @@ function UISwitcher:switchOption(direction)
     local success=self:makeOptions()
     if not success then  -- out of options
         self.currentOptionIndex=self.currentOptionIndex-direction -- revert index change
-        -- SFX:play('cancel')
+        -- SFX:play('cancel',false)
     else
-        SFX:play('select')
+        SFX:play('select',false)
         self:emit(UI.EVENTS.SWITCHED,{index=self.currentOptionIndex})
         self.lerpingOptionIndexOffset=self.lerpingOptionIndexOffset+direction
     end

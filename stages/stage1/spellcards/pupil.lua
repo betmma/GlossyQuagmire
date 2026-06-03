@@ -70,10 +70,10 @@ return BossManager.SpellcardPhase{
             }
         }
         Event.LoopEvent{obj=spawner,period=period,firstPeriod=time+50,executeFunc=function()
-            SFX:play('enemyCharge')
+            SFX:play('enemyCharge',false)
         end}
         Event.LoopEvent{obj=spawner,period=period,firstPeriod=time+110,executeFunc=function()
-            SFX:play('enemyPowerfulShot')
+            SFX:play('enemyPowerfulShot',false)
         end}
     end
 }

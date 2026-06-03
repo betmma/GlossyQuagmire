@@ -58,7 +58,7 @@ return {
             extraUpdates={
                 function(switcher)
                     if isPressed('z') then
-                        SFX:play('select',true)
+                        SFX:play('select')
                         local difficulty=G.CONSTANTS.REGULAR_DIFFICULTIES[switcher.currentOptionIndex]
                         G.runInfo.difficulty=difficulty
                         self:switchState(self.STATES.CHOOSE_PLAYER)
@@ -77,7 +77,7 @@ return {
     update=function(self,dt)
         self.backgroundPattern:update(dt)
         if isPressed('x') or isPressed('escape')then
-            SFX:play('select')
+            SFX:play('select',false)
             self:switchState(self.STATES.MAIN_MENU)
             return
         end

@@ -13,25 +13,26 @@ local midboss=BossManager.BossSegment{
                 key='reimu-dream-seal',
                 bonusScore=10000,
                 time=1200,
-                hp=1500,
+                hp=1200,
                 dropItems={point=15,powerSmall=10},
                 func=function(self, boss)
                     local function largeOrb(dir)
                         local largeOrbLife=60
                         local orb=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),speed=500,dir=dir},sprite=BulletSprites.lightRound.red,lifeFrame=largeOrbLife,}
-                        local spawner=BulletSpawner{period=5,lifeFrame=largeOrbLife,bulletNumber=4,range=0,bulletSpeed=100,angle='player',bulletSprite=BulletSprites.bill.red,bulletLifeFrame=300,visible=true,bulletEvents={function(cir,args,self)
+                        local spawner=BulletSpawner{period=8,lifeFrame=largeOrbLife,bulletNumber=DSWITCH{1,2,3,4},range=0,bulletSpeed=100,angle='player',bulletSprite=BulletSprites.bill.red,bulletLifeFrame=600,visible=true,bulletEvents={function(cir,args,self)
                             local waitFrame=orb.lifeFrame-orb.frame
-                            cir.kinematicState.speed=cir.kinematicState.speed*(1+(args.index-1)*0.5)
+                            local speedRatio=(1+(args.index-1)*0.5)
+                            cir.kinematicState.speed=cir.kinematicState.speed*speedRatio
                             Event.Event{obj=cir,action=function()
                                 wait(waitFrame+1)
                                 for i=1,3 do
                                     local dir=G.runInfo.geometry:to(cir.kinematicState.pos,G.runInfo.player.kinematicState.pos)
                                     cir.kinematicState.dir=dir
-                                    cir.kinematicState.speed=300
+                                    cir.kinematicState.speed=120*speedRatio
                                     local colors={'purple','blue','white'}
                                     local color=colors[i]
                                     cir:changeSpriteColor(color)
-                                    SFX:play('enemyShot',true)
+                                    SFX:play('enemyShot')
                                     if i==3 then
                                         cir.flag=true
                                     end
@@ -43,11 +44,11 @@ local midboss=BossManager.BossSegment{
                             self.kinematicState.speed=self.kinematicState.speed*0.95
                         end}}
                         spawner:bindState(orb)
-                        local spawner2=BulletSpawner{period=largeOrbLife-1,lifeFrame=largeOrbLife,bulletNumber=32,range=0,bulletSpeed=70,angle='player',bulletSize=2,bulletSprite=BulletSprites.billDark.red,bulletLifeFrame=600,visible=false,bulletEvents={function(cir,args,self)
-                            SFX:play('enemyShot',true)
+                        local spawner2=BulletSpawner{period=largeOrbLife-1,lifeFrame=largeOrbLife,bulletNumber=16,range=0,bulletSpeed=70,angle='player',bulletSize=2,bulletSprite=BulletSprites.billDark.red,bulletLifeFrame=600,visible=false,bulletEvents={function(cir,args,self)
+                            SFX:play('enemyShot')
                             local m,n=args.index%8,math.ceil(args.index/8)
                             cir.kinematicState.speed=cir.kinematicState.speed*(1+m*0.5)
-                            cir.kinematicState.dir=cir.kinematicState.dir+math.pi/16*(n-2.5)
+                            cir.kinematicState.dir=cir.kinematicState.dir+math.pi/16*(n-1.5)
                         end}}
                         spawner2:bindState(orb)
                     end
@@ -74,7 +75,7 @@ local midboss=BossManager.BossSegment{
                             largeOrb(dir+math.pi-math.pi/6*j)
                             wait(10)
                         end
-                        wait(30)
+                        wait(120)
                     end
                 end
             },
