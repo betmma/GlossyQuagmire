@@ -178,4 +178,16 @@ function Item:picked()
     end
 end
 
+-- for fixed loop order
+Item.ItemTypes={
+    ItemType.point,
+    ItemType.pointGolden,
+    ItemType.powerSmall,
+    ItemType.powerLarge,
+    ItemType.powerFull,
+    ItemType.lifePiece,
+    ItemType.bombPiece,
+    ItemType.life,
+    ItemType.bomb,
+}
 return Item

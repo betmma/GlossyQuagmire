@@ -295,12 +295,15 @@ function Boss:dieEffect()
     SFX:play('kill')
     local final=not self.revivable -- final shockwave need to be more juicy
     Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=25,radius=20,growSpeed=1.7,spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
-    for itemType,num in pairs(self.dropItems) do
-        for i=1,num do
-            local angle=G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)+(math.pseudoRandom(i)*2-1)*0.3
-            local speed=math.eval(1600,800)
-            local kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed}
-            Item{kinematicState=kinematicState,type=itemType}
+    for _,itemType in ipairs(Item.ItemTypes) do
+        if self.dropItems[itemType] then
+            local num=self.dropItems[itemType]
+            for i=1,num do
+                local angle=G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)+(math.pseudoRandom(i)*2-1)*0.3
+                local speed=math.eval(1600,800)
+                local kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed}
+                Item{kinematicState=kinematicState,type=itemType}
+            end
         end
     end
 end
