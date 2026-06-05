@@ -109,7 +109,7 @@ function GeoLaser:collide(pos,radius)
 end
 
 function GeoLaser:checkShockwaveRemove()
-    for k,shockwave in pairs(Effect.Shockwave.objects) do
+    for k,shockwave in ipairs(Effect.Shockwave.objects) do
         ---@cast shockwave Shockwave
         if shockwave.canRemove.bullet==true and
         (self.invincible==false or shockwave.canRemove.invincible==true) and

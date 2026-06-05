@@ -382,10 +382,12 @@ function makeDynamicUIObjs()
         end
         SFX:play('notice')
         local pos,dir=G.runInfo.geometry:rThetaGo(player.kinematicState.pos,80,player.viewDirection-math.pi/2)
-        for key, count in pairs(bonus.items) do
+        
+        for _,itemType in ipairs(Item.ItemTypes) do
+            local count=bonus.items[itemType] or 0
             for i=1,count do
                 local kinematicState={pos=copyTable(pos),dir=dir+math.eval(0,0.1),speed=math.eval(300,100)}
-                Item{kinematicState=kinematicState,type=key}
+                Item{kinematicState=kinematicState,type=itemType}
             end
         end
     end

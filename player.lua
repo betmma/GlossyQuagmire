@@ -335,7 +335,8 @@ function Player:hitEffect(damage)
         -- G:lose()
     end
     
-    for itemType,num in pairs(dropItems) do
+    for _,itemType in ipairs(Item.ItemTypes) do
+        local num=dropItems[itemType] or 0
         for i=1,num do
             local angle=self.viewDirection-math.pi/2+math.eval(0,1)
             local speed=math.eval(200,50)

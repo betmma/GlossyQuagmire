@@ -150,7 +150,7 @@ local function findClosestEnemy(bullet)
     local closestEnemy
     local enemyClasses={Enemy, Boss}
     for _, enemyClass in pairs(enemyClasses) do
-        for key, value in pairs(enemyClass.objects) do
+        for _, value in ipairs(enemyClass.objects) do
             ---@cast value Enemy
             local dis=G.runInfo.geometry:distance(bullet.kinematicState.pos,value.kinematicState.pos)
             if dis<closestDistance then

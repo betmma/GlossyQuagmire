@@ -81,7 +81,7 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     damageFactor=damageFactor or 1
     local damageSum=0
     local selfRadius=self:getHitboxRadius()+32 -- easier to hit. doesn't directly increase hitbox so player can stand above enemy to hit without being hit.
-    for key, circ in pairs(PlayerShot.objects) do
+    for _, circ in ipairs(PlayerShot.objects) do
         ---@cast circ PlayerShot
         local radius=selfRadius+circ:getHitboxRadius()
         if not circ.safe and G.runInfo.geometry:distance(circ.kinematicState.pos,self.kinematicState.pos)<radius then
@@ -121,7 +121,8 @@ function Enemy:dieEffect()
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
     local shockwaveColor=Asset.spectrum1MapSpectrum2[spriteColor] or 'gray'
     Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
-    for itemType,num in pairs(self.dropItems) do
+    for _,itemType in ipairs(Item.ItemTypes) do
+        local num=self.dropItems[itemType] or 0
         for i=1,num do
             local angle=math.random()*math.pi*2
             local speed=math.eval(200,150)

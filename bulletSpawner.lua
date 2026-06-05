@@ -56,7 +56,7 @@ function BulletSpawner:new(args)
         _args.extraUpdate=self.bulletExtraUpdate or {}
         local cir=Bullet(_args)
         -- table.insert(ret,cir)
-        for key, func in pairs(self.bulletEvents) do
+        for _, func in ipairs(self.bulletEvents) do
             func(cir,_args,self)
         end
         return cir
@@ -100,7 +100,7 @@ end
 function BulletSpawner:update(dt)
     BulletSpawner.super.update(self,dt)
     local selfHitboxRadius=self:getHitboxRadius()
-    for k,shockwave in pairs(Effect.Shockwave.objects) do
+    for k,shockwave in ipairs(Effect.Shockwave.objects) do
         ---@cast shockwave Shockwave
         if shockwave.canRemove.bulletSpawner and G.runInfo.geometry:distance(shockwave.kinematicState.pos,self.kinematicState.pos)<shockwave:getHitboxRadius()+selfHitboxRadius then
             self:remove()
