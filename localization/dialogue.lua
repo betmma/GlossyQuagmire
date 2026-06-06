@@ -6,19 +6,29 @@
 ---@field expression expression used to pick image
 ---@field textKey string text is in localization.lua
 ---@field position position where to position image (and flip)
+---@field autoForwardTime number? if not nil, cannot advance manually and will auto advance after this time (in seconds).
+---@field playBGM boolean? if true, will play BGM when this line is displayed. the BGM key is passed on creation of DialogueController.
+
+---@class LineExtra
+---@field playBGM boolean?
+---@field autoForwardTime number?
+---@field position position
 
 --- of course i want to omit "key=" in each line definition
 ---@param speaker string
 ---@param expression expression
 ---@param textKey string
----@param position position
+---@param extra LineExtra|nil
 ---@return DialogueLine
-local function line(speaker,expression,textKey,position)
+local function line(speaker,expression,textKey,extra)
+    extra=extra or {}
     return {
         speaker=speaker,
         expression=expression,
         textKey=textKey,
-        position=position,
+        playBGM=extra.playBGM,
+        autoForwardTime=extra.autoForwardTime,
+        position=extra.position,
     }
 end
 
@@ -39,7 +49,8 @@ local Dialogue={}
 ---@field dialogueKey string key in Dialogue.data
 ---@field data Dialogue
 ---@field afterFunc function called after dialogue ends
----@field activeCharacters table<string,activeCharacter> list of characters that have appeared in this dialogue
+---@field activeCharacters table<string,activeCharacter> list of characters that have appeared in this 
+---@field BGM? string
 ---@overload fun(args:DialogueControllerArgs):DialogueController
 local DialogueController=GameObject:extend()
 local portraitBatch=Asset.portraitBatch
@@ -48,6 +59,7 @@ local portraitWidth,portraitHeight=Asset.portraitWidth,Asset.portraitHeight
 
 ---@class DialogueControllerArgs
 ---@field key string key in Dialogue.data
+---@field BGM? string will be played when the line with playBGM=true is displayed. 
 ---@field autoAdvanceTime? number seconds to auto advance
 ---@field afterFunc? function called after dialogue ends
 function DialogueController:new(args)
@@ -63,6 +75,11 @@ function DialogueController:new(args)
     if not self.data then
         error("Dialogue key "..tostring(args.key).." not found in Dialogue.data")
     end
+    self.BGM=args.BGM
+    if self.data.lines[self.currentLineIndex].playBGM and self.BGM then
+        BGM:play(self.BGM)
+        DynamicUIObjs.showSoundtrack()
+    end
     self.afterFunc=args.afterFunc -- function to call after dialogue ends
     ---@class activeCharacter
     ---@field speaker string
@@ -74,7 +91,7 @@ function DialogueController:new(args)
     self.activeCharacters={} -- list of characters that have appeared in this dialogue. once appeared, their portrait will stay on screen (changing transparency based on who is speaking)
 
     self.playerZCallback=function() -- why dont in DialogueController:update directly read player.keyIsPressed? because DialogueController:update could be called after player:update, while player:update bumps player.frame by 1. so in replay player.keyIsPressed call in DialogueController:update could see 1 frame later than the calls in player.update. so let player emit an event in player.update to prevent this issue.
-        if self.timeSinceLastAutoAdvance>0.5 then -- > 0.5 check to avoid unintended advance after an auto advance
+        if self.timeSinceLastAutoAdvance>0.5 and not self.data.lines[self.currentLineIndex].autoForwardTime then -- > 0.5 check to avoid unintended advance after an auto advance
             self:advanceDialogue()
         end
     end
@@ -102,8 +119,9 @@ function DialogueController:update(dt)
     self.timeSinceLastAutoAdvance=self.timeSinceLastAutoAdvance+dt
     local player=G.runInfo.player
     if player then
-        if self.timeSinceLastAdvance>=self.autoAdvanceTime then -- or love.keyboard.isDown('lctrl') then -- press z or hold left ctrl to advance. lctrl isn't in player's replay record keys so cannot add now. and adding lctrl would exceed 8 keys and also need to change replayManager's serialize (currently 8 keys -> 2 hex chars) ughh
-            self:advanceDialogue()
+        local advanceTime=self.data.lines[self.currentLineIndex].autoForwardTime or self.autoAdvanceTime
+        if self.timeSinceLastAdvance>=advanceTime then -- or love.keyboard.isDown('lctrl') then -- press z or hold left ctrl to advance. lctrl isn't in player's replay record keys so cannot add now. and adding lctrl would exceed 8 keys and also need to change replayManager's serialize (currently 8 keys -> 2 hex chars) ughh
+            self:advanceDialogue(true)
         end
     end
     if self.removed then
@@ -133,9 +151,9 @@ function DialogueController:update(dt)
     end
 end
 
-function DialogueController:advanceDialogue()
+function DialogueController:advanceDialogue(isAuto)
     SFX:play('select',false)
-    if self.timeSinceLastAdvance>=self.autoAdvanceTime then
+    if isAuto then
         self.timeSinceLastAutoAdvance=0
     end
     self.timeSinceLastAdvance=0
@@ -146,6 +164,12 @@ function DialogueController:advanceDialogue()
         end
         self.removing=true
         self.currentLineIndex=#self.data.lines -- stay on last line until removed
+    else
+        local line=self.data.lines[self.currentLineIndex]
+        if line.playBGM and self.BGM then
+            BGM:play(self.BGM)
+            DynamicUIObjs.showSoundtrack()
+        end
     end
 end
 
@@ -238,7 +262,7 @@ local REIMUS1BossBefore={
         line('kotoba','frustrated','ughNo'),
         line('reimu','surprised','howCanYouNotKnow'),
         line('kotoba','sad','ahhhIMeanIKnowBut'),
-        line('reimu','cunning','aDanmakuBattleWouldHelpYouRemember'),
+        line('reimu','cunning','aDanmakuBattleWouldHelpYouRemember',{playBGM=true}),
     }
 }
 
@@ -266,7 +290,7 @@ local MARISAS1BossBefore={
         line('marisa','normal','ohHi'),
         line('marisa','cunning','wheresThatPlace'),
         line('kotoba','surprised','waitThatThievishLook'),
-        line('kotoba','angry','iMustStopYouNow'),
+        line('kotoba','angry','iMustStopYouNow',{playBGM=true}),
     }
 }
 

@@ -117,16 +117,13 @@ end
 local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     bossName='kotoba',
     key='1-boss-kotoba',
+    BGM='level1b',
     players={REIMU=true,MARISA=true},
     beforeDialogueKey=function ()
         return G.runInfo.playerType..'S1BossBefore'
     end,
     afterDialogueKey=function ()
         return G.runInfo.playerType..'S1BossAfter'
-    end,
-    init=function()
-        BGM:play('level1b')
-        DynamicUIObjs.showSoundtrack()
     end,
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry

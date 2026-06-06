@@ -3,6 +3,7 @@
 ---@field SKIP_INCLUDE boolean|nil
 ---@field key string like "1-mid"
 ---@field bossName string a key to be sent to Localize and to get sprite
+---@field BGM? string key for BGM:play(). will be sent to dialogue if has beforeDialogueKey and not in spell practice. otherwise directly played when func is called.
 ---@field getBossSpawnPos fun(self):Position
 ---@field rounds BossRound[]
 ---@field beforeDialogueKey? fun():string
@@ -12,6 +13,7 @@
 ---@class BossSegment:Segment a segment that can be called by StageManager, which contains multiple boss rounds. (would also include dialogues in the future)
 ---@field type 'boss'
 ---@field bossName string a key to be sent to Localize and to get sprite
+---@field BGM? string key for BGM:play(). will be sent to dialogue if has beforeDialogueKey and not in spell practice. otherwise directly played when func is called.
 ---@field getBossSpawnPos fun(self):Position
 ---@field rounds BossRound[]
 ---@field beforeDialogueKey? fun():string it's a function so can route to different dialogue based on shot type or difficulty
@@ -25,6 +27,7 @@ function BossSegment:new(args)
     self.key=args.key
     self.type='boss'
     self.bossName=args.bossName
+    self.BGM=args.BGM
     self.getBossSpawnPos=args.getBossSpawnPos
     self.rounds=args.rounds
     self.beforeDialogueKey=args.beforeDialogueKey
@@ -53,6 +56,10 @@ function BossSegment:func(args)
                 end
             end
         end
+        if self.BGM then
+            BGM:play(self.BGM)
+            DynamicUIObjs.showSoundtrack()
+        end
     end
     local pos=self.getBossSpawnPos(self)
     Effect.Shockwave{kinematicState={pos=copyTable(pos),dir=0,speed=0},lifeFrame=20,radius=20,growSpeed=1.2,spriteTransparency=1,color='yellow',canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
@@ -74,7 +81,7 @@ function BossSegment:func(args)
     
     -- after dialogues are implemented, could add something before the rounds
     if self.beforeDialogueKey and not args.practicePhase then
-        DialogueController{key=self.beforeDialogueKey()}:block()
+        DialogueController{key=self.beforeDialogueKey(), BGM=self.BGM}:block()
         wait(30)
     end
 
