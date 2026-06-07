@@ -269,6 +269,7 @@ return{
                 wait(360)
             end
         },
-        kotobaBosses[2]
+        kotobaBosses[2],
+        require('stages.stage1.marisa')
     }
 }
