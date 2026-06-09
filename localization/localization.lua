@@ -71,6 +71,32 @@ return {
                     zh_cn = '灵符「梦想封印　集」',
                 }
             }
+        },
+        ['marisa-star'] = {
+            EASY = {
+                name = {
+                    en_us = 'Star Sign "\'Oumuamua"',
+                    zh_cn = '星符「奥陌陌」',
+                }
+            },
+            NORMAL = {
+                name = {
+                    en_us = 'Star Sign "\'Ayló\'chaxnim"',
+                    zh_cn = '星符「爱洛查赫妮姆」',
+                }
+            },
+            HARD = {
+                name = {
+                    en_us = 'Star Sign "G!ò\'é !Hú"',
+                    zh_cn = '星符「雹卫一」',
+                }
+            },
+            __default__ = {
+                name = {
+                    en_us = 'Star Sign "G!kún||\'hòmdímà"',
+                    zh_cn = '星符「雹神星」',
+                }
+            },
         }
     },
     levelData = {
@@ -915,6 +941,16 @@ return {
             description = {
                 en_us = 'Kotoba Kyokuwa\'s theme.\nUnnecessarily rapid and dark for stage 1 huh? If this trend continues, player would be exhausted before facing the real challenges.',
                 zh_cn = '曲话言波的主题曲。\n用于一面，是不是过于快速和黑暗了？如果继续这样下去，玩家在面对真正的挑战之前就会精疲力尽了吧。'
+            }
+        },
+        level1c = {
+            name = {
+                en_us = 'Unrestrained Magic ~ Eastern Magician',
+                zh_cn = '奔放的魔法　～ Eastern Magician',
+            },
+            description = {
+                en_us = 'Marisa Kirisame\'s theme.\nVery emotional. When writing the intro I was thinking of her IN theme\'s intro, but later I found I mistook Reimu\'s intro for hers. It still makes sense, because Reimu is the midboss and deserves a part (^^;',
+                zh_cn = '雾雨魔理沙的主题曲。\n很有感情。在写前奏时，我原本想着她永夜抄主题曲的前奏，但后来发现把灵梦的前奏误认为是她的了。也可以吧，因为灵梦是道中Boss，值得有一段 (^^;',
             }
         },
         level2b = {

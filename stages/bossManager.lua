@@ -83,6 +83,9 @@ function BossSegment:func(args)
     if self.beforeDialogueKey and not args.practicePhase then
         DialogueController{key=self.beforeDialogueKey(), BGM=self.BGM}:block()
         wait(30)
+    elseif self.BGM and not args.practicePhase then
+        BGM:play(self.BGM)
+        DynamicUIObjs.showSoundtrack()
     end
 
     for i, round in ipairs(roundsToRun) do

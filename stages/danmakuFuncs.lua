@@ -34,6 +34,9 @@ end
 function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
 ---@diagnostic disable-next-line: inject-field
     shape.centerObj=centerObj
+    rtheta=type(rtheta)=="function" and rtheta or function ()
+        return rtheta
+    end
     shape.extraUpdate[#shape.extraUpdate+1] = function(self, dt)
         if centerObj.removed then
             if not self.calledOnCenterRemoved then
@@ -44,7 +47,7 @@ function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
             end
             return
         end
-        local rthetanew=type(rtheta)=="function" and rtheta(self, centerObj) or rtheta
+        local rthetanew=rtheta(self, centerObj)
         local centerPos=centerObj.kinematicState.pos
         self.kinematicState.pos,self.kinematicState.dir=G.runInfo.geometry:rThetaGo(centerPos,rthetanew.r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
     end
