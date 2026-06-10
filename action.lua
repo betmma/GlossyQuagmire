@@ -78,22 +78,24 @@ end
 local zoomIn=function(self,params)
     local zoomFrame=params.zoomFrame or 30
     local targetSize=params.targetSize or self.zoomInTargetSize
+    local initialSize=params.initSize or 0
     if self.frame<=zoomFrame then
-        self.size=targetSize*self.frame/zoomFrame
+        self.size=math.interpolate(initialSize, targetSize, self.frame/zoomFrame)
     end
 end
 
 local zoomInInit=function(self,params)
     self.zoomInTargetSize=self.size
-    self.size=0
+    self.size=params.initSize or 0
 end
 
 -- bullet size grows from 0 to [self.targetSize] in [self.zoomFrame] frames.
 --- @param zoomFrame integer number of frames for the zoom animation, default 30
 --- @param targetSize number|nil target size for the zoom animation, default self.size
+--- @param initSize number|nil initial size for the zoom animation, default 0
 --- @return Action
-Action.ZoomIn=function(zoomFrame,targetSize)
-    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize},func=zoomIn,init=zoomInInit}
+Action.ZoomIn=function(zoomFrame,targetSize,initSize)
+    return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize,initSize=initSize},func=zoomIn,init=zoomInInit}
 end
 
 local appearingHint=function(self,params)

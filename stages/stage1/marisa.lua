@@ -57,7 +57,7 @@ local marisaBoss=BossManager.BossSegment{
     end,
     rounds={
         BossManager.BossRound{SKIP_INCLUDE=true,phases={
-            BossManager.NonSpellPhase{--SKIP_INCLUDE=true,
+            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='1-boss-marisa-non-1',
                 time=1500,
                 hp=2000,
@@ -116,6 +116,7 @@ local marisaBoss=BossManager.BossSegment{
                 hp=2200,
                 func=function(self, boss)
                     local function spawner(r,angle,rotateSpeed)
+                        local center=G.runInfo.geometry:init().pos
                         local prepTime=100
                         local period=40
                         local bigStar=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),speed=0,dir=0},sprite=BulletSprites.bigStar.red,lifeFrame=1800,invincible=true,safe=true,size=2,spriteTransparency=0.5,extraUpdate={function(self)
@@ -126,6 +127,10 @@ local marisaBoss=BossManager.BossSegment{
                         bigStar.spriteRotationSpeed=0.05
                         local bulletSpawner=BulletSpawner{lifeFrame=1800,kinematicState={pos=copyTable(boss.kinematicState.pos),speed=0,dir=0},period=2,firstPeriod=prepTime+20,bulletNumber=3,bulletSpeed=120,angle=0,bulletSprite=BulletSprites.star.red,bulletLifeFrame=400,visible=true,bulletEvents={function(cir,args,self)
                             starTweak(cir,math.floor(self.frame/period)%7+1)
+                            local toPlayer=G.runInfo.geometry:to(cir.kinematicState.pos,G.runInfo.player.kinematicState.pos)
+                            if math.angleDiff(toPlayer, cir.kinematicState.dir)>math.pi/2 then
+                                cir.lifeFrame=cir.lifeFrame/2 -- if it's going outward, reduce its life to make it disappear sooner
+                            end
                         end},bulletExtraUpdate={Action.FadeOut(30,true)}}
                         Event.LoopEvent{obj=bulletSpawner,period=1,executeFunc=function()
                             local ratio=Event.sineOProgressFunc(math.min(bulletSpawner.frame/prepTime,1))
@@ -161,7 +166,8 @@ local marisaBoss=BossManager.BossSegment{
                         circle(300,3,-0.01)
                     end
                 end
-            }
+            },
+            require'stages.stage1.spellcards.light',
         }},
     }
 }

@@ -97,6 +97,21 @@ return {
                     zh_cn = '星符「雹神星」',
                 }
             },
+        },
+        ['marisa-light'] = {
+            EASY = {
+                name = {
+                    en_us = 'Light Sign "Rainbow Wave"',
+                    zh_cn = '光符「彩虹波」',
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Light Blast "Chroma Swirl"',
+                    zh_cn = '光击「色彩漩涡」',
+                }
+            }
         }
     },
     levelData = {

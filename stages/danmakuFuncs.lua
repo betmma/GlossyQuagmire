@@ -26,16 +26,23 @@ function DanmakuFuncs.moveToInTime(shape, targetPos, duration, progressFunc, upd
     end}
 end
 
+---@class rThetaRet
+---@field r number
+---@field theta number
+---@field absolute boolean|nil whether the theta is absolute or relative to centerObj's direction. default false (relative)
+---@field extraTheta number|nil an extra value to be added to shape.kinematicState.dir
+
 ---add an extraUpdate function to [shape] to make it orbit around [centerObj] with radius and angle determined by [rtheta]. it will not set position if centerObj is removed.
 ---@param shape Shape
 ---@param centerObj Shape
----@param rtheta {r:number, theta:number, absolute:boolean?}|fun(self:Shape, centerObj:Shape): {r:number, theta:number, absolute:boolean?}
+---@param rtheta rThetaRet|fun(self:Shape, centerObj:Shape): rThetaRet
 ---@param onCenterRemoved fun(self:Shape)|nil a function to be called when the centerObj is removed. can choose to remove the shape or do something else. if nil does nothing
 function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
 ---@diagnostic disable-next-line: inject-field
     shape.centerObj=centerObj
+    local rthetaRef=rtheta
     rtheta=type(rtheta)=="function" and rtheta or function ()
-        return rtheta
+        return rthetaRef
     end
     shape.extraUpdate[#shape.extraUpdate+1] = function(self, dt)
         if centerObj.removed then
@@ -50,5 +57,8 @@ function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
         local rthetanew=rtheta(self, centerObj)
         local centerPos=centerObj.kinematicState.pos
         self.kinematicState.pos,self.kinematicState.dir=G.runInfo.geometry:rThetaGo(centerPos,rthetanew.r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
+        if rthetanew.extraTheta then
+            self.kinematicState.dir=self.kinematicState.dir+rthetanew.extraTheta
+        end
     end
 end

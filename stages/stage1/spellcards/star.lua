@@ -27,7 +27,7 @@ return BossManager.SpellcardPhase{
                     if i==num and DIFF()==G.NORMAL then
                         local bulletSpawner=BulletSpawner{lifeFrame=240,kinematicState={pos=copyTable(center),speed=0,dir=0},period=1,firstPeriod=60,bulletNumber=1,bulletSpeed=180,angle=0,bulletSprite=BulletSprites.star[color],bulletLifeFrame=400,visible=true,fogEffect=true,fogTime=20,bulletEvents={function(cir,args,self)
                             cir.kinematicState.dir=bullet.kinematicState.dir
-                        end},bulletExtraUpdate={Action.FadeOut(20,true)}}
+                        end},bulletExtraUpdate={Action.ZoomIn(20,1,2),Action.FadeIn(10,true),Action.FadeOut(20,true)}}
                         bulletSpawner:bindState(bullet)
                         Event.LoopEvent{obj=bulletSpawner,period=1,executeFunc=function()
                             local period=8
