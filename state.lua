@@ -1,6 +1,6 @@
 BackgroundPattern=require"backgroundPattern"
 -- ENHL have same order of stages so combine them
-local normalStageOrder={'stage1','stage2','stage3','stage4','stage5','stage6'}
+local normalStageOrder={'stage2','stage1','stage3','stage4','stage5','stage6'}
 G={
     ---@class G.CONSTANTS
     ---@field DRAW fun(self, uiToDrawBatch?: STATE)
@@ -449,7 +449,7 @@ G={
         local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[gameType]
         self.runInfo.lives=startResources.lives
         self.runInfo.bombs=startResources.bombs
-        self.runInfo.power=0 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
+        self.runInfo.power=200 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
         self.runInfo.score=0
         self.runInfo.grazes=0
         self.runInfo.replay=replay

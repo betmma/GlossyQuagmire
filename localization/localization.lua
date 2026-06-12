@@ -1050,7 +1050,7 @@ return {
                 zh_cn = '哦嗨……',
             },
             wheresThatPlace = {
-                en_us = 'Where\'s that place? Squeezing my eyes...',
+                en_us = 'Where\'s that place? Squinting my eyes...',
                 zh_cn = '那个地方在哪里？眯着眼睛找找……',
             },
             waitThatThievishLook = {
@@ -1065,7 +1065,7 @@ return {
         MARISAS1BossAfter = {
             youreStrong = {
                 en_us = 'You\'re strong...',
-                zh_cn = '你还挺强的……',
+                zh_cn = '好强……',
             },
             ofCourseIAm = {
                 en_us = 'Of course I am. Ha!',
@@ -1086,6 +1086,54 @@ return {
             shouldTellMeInTheBeginning = {
                 en_us = 'You should tell me in the beginning, you know?',
                 zh_cn = '你应该一开始就告诉我的，知道吧？',
+            }
+        },
+        KOTOBAS1BossBefore = {
+            wheresThatPlace = {
+                en_us = 'Where\'s that place? Squinting my eyes...',
+                zh_cn = '那个地方在哪里？眯着眼睛找找……',
+            },
+            waitThatThievishLook = {
+                en_us = 'Wait, that thievish look... What is she planning?',
+                zh_cn = '等等，这贼眉鼠眼的表情……她在打什么主意？',
+            },
+            whoYouAre = {
+                en_us = 'Who are you? What are you doing now?',
+                zh_cn = '你是谁？你在做什么？',
+            },
+            imReimu = {
+                en_us = 'I\'m Reimu Hakurei. The shrine maiden.',
+                zh_cn = '我是博丽灵梦。那个巫女。',
+            },
+            iJustMetHerYouKnow = {
+                en_us = 'I just met her one minute ago. She dresses in red, you know?',
+                zh_cn = '我一分钟前刚见过她。她穿红色的，知道吧？',
+            },
+            herDressCanChangeColorYouKnow = {
+                en_us = 'Her dress can change color, you know? That infrared fabric...',
+                zh_cn = '她的裙子会变色的，知道吧？红外线编出来的！',
+            },
+            thatsLame = {
+                en_us = 'Infrared fabric? No, that\'s entirely fabricated!',
+                zh_cn = '红外线编的？不会编就别编了！',
+            },
+            okthenImMarisa = {
+                en_us = 'Ok then, I\'m Marisa Kirisame!',
+                zh_cn = '那好吧，我是雾雨魔理沙！',
+            },
+            andIllPunishYou = {
+                en_us = 'And I\'ll punish you right now!',
+                zh_cn = '我现在就惩罚你！',
+            }
+        },
+        KOTOBAS1BossAfter = {
+            impossible = {
+                en_us = 'Impossible... How could you defeat me?',
+                zh_cn = '不可能……你怎么能打败我？',
+            },
+            whatStrangePerson = {
+                en_us = 'What a strange person...',
+                zh_cn = '真是个奇怪的人……',
             }
         }
     },

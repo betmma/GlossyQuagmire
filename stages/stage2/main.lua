@@ -122,7 +122,7 @@ return{
         {
             key='2-3',
             type='midStage',
-            func=function()
+            func=function() -- 9s
                 local basePos=G.runInfo.geometry:init().pos
                 for i=1,8 do
                     local n=DSWITCH{4,4,6,8}
@@ -141,6 +141,13 @@ return{
                     wait(30)
                 end
                 wait(300)
+            end
+        },
+        {
+            key='2-branch',
+            type='midStage',
+            func=function()
+                
             end
         }
     }

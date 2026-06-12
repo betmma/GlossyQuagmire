@@ -310,12 +310,45 @@ local MARISAS1BossAfter={
     }
 }
 
+local KOTOBAS1BossBefore={
+    name='KOTOBAS1BossBefore',
+    defaultSpeakerPosition={
+        kotoba='left',
+        marisa='right',
+    },
+    lines={
+        line('marisa','cunning','wheresThatPlace'),
+        line('kotoba','surprised','waitThatThievishLook'),
+        line('kotoba','surprised','whoYouAre'),
+        line('marisa','normal','imReimu'),
+        line('kotoba','angry','iJustMetHerYouKnow'),
+        line('marisa','normal','herDressCanChangeColorYouKnow'),
+        line('kotoba','angry','thatsLame'),
+        line('marisa','cunning','okthenImMarisa',{playBGM=true}),
+        line('marisa','cunning','andIllPunishYou'),
+    }
+}
+
+local KOTOBAS1BossAfter={
+    name='KOTOBAS1BossAfter',
+    defaultSpeakerPosition={
+        kotoba='left',
+        marisa='right',
+    },
+    lines={
+        line('marisa','sad','impossible'),
+        line('kotoba','frustrated','whatStrangePerson'),
+    }
+}
+
 ---@type table<string,Dialogue>
 Dialogue.data={
     REIMUS1BossBefore=REIMUS1BossBefore,
     REIMUS1BossAfter=REIMUS1BossAfter,
     MARISAS1BossBefore=MARISAS1BossBefore,
     MARISAS1BossAfter=MARISAS1BossAfter,
+    KOTOBAS1BossBefore=KOTOBAS1BossBefore,
+    KOTOBAS1BossAfter=KOTOBAS1BossAfter,
 }
 
 
