@@ -95,7 +95,7 @@ function DialogueController:new(args)
             self:advanceDialogue()
         end
     end
-    EventManager.listenTo(EventManager.EVENTS.PLAYER_PRESS_Z,self.playerZCallback)
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_PRESS_Z,self.playerZCallback,EventManager.EVENTS.LEAVE_GAME)
 end
 
 function DialogueController:block()

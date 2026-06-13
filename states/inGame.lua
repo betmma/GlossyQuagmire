@@ -129,8 +129,8 @@ return {
     end,
     update=function(self,dt)
         base:updateHierarchy()
-        GameObject:updateAll(dt)
         StageManager:update()
+        GameObject:updateAll(dt)
         if isPressed('d') then
             local index=1
             local geometries={}
