@@ -228,6 +228,10 @@ function DialogueController:drawDialogueBox()
     else
         love.graphics.setColor(0,0,0,0.5*self.transparency)
         local x,y,width,height=50,450,500,130
+        if G.foregroundShaderData.shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
+            local xywh=G.foregroundShaderData.args.xywh
+            x,y,width,height=xywh[1],xywh[2]+xywh[4]-130,xywh[3],130
+        end
         love.graphics.rectangle('fill',x,y,width,height)
         local gap=15
         love.graphics.setColor(1,1,1,1*self.transparency)
@@ -341,6 +345,42 @@ local KOTOBAS1BossAfter={
     }
 }
 
+local S2Branch1={
+    name='S2Branch1',
+    defaultSpeakerPosition={
+        tooshi='right',
+    },
+    lines={
+        line('tooshi','normal','hiThere',{autoForwardTime=1}),
+        line('tooshi','normal','areYouGoingForward',{autoForwardTime=2}),
+        line('tooshi','normal','thereAreTwoPaths',{autoForwardTime=3}),
+        line('tooshi','normal','stayAtLeftOrRightSide',{autoForwardTime=2}),
+        line('tooshi','normal','three',{autoForwardTime=1}),
+        line('tooshi','normal','two',{autoForwardTime=1}),
+        line('tooshi','normal','one',{autoForwardTime=1}),
+    }
+}
+
+local S2BranchLeft={
+    name='S2BranchLeft',
+    defaultSpeakerPosition={
+        tooshi='right',
+    },
+    lines={
+        line('tooshi','normal','youChoseLeft',{autoForwardTime=2}),
+    }
+}
+
+local S2BranchRight={
+    name='S2BranchRight',
+    defaultSpeakerPosition={
+        tooshi='right',
+    },
+    lines={
+        line('tooshi','normal','youChoseRight',{autoForwardTime=2}),
+    }
+}
+
 ---@type table<string,Dialogue>
 Dialogue.data={
     REIMUS1BossBefore=REIMUS1BossBefore,
@@ -349,6 +389,9 @@ Dialogue.data={
     MARISAS1BossAfter=MARISAS1BossAfter,
     KOTOBAS1BossBefore=KOTOBAS1BossBefore,
     KOTOBAS1BossAfter=KOTOBAS1BossAfter,
+    S2Branch1=S2Branch1,
+    S2BranchLeft=S2BranchLeft,
+    S2BranchRight=S2BranchRight,
 }
 
 

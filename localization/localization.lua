@@ -1135,6 +1135,48 @@ return {
                 en_us = 'What a strange person...',
                 zh_cn = '真是个奇怪的人……',
             }
-        }
+        },
+        S2Branch1 = {
+            hiThere = {
+                en_us = 'Hi there.',
+                zh_cn = '嗨，你好呀。',
+            },
+            areYouGoingForward = {
+                en_us = 'Are you going forward? I can lead you.',
+                zh_cn = '你要往前走吗？我可以带路哦。',
+            },
+            thereAreTwoPaths = {
+                en_us = 'There are two paths ahead. The left one is safer, while the right one has more rewards.',
+                zh_cn = '前面有两条路。左边的路更安全，右边的路奖励更多。',
+            },
+            stayAtLeftOrRightSide = {
+                en_us = 'Stay at the left or right side of the screen to choose.',
+                zh_cn = '待在屏幕左侧或右侧来选择。',
+            },
+            three = {
+                en_us = 'Three...',
+                zh_cn = '三……',
+            },
+            two = {
+                en_us = 'Two...',
+                zh_cn = '二……',
+            },
+            one = {
+                en_us = 'One...',
+                zh_cn = '一……',
+            }
+        },
+        S2BranchLeft = {
+            youChoseLeft = {
+                en_us = 'The safer path? Ok, follow me!',
+                zh_cn = '安全的道路？好的，跟我来！',
+            },
+        },
+        S2BranchRight = {
+            youChoseRight = {
+                en_us = 'The more rewarding path? Ok, Follow me!',
+                zh_cn = '奖励更多的道路？好的，跟我来！',
+            },
+        },
     },
 }

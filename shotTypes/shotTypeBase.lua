@@ -432,7 +432,10 @@ local function reimuSpellcardFunc(playerState, isFocused)
         end},forceMesh=true}
         bigAmulet.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. it will keep damaging
         end
-        -- bigAmulet.spriteRotationSpeed=math.pi/10
+        
+        bigAmulet.spriteRotationSpeed=math.pi/10
+        bigAmulet.spriteExtraDirection=math.eval(0,999)
+        bigAmulet.extraUpdate[2].params.fadeTransparency=0.5
         wait(60)
         -- starting to aim for enemies
         addHoming(bigAmulet, HOMING_MODE.ABRUPT, 0.2)

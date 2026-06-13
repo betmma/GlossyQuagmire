@@ -222,7 +222,7 @@ end
 
 function Hyperbolic:canSimpleDraw(position,radius)
     local ratio=radius/Hyperbolic.curvature
-    if ratio<0.15 then
+    if ratio<0.17 then
         return true,8
     end
     local sides=math.clamp(math.ceil(ratio*GeometryBase.MESH_MAX_SIDES),8,GeometryBase.MESH_MAX_SIDES)
