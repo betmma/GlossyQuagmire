@@ -23,12 +23,12 @@ return{
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)
         elseif G.runInfo.geometry==G.geometries.MovingHyperbolic then
-            local border=Border.XYBorder{minx=20,maxx=500,miny=20,maxy=560}
+            local border=Border.XYBorder{minx=20,maxx=500,miny=30,maxy=560}
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Planes)
         else
         end
-        BGM:play('level1')
+        BGM:play('level2')
         DynamicUIObjs.showSoundtrack()
         G.runInfo.player.kinematicState.skipZoom=true
         setZoomSpeed(0,0)
@@ -133,7 +133,7 @@ return{
                         -- dir4=dir4+math.pi
                         local fairy=Enemy{kinematicState={pos=copyTable(pos4),speed=50,dir=G.runInfo.geometry:to(pos4,basePos)},maxhp=30,sprite=Asset.fairySprites.small.green,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1}}
                         local spawner=BulletSpawner{
-                            period=300,firstPeriod=30,lifeFrame=120,bulletNumber=DSWITCH{6,8,12,16},range=math.pi*2,bulletSpeed=100,angle=dir4+i,bulletSprite=BulletSprites.rice.green,bulletLifeFrame=600,visible=false,bulletEvents={function(cir,args,self)
+                            period=300,firstPeriod=30,lifeFrame=120,bulletNumber=DSWITCH{6,8,11,14},range=math.pi*2,bulletSpeed=100,angle=dir4+i,bulletSprite=BulletSprites.rice.green,bulletLifeFrame=600,visible=false,bulletEvents={function(cir,args,self)
                                 cir.kinematicState.speed=cir.kinematicState.speed+math.eval(0,50)
                             end}
                         }:bindState(fairy)
@@ -155,10 +155,40 @@ return{
                 Effect.Charge{obj={kinematicState={pos=copyTable(bossPos),dir=0,speed=0}}}
                 wait(60)
                 local bossName='tooshi'
+                -- it isn't removed after this segment. the effect is she leading the player in the front and also jumping till the boss phase
                 local boss=Boss{
                     kinematicState={pos=bossPos,dir=0,speed=0,skipZoom=true},
                     sprite=Asset.boss[bossName],maxhp=999999,revivable=true
                 }
+                boss.showHexagram=false
+                Event{obj=boss,action=function()
+                    wait(840)
+                    -- since bgm is 130 bpm, jump period is 60/130*60
+                    local jumpPeriod=60/130*60
+                    local jumpCount=0 -- 40s * 130bpm = 86 jumps
+                    for i=1,2520 do
+                        if boss.removed then
+                            return
+                        end
+                        wait()
+                        if math.ceil(i/jumpPeriod)~=math.ceil((i-1)/jumpPeriod) then
+                            jumpCount=jumpCount+1
+                            local sign=math.mod2Sign(jumpCount)
+                            local pos1,dir1=geo:rThetaGo(basePos,150+jumpCount*3,-math.pi/2)
+                            dir1=dir1+math.pi/2*sign
+                            local jumpPos=geo:rThetaGo(pos1,100,dir1)
+                            DanmakuFuncs.moveToInTime(boss,jumpPos,jumpPeriod*0.8,Event.sineOProgressFunc)
+                            if jumpCount==1 then
+                                boss.checkHitByPlayer=function()end -- players bullets do not hit her, to prevent she blocking fairies.
+                            end
+                        end
+                    end
+                    DanmakuFuncs.moveToInTime(boss,bossPos,30,Event.sineOProgressFunc)
+                    wait(30)
+                    Effect.Charge{obj={kinematicState={pos=copyTable(boss.kinematicState.pos),dir=0,speed=0}}}
+                    wait(50)
+                    boss:remove()
+                end}
                 DialogueController{key='S2Branch1'}:block() -- 11s
                 local left=G.runInfo.player.kinematicState.pos.x<basePos.x
                 if left then
@@ -169,12 +199,12 @@ return{
             end
         },
         {
-            key='2-A',
-            type='midStage',
+            key='2-A-1',
+            type='midStage',SKIP_INCLUDE=true,
             skip=function()
                 setZoomSpeed(0.015,0)
             end,
-            func=function()
+            func=function() -- 20s
                 setZoomSpeed(0.015,1200)
                 local geo=G.runInfo.geometry
                 local basePos=geo:init().pos
@@ -194,7 +224,7 @@ return{
                     end
                 end
                 local spawnSmallFairy=function(color,life,largeFairy,angle0,r0,alt)
-                    local smallFairy=Enemy{maxhp=50,sprite=Asset.fairySprites.small[color],lifeFrame=life,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1,point=1}}
+                    local smallFairy=Enemy{maxhp=30,sprite=Asset.fairySprites.small[color],lifeFrame=life,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1,point=1}}
                     DanmakuFuncs.orbitBind(smallFairy,largeFairy,function(self, centerObj)
                         local rat=math.min(1,self.frame/60)
                         return {r=rat*r0,theta=angle0+centerObj.frame*0.02}
@@ -303,8 +333,99 @@ return{
                 wait(300)
                 spawnLarge(-1,'blue',true)
                 wait(300) -- 20s
-                wait(600)
             end
-        }
+        },
+        {
+            key='2-A-2',
+            type='midStage',
+            skip=function()
+                setZoomSpeed(0,0)
+            end,
+            func=function() -- 22s
+                setZoomSpeed(0.025,1200)
+                local geo=G.runInfo.geometry
+                local basePos=geo:init().pos
+                local pos0,dir0=geo:rThetaGo(basePos,500,-math.pi/2)
+                local function getSpawnPosDir(side,up)
+                    local pos0,dir0=geo:rThetaGo(basePos,up,-math.pi/2)
+                    local pos1,dir1=geo:rThetaGo(pos0,400,dir0+math.pi/2*side)
+                    dir1=dir1-math.pi*0.6*side
+                    return pos1,dir1
+                end
+                ---@param mask fun(frame:integer,i:integer):boolean
+                local function fairyWave(side,color,up,mask)
+                    local pos1,dir1=getSpawnPosDir(side,up)
+                    for i=1,30 do
+                        local fairy=Enemy{kinematicState={pos=copyTable(pos1),speed=400,dir=dir1,skipZoom=true},maxhp=10,sprite=Asset.fairySprites.small[color],lifeFrame=520,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                            ---@cast geo Hyperbolic
+                            if geo.curvature then
+                                self.kinematicState.dir=self.kinematicState.dir-self.kinematicState.speed/geo.curvature/60*side
+                            end
+                        end},dropItems={powerSmall=1,point=i%3==0 and 1 or 0}}
+                        fairy:addHPProtection(200,90)
+                        Event{obj=fairy,action=function()
+                            wait(200-i*5)
+                            fairy.kinematicState.skipZoom=false
+                            wait(i*5+50)
+                            fairy.kinematicState.skipZoom=true
+                            fairy.kinematicState.speed=0
+                            local nowpos=fairy.kinematicState.pos
+                            local distance=geo:distance(nowpos,pos0)
+                            local dirTo=geo:to(nowpos,pos0)
+                            local midPos=geo:rThetaGo(nowpos,distance/2,dirTo)
+                            local toNow=geo:to(midPos,nowpos)
+                            for i=1,120 do
+                                fairy.kinematicState.pos=geo:rThetaGo(midPos,distance/2,toNow+math.pi*i/120*side)
+                                wait()
+                            end
+                            fairy.kinematicState.skipZoom=false
+                            -- fairy.kinematicState.speed=150
+                            -- fairy.kinematicState.dir=math.pi/2
+                        end}
+                        local spawner=BulletSpawner{
+                            period=1,firstPeriod=150,lifeFrame=200,bulletNumber=1,range=math.pi/2,bulletSpeed=200,angle=dir1+math.pi/2*side,bulletSprite=BulletSprites.dot[color],bulletLifeFrame=600,visible=false,bulletExtraUpdate={Action.FadeOut(30,true),function(self)
+                                self.kinematicState.speed=self.kinematicState.speed*0.98
+                                if self.frame%10==0 and geo:distance(self.kinematicState.pos,basePos)>500 then -- if too far, remove
+                                    self.lifeFrame=math.min(self.lifeFrame,self.frame+30)
+                                end
+                            end}
+                        }
+                        spawner:bindState(fairy)
+                        Event.LoopEvent{obj=spawner,period=1,executeFunc=function()
+                            if mask(spawner.frame, i) then
+                                spawner.bulletNumber=0
+                            else
+                                spawner.bulletNumber=1
+                            end
+                        end}
+                        wait(10)
+                    end
+                end
+                local function nonblockFairyWave(side,color,up,mask)
+                    Event{action=function()
+                        fairyWave(side,color,up,mask)
+                    end}
+                end
+                local mask1=function(frame, i)
+                    return (frame+i+4)%8>4 or (frame-6*i)%60>40
+                end
+                local mask2=function(frame, i)
+                    local j=math.abs(frame-180-10*math.sin(i*math.pi/16))
+                    return j<4 or j>10
+                end
+                nonblockFairyWave(1,'red',40,mask2)
+                wait(120)
+                nonblockFairyWave(-1,'blue',40,mask2)
+                wait(150)
+                nonblockFairyWave(1,'orange',20,mask1)
+                wait(150)
+                nonblockFairyWave(-1,'green',20,mask1)
+                wait(150)
+                wait(630)
+                setZoomSpeed(0,120)
+                wait(120)
+            end
+        },
+        require'stages.stage2.tooshi',
     }
 }
