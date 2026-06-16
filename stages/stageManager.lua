@@ -28,7 +28,7 @@ spell practice: jump to specific boss segment, and only run the spellcard phase 
 ---@field next nil
 
 ---@class SegmentRawWithNext:SegmentRaw
----@field func fun(self,segmentFuncArgs):SegmentKey the return value must be one of the values in next, which decides the next segment. "end" means end of stage
+---@field func fun(self,segmentFuncArgs):SegmentKey|nil the return value must be one of the values in next, which decides the next segment. "end" means end of stage. if only one possible next segment, func can also return nil, which will be considered as going to the only possible next segment.
 ---@field next SegmentKey[] list of keys of possible next segments. unless including the next segment, the next segment in the segments table is not considered as a possible segment.
 
 ---@class Segment:SegmentRaw
@@ -168,7 +168,8 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                 PC=self.currentStageData.key2Index[pathToSkipSegment[pathIndex+1]]
                 pathIndex=pathIndex+1
             else
-                if funcRet then
+                if segment.next then
+                    funcRet=funcRet or segment.next[1] -- if func returns nil, will go to the first next segment
                     if funcRet=='end' then
                         break
                     end

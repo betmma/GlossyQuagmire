@@ -78,9 +78,9 @@ function BulletSpawner:new(args)
         local spawnCircleAngle=math.eval(self.spawnCircleAngle)
         local spawnCircleRange=math.eval(self.spawnCircleRange)
         local spawnCircleRadius=math.eval(self.spawnCircleRadius)
-        local speed=math.eval(self.bulletSpeed)
         local size=math.eval(self.bulletSize)
         for i = 1, num, 1 do
+            local speed=math.eval(self.bulletSpeed)
             local direction=range*(i-0.5-num/2)/num+angle
             local pos=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,spawnCircleRadius,spawnCircleRange*(i-0.5-num/2)/num+spawnCircleAngle)
             if spawnCircleRadius~=0 then

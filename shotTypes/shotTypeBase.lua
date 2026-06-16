@@ -665,7 +665,7 @@ ShotTypes.MARISAB=ShotType{
 ---@type PlayerSpellcardFunc
 local function kotobaSpellcardFunc(playerState, isFocused)
     Event{obj=G.runInfo.player,action=function()
-        local beachBall=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0},sprite=Asset.playerShotSprites.beachBall,size=0,damage=0,safe=true,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
+        local beachBall=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0, skipZoom=true},sprite=Asset.playerShotSprites.beachBall,size=0,damage=0,safe=true,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
             self.kinematicState.pos=G.runInfo.player.kinematicState.pos -- follow player. not using bindState is because its dir will be changed by player's moving direction
             if self.frame>265 then
                 self.sprite:countDown() -- start fade out animation when about to end
