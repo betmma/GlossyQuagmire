@@ -146,7 +146,7 @@ return{
         {
             key='2-branch',
             type='midStage',
-            next={'2-A-1','2-B-1'},
+            next={'2-B-1','2-A-1',},
             func=function() -- 15s till music turn point (48s total). this segment is 14s long
                 -- there's no boss phase so doesn't use bossSegment
                 local geo=G.runInfo.geometry
@@ -214,7 +214,7 @@ return{
         },
         {
             key='2-A-1',
-            type='midStage',SKIP_INCLUDE=true,
+            type='midStage',
             skip=function()
                 setZoomSpeed(0.0175,0)
             end,
@@ -469,7 +469,7 @@ return{
         },
         {
             key='2-B-1',
-            type='midStage',
+            type='midStage',SKIP_INCLUDE=true,
             skip=function()
                 setZoomSpeed(0.015,0)
             end,
@@ -608,7 +608,7 @@ return{
         },
         {
             key='2-B-2',
-            type='midStage',
+            type='midStage',SKIP_INCLUDE=true,
             next={'2-boss'},
             skip=function()
                 setZoomSpeed(0,0)
@@ -625,7 +625,7 @@ return{
                     return pos1,dir1
                 end
                 ---@param mask fun(frame:integer,i:integer):boolean
-                local function fairyWave(side,color,up,mask)
+                local function fairyWave(side,color,up,mask,dieEffect)
                     local pos1,dir1=getSpawnPosDir(side,up)
                     for i=1,30 do
                         local fairy=Enemy{kinematicState={pos=copyTable(pos1),speed=400,dir=dir1,skipZoom=true},maxhp=10,sprite=Asset.fairySprites.small[color],lifeFrame=520,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
@@ -652,8 +652,6 @@ return{
                                 wait()
                             end
                             fairy.kinematicState.skipZoom=false
-                            -- fairy.kinematicState.speed=150
-                            -- fairy.kinematicState.dir=math.pi/2
                         end}
                         local spawner=BulletSpawner{
                             period=1,firstPeriod=150,lifeFrame=200,bulletNumber=1,range=math.pi/2,bulletSpeed=200,angle=dir1+math.pi/2*side,bulletSprite=BulletSprites.dot[color],bulletLifeFrame=600,visible=false,bulletExtraUpdate={Action.FadeOut(30,true),function(self)
@@ -700,6 +698,11 @@ return{
                 wait(150)
                 nonblockFairyWave(-1,'green',20,mask1)
                 wait(150)
+                local mask3=function(frame, i)
+                    local sawi=math.abs(i%8-3)
+                    return (frame+sawi)%8>DSWITCH{2,3,4,4}
+                end
+                nonblockFairyWave(1,'purple',80,mask3)
                 wait(630)
                 setZoomSpeed(0,120)
                 wait(120)
