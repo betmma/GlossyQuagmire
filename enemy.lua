@@ -190,6 +190,7 @@ function Enemy:drawSprite()
             zoom=self.size,
             normalBatch=Asset.bossBatch,
             meshBatch=Asset.bossMeshes,
+            isSquare=true
         }
     else
         self:drawQuad{

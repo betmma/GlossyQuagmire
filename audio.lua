@@ -122,7 +122,6 @@ function SmoothAudioSystem:_play(name)
 end
 
 function SmoothAudioSystem:_stop(name)
-    love.audio.stop(self.data[name])
     self.smoothData[name].playing=false
 end
 
