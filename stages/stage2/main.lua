@@ -469,7 +469,7 @@ return{
         },
         {
             key='2-B-1',
-            type='midStage',SKIP_INCLUDE=true,
+            type='midStage',--SKIP_INCLUDE=true,
             skip=function()
                 setZoomSpeed(0.015,0)
             end,
@@ -608,7 +608,7 @@ return{
         },
         {
             key='2-B-2',
-            type='midStage',SKIP_INCLUDE=true,
+            type='midStage',--SKIP_INCLUDE=true,
             next={'2-boss'},
             skip=function()
                 setZoomSpeed(0,0)

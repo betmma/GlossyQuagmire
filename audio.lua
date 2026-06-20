@@ -63,7 +63,7 @@ function AudioSystem:play(name,restart,overrideVolume)
         self:_stop(self.currentAudio)
     end
     if restart==true then
-        self:_stop(name)
+        self.data[name]:seek(0)
     end
     self.data[name]:setVolume(self.currentVolume*self.volumeCoeff*(overrideVolume or self.audioVolumes[name]))
     self:_play(name)

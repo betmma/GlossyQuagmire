@@ -163,6 +163,16 @@ return {
         kotoba = '@ref:KOTOBA', -- player names are uppercase, boss and dialogue names are lowercase
         reimu = '@ref:REIMU',
         marisa = '@ref:MARISA',
+        tooshi = {
+            name = {
+                en_us = 'Tooshi Katsuyama',
+                zh_cn = '堪山远志',
+            },
+            nickname = {
+                en_us = 'Misleading Brown Fox',
+                zh_cn = '误导人的棕色狐狸',
+            }
+        }
     },
     ui = {
         MAIN_MENU={
@@ -968,6 +978,16 @@ return {
                 zh_cn = '雾雨魔理沙的主题曲。\n很有感情。在写前奏时，我原本想着她永夜抄主题曲的前奏，但后来发现把灵梦的前奏误认为是她的了。也可以吧，因为灵梦是道中Boss，值得有一段 (^^;',
             }
         },
+        level2 = {
+            name = {
+                en_us = 'Accelerating Voyage',
+                zh_cn = '加速之旅',
+            },
+            description = {
+                en_us = 'Stage 2\'s theme.\nAn enjoyable trip that urges you to go faster and faster.\nThough, the background of the stage is inspired by basalt columns and is quite barren.',
+                zh_cn = '第二面的主题曲。\n令人愉快的旅程，催促你越来越快地前进。\n虽然游戏背景以玄武岩柱为灵感，显得相当荒凉。',
+            }
+        },
         level2b = {
             name = {
                 en_us = 'Foxtrot Towards the Beyond',
@@ -1178,5 +1198,43 @@ return {
                 zh_cn = '奖励更多的道路？好的，跟我来！',
             },
         },
+        MARISAS2BossBefore = {
+            whyGoingSoFast = {
+                en_us = 'Why are you going so fast? Wait for me!',
+                zh_cn = '你为什么跑那么快？等等我！',
+            },
+            ohYouAreStillFollowing = {
+                en_us = 'Oh, you are still following?',
+                zh_cn = '哦，你还跟着呢？',
+            },
+            youAreReallyGood = {
+                en_us = 'You are really good at hiking!',
+                zh_cn = '你真的很擅长徒步啊！',
+            },
+            huhWhat = {
+                en_us = 'Ah, of course! (Actually I was flying with my broom)',
+                zh_cn = '啊，当然了！(其实我是骑扫帚飞)',
+            },
+            youDidWantToAbandonMe = {
+                en_us = 'Wait, you did want to abandon me, right?',
+                zh_cn = '不对，你就是想抛下我吧？',
+            },
+            calmDownPlease = {
+                en_us = 'Calm down, please!',
+                zh_cn = '冷静一下！',
+            },
+            lookAtMyLantern = {
+                en_us = 'Look at my lantern! Why I bring it with me, if not for leading people?',
+                zh_cn = '看我的灯笼！如果不是为了带路，我为什么要带着它？',
+            },
+            whyWouldIKnowThat = {
+                en_us = 'Why would I look at that? Maybe it\'s magical as my broom?',
+                zh_cn = '为什么我要看？也许它像我的扫帚一样有魔力？',
+            },
+            die = {
+                en_us = 'How did you know that? Die!',
+                zh_cn = '你怎么知道的？去死吧！',
+            }
+        }
     },
 }

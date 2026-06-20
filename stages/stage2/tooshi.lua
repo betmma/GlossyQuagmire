@@ -2,6 +2,9 @@ local tooshiBoss=BossManager.BossSegment{
     bossName='tooshi',
     key='2-boss',
     BGM='level2b',
+    beforeDialogueKey=function ()
+        return G.runInfo.playerType..'S2BossBefore'
+    end,
     getBossSpawnPos=function(self)
         local geo=G.runInfo.geometry
         local basePos=geo:init().pos

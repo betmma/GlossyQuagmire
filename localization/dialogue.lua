@@ -56,6 +56,10 @@ local DialogueController=GameObject:extend()
 local portraitBatch=Asset.portraitBatch
 local portraitQuads=Asset.portraitQuads
 local portraitWidth,portraitHeight=Asset.portraitWidth,Asset.portraitHeight
+---@type table<string,{x:integer,y:integer,size:number}>
+local speakerOffset={
+    tooshi={x=-50,y=-10,size=1.2} -- her drawn size is a bit smaller
+}
 
 ---@class DialogueControllerArgs
 ---@field key string key in Dialogue.data
@@ -198,9 +202,21 @@ function DialogueController:draw()
         if not quad then
             goto continue
         end
-        local x=character.position=='left' and -150+portraitWidth/4 or WINDOW_WIDTH-10-portraitWidth/4 -- width and height are 2000px. /4 -> 500px
+        local portraitSize=0.25
+        local x=character.position=='left' and -100+portraitWidth*portraitSize or WINDOW_WIDTH-100-portraitWidth*portraitSize -- width and height are 2000px. /4 -> 500px
+        if G.foregroundShaderData.shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
+            local xywh=G.foregroundShaderData.args.xywh
+            if character.position=='right' then
+                x=xywh[1]+xywh[3]+160-portraitWidth*portraitSize
+            end
+        end
         local y=WINDOW_HEIGHT-portraitHeight/4
-        portraitBatch:add(quad,x,y,0,0.25*(character.position=='left' and -1 or 1),0.25)
+        if speakerOffset[speaker] then
+            x=x+speakerOffset[speaker].x
+            y=y+speakerOffset[speaker].y
+            portraitSize=portraitSize*speakerOffset[speaker].size
+        end
+        portraitBatch:add(quad,x,y,0,portraitSize*(character.position=='left' and -1 or 1),portraitSize)
         ::continue::
     end
     Asset.dialogueBatch:add(function()
@@ -351,7 +367,7 @@ local S2Branch1={
         tooshi='right',
     },
     lines={
-        line('tooshi','normal','hiThere',{autoForwardTime=1}),
+        line('tooshi','happy','hiThere',{autoForwardTime=1}),
         line('tooshi','normal','areYouGoingForward',{autoForwardTime=2}),
         line('tooshi','normal','thereAreTwoPaths',{autoForwardTime=3}),
         line('tooshi','normal','stayAtLeftOrRightSide',{autoForwardTime=2}),
@@ -367,7 +383,7 @@ local S2BranchLeft={
         tooshi='right',
     },
     lines={
-        line('tooshi','normal','youChoseLeft',{autoForwardTime=2}),
+        line('tooshi','happy','youChoseLeft',{autoForwardTime=2}),
     }
 }
 
@@ -377,7 +393,26 @@ local S2BranchRight={
         tooshi='right',
     },
     lines={
-        line('tooshi','normal','youChoseRight',{autoForwardTime=2}),
+        line('tooshi','happy','youChoseRight',{autoForwardTime=2}),
+    }
+}
+
+local MARISAS2BossBefore={
+    name='MARISAS2BossBefore',
+    defaultSpeakerPosition={
+        marisa='left',
+        tooshi='right',
+    },
+    lines={
+        line('marisa','angry','whyGoingSoFast'),
+        line('tooshi','surprised','ohYouAreStillFollowing'),
+        line('tooshi','happy','youAreReallyGood'),
+        line('marisa','surprised','huhWhat'),
+        line('marisa','angry','youDidWantToAbandonMe'),
+        line('tooshi','normal','calmDownPlease'),
+        line('tooshi','normal','lookAtMyLantern'),
+        line('marisa','normal','whyWouldIKnowThat'),
+        line('tooshi','cunning','die',{playBGM=true}),
     }
 }
 
@@ -392,6 +427,7 @@ Dialogue.data={
     S2Branch1=S2Branch1,
     S2BranchLeft=S2BranchLeft,
     S2BranchRight=S2BranchRight,
+    MARISAS2BossBefore=MARISAS2BossBefore,
 }
 
 
