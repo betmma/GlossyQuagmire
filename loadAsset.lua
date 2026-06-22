@@ -86,6 +86,11 @@ function GIFSprite:getDuration()
     return self.frameTime*#self.quads
 end
 
+function GIFSprite:copyStateFrom(other)
+    self.currentFrame=other.currentFrame
+    self.switchCounting=other.switchCounting
+end
+
 ---@alias MovingSpriteState 'normal'|'moveTransition'|'moving'
 
 ---@class MovingSprite:Sprite sprite including normal (not moving), transition left/right and left/right variations. Calculate which to use on countdown(). Used for player and fairy.
@@ -171,7 +176,7 @@ local bulletImage = love.graphics.newImage( "assets/bullets.png" )
 Asset.bulletImage=bulletImage
 bulletImage:setFilter("nearest", "linear") -- this "linear filter" removes some artifacts if we were to scale the tiles
 
-local hitRadius={laser=3,scale=2.4,rim=2.4,round=4,rice=2.4,kunai=2.4,crystal=2.4,bill=2.8,bullet=2.4,blackrice=2.4,star=4,darkdot=2.4,dot=2.4,bigStar=7,bigRound=8.5,butterfly=7,knife=5,ellipse=7,fog=8.5,heart=7,giant=14,lightRound=14,hollow=2.4,flame=6,orb=6,moon=60,nuke=96,explosion=38,snake=2.4,shockwave=64}
+local hitRadius={laser=3,scale=2.4,rim=2.4,round=4,rice=2.4,kunai=2.4,crystal=2.4,bill=2.8,bullet=2.4,blackrice=2.4,star=4,darkdot=2.4,dot=2.4,bigStar=7,bigRound=8.5,butterfly=7,knife=5,ellipse=6,fog=8.5,heart=7,giant=14,lightRound=14,hollow=2.4,flame=6,orb=6,moon=60,nuke=96,explosion=38,snake=2.4,shockwave=64}
 Asset.hitRadius=hitRadius
 
 local fairyImage = love.graphics.newImage( "assets/fairy.png" )

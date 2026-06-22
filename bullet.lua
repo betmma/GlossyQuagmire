@@ -213,7 +213,12 @@ function Bullet:changeSpriteColor(color)
         local ind=math.floor(math.random(1,#colors+0.999999))
         color=colors[ind]
     end
+    local spriteRef=self.sprite
     self.sprite=BulletSprites[self.sprite.data.key][color] or self.sprite
+    if self.sprite.data.isGIF then
+        self.sprite=copyTable(self.sprite)
+        self.sprite:copyStateFrom(spriteRef)
+    end
 end
 
 -- you shouldn't directly change self.sprite, cuz radius won't update (same as how Kanako's 神穀 spellcard has larger hitbox)

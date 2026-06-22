@@ -412,7 +412,7 @@ local MARISAS2BossBefore={
         line('tooshi','normal','calmDownPlease'),
         line('tooshi','normal','lookAtMyLantern'),
         line('marisa','normal','whyWouldIKnowThat'),
-        line('tooshi','cunning','die',{playBGM=true}),
+        line('tooshi','cunning','die',{playBGM=true,autoForwardTime=60/130*4}),
     }
 }
 

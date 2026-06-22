@@ -112,6 +112,21 @@ return {
                     zh_cn = '光击「色彩漩涡」',
                 }
             }
+        },
+        ['tooshi-dance'] = {
+            EASY = {
+                name = {
+                    en_us = 'Dance Sign "Fox Steps"',
+                    zh_cn = '舞符「狐之舞步」',
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Dance Sign "Illusional Fox Steps"',
+                    zh_cn = '舞符「幻影狐步」',
+                }
+            }
         }
     },
     levelData = {
