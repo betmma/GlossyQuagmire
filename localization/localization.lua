@@ -127,6 +127,32 @@ return {
                     zh_cn = '舞符「幻影狐步」',
                 }
             }
+        },
+        ['tooshi-lantern'] = {
+            EASY = {
+                name = {
+                    en_us = 'Bright Lantern "Light that Guides You"',
+                    zh_cn = '明灯「指引前路之光」',
+                }
+            },
+            NORMAL = {
+                name = {
+                    en_us = 'Bright Lantern "Light that Soothes You"',
+                    zh_cn = '明灯「抚慰心灵之光」',
+                }
+            },
+            HARD = {
+                name = {
+                    en_us = 'Bright Lantern "Light that is Immaculate and Solemn"',
+                    zh_cn = '明灯「无垢庄严之光」',
+                }
+            },
+            __default__ = {
+                name = {
+                    en_us = 'Bright Lantern "Light that Eliminates Darkness"',
+                    zh_cn = '明灯「灭除痴暗之光」',
+                }
+            }
         }
     },
     levelData = {

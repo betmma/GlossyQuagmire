@@ -123,7 +123,8 @@ local tooshiBoss=BossManager.BossSegment{
                         wait(180)
                     end
                 end
-            }
+            },
+            require('stages.stage2.spellcards.lantern')
         }}
     }
 }

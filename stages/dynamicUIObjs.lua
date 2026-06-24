@@ -163,7 +163,7 @@ function makeDynamicUIObjs()
                 self.x,self.y=centerXY[1],centerXY[2]-radius+10
             end,
             function(self, xywh)
-                self.x,self.y=xywh[1]+xywh[3]/2,xywh[2]+20
+                self.x,self.y=xywh[1]+xywh[3]/2,xywh[2]+50
             end
         )}
     })
