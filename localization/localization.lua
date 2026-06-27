@@ -153,6 +153,14 @@ return {
                     zh_cn = '明灯「灭除痴暗之光」',
                 }
             }
+        },
+        ['tooshi-flower'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Flower Sign "Quiet in Purple"',
+                    zh_cn = '花符「紫色的沉静」',
+                }
+            }
         }
     },
     levelData = {

@@ -12,7 +12,7 @@ local tooshiBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{phases={
+        BossManager.BossRound{SKIP_INCLUDE=true,phases={
             BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='2-boss-tooshi-non-1',
                 time=1500,
@@ -21,13 +21,14 @@ local tooshiBoss=BossManager.BossSegment{
                     boss.frame=0 -- for dance spellcard to align with music
                     local geo=G.runInfo.geometry
                     local basePos=geo:init().pos
+                    wait(30)
                     for i=1,16 do
                         local sign=math.mod2Sign(i)
                         local dir=geo:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)
                         local spawner
                         local lifeFrame=60
                         spawner=BulletSpawner{angle=dir-math.pi*0.3*sign,range=math.pi*0,bulletNumber=15,lifeFrame=lifeFrame,period=2,bulletLifeFrame=300,bulletSize=0.25,bulletSpeed=500,bulletSprite=BulletSprites.ellipse.orange,highlight=true,bulletEvents={function(cir,args,self)
-                            cir.kinematicState.dir=math.eval(cir.kinematicState.dir,0.01)
+                            cir.kinematicState.dir=math.eval(cir.kinematicState.dir,0.005)
                             cir.speedRef=cir.kinematicState.speed+math.eval(0,30)
                             cir.keyFrame=lifeFrame+spawner.frame
                             Event.EaseEvent{obj=cir,easeObj=cir.kinematicState,aims={speed=50},duration=lifeFrame}
@@ -58,7 +59,7 @@ local tooshiBoss=BossManager.BossSegment{
             require('stages.stage2.spellcards.dance'),
         }},
         BossManager.BossRound{SKIP_INCLUDE=true,phases={
-            BossManager.NonSpellPhase{
+            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='2-boss-tooshi-non-2',
                 time=1500,
                 hp=1600,
@@ -67,6 +68,7 @@ local tooshiBoss=BossManager.BossSegment{
                     local basePos=geo:init().pos
                     local pos,dir=geo:rThetaGo(basePos,200,-math.pi/2)
                     DanmakuFuncs.moveToInTime(boss,pos,60,Event.sineOProgressFunc)
+                    wait(60)
                     for i=1,16 do
                         local sign=math.mod2Sign(i)
                         local dir=geo:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)
@@ -125,7 +127,10 @@ local tooshiBoss=BossManager.BossSegment{
                 end
             },
             require('stages.stage2.spellcards.lantern')
-        }}
+        }},
+        BossManager.BossRound{phases={
+            require('stages.stage2.spellcards.flower')
+        }},
     }
 }
 return tooshiBoss
