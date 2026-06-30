@@ -180,6 +180,13 @@ SaveManager.defaultSaveData=DefaultRoot{
             addDiffAndShotType(highScores[stagePractice][stageKey], difficulties)
         end
     end),
+    reachedSegments=AlwaysFunction(function(otherTable,key)
+        otherTable[key]=otherTable[key] or {}
+        local reachedSegments=otherTable[key]
+        for stageKey,segments in pairs(SegmentsData.byStage) do
+            reachedSegments[stageKey]=reachedSegments[stageKey] or {}
+        end
+    end),
     extraUnlock={
     },
     musicUnlock={

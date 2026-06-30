@@ -80,9 +80,15 @@ return {
                                     return
                                 end
                                 SFX:play('select')
-                                G:resetRunInfo(G.CONSTANTS.GAME_TYPES.FULL_GAME,G.runInfo.difficulty,selectedShotType,G.STATES.CHOOSE_PLAYER) -- difficulty is already set in chooseDifficulty
-                                G:switchState(G.STATES.IN_GAME)
-                                StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty][1],nil,nil,'nextStage')
+                                if G.menuRunType==G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE then
+                                    G.runInfo.shotType=selectedShotType
+                                    G.runInfo.playerType=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[selectedShotType]
+                                    G:switchState(G.STATES.PRACTICE)
+                                else
+                                    G:resetRunInfo(G.CONSTANTS.GAME_TYPES.FULL_GAME,G.runInfo.difficulty,selectedShotType,G.STATES.CHOOSE_PLAYER) -- difficulty is already set in chooseDifficulty
+                                    G:switchState(G.STATES.IN_GAME)
+                                    StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty][1],nil,nil,'nextStage')
+                                end
                             end
                         end
                     },

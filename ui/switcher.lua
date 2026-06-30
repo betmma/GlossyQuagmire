@@ -14,8 +14,10 @@ local UI=...
 ---@field public canHold boolean whether holding the switch key will continuously switch options. default to false.
 ---@field public increaseKey love.KeyConstant the key to switch to next option. can be auto set to arrow keys based on arrange function if not provided.
 ---@field public decreaseKey love.KeyConstant the key to switch to previous option. can be auto set as above
+---@field public autoSize boolean whether to automatically set width and height to the width and height of the current option. default to false.
 ---@field private switchOption fun(self,direction:integer):nil a function that switches options in the given direction (1 for next, -1 for previous). this will be called when the switch key is pressed.
 ---@field private makeOptions fun(self):boolean a function that constructs the UI for the current option index and its preview options. returns false if current option index is out of range (optionConstructor returns nil).
+---@field public remakeOptions fun(self):nil a function that reconstructs the UI for all options.
 ---@field private lerpOffset fun(self,ratio:number|nil):nil a function that lerps the lerpingOptionIndexOffset by the given ratio. if ratio is nil, use self.lerpRatio.
 ---@overload fun(args:UISwitcherConfig):UISwitcher
 local UISwitcher=UI.Base:extend()
@@ -38,6 +40,7 @@ UISwitcher.PREVIEW_DECAY_MODES={
 ---@field canHold boolean|nil
 ---@field increaseKey love.KeyConstant|nil
 ---@field decreaseKey love.KeyConstant|nil
+---@field autoSize boolean|nil whether to automatically set width and height to the width and height of the current option. default to false.
 
 function UISwitcher:new(args)
     UI.Base.new(self,args)
@@ -48,6 +51,7 @@ function UISwitcher:new(args)
     self.preview=args.preview or 0
     self.lerpRatio=args.lerpRatio or 0.5
     self.canHold=args.canHold or false
+    self.autoSize=args.autoSize or false
     if args.container then
         self.container=args.container
     else
@@ -179,6 +183,16 @@ function UISwitcher:update()
         end
         option.transparency=0.5^(distance/math.max(self.previewDecayRadius,0.1))
     end
+    if self.autoSize and self.currentOption then
+        self.width,self.height=self.currentOption.width,self.currentOption.height
+    end
+end
+
+function UISwitcher:remakeOptions()
+    for i=#self.container.children,1,-1 do
+        self.container.children[i]:remove()
+    end
+    self:makeOptions()
 end
 
 return UISwitcher

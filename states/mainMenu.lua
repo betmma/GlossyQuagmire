@@ -36,9 +36,9 @@ return {
             }
         )
         local options={
-                {value='GAME_START',state='CHOOSE_DIFFICULTY'},
+                {value='GAME_START',state='CHOOSE_DIFFICULTY',gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME},
                 {value='EXTRA_START',disabled=true},
-                {value='PRACTICE',disabled=true},
+                {value='PRACTICE',state='CHOOSE_DIFFICULTY',gameType=G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE},
                 {value='SPELL_PRACTICE'},
                 {value='REPLAY',state='LOAD_REPLAY'},
                 {value='PLAYER_DATA',disabled=true},
@@ -68,6 +68,9 @@ return {
                                 self:saveData()
                                 love.event.quit()
                                 return
+                            end
+                            if data.gameType then
+                                self.menuRunType=data.gameType
                             end
                             local state=data.state or value -- need to ensure same as state name
                             if state then

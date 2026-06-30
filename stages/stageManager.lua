@@ -15,7 +15,7 @@ spell practice: jump to specific boss segment, and only run the spellcard phase 
 ---@alias SegmentKey string
 
 ---@class SegmentRaw:strict
----@field key string stage practice will be able to start from any segment, and segments will be listed. names like '1-1' '1-mid' '2-5A' are enough and do not need localization.
+---@field key string stage practice will be able to start from any segment, and segments will be listed. names like '1-1' '1-mid' '2-5A' are enough and still need localization. segments in different stages cannot have the same key.
 ---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this segment. for testing middle segments. only for dev testing.
 ---@field type SegmentType
 ---@field init fun(self,segmentFuncArgs)|nil when jumping to later segment like in practice mode, init of all previous segments will be called while func of previous segments will be skipped, so init should include things like setting player border, while func should include things like spawning bullets.
@@ -113,6 +113,33 @@ end
 require 'stages.bossManager'
 loadStageData()
 
+---@type table<StageKey,SegmentKey[]> what segments are in each stage
+local byStage={}
+local bySegment={}
+
+for stageKey,stageData in pairs(StageData) do
+    byStage[stageKey]={}
+    for _,segment in ipairs(stageData.segments) do
+        table.insert(byStage[stageKey],segment.key)
+        bySegment[segment.key]=segment
+    end
+end
+
+---@type {byStage: table<StageKey,SegmentKey[]>, bySegment: table<SegmentKey,Segment>}
+SegmentsData={byStage=byStage,bySegment=bySegment}
+
+function StageManager:markSegmentReached(stageKey, segmentKey)
+    if G.runInfo.replay then
+        return
+    end
+    local gameType=G.runInfo.gameType
+    if gameType~=G.CONSTANTS.GAME_TYPES.FULL_GAME and gameType~=G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE then
+        return
+    end
+    G.save.reachedSegments[stageKey][segmentKey]=true
+    G:saveData()
+end
+
 ---@param stageKey StageKey
 ---@param skipToSegmentKey SegmentKey|nil if not nil, will skip all segments before the segment with this key. used for stage practice to jump directly to a segment.
 ---@param onlyRunOneSegment boolean|nil if true, will only run the segment with key [skipToSegmentKey]. used for spellcard practice on midboss that would otherwise be followed with second half of the stage
@@ -130,6 +157,12 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
             skipToSegmentKey=self.currentStageData.segments[1].key -- first segment equals to not skipping any
         end
     end
+    self.args={
+        stageKey=stageKey,
+        skipToSegmentKey=skipToSegmentKey,
+        onlyRunOneSegment=onlyRunOneSegment,
+        segmentFuncArgs=segmentFuncArgs
+    }
     local func=function()
         self.currentStageData.init()
         local PC=1
@@ -159,6 +192,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                     segment:skip(segmentFuncArgs)
                 end
             else
+                self:markSegmentReached(stageKey, segment.key)
                 funcRet=segment:func(segmentFuncArgs)
                 if onlyRunOneSegment then
                     break
@@ -248,12 +282,6 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
     if not nextStaging then
         self.previousStagesData={}
     end
-    self.args={
-        stageKey=stageKey,
-        skipToSegmentKey=skipToSegmentKey,
-        onlyRunOneSegment=onlyRunOneSegment,
-        segmentFuncArgs=segmentFuncArgs
-    }
 end
 
 -- is called when finishing a stage in StageManager:update, and called in gameEnd for dying in middle of a stage.

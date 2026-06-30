@@ -1,6 +1,6 @@
 BackgroundPattern=require"backgroundPattern"
 -- ENHL have same order of stages so combine them
-local normalStageOrder={'stage2','stage1','stage3','stage4','stage5','stage6'}
+local normalStageOrder={'stage1','stage2','stage3','stage4','stage5','stage6'}
 G={
     ---@class G.CONSTANTS
     ---@field DRAW fun(self, uiToDrawBatch?: STATE)
@@ -251,6 +251,7 @@ G={
         MAIN_MENU='MAIN_MENU',
         CHOOSE_DIFFICULTY='CHOOSE_DIFFICULTY',
         CHOOSE_PLAYER='CHOOSE_PLAYER',
+        PRACTICE='PRACTICE',
         SPELL_PRACTICE='SPELL_PRACTICE',
         MUSIC_ROOM='MUSIC_ROOM',
         -- NICKNAMES='NICKNAMES',
@@ -267,6 +268,7 @@ G={
         TRANSITION_FADE='TRANSITION_FADE', -- fade out/in certain ui object 
     },
     STATE=...,
+    menuRunType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
     transitionData={ -- transitionData[STATE1][STATE2] is the transition data from STATE1 to STATE2. like, if transitionData[MAIN_MENU][CHOOSE_LEVELS].slideDirection='up', then when switching from MAIN_MENU to CHOOSE_LEVELS, the texts of both states will slide up.
         MAIN_MENU={
             CHOOSE_DIFFICULTY={
@@ -311,6 +313,9 @@ G={
                 transitionState='TRANSITION_IMAGE'
             },
             CHOOSE_PLAYER={
+                transitionState='TRANSITION_IMAGE',
+            },
+            PRACTICE={
                 transitionState='TRANSITION_IMAGE',
             },
             SPELL_PRACTICE={
@@ -361,9 +366,20 @@ G={
             CHOOSE_DIFFICULTY={
                 slideDirection='down'
             },
+            PRACTICE={
+                slideDirection='up',
+            },
             IN_GAME={
                 transitionState='TRANSITION_IMAGE',
             }
+        },
+        PRACTICE={
+            CHOOSE_PLAYER={
+                slideDirection='down',
+            },
+            IN_GAME={
+                transitionState='TRANSITION_IMAGE',
+            },
         },
         SPELL_PRACTICE={
             MAIN_MENU={
@@ -375,6 +391,9 @@ G={
         },
         PAUSE={
             CHOOSE_PLAYER={
+                transitionState='TRANSITION_IMAGE',
+            },
+            PRACTICE={
                 transitionState='TRANSITION_IMAGE',
             },
             SPELL_PRACTICE={
@@ -449,7 +468,7 @@ G={
         local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[gameType]
         self.runInfo.lives=startResources.lives
         self.runInfo.bombs=startResources.bombs
-        self.runInfo.power=200 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
+        self.runInfo.power=0 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
         self.runInfo.score=0
         self.runInfo.grazes=0
         self.runInfo.replay=replay
@@ -503,6 +522,7 @@ end
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
 ---@field spellcardHistory table<string, table<DIFFICULTY, {unlocked:boolean, [SHOT_TYPE]: table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>}>>>
 ---@field highScores {FULL_GAME: table<DIFFICULTY, table<SHOT_TYPE, integer>>, STAGE_PRACTICE: table<StageKey,table<DIFFICULTY, table<SHOT_TYPE, integer>>>}
+---@field reachedSegments table<StageKey, table<SegmentKey, boolean>>
 ---@field extraUnlock {[string]: boolean} -- secret level unlocks, format not decided
 ---@field musicUnlock {[string]: boolean}
 ---@field nicknameUnlock {[string]: boolean}
@@ -520,6 +540,7 @@ G.save={
         FULL_GAME={},
         STAGE_PRACTICE={}
     },
+    reachedSegments={},
     extraUnlock={
     }, -- secret level unlocks, format not decided
     musicUnlock={},

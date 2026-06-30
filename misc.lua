@@ -313,23 +313,31 @@ local localization=require 'localization.localization'
 local function getRawLocalizeString(args)
     local lang=G.language or 'en_us'
     local current=localization
-    for key, value in ipairs(args) do
+    for i, value in ipairs(args) do
+        local next
         if current[value] then
-            local next=current[value]
-            if type(next)=="string" then
-                local op,val=next:match('@(.+):(.+)')
-                if op=='ref' then
-                    next=current[val]
-                else
-                    return 'ERROR', false
-                end
-            end
-            current=next
+            next=current[value]
         elseif current['__default__'] then
-            current=current['__default__']
+            next=current['__default__']
         else
             return 'ERROR', false
         end
+        if type(next)=="string" then
+            local op,val=next:match('@(.*):(.*)')
+            if op=='ref' then -- refer to another key. like, spellcard name of Normal difficulty is the same as Easy difficulty, so we can just refer to the Easy one to avoid duplication.
+                next=current[val]
+            elseif op=='nolocalize' then -- no localization, just return the value or earlier layer's value
+                if val=='' then
+                    val=0
+                else
+                    val=tonumber(val)
+                end
+                next={en_us=args[i-val]}
+            else
+                return 'ERROR', false
+            end
+        end
+        current=next
     end
     ---@cast current localizationItem
     if current[lang] then

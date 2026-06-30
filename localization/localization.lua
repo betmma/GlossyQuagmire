@@ -1,5 +1,5 @@
----@alias lang string
----@alias magicString string -- defined in misc.getRawLocalizeString. something like '@op:val' that can be used to refer to other localization items or do some operations. currently only supports '@ref:someKey' to refer to other localization items in the same table to avoid repetition.
+﻿---@alias lang string
+---@alias magicString string -- defined in misc.getRawLocalizeString. something like '@op:val' that can be used to refer to other localization items or do some operations. currently supports '@ref:someKey' to refer to other localization items in the same table to avoid repetition, and '@nolocalize:layer' to return the raw value (no layer or layer=0) or certain previous layer (like localize('a','b','c') with .a.b.c='@nolocalize:1' would refer to 1 layer above that is 'b').
 ---@alias localizationItem table<lang,string>
 
 return {
@@ -750,6 +750,75 @@ return {
                 },
             }
         },
+        PRACTICE = {
+            headers = {
+                segment = {
+                    en_us = 'Segment',
+                    zh_cn = '小节',
+                },
+                mode = {
+                    en_us = 'Mode',
+                    zh_cn = '模式',
+                },
+            },
+            modes = {
+                segment = {
+                    en_us = 'Exit after segment',
+                    zh_cn = '小节结束后退出',
+                },
+                stage = {
+                    en_us = 'Exit after stage',
+                    zh_cn = '关卡结束后退出',
+                },
+            },
+            segments = {
+                notReached = {
+                    name = {
+                        en_us = '???',
+                        zh_cn = '???',
+                    }
+                },
+                __default__ = {
+                    name = "@nolocalize:1",
+                },
+                ['1-mid-kotoba'] = {
+                    name = {
+                        en_us = '1-MidBoss-Kotoba',
+                        zh_cn = '1-道中Boss-言波',
+                    }
+                },
+                ['1-mid-reimu'] = {
+                    name = {
+                        en_us = '1-MidBoss-Reimu',
+                        zh_cn = '1-道中Boss-灵梦',
+                    }
+                },
+                ['1-boss-kotoba'] = {
+                    name = {
+                        en_us = '1-Boss-Kotoba',
+                        zh_cn = '1-Boss-言波',
+                    }
+                },
+                ['1-boss-marisa'] = {
+                    name = {
+                        en_us = '1-Boss-Marisa',
+                        zh_cn = '1-Boss-魔理沙',
+                    }
+                },
+                ['2-branch'] = {
+                    name = {
+                        en_us = '2-Branch',
+                        zh_cn = '2-分支',
+                    }
+                },
+                ['2-boss'] = {
+                    name = {
+                        en_us = '2-Boss',
+                        zh_cn = '2-Boss',
+                    }
+                }
+            }
+        },
         SPELL_PRACTICE = {
             ---@type table<StageKey, localizationItem>
             stages = {
@@ -1058,7 +1127,7 @@ return {
             }
         }
     },
-    ---@type table<string, NicknameLocalization>
+    --@type table<string, NicknameLocalization>
     nickname = {},
     dialogues = {
         REIMUS1BossBefore = {

@@ -6,6 +6,7 @@ Collect items consecutively to keep combo. Combo count × (1 + Combo duration / 
 
 ### Todo
 #### Code
+Fix bug: enter music room, use up and down to select one (but not pressing z to play), then exit music room, then enter every menu except game start and replay, the chosen music will replace menu music
 Add func to calculate the orientation to make a sprite face upward in final rendering.
 Background
 
