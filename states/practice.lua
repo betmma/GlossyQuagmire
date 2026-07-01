@@ -19,6 +19,10 @@ local function segmentSwitcherRemake()
     segmentSwitcher:remakeOptions()
     segmentSwitcher.transparency=0
 end
+local modes={
+    {onlyRunOneSegment=true,localizeKey='segment'},
+    {onlyRunOneSegment=false,localizeKey='stage'},
+}
 local function enter()
     local stageKey=G.CONSTANTS.STAGE_KEYS[stageSwitcher.currentOptionIndex]
     local segment=SegmentsData.byStage[stageKey][segmentSwitcher.currentOptionIndex]
@@ -117,10 +121,6 @@ return {
                 }
                 return segmentText
             end
-        }
-        local modes={
-            {onlyRunOneSegment=true,localizeKey='segment'},
-            {onlyRunOneSegment=false,localizeKey='stage'},
         }
         modeSwitcher=UI.Switcher{
             parent=base,

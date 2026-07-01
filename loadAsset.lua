@@ -212,7 +212,7 @@ local bossWidth,bossHeight=80,80
 ---@type {width:number,height:number,[string]:{key:string,width:number,height:number,normal:love.Quad[]}}
 Asset.boss={}
 Asset.boss.width,Asset.boss.height=bossWidth,bossHeight
-local bossImagePoses={{name='placeholder',num=4},{name='tooshi',num=4},{name='marisa',num=2},{name='kotoba',num=4},}
+local bossImagePoses={{name='placeholder',num=4},{name='tooshi',num=4},{name='marisa',num=2},{name='kotoba',num=4},{name='reimu',num=4}}
 for i,info in pairs(bossImagePoses) do
     Asset.boss[info.name]={key='boss',width=bossWidth,height=bossHeight,normal={}}
     for j=1,info.num do
