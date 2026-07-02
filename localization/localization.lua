@@ -1112,8 +1112,8 @@ return {
                 zh_cn = '通往远方的狐步舞',
             },
             description = {
-                en_us = 'Tooshi Katsuyama\'s theme. (Planned Stage 2 boss\'s theme)\nA playful and bouncy composition. The whole song keeps using similar rhythm patterns, but the switching of instruments and melodies makes it feel fresh and interesting the whole time. The fox gave herself a stoic name to mislead people (^^;',
-                zh_cn = '堪山远志的主题曲。 (计划为2面BOSS的主题曲)\n一个有趣且弹跳的曲子。整首歌持续使用相似的节奏模式，但乐器和旋律的切换使曲子新鲜又有趣。狐狸给自己起了一个坚忍的名字来误导人们(^^;',
+                en_us = 'Tooshi Katsuyama\'s theme.\nA playful and bouncy composition. The whole song keeps using similar rhythm patterns, but the switching of instruments and melodies makes it feel fresh and interesting the whole time. The fox gave herself a stoic name to mislead people (^^;',
+                zh_cn = '堪山远志的主题曲。\n一个有趣且弹跳的曲子。整首歌持续使用相似的节奏模式，但乐器和旋律的切换使曲子新鲜又有趣。狐狸给自己起了一个坚忍的名字来误导人们(^^;',
             },
         },
         level5 = {

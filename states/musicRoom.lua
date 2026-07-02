@@ -58,6 +58,9 @@ return {
             end,
             extraUpdates={
                 function(switcher)
+                    if not switcher.focused then
+                        return
+                    end
                     local musicName=musics[switcher.currentOptionIndex].value
                     local musicUnlock=self.save.musicUnlock
                     if isPressed('z') then
