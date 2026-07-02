@@ -44,12 +44,12 @@ local marisaBoss=BossManager.BossSegment{
     players={KOTOBA=true},
     key='1-boss-marisa',
     BGM='level1c',
-    -- beforeDialogueKey=function ()
-    --     return G.runInfo.playerType..'S1BossBefore'
-    -- end,
-    -- afterDialogueKey=function ()
-    --     return G.runInfo.playerType..'S1BossAfter'
-    -- end,
+    beforeDialogueKey=function ()
+        return G.runInfo.playerType..'S1BossBefore'
+    end,
+    afterDialogueKey=function ()
+        return G.runInfo.playerType..'S1BossAfter'
+    end,
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
         local pos,dir=geometry:rThetaGo(geometry:init().pos,30,G.runInfo.player.viewDirection-math.pi/2)

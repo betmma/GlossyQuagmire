@@ -1,4 +1,4 @@
-﻿---@alias lang string
+---@alias lang string
 ---@alias magicString string -- defined in misc.getRawLocalizeString. something like '@op:val' that can be used to refer to other localization items or do some operations. currently supports '@ref:someKey' to refer to other localization items in the same table to avoid repetition, and '@nolocalize:layer' to return the raw value (no layer or layer=0) or certain previous layer (like localize('a','b','c') with .a.b.c='@nolocalize:1' would refer to 1 layer above that is 'b').
 ---@alias localizationItem table<lang,string>
 
