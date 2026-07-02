@@ -1316,6 +1316,78 @@ return {
                 zh_cn = '奖励更多的道路？好的，跟我来！',
             },
         },
+        REIMUS2BossBefore = {
+            stop = {
+                en_us = 'Stop! You are going too fast!',
+                zh_cn = '等等！你跑得太快了！',
+            },
+            ohYouAreStillFollowing = {
+                en_us = 'Oh, you are still following?',
+                zh_cn = '哦，你还跟着呢？',
+            },
+            youAreReallyGood = {
+                en_us = 'You are really good at hiking!',
+                zh_cn = '你真的很擅长徒步啊！',
+            },
+            huhWhat = {
+                en_us = 'Huh, no. I can fly.',
+                zh_cn = '啊，不，我会飞哦。',
+            },
+            youAreMaliciousYoukai = {
+                en_us = 'Anyway, you are a malicious youkai, right?',
+                zh_cn = '不管怎样，你并非善类吧？',
+            },
+            whyYouSayThat = {
+                en_us = 'Why do you say that? I\'m leading the way for you.',
+                zh_cn = '为什么这么说？我可是带路的哦。',
+            },
+            yourLantern = {
+                en_us = 'Your lantern is not normal.',
+                zh_cn = '你的灯笼不正常。',
+            },
+            itCanAffectOthersMinds = {
+                en_us = 'It can affect others\' minds.',
+                zh_cn = '它可以影响别人的心智。',
+            },
+            ohIDontKnowWhyYouGuessThat = {
+                en_us = 'Oh, I don\'t know why you guess that.',
+                zh_cn = '哦，我不知道你为什么会这么猜。',
+            },
+            butDie = {
+                en_us = 'But die!',
+                zh_cn = '但是去死吧！',
+            }
+        },
+        REIMUS2BossAfter = {
+            wahISurrender = {
+                en_us = 'Wah! I surrender!',
+                zh_cn = '哇！我投降！',
+            },
+            whatWereYouTryingToDo = {
+                en_us = 'What were you trying to do?',
+                zh_cn = '你到底想干什么？',
+            },
+            iJustLikePranking = {
+                en_us = 'I just like pranking people.',
+                zh_cn = '我只是喜欢恶作剧而已。',
+            },
+            leadPeopleDeepAndAbandonThem = {
+                en_us = 'Lead people deep into such place and abandon them.',
+                zh_cn = '把人带到这种地方深处然后抛下他们。',
+            },
+            soIsThatPlaceReallyHere = {
+                en_us = 'So is that beautiful place really here?',
+                zh_cn = '所以那个美丽的地方真的在这里吗？',
+            },
+            yeahYouSeeItFromHere = {
+                en_us = 'Yeah. It\'s called Pavilion of Visual Splendor. You can see it from here.',
+                zh_cn = '是呀。它叫“观艳馆”。这里已经可以看到它了。',
+            },
+            okBye = {
+                en_us = 'Ok, bye.',
+                zh_cn = '好吧，拜拜。',
+            }
+        },
         MARISAS2BossBefore = {
             whyGoingSoFast = {
                 en_us = 'Why are you going so fast? Wait for me!',
@@ -1352,6 +1424,92 @@ return {
             die = {
                 en_us = 'How did you know that? Die!',
                 zh_cn = '你怎么知道的？去死吧！',
+            }
+        },
+        MARISAS2BossAfter = {
+            wahISurrender = {
+                en_us = 'Wah! I surrender!',
+                zh_cn = '哇！我投降！',
+            },
+            badFox = {
+                en_us = 'Bad fox! How dare you fight me!',
+                zh_cn = '坏狐狸！你怎么敢和我斗！',
+            },
+            iSeeTheresABuilding = {
+                en_us = 'I see there\'s a building in the distance. You know its name?',
+                zh_cn = '我看到远处有一栋建筑。你知道它的名字吗？',
+            },
+            itsName = {
+                en_us = 'Its name is Pavilion of Visual Splendor.',
+                zh_cn = '它的名字叫“观艳馆”。',
+            },
+            strangeName = {
+                en_us = 'Strange name. But it sounds like my target.',
+                zh_cn = '好奇怪的名字。但听起来就是我的目标地点。',
+            }
+        },
+        KOTOBAS2BossBefore = {
+            areWeAlmostThere = {
+                en_us = 'Are we almost there?',
+                zh_cn = '我们快到了吗？',
+            },
+            ohYouAreStillFollowing = {
+                en_us = 'Oh, you are still following?',
+                zh_cn = '哦，你还跟着呢？',
+            },
+            youAreReallyGood = {
+                en_us = 'You are really good at hiking!',
+                zh_cn = '你真的很擅长徒步啊！',
+            },
+            whyAmIFast = {
+                en_us = 'Why am I so fast? Cuz I began a fast today!',
+                zh_cn = '只要心情愉快，速度就能变快了！',
+            },
+            lookAtMyLantern = {
+                en_us = 'Cool. Now look at my lantern.',
+                zh_cn = '好。现在看我的灯笼。',
+            },
+            yeah = {
+                en_us = 'Yeah...',
+                zh_cn = '嗯……',
+            },
+            iFeelStrange = {
+                en_us = 'I start to feel strange?',
+                zh_cn = '我感觉有点奇怪？',
+            },
+            enjoyTheDance = {
+                en_us = 'Dance with me!',
+                zh_cn = '和我一起跳舞吧！',
+            }
+        },
+        KOTOBAS2BossAfter = {
+            wahISurrender = {
+                en_us = 'Wah! I surrender!',
+                zh_cn = '哇！我投降！',
+            },
+            whatWasIDoing = {
+                en_us = 'What was I doing?',
+                zh_cn = '我在做什么来着？',
+            },
+            soDoYouReallyKnowThatPlace = {
+                en_us = 'Oh right. So do you really know that place?',
+                zh_cn = '哦哦。所以你真的知道那个地方吗？',
+            },
+            itsCloseYouCanSeeItFromHere = {
+                en_us = 'It\'s close. You can see it from here.',
+                zh_cn = '很近了。你从这里就能看到它。',
+            },
+            ohSoThisIsntAScam = {
+                en_us = 'Oh, so this isn\'t a scam? I\'m still confused...',
+                zh_cn = '哦，所以这不是骗局？我还是没明白……',
+            },
+            ofCourse = {
+                en_us = 'Of course not. I\'m leading you to the Pavilion of Visual Splendor.',
+                zh_cn = '当然不是。我是带你去观艳馆的。',
+            },
+            whateverImHeadingThere = {
+                en_us = 'Whatever. I\'m heading there.',
+                zh_cn = '随便啦，我是要去那里。',
             }
         }
     },

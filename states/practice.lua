@@ -79,6 +79,9 @@ return {
                 local angle=anglePerOption*index
                 return previewCircleRadius*math.cos(angle),previewCircleRadius*math.sin(angle)
             end,
+            events={
+                [UI.EVENTS.SWITCHED]=segmentSwitcherRemake
+            },
             optionConstructor=function (self, optionIndex)
                 local stageKey=G.CONSTANTS.STAGE_KEYS[optionIndex]
                 if not stageKey or not SegmentsData.byStage[stageKey] then return nil end

@@ -208,6 +208,8 @@ function DialogueController:draw()
             local xywh=G.foregroundShaderData.args.xywh
             if character.position=='right' then
                 x=xywh[1]+xywh[3]+160-portraitWidth*portraitSize
+            else
+                x=x-50
             end
         end
         local y=WINDOW_HEIGHT-portraitHeight/4
@@ -397,6 +399,45 @@ local S2BranchRight={
     }
 }
 
+local S2BossAutoForwardTime=60/130*4 -- 4 beats at 130bpm, in seconds
+
+local REIMUS2BossBefore={
+    name='REIMUS2BossBefore',
+    defaultSpeakerPosition={
+        reimu='left',
+        tooshi='right',
+    },
+    lines={
+        line('reimu','angry','stop'),
+        line('tooshi','surprised','ohYouAreStillFollowing'),
+        line('tooshi','happy','youAreReallyGood'),
+        line('reimu','surprised','huhWhat'),
+        line('reimu','angry','youAreMaliciousYoukai'),
+        line('tooshi','surprised','whyYouSayThat'),
+        line('reimu','normal','yourLantern'),
+        line('reimu','angry','itCanAffectOthersMinds'),
+        line('tooshi','cunning','ohIDontKnowWhyYouGuessThat'),
+        line('tooshi','cunning','butDie',{playBGM=true,autoForwardTime=S2BossAutoForwardTime}),
+    }
+}
+
+local REIMUS2BossAfter={
+    name='REIMUS2BossAfter',
+    defaultSpeakerPosition={
+        reimu='left',
+        tooshi='right',
+    },
+    lines={
+        line('tooshi','sad','wahISurrender'),
+        line('reimu','normal','whatWereYouTryingToDo'),
+        line('tooshi','sad','iJustLikePranking'),
+        line('tooshi','sad','leadPeopleDeepAndAbandonThem'),
+        line('reimu','frustrated','soIsThatPlaceReallyHere'),
+        line('tooshi','normal','yeahYouSeeItFromHere'),
+        line('reimu','normal','okBye'),
+    }
+}
+
 local MARISAS2BossBefore={
     name='MARISAS2BossBefore',
     defaultSpeakerPosition={
@@ -412,7 +453,57 @@ local MARISAS2BossBefore={
         line('tooshi','normal','calmDownPlease'),
         line('tooshi','normal','lookAtMyLantern'),
         line('marisa','normal','whyWouldIKnowThat'),
-        line('tooshi','cunning','die',{playBGM=true,autoForwardTime=60/130*4}),
+        line('tooshi','cunning','die',{playBGM=true,autoForwardTime=S2BossAutoForwardTime}),
+    }
+}
+
+local MARISAS2BossAfter={
+    name='MARISAS2BossAfter',
+    defaultSpeakerPosition={
+        marisa='left',
+        tooshi='right',
+    },
+    lines={
+        line('tooshi','sad','wahISurrender'),
+        line('marisa','happy','badFox'),
+        line('marisa','happy','iSeeTheresABuilding'),
+        line('tooshi','sad','itsName'),
+        line('marisa','happy','strangeName'),
+    }
+}
+
+local KOTOBAS2BossBefore={
+    name='KOTOBAS2BossBefore',
+    defaultSpeakerPosition={
+        kotoba='left',
+        tooshi='right',
+    },
+    lines={
+        line('kotoba','normal','areWeAlmostThere'),
+        line('tooshi','surprised','ohYouAreStillFollowing'),
+        line('tooshi','happy','youAreReallyGood'),
+        line('kotoba','happy','whyAmIFast'),
+        line('tooshi','normal','lookAtMyLantern'),
+        line('kotoba','normal','yeah'),
+        line('kotoba','frustrated','iFeelStrange'),
+        line('tooshi','cunning','enjoyTheDance',{playBGM=true,autoForwardTime=S2BossAutoForwardTime}),
+    }
+}
+
+local KOTOBAS2BossAfter={
+    name='KOTOBAS2BossAfter',
+    defaultSpeakerPosition={
+        kotoba='left',
+        tooshi='right',
+    },
+    lines={
+        line('tooshi','sad','wahISurrender'),
+        line('kotoba','frustrated','whatWasIDoing'),
+        line('kotoba','frustrated','soDoYouReallyKnowThatPlace'),
+        line('tooshi','sad','itsCloseYouCanSeeItFromHere'),
+        line('kotoba','frustrated','ohSoThisIsntAScam'),
+        line('tooshi','sad','ofCourse'),
+        line('kotoba','frustrated','whateverImHeadingThere'),
     }
 }
 
@@ -427,7 +518,12 @@ Dialogue.data={
     S2Branch1=S2Branch1,
     S2BranchLeft=S2BranchLeft,
     S2BranchRight=S2BranchRight,
+    REIMUS2BossBefore=REIMUS2BossBefore,
+    REIMUS2BossAfter=REIMUS2BossAfter,
     MARISAS2BossBefore=MARISAS2BossBefore,
+    MARISAS2BossAfter=MARISAS2BossAfter,
+    KOTOBAS2BossBefore=KOTOBAS2BossBefore,
+    KOTOBAS2BossAfter=KOTOBAS2BossAfter,
 }
 
 
