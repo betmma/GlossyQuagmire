@@ -174,6 +174,10 @@ return {
                             local idText=UI.Text{text='ID. '..tostring(id),fontSize=16,color=color,boldColor={0,0,0,1},x=0,y=20,parent=base}
                             local spellcardName=status>=2 and Localize{'spellcards',item.phaseKey, diff,'name'} or Localize{'spellcards','UNKNOWN', diff,'name'}
                             local spellcardNameText=UI.Text{text=spellcardName,fontSize=20,color=color,boldColor={0,0,0,1},x=500,y=0,width=400,align="right",parent=base}
+                            local width=SetFont(spellcardNameText.fontSize,spellcardNameText.fontName):getWidth(spellcardNameText.text)
+                            if width>400 then
+                                spellcardNameText.fontSize=math.floor(spellcardNameText.fontSize*400/width)
+                            end
                             local historyText=Localize{'ui','SPELL_PRACTICE','spellcardHistory',
                                 ingamePass=historyTable.ingame.passes,
                                 ingameTries=historyTable.ingame.tries,
