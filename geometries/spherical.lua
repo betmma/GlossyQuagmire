@@ -13,6 +13,7 @@ local GeometryBase = ...
 ---@field sourceSecondaryCenter ScreenPosition
 ---@field primaryCircle SphericalCircleConfig
 ---@field secondaryCircle SphericalCircleConfig
+---@field rotateSpeed number
 
 ---@class Spherical
 local Spherical = GeometryBase:extend()
@@ -38,6 +39,7 @@ Spherical.viewConfig = {
         center = { x = WINDOW_WIDTH * 0.8, y = WINDOW_HEIGHT * 0.8 },
         radius = WINDOW_HEIGHT * 0.16,
     },
+    rotateSpeed=0,
 }
 
 local function vec3(x, y, z)
@@ -62,9 +64,6 @@ end
 
 local function normalize(v)
     local m = length3(v)
-    if m < Spherical.EPS then
-        return vec3(0, 0, 1)
-    end
     return vec3(v.x / m, v.y / m, v.z / m)
 end
 
@@ -87,9 +86,6 @@ end
 local function basis_at(unitPos)
     local northAxis = vec3(0, 0, 1)
     local east = cross(northAxis, unitPos)
-    if length3(east) < Spherical.EPS then
-        east = cross(vec3(0, 1, 0), unitPos)
-    end
     east = normalize(east)
     local north = normalize(cross(unitPos, east))
     return east, north
@@ -120,18 +116,12 @@ end
 
 local function project_from_north(unitPos)
     local denom = 1 - unitPos.z
-    if denom < Spherical.EPS then
-        return nil
-    end
     local k = (2 * Spherical.radius) / denom
     return { x = k * unitPos.x, y = k * unitPos.y }
 end
 
 local function project_from_south(unitPos)
     local denom = 1 + unitPos.z
-    if denom < Spherical.EPS then
-        return nil
-    end
     local k = (2 * Spherical.radius) / denom
     return { x = k * unitPos.x, y = k * unitPos.y }
 end
@@ -152,6 +142,16 @@ function Spherical:init()
     return { pos = { x = p.x, y = p.y, z = p.z }, speed = 0, dir = 0 }
 end
 
+function Spherical:setZoomSpeed(value,duration)
+    if duration==0 then
+        self.viewConfig.rotateSpeed=value
+        return
+    end
+    Event.EaseEvent{
+        easeObj=self.viewConfig,aims={rotateSpeed=value},duration=duration
+    }
+end
+
 function Spherical:update(state, dt)
     dt = dt or (1 / 60)
     local newPos, newDir = self:rThetaGo(state.pos, state.speed * dt, state.dir)
@@ -159,6 +159,10 @@ function Spherical:update(state, dt)
         state.pos[key] = value
     end
     state.dir = newDir
+    if self.viewConfig.rotateSpeed~=0 and not state.skipZoom then
+        local angle = self.viewConfig.rotateSpeed * dt *60
+        state.pos.x,state.pos.z = state.pos.x * math.cos(angle) - state.pos.z * math.sin(angle), state.pos.x * math.sin(angle) + state.pos.z * math.cos(angle)
+    end
 end
 
 function Spherical:rThetaGo(position, length, direction)
@@ -205,9 +209,6 @@ function Spherical:to(position, target)
     local v = to_unit(target)
 
     local normal = cross(u, v)
-    if length3(normal) < Spherical.EPS then
-        return 0
-    end
     normal = normalize(normal)
 
     local tangent = normalize(cross(normal, u))
@@ -224,9 +225,6 @@ function Spherical:sideToLine(position, linePoint1, linePoint2)
     local a = to_unit(linePoint1)
     local b = to_unit(linePoint2)
     local normal = cross(a, b)
-    if length3(normal) < Spherical.EPS then
-        return false
-    end
     return dot(u, normal) > 0
 end
 

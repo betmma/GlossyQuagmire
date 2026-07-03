@@ -539,7 +539,7 @@ local function marisaSpellcardFunc(playerState, isFocused)
                 Effect.Shockwave{kinematicState=copyTable(G.runInfo.player.kinematicState),animationFrame=20,size=1,growSpeed=0.15,spriteTransparency=0.5,color=color,canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false}}
             end
             local dirBase=G.runInfo.player.viewDirection-math.pi/2+math.mod2Sign(i)*0.2*(i%5/5)
-            local star=PlayerShot{kinematicState={pos=copyTable(G.runInfo.player.kinematicState.pos), speed=900, dir=dirBase},sprite=BulletSprites.bigStar.blue,size=0,damage=3,lifeFrame=30,batch=Asset.bulletBatch,meshBatch=Asset.bigBulletMeshes,extraUpdate={Action.FadeIn(3,false),Action.ZoomIn(8,2),Action.Trail(9,2)}}
+            local star=PlayerShot{kinematicState={pos=copyTable(G.runInfo.player.kinematicState.pos), speed=900, dir=dirBase},sprite=BulletSprites.bigStar.blue,size=0,damage=3,lifeFrame=30,forceQuad=true,batch=Asset.bulletBatch,meshBatch=Asset.bigBulletMeshes,extraUpdate={Action.FadeIn(3,false),Action.ZoomIn(8,2),Action.Trail(9,2)}}
             star.i=i
             star:changeSpriteColor()
             star.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. it will keep damaging

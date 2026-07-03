@@ -55,6 +55,7 @@
 ---@alias def.GeometryBase.rThetaTo fun(self:GeometryBase,position:Position,target:Position):number,number
 ---Returns the zoom factors at the screen space of the position (one for each toScreen results). It's used to draw quads (only a square) where distortion is negligible (and with prerequisite that the geometry is conformal). The default implementation calls toScreen on position and position+small value to estimate.
 ---@alias def.GeometryBase.zoomFactorToScreen fun(self:GeometryBase,position:Position):number[]
+---@alias def.MovingGeometryBase.setZoomSpeed fun(self:MovingGeometryBase,value:number,duration:number):nil
 
 ---@class GeometryBase:Object base class for all geometries. is actually euclidean geometry as an example (and also because lua annotation doesnt support abstract classes). should not be instantiated as only its methods are used.
 ---@field name string same as the key in geometries, for saving to replay data.
@@ -77,7 +78,8 @@
 ---@field rThetaTo def.GeometryBase.rThetaTo
 ---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen
 
-
+---@class MovingGeometryBase:GeometryBase base class for all moving geometries.
+---@field setZoomSpeed def.MovingGeometryBase.setZoomSpeed
 
 ---@class Hyperbolic:GeometryBase
 ---@field curvature number

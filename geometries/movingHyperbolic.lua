@@ -1,3 +1,5 @@
+-- why make this a new kind of geometry instead of adding zoom function to Hyperbolic geometry? the basic reason is to map each stage to one unique kind of geometry. otherwise would also need config
+
 ---@type Hyperbolic
 local Hyperbolic=...
 
@@ -22,6 +24,16 @@ MovingHyperbolic.viewConfig={
     zoomCenterX=WINDOW_WIDTH/40*13, -- the center of rectangle foreground shader area
     zoomRatio=1.002
 }
+
+function MovingHyperbolic:setZoomSpeed(value,duration)
+    if duration==0 then
+        self.viewConfig.zoomRatio=math.exp(value)
+        return
+    end
+    Event.EaseEvent{
+        easeObj=self.viewConfig,aims={zoomRatio=math.exp(value)},duration=duration
+    }
+end
 
 function MovingHyperbolic:init()
     return {pos={x=self.viewConfig.screenCenter.x,y=self.viewConfig.screenCenter.y},speed=0,dir=0}

@@ -1,20 +1,4 @@
-local function setZoomSpeed(value,duration)
-    if G.runInfo.geometry~=G.geometries.MovingHyperbolic then
-        return
-    end
-    if duration==0 then
-        G.runInfo.geometry.viewConfig.zoomRatio=math.exp(value)
-        G.backgroundPattern.autoForwardSpeed=value*60
-        return
-    end
-    duration=math.ceil(duration)
-    Event.EaseEvent{
-        easeObj=G.runInfo.geometry.viewConfig,aims={zoomRatio=math.exp(value)},duration=duration
-    }
-    Event.EaseEvent{
-        easeObj=G.backgroundPattern,aims={autoForwardSpeed=value*60},duration=duration
-    }
-end
+local setZoomSpeed=require('stages.stage2.setZoomSpeed')
 
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
@@ -38,13 +22,15 @@ return BossManager.SpellcardPhase{
             local angle2=angle%(math.pi*2/self.polygonN)-(math.pi/self.polygonN)
             cir.kinematicState.speed=cir.kinematicState.speed/math.cos(angle2)
         end},bulletExtraUpdate={function(self)
-            if scrolling and self.frame%3==0 then
+            if scrolling then
                 if not self.flag then
                     self:changeSpriteColor('purple')
                     self.flag=true
                 end
-                local lifeFrame=9
-                Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0,skipZoom=true},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,invincible=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
+                if self.frame%3==0 then
+                    local lifeFrame=8
+                    Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0,skipZoom=true},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,invincible=true,extraUpdate={Action.ZoomOut(lifeFrame)}}
+                end
             end
             if self.flag and not scrolling then
                 self:changeSpriteColor('orange')
@@ -70,12 +56,12 @@ return BossManager.SpellcardPhase{
                 local sign=math.mod2Sign(beatCount)
                 SFX:play('hit')
                 setZoomSpeed(sign*scrollAmount,0)
-                setZoomSpeed(0,beat/2)
+                setZoomSpeed(0,math.ceil(beat/2))
                 Event{obj=sentry,action=function(self)
                     wait(math.ceil(beat/2))
                     SFX:play('hit')
                     setZoomSpeed(sign*scrollAmount,0)
-                    setZoomSpeed(0,beat/2)
+                    setZoomSpeed(0,math.ceil(beat/2))
                     wait(math.ceil(beat/2))
                     scrolling=false
                 end}

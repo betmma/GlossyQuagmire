@@ -1,20 +1,4 @@
-local function setZoomSpeed(value,duration)
-    if G.runInfo.geometry~=G.geometries.MovingHyperbolic then
-        return
-    end
-    if duration==0 then
-        G.runInfo.geometry.viewConfig.zoomRatio=math.exp(value)
-        G.backgroundPattern.autoForwardSpeed=value*60
-        return
-    end
-    Event.EaseEvent{
-        easeObj=G.runInfo.geometry.viewConfig,aims={zoomRatio=math.exp(value)},duration=duration
-    }
-    Event.EaseEvent{
-        easeObj=G.backgroundPattern,aims={autoForwardSpeed=value*60},duration=duration
-    }
-end
-
+local setZoomSpeed=require('stages.stage2.setZoomSpeed')
 ---@type OneStageDataRaw
 return{
     init=function()
@@ -194,15 +178,17 @@ return{
                 SFX:play('enemyCharge')
                 local left=G.runInfo.player.kinematicState.pos.x<basePos.x
                 local sign=left and 1 or -1
-                Event.EaseEvent{
-                    easeObj=G.backgroundPattern,aims={cam_yaw=G.backgroundPattern.cam_yaw-0.5*sign},duration=120
-                }
-                Event.EaseEvent{
-                    easeObj=G.backgroundPattern.cam_translation,aims={[1]=0.6*sign,[2]=0.1},duration=120
-                }
-                Event.EaseEvent{
-                    easeObj=G.backgroundPattern.camMoveCenter,aims={[1]=0.6*sign,[2]=0.1},duration=120
+                if G.backgroundPattern:is(BackgroundPattern.Planes) then
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern,aims={cam_yaw=G.backgroundPattern.cam_yaw-0.5*sign},duration=120
                     }
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern.cam_translation,aims={[1]=0.6*sign,[2]=0.1},duration=120
+                    }
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern.camMoveCenter,aims={[1]=0.6*sign,[2]=0.1},duration=120
+                    }
+                end
                 if left then
                     DialogueController{key='S2BranchLeft'}:block() -- 2s
                     return '2-A-1'
@@ -708,6 +694,6 @@ return{
                 wait(120)
             end
         },
-        require'stages.stage2.tooshi',
+        require('stages.stage2.tooshi'),
     }
 }
