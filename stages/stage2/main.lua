@@ -1,4 +1,5 @@
 local setZoomSpeed=require('stages.stage2.setZoomSpeed')
+local deltaYaw=0.5
 ---@type OneStageDataRaw
 return{
     init=function()
@@ -11,6 +12,7 @@ return{
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Planes)
         else
+            G:replaceBackgroundPatternIfNot(BackgroundPattern.SphericalGrid)
         end
         BGM:play('level2',true)
         DynamicUIObjs.showSoundtrack()
@@ -180,7 +182,7 @@ return{
                 local sign=left and 1 or -1
                 if G.backgroundPattern:is(BackgroundPattern.Planes) then
                     Event.EaseEvent{
-                        easeObj=G.backgroundPattern,aims={cam_yaw=G.backgroundPattern.cam_yaw-0.5*sign},duration=120
+                        easeObj=G.backgroundPattern,aims={cam_yaw=G.backgroundPattern.cam_yaw-deltaYaw*sign},duration=120
                     }
                     Event.EaseEvent{
                         easeObj=G.backgroundPattern.cam_translation,aims={[1]=0.6*sign,[2]=0.1},duration=120
@@ -450,6 +452,17 @@ return{
                 end}
                 wait(630)
                 setZoomSpeed(0,120)
+                if G.backgroundPattern:is(BackgroundPattern.Planes) then
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern,aims={cam_yaw=G.backgroundPattern.cam_yaw+deltaYaw},duration=120
+                    }
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern.cam_translation,aims={[1]=0,[2]=0.1},duration=120
+                    }
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern.camMoveCenter,aims={[1]=0,[2]=0.1},duration=120
+                    }
+                end
                 wait(120)
             end
         },
@@ -691,6 +704,17 @@ return{
                 nonblockFairyWave(1,'purple',80,mask3)
                 wait(630)
                 setZoomSpeed(0,120)
+                if G.backgroundPattern:is(BackgroundPattern.Planes) then
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern,aims={cam_yaw=G.backgroundPattern.cam_yaw-deltaYaw},duration=120
+                    }
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern.cam_translation,aims={[1]=0,[2]=0.1},duration=120
+                    }
+                    Event.EaseEvent{
+                        easeObj=G.backgroundPattern.camMoveCenter,aims={[1]=0,[2]=0.1},duration=120
+                    }
+                end
                 wait(120)
             end
         },

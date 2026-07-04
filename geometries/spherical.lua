@@ -49,6 +49,84 @@ local function source_hemisphere_radius_pixels()
     return Spherical.viewConfig.sourceCircleRadius * hemisphereLimit / sourceLimit
 end
 
+local function tangent_basis(ux, uy, uz)
+    local eastX = -uy
+    local eastY = ux
+    local eastZ = 0
+    local eastLen = math.sqrt(eastX * eastX + eastY * eastY + eastZ * eastZ)
+    if eastLen < Spherical.EPS then
+        eastX = 1
+        eastY = 0
+        eastZ = 0
+    else
+        eastX = eastX / eastLen
+        eastY = eastY / eastLen
+        eastZ = eastZ / eastLen
+    end
+
+    local northX = uy * eastZ - uz * eastY
+    local northY = uz * eastX - ux * eastZ
+    local northZ = ux * eastY - uy * eastX
+    local northLen = math.sqrt(northX * northX + northY * northY + northZ * northZ)
+    northX = northX / northLen
+    northY = northY / northLen
+    northZ = northZ / northLen
+
+    return eastX, eastY, eastZ, northX, northY, northZ
+end
+
+local function direction_to_tangent(ux, uy, uz, direction)
+    local eastX, eastY, eastZ, northX, northY, northZ = tangent_basis(ux, uy, uz)
+    local dirCos = math.cos(direction)
+    local dirSin = math.sin(direction)
+
+    return
+        eastX * dirCos + northX * dirSin,
+        eastY * dirCos + northY * dirSin,
+        eastZ * dirCos + northZ * dirSin
+end
+
+local function tangent_to_direction(ux, uy, uz, tangentX, tangentY, tangentZ)
+    local eastX, eastY, eastZ, northX, northY, northZ = tangent_basis(ux, uy, uz)
+    return math.atan2(
+        tangentX * northX + tangentY * northY + tangentZ * northZ,
+        tangentX * eastX + tangentY * eastY + tangentZ * eastZ
+    )
+end
+
+local function rotate_position_and_direction(position, direction, angle)
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    if posLen < Spherical.EPS then
+        return position.x, position.y, position.z, direction
+    end
+
+    local ux = position.x / posLen
+    local uy = position.y / posLen
+    local uz = position.z / posLen
+    local tangentX, tangentY, tangentZ = direction_to_tangent(ux, uy, uz, direction)
+
+    local c = math.cos(angle)
+    local s = math.sin(angle)
+    local rotatedX = position.x * c - position.z * s
+    local rotatedY = position.y
+    local rotatedZ = position.x * s + position.z * c
+    local rotatedTangentX = tangentX * c - tangentZ * s
+    local rotatedTangentY = tangentY
+    local rotatedTangentZ = tangentX * s + tangentZ * c
+
+    local rotatedLen = math.sqrt(rotatedX * rotatedX + rotatedY * rotatedY + rotatedZ * rotatedZ)
+    local rotatedDir = tangent_to_direction(
+        rotatedX / rotatedLen,
+        rotatedY / rotatedLen,
+        rotatedZ / rotatedLen,
+        rotatedTangentX,
+        rotatedTangentY,
+        rotatedTangentZ
+    )
+
+    return rotatedX, rotatedY, rotatedZ, rotatedDir
+end
+
 function Spherical:init()
     local len = math.sqrt(0.35 * 0.35 + 0.93 * 0.93)
     return { pos = { x = 0.35 / len * Spherical.radius, y = 0, z = 0.93 / len * Spherical.radius }, speed = 0, dir = 0 }
@@ -73,7 +151,7 @@ function Spherical:update(state, dt)
     state.dir = newDir
     if self.viewConfig.rotateSpeed~=0 and not state.skipZoom then
         local angle = self.viewConfig.rotateSpeed * dt *60
-        state.pos.x,state.pos.z = state.pos.x * math.cos(angle) - state.pos.z * math.sin(angle), state.pos.x * math.sin(angle) + state.pos.z * math.cos(angle)
+        state.pos.x, state.pos.y, state.pos.z, state.dir = rotate_position_and_direction(state.pos, state.dir, angle)
     end
 end
 
