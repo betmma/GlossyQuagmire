@@ -9,6 +9,9 @@
 ---@field x number
 ---@field y number
 
+---@class SphericalPosition:Position
+---@field z number
+
 ---@class ScreenPosition
 ---@field x number
 ---@field y number
@@ -101,19 +104,34 @@
 ---@field rThetaTo def.GeometryBase.rThetaTo
 ---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen
 
+---@alias def.Spherical.init fun(self:Spherical):KinematicState
+---@alias def.Spherical.update fun(self:Spherical,state:KinematicState,dt:number):nil
+---@alias def.Spherical.rThetaGo fun(self:Spherical,position:SphericalPosition,length:number,direction:number):SphericalPosition,number
+---@alias def.Spherical.distance fun(self:Spherical,position1:SphericalPosition,position2:SphericalPosition):number
+---@alias def.Spherical.to fun(self:Spherical,position:SphericalPosition,target:SphericalPosition):number
+---@alias def.Spherical.sideToLine fun(self:Spherical,position:SphericalPosition,linePoint1:SphericalPosition,linePoint2:SphericalPosition):boolean
+---@alias def.Spherical.nearestToLine fun(self:Spherical,position:SphericalPosition,linePoint1:SphericalPosition,linePoint2:SphericalPosition):SphericalPosition
+---@alias def.Spherical.toScreen fun(self:Spherical,position:SphericalPosition):PossiblePosition[]
+---@alias def.Spherical.canSimpleDraw fun(self:Spherical,position:SphericalPosition,radius:number):boolean,integer
+---@alias def.Spherical.applyVertexShader fun(self:Spherical,viewer:Viewer):nil
+---@alias def.Spherical.applyPixelShader fun(self:Spherical,viewer:Viewer):nil
+---@alias def.Spherical.applyForegroundShader fun(self:Spherical):nil
+---@alias def.Spherical.rThetaTo fun(self:Spherical,position:SphericalPosition,target:SphericalPosition):number,number
+---@alias def.Spherical.zoomFactorToScreen fun(self:Spherical,position:SphericalPosition):number[]
+
 
 ---@class Spherical:GeometryBase
----@field init def.GeometryBase.init
----@field update def.GeometryBase.update
----@field rThetaGo def.GeometryBase.rThetaGo
----@field distance def.GeometryBase.distance
----@field to def.GeometryBase.to
----@field sideToLine def.GeometryBase.sideToLine
----@field nearestToLine def.GeometryBase.nearestToLine
----@field toScreen def.GeometryBase.toScreen
----@field canSimpleDraw def.GeometryBase.canSimpleDraw
----@field applyVertexShader def.GeometryBase.applyVertexShader
----@field applyPixelShader def.GeometryBase.applyPixelShader
----@field applyForegroundShader def.GeometryBase.applyForegroundShader
----@field rThetaTo def.GeometryBase.rThetaTo
----@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen
+---@field init def.Spherical.init
+---@field update def.Spherical.update
+---@field rThetaGo def.Spherical.rThetaGo
+---@field distance def.Spherical.distance
+---@field to def.Spherical.to
+---@field sideToLine def.Spherical.sideToLine
+---@field nearestToLine def.Spherical.nearestToLine
+---@field toScreen def.Spherical.toScreen
+---@field canSimpleDraw def.Spherical.canSimpleDraw
+---@field applyVertexShader def.Spherical.applyVertexShader
+---@field applyPixelShader def.Spherical.applyPixelShader
+---@field applyForegroundShader def.Spherical.applyForegroundShader
+---@field rThetaTo def.Spherical.rThetaTo
+---@field zoomFactorToScreen def.Spherical.zoomFactorToScreen

@@ -251,7 +251,7 @@ return{
                 local fairy=Enemy{kinematicState={pos=copyTable(pos0),dir=dir0,speed=0,skipZoom=true},maxhp=1500,sprite=Asset.fairySprites.large.white,lifeFrame=1200,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=5}}
                 local side=-1 -- -1 is left, 1 is right
                 local spawner=BulletSpawner{
-                    period=60,firstPeriod=9999,lifeFrame=1200,bulletNumber=200,bulletSpeed=150,angle=dir0+math.pi,range=math.pi/15,bulletSprite=BulletSprites.rain.white,bulletLifeFrame=300,visible=false,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
+                    period=60,firstPeriod=9999,lifeFrame=1200,bulletNumber=200,bulletSpeed=150,angle=dir0+math.pi,range=math.pi/15,bulletSprite=BulletSprites.rain.white,bulletLifeFrame=200,visible=false,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
                         cir.kinematicState.speed=args.index*5
                         if side==1 then
                             cir.kinematicState.speed=5*(self.bulletNumber+1)-cir.kinematicState.speed

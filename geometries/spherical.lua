@@ -42,104 +42,16 @@ Spherical.viewConfig = {
     rotateSpeed=0,
 }
 
-local function vec3(x, y, z)
-    return { x = x, y = y, z = z }
-end
-
-local function dot(a, b)
-    return a.x * b.x + a.y * b.y + a.z * b.z
-end
-
-local function cross(a, b)
-    return {
-        x = a.y * b.z - a.z * b.y,
-        y = a.z * b.x - a.x * b.z,
-        z = a.x * b.y - a.y * b.x,
-    }
-end
-
-local function length3(v)
-    return math.sqrt(dot(v, v))
-end
-
-local function normalize(v)
-    local m = length3(v)
-    return vec3(v.x / m, v.y / m, v.z / m)
-end
-
-local function scale(v, s)
-    return vec3(v.x * s, v.y * s, v.z * s)
-end
-
-local function add(a, b)
-    return vec3(a.x + b.x, a.y + b.y, a.z + b.z)
-end
-
-local function sub(a, b)
-    return vec3(a.x - b.x, a.y - b.y, a.z - b.z)
-end
-
-local function copy_pos(p)
-    return { x = p.x, y = p.y, z = p.z }
-end
-
-local function basis_at(unitPos)
-    local northAxis = vec3(0, 0, 1)
-    local east = cross(northAxis, unitPos)
-    east = normalize(east)
-    local north = normalize(cross(unitPos, east))
-    return east, north
-end
-
-local function to_unit(pos)
-    return normalize(vec3(pos.x, pos.y, pos.z))
-end
-
-local function from_unit(unitPos)
-    return scale(unitPos, Spherical.radius)
-end
-
-local function projection_limit_radius(c)
-    return (2 * Spherical.radius * math.sqrt(1 - c * c)) / (1 - c)
-end
-
-local function source_projection_limit_radius()
-    local c = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
-    return projection_limit_radius(c)
-end
-
 local function source_hemisphere_radius_pixels()
-    local sourceLimit = source_projection_limit_radius()
-    local hemisphereLimit = projection_limit_radius(0)
+    local c = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
+    local sourceLimit = (2 * Spherical.radius * math.sqrt(1 - c * c)) / (1 - c)
+    local hemisphereLimit = 2 * Spherical.radius
     return Spherical.viewConfig.sourceCircleRadius * hemisphereLimit / sourceLimit
 end
 
-local function project_from_north(unitPos)
-    local denom = 1 - unitPos.z
-    local k = (2 * Spherical.radius) / denom
-    return { x = k * unitPos.x, y = k * unitPos.y }
-end
-
-local function project_from_south(unitPos)
-    local denom = 1 + unitPos.z
-    local k = (2 * Spherical.radius) / denom
-    return { x = k * unitPos.x, y = k * unitPos.y }
-end
-
-local function map_to_source_circle(proj, center)
-    local limitR = source_projection_limit_radius()
-    local normalizedX = proj.x / limitR
-    local normalizedY = proj.y / limitR
-    return {
-        x = center.x + normalizedX * Spherical.viewConfig.sourceCircleRadius,
-        y = center.y + normalizedY * Spherical.viewConfig.sourceCircleRadius,
-    }
-end
-
 function Spherical:init()
-    local start = normalize(vec3(0.35, 0.0, 0.93))
-    local p = from_unit(start)
-    return { pos = { x = p.x, y = p.y, z = p.z }, speed = 0, dir = 0 }
+    local len = math.sqrt(0.35 * 0.35 + 0.93 * 0.93)
+    return { pos = { x = 0.35 / len * Spherical.radius, y = 0, z = 0.93 / len * Spherical.radius }, speed = 0, dir = 0 }
 end
 
 function Spherical:setZoomSpeed(value,duration)
@@ -167,7 +79,7 @@ end
 
 function Spherical:rThetaGo(position, length, direction)
     if length == 0 then
-        return copy_pos(position), direction
+        return { x = position.x, y = position.y, z = position.z }, direction
     end
 
     local backward = length < 0
@@ -176,111 +88,279 @@ function Spherical:rThetaGo(position, length, direction)
         direction = direction + math.pi
     end
 
-    local u = to_unit(position)
-    local east, north = basis_at(u)
-    local tangent = normalize(add(scale(east, math.cos(direction)), scale(north, math.sin(direction))))
+    -- Work on the unit sphere with scalar components to avoid hot-path vector tables.
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    local ux = position.x / posLen
+    local uy = position.y / posLen
+    local uz = position.z / posLen
 
+    -- Local tangent basis at the start point: east = z-axis cross u, north = u cross east.
+    local eastX = -uy
+    local eastY = ux
+    local eastZ = 0
+    local eastLen = math.sqrt(eastX * eastX + eastY * eastY + eastZ * eastZ)
+    eastX = eastX / eastLen
+    eastY = eastY / eastLen
+    eastZ = eastZ / eastLen
+
+    local northX = uy * eastZ - uz * eastY
+    local northY = uz * eastX - ux * eastZ
+    local northZ = ux * eastY - uy * eastX
+    local northLen = math.sqrt(northX * northX + northY * northY + northZ * northZ)
+    northX = northX / northLen
+    northY = northY / northLen
+    northZ = northZ / northLen
+
+    local dirCos = math.cos(direction)
+    local dirSin = math.sin(direction)
+    local tangentX = eastX * dirCos + northX * dirSin
+    local tangentY = eastY * dirCos + northY * dirSin
+    local tangentZ = eastZ * dirCos + northZ * dirSin
+    local tangentLen = math.sqrt(tangentX * tangentX + tangentY * tangentY + tangentZ * tangentZ)
+    tangentX = tangentX / tangentLen
+    tangentY = tangentY / tangentLen
+    tangentZ = tangentZ / tangentLen
+
+    -- Advance along the great circle by alpha radians.
     local alpha = length / Spherical.radius
-    local newUnit = normalize(add(scale(u, math.cos(alpha)), scale(tangent, math.sin(alpha))))
+    local alphaCos = math.cos(alpha)
+    local alphaSin = math.sin(alpha)
+    local newX = ux * alphaCos + tangentX * alphaSin
+    local newY = uy * alphaCos + tangentY * alphaSin
+    local newZ = uz * alphaCos + tangentZ * alphaSin
+    local newLen = math.sqrt(newX * newX + newY * newY + newZ * newZ)
+    newX = newX / newLen
+    newY = newY / newLen
+    newZ = newZ / newLen
 
-    local axis = normalize(cross(u, tangent))
-    local transportedTangent = normalize(cross(axis, newUnit))
+    -- Parallel-transport the heading around the same great-circle rotation axis.
+    local axisX = uy * tangentZ - uz * tangentY
+    local axisY = uz * tangentX - ux * tangentZ
+    local axisZ = ux * tangentY - uy * tangentX
+    local axisLen = math.sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ)
+    axisX = axisX / axisLen
+    axisY = axisY / axisLen
+    axisZ = axisZ / axisLen
 
-    local east2, north2 = basis_at(newUnit)
-    local newDir = math.atan2(dot(transportedTangent, north2), dot(transportedTangent, east2))
+    local transportedX = axisY * newZ - axisZ * newY
+    local transportedY = axisZ * newX - axisX * newZ
+    local transportedZ = axisX * newY - axisY * newX
+    local transportedLen = math.sqrt(transportedX * transportedX + transportedY * transportedY + transportedZ * transportedZ)
+    transportedX = transportedX / transportedLen
+    transportedY = transportedY / transportedLen
+    transportedZ = transportedZ / transportedLen
+
+    -- Express the transported tangent in the destination's east/north basis.
+    local east2X = -newY
+    local east2Y = newX
+    local east2Z = 0
+    local east2Len = math.sqrt(east2X * east2X + east2Y * east2Y + east2Z * east2Z)
+    east2X = east2X / east2Len
+    east2Y = east2Y / east2Len
+    east2Z = east2Z / east2Len
+
+    local north2X = newY * east2Z - newZ * east2Y
+    local north2Y = newZ * east2X - newX * east2Z
+    local north2Z = newX * east2Y - newY * east2X
+    local north2Len = math.sqrt(north2X * north2X + north2Y * north2Y + north2Z * north2Z)
+    north2X = north2X / north2Len
+    north2Y = north2Y / north2Len
+    north2Z = north2Z / north2Len
+
+    local newDir = math.atan2(
+        transportedX * north2X + transportedY * north2Y + transportedZ * north2Z,
+        transportedX * east2X + transportedY * east2Y + transportedZ * east2Z
+    )
 
     if backward then
         newDir = newDir + math.pi
     end
 
-    local p = from_unit(newUnit)
-    return { x = p.x, y = p.y, z = p.z }, newDir
+    return { x = newX * Spherical.radius, y = newY * Spherical.radius, z = newZ * Spherical.radius }, newDir
 end
 
 function Spherical:distance(position1, position2)
-    local u = to_unit(position1)
-    local v = to_unit(position2)
-    local c = math.clamp(dot(u, v), -1, 1)
+    local len1 = math.sqrt(position1.x * position1.x + position1.y * position1.y + position1.z * position1.z)
+    local len2 = math.sqrt(position2.x * position2.x + position2.y * position2.y + position2.z * position2.z)
+    local c = math.clamp(
+        (position1.x / len1) * (position2.x / len2) +
+        (position1.y / len1) * (position2.y / len2) +
+        (position1.z / len1) * (position2.z / len2),
+        -1,
+        1
+    )
     return Spherical.radius * math.acos(c)
 end
 
 function Spherical:to(position, target)
-    local u = to_unit(position)
-    local v = to_unit(target)
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    local ux = position.x / posLen
+    local uy = position.y / posLen
+    local uz = position.z / posLen
 
-    local normal = cross(u, v)
-    normal = normalize(normal)
+    local targetLen = math.sqrt(target.x * target.x + target.y * target.y + target.z * target.z)
+    local vx = target.x / targetLen
+    local vy = target.y / targetLen
+    local vz = target.z / targetLen
 
-    local tangent = normalize(cross(normal, u))
-    if dot(tangent, sub(v, u)) < 0 then
-        tangent = scale(tangent, -1)
+    -- Great-circle plane normal, then tangent direction at the current point.
+    local normalX = uy * vz - uz * vy
+    local normalY = uz * vx - ux * vz
+    local normalZ = ux * vy - uy * vx
+    local normalLen = math.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ)
+    normalX = normalX / normalLen
+    normalY = normalY / normalLen
+    normalZ = normalZ / normalLen
+
+    local tangentX = normalY * uz - normalZ * uy
+    local tangentY = normalZ * ux - normalX * uz
+    local tangentZ = normalX * uy - normalY * ux
+    local tangentLen = math.sqrt(tangentX * tangentX + tangentY * tangentY + tangentZ * tangentZ)
+    tangentX = tangentX / tangentLen
+    tangentY = tangentY / tangentLen
+    tangentZ = tangentZ / tangentLen
+
+    -- Choose the tangent orientation that points toward the target.
+    if tangentX * (vx - ux) + tangentY * (vy - uy) + tangentZ * (vz - uz) < 0 then
+        tangentX = -tangentX
+        tangentY = -tangentY
+        tangentZ = -tangentZ
     end
 
-    local east, north = basis_at(u)
-    return math.atan2(dot(tangent, north), dot(tangent, east))
+    -- Convert the tangent vector back into a local heading angle.
+    local eastX = -uy
+    local eastY = ux
+    local eastZ = 0
+    local eastLen = math.sqrt(eastX * eastX + eastY * eastY + eastZ * eastZ)
+    eastX = eastX / eastLen
+    eastY = eastY / eastLen
+    eastZ = eastZ / eastLen
+
+    local northX = uy * eastZ - uz * eastY
+    local northY = uz * eastX - ux * eastZ
+    local northZ = ux * eastY - uy * eastX
+    local northLen = math.sqrt(northX * northX + northY * northY + northZ * northZ)
+    northX = northX / northLen
+    northY = northY / northLen
+    northZ = northZ / northLen
+
+    return math.atan2(
+        tangentX * northX + tangentY * northY + tangentZ * northZ,
+        tangentX * eastX + tangentY * eastY + tangentZ * eastZ
+    )
 end
 
 function Spherical:sideToLine(position, linePoint1, linePoint2)
-    local u = to_unit(position)
-    local a = to_unit(linePoint1)
-    local b = to_unit(linePoint2)
-    local normal = cross(a, b)
-    return dot(u, normal) > 0
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    local ux = position.x / posLen
+    local uy = position.y / posLen
+    local uz = position.z / posLen
+
+    local aLen = math.sqrt(linePoint1.x * linePoint1.x + linePoint1.y * linePoint1.y + linePoint1.z * linePoint1.z)
+    local ax = linePoint1.x / aLen
+    local ay = linePoint1.y / aLen
+    local az = linePoint1.z / aLen
+
+    local bLen = math.sqrt(linePoint2.x * linePoint2.x + linePoint2.y * linePoint2.y + linePoint2.z * linePoint2.z)
+    local bx = linePoint2.x / bLen
+    local by = linePoint2.y / bLen
+    local bz = linePoint2.z / bLen
+
+    -- Side is the sign of position dot the great-circle plane normal.
+    local normalX = ay * bz - az * by
+    local normalY = az * bx - ax * bz
+    local normalZ = ax * by - ay * bx
+    return ux * normalX + uy * normalY + uz * normalZ > 0
 end
 
 function Spherical:nearestToLine(position, linePoint1, linePoint2)
-    local u = to_unit(position)
-    local a = to_unit(linePoint1)
-    local b = to_unit(linePoint2)
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    local ux = position.x / posLen
+    local uy = position.y / posLen
+    local uz = position.z / posLen
+
+    local aLen = math.sqrt(linePoint1.x * linePoint1.x + linePoint1.y * linePoint1.y + linePoint1.z * linePoint1.z)
+    local ax = linePoint1.x / aLen
+    local ay = linePoint1.y / aLen
+    local az = linePoint1.z / aLen
+
+    local bLen = math.sqrt(linePoint2.x * linePoint2.x + linePoint2.y * linePoint2.y + linePoint2.z * linePoint2.z)
+    local bx = linePoint2.x / bLen
+    local by = linePoint2.y / bLen
+    local bz = linePoint2.z / bLen
 
     -- The normal vector to the plane containing the Great Circle
-    local normal = cross(a, b)
-    local len = length3(normal)
+    local normalX = ay * bz - az * by
+    local normalY = az * bx - ax * bz
+    local normalZ = ax * by - ay * bx
+    local len = math.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ)
 
     -- If linePoint1 and linePoint2 are the same or antipodal, the line is undefined.
     if len < Spherical.EPS then
-        return copy_pos(linePoint1)
+        return { x = linePoint1.x, y = linePoint1.y, z = linePoint1.z }
     end
-    normal = scale(normal, 1 / len)
+    normalX = normalX / len
+    normalY = normalY / len
+    normalZ = normalZ / len
 
-    -- Project the point u onto the plane: proj = u - (u · normal) * normal
-    local distToPlane = dot(u, normal)
-    local proj = sub(u, scale(normal, distToPlane))
+    -- Project the point u onto the plane: proj = u - (u dot normal) * normal.
+    local distToPlane = ux * normalX + uy * normalY + uz * normalZ
+    local projX = ux - normalX * distToPlane
+    local projY = uy - normalY * distToPlane
+    local projZ = uz - normalZ * distToPlane
 
     -- If the point is exactly at the "pole" of the great circle, 
     -- all points on the circle are equidistant. Return a default.
-    local projLen = length3(proj)
+    local projLen = math.sqrt(projX * projX + projY * projY + projZ * projZ)
     if projLen < Spherical.EPS then
-        return copy_pos(linePoint1)
+        return { x = linePoint1.x, y = linePoint1.y, z = linePoint1.z }
     end
 
     -- Normalize the projection to move it to the sphere's surface and scale to radius
-    return from_unit(scale(proj, 1 / projLen))
+    return {
+        x = projX / projLen * Spherical.radius,
+        y = projY / projLen * Spherical.radius,
+        z = projZ / projLen * Spherical.radius,
+    }
 end
 
 function Spherical:toScreen(position)
-    local u = to_unit(position)
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    local ux = position.x / posLen
+    local uy = position.y / posLen
+    local uz = position.z / posLen
     ---@type (Dummy|ScreenPosition)[]
     local ret = { GeometryBase.Dummy, GeometryBase.Dummy }
     local sourceCutoff = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
+    -- Scale stereographic coordinates so the cutoff latitude lands on the source circle.
+    local sourceLimitR = (2 * Spherical.radius * math.sqrt(1 - sourceCutoff * sourceCutoff)) / (1 - sourceCutoff)
+    local sourceScale = Spherical.viewConfig.sourceCircleRadius / sourceLimitR
 
     -- Primary map: project from viewer (north pole), cover 45N to 90S.
-    if u.z <= sourceCutoff then
-        local p = project_from_north(u)
-        if p then
-            ret[1] = map_to_source_circle(p, Spherical.viewConfig.sourcePrimaryCenter)
-            ret[1].rotation = -math.atan2(p.y,p.x)+math.pi/2
-            ret[1].flip = true
-        end
+    if uz <= sourceCutoff then
+        local k = (2 * Spherical.radius) / (1 - uz)
+        local px = k * ux
+        local py = k * uy
+        local center = Spherical.viewConfig.sourcePrimaryCenter
+        ret[1] = {
+            x = center.x + px * sourceScale,
+            y = center.y + py * sourceScale,
+            rotation = -math.atan2(py, px) + math.pi / 2,
+            flip = true,
+        }
     end
 
     -- Secondary map: project from south pole, cover 90N to 45S.
-    if u.z >= -sourceCutoff then
-        local p = project_from_south(u)
-        if p then
-            ret[2] = map_to_source_circle(p, Spherical.viewConfig.sourceSecondaryCenter)
-            ret[2].rotation = math.atan2(p.y,p.x)+math.pi/2
-        end
+    if uz >= -sourceCutoff then
+        local k = (2 * Spherical.radius) / (1 + uz)
+        local px = k * ux
+        local py = k * uy
+        local center = Spherical.viewConfig.sourceSecondaryCenter
+        ret[2] = {
+            x = center.x + px * sourceScale,
+            y = center.y + py * sourceScale,
+            rotation = math.atan2(py, px) + math.pi / 2,
+        }
     end
 
     return ret
@@ -329,9 +409,10 @@ function Spherical:applyPixelShader(viewer)
     local viewerLat, viewerLon = 0.0, 0.0
     local viewDirection = 0.0
     if Spherical.viewConfig.following then
-        local u = to_unit(viewer.kinematicState.pos)
-        viewerLat = math.asin(math.clamp(u.z, -1, 1))
-        viewerLon = math.atan2(u.y, u.x)
+        local pos = viewer.kinematicState.pos
+        local posLen = math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
+        viewerLat = math.asin(math.clamp(pos.z / posLen, -1, 1))
+        viewerLon = math.atan2(pos.y / posLen, pos.x / posLen)
         viewDirection = viewer.viewDirection
     end
     shader:send("viewer_view_direction", viewDirection)
@@ -343,19 +424,22 @@ function Spherical:applyForegroundShader()
 end
 
 function Spherical:zoomFactorToScreen(position)
-    local u = to_unit(position)
+    local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
+    local uz = position.z / posLen
     local factors = { 0, 0 }
     local sourceCutoff = Spherical.viewConfig.sourceCutoffZ
-    local sourceLimitR = source_projection_limit_radius()
+    -- Match toScreen's source-circle scaling, then apply the local stereographic derivative.
+    local c = math.clamp(sourceCutoff, 0, 0.999999)
+    local sourceLimitR = (2 * Spherical.radius * math.sqrt(1 - c * c)) / (1 - c)
 
-    if u.z <= sourceCutoff then
-        local denom = 1 - u.z
+    if uz <= sourceCutoff then
+        local denom = 1 - uz
         local stereoScale = (2 * Spherical.radius) / denom
         factors[1] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.sourceCircleRadius / sourceLimitR)
     end
 
-    if u.z >= -sourceCutoff then
-        local denom = 1 + u.z
+    if uz >= -sourceCutoff then
+        local denom = 1 + uz
         local stereoScale = (2 * Spherical.radius) / denom
         factors[2] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.sourceCircleRadius / sourceLimitR)
     end
