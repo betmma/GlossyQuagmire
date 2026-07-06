@@ -28,7 +28,7 @@ local UIText=UI.Base:extend()
 ---@field autoSize boolean|nil whether to automatically set width to the width of the text using font:getWidth, and same to height. default false.
 ---@field isBold boolean|nil whether to simulate bold by drawing text multiple times with slight offset. default true.
 ---@field boldOffset number|nil the offset ratio for simulating bold (will be multiplied by font size to get actual offset). default to 0.05 = 5% of font size.
----@field boldColor rgbColor|nil the color for simulating bold, default to 1-color with same alpha.
+---@field boldColor rgbColor|nil the color for simulating bold, default to black or white based on the text color with same alpha.
 ---@field updateText nil|fun(self):string if set, this function will be called in update to update the text. this is useful for dynamic text that changes every frame, like score.
 
 function UIText:new(args)
@@ -42,7 +42,14 @@ function UIText:new(args)
     self.autoSize=args.autoSize or false
     self.isBold=args.isBold~=false
     self.boldOffset=args.boldOffset or 0.05
-    self.boldColor=args.boldColor or {1-self.color[1],1-self.color[2],1-self.color[3],self.color[4]}
+    self.boldColor=args.boldColor
+    if self.boldColor==nil then
+        if math.max(self.color[1], self.color[2], self.color[3])>0.5 then
+            self.boldColor={0,0,0,self.color[4]}
+        else
+            self.boldColor={1,1,1,self.color[4]}
+        end
+    end
     self.updateText=args.updateText
     local text=args.text or ""
     self:setText(text)

@@ -20,7 +20,7 @@ return {
         local titleText=leftPart:child(
             UI.Text{
                 text=GAME_NAME,
-                fontSize=36,color={55/255,65/255,81/255,1},
+                fontSize=36,color={55/255,65/255,81/255,1},boldColor={1-55/255,1-65/255,1-81/255,1},isBold=true,
                 x=200,y=250,width=400,
                 align='center',
             }

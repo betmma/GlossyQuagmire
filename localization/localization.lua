@@ -706,6 +706,10 @@ return {
                 en_us = 'Bombs',
                 zh_cn = '符卡',
             },
+            pieces = {
+                en_us = '{piece}/{max} ^',
+                zh_cn = '{piece}/{max} ^'
+            },
             power = {
                 en_us = 'Power',
                 zh_cn = '火力',
