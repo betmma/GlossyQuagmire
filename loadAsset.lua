@@ -469,11 +469,49 @@ Asset.flushBatches=function(self)
         batch:flush()
     end
 end
+
+---@class shoveEffect:strict
+---@field name string
+---@field active fun(self):boolean
+---@field shader love.Shader
+---@field sendArgs fun(self,shader:love.Shader):nil
+
+---@class callableShoveEffect:shoveEffect effect that can be easily used by call its run() method. Generally it will create an event to manage its args
+---@field run fun(self:callableShoveEffect):nil
+---@field args table
+
+---@type callableShoveEffect
+local glassBrokenEffect={
+    name='glassBroken',
+    shader=ShaderScan:load_shader('shaders/effects/glassBroken.glsl'),
+    active=function(self)
+        return true
+    end,
+    sendArgs=function(self,shader)
+        shader:send('progress',self.args.progress)
+        shader:send('seed',self.args.seed)
+    end,
+    args={progress=0,seed=0},
+    run=function(self)
+        self.args.progress=0
+        Event.EaseEvent{easeObj=self.args,aims={progress=1},duration=60}
+        self.args.seed=math.pseudoRandom(G.frame or 0)
+    end
+}
+---@type shoveEffect[]
+Asset.mainEffects={
+    glassBrokenEffect
+}
+
+Asset.mainEffectsByName={}
+for i, effect in pairs(Asset.mainEffects) do
+    Asset.mainEffectsByName[effect.name]=effect
+end
 local activeCanvas
 Asset.drawBatches=function(self)
-    if G:useCanvas() then
+    if G.runInfo.geometry.hasPixelShader then
         activeCanvas=love.graphics.getCanvas() -- shove is lying. it does not preserve canvas so must save and call setCanvas(activeCanvas) later
-        love.graphics.setCanvas(G.mainCanvas)
+        love.graphics.setCanvas(G.runInfo.geometry.canvas)
         love.graphics.clear({0,0,0,1})
     end
     if G.runInfo.player then
@@ -501,15 +539,23 @@ Asset.drawBatches=function(self)
             love.graphics.setBlendMode('alpha') -- default mode
         end
         if layer=='MAIN' then
-            if G:useCanvas() then
+            if G.runInfo.geometry.hasPixelShader then
                 love.graphics.setShader()
                 if G.runInfo.player then
                     G.runInfo.geometry:applyPixelShader(G.runInfo.player)
                 end
                 love.graphics.setCanvas(activeCanvas)
-                love.graphics.draw(G.mainCanvas)
+                love.graphics.draw(G.runInfo.geometry.canvas)
             end
             love.graphics.setShader()
+            -- add shoveEffects before ending main layer
+            shove.clearEffects('main')
+            for i, effect in pairs(self.mainEffects) do
+                if effect:active() then
+                    effect:sendArgs(effect.shader)
+                    shove.addEffect('main',effect.shader)
+                end
+            end
             shove.endLayer()
             shove.beginLayer('UIBatches')
             love.graphics.origin()

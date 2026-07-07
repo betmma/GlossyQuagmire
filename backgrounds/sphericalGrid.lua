@@ -131,7 +131,7 @@ function SphericalGrid:drawInSphericalCanvas()
     love.graphics.setColor(self.color[1],self.color[2],self.color[3])
     love.graphics.setShader(self.shader)
     self:paramSendFunction(self.shader)
-    love.graphics.rectangle('fill',0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
+    love.graphics.rectangle('fill',0,0,G.geometries.Spherical.CANVAS_WIDTH,G.geometries.Spherical.CANVAS_HEIGHT)
     love.graphics.setShader()
     love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
 end

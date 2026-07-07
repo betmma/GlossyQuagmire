@@ -374,6 +374,8 @@ function SpellcardPhase:run(boss)
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
     if self.remainingFrames==0 and not self.isTimeout then
         self.failedBonus=true
+    else -- excluding timing out normal spellcard, which is either timeout spell and time runs out, or hp<=0 and cleared the spellcard. show glassBroken effect
+        Asset.mainEffectsByName.glassBroken:run()
     end
     if not self.failedBonus then
         EventManager.post(EventManager.EVENTS.GAIN_SCORE, self.currentBonus)

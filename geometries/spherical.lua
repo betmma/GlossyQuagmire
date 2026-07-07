@@ -20,6 +20,9 @@ local Spherical = GeometryBase:extend()
 
 Spherical.radius = 220
 Spherical.EPS = 1e-8
+Spherical.CANVAS_WIDTH, Spherical.CANVAS_HEIGHT = 3000, 1500
+local CANVAS_WIDTH, CANVAS_HEIGHT = Spherical.CANVAS_WIDTH, Spherical.CANVAS_HEIGHT
+Spherical.canvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 local CUTOFF_Z = math.sqrt(0.5) -- 45 deg latitude on a unit sphere.
 local sourceR=CANVAS_WIDTH/4
 ---@type SphericalViewConfig

@@ -178,7 +178,6 @@ local geometries=require"geometries.geometryBase"
 ---@field language string
 ---@field frame integer
 ---@field replay table|nil
----@field mainCanvas love.Canvas
 ---@field foregroundShaderData {shader: love.Shader, args: table}
 ---@field transitionData table<string, table<string, table>>
 ---@field sceneTempObjs any[]
@@ -643,7 +642,6 @@ G.update=function(self,dt)
 
     UI.Base:cleanObjects() -- to remove removed elements in class.objects
 end
-G.mainCanvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 G.draw=function(self)
     Asset:clearBatches()
     shove.beginLayer('main')
@@ -682,9 +680,6 @@ G._drawBatches=function(self)
         self.backgroundPattern:draw()
     end
     self.currentUI.draw(self)
-end
-G.useCanvas=function(self)
-    return self.runInfo.geometry.hasPixelShader
 end
 -- remove all objects in the scene
 G.removeAll=function(self)

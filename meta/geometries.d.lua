@@ -50,8 +50,10 @@
 ---@alias def.GeometryBase.canSimpleDraw fun(self:GeometryBase,position:Position,radius:number):boolean,integer
 ---Apply shader for drawing objects in this geometry if needed. The viewer is usually the player, and the shader will need the viewer's position and direction to do correct projection. It's called before drawing batches.
 ---@alias def.GeometryBase.applyVertexShader fun(self:GeometryBase,viewer:Viewer):nil
----Apply pixel shader. If using pixel shader, the geometry's toScreen considers CANVAS_WIDTH and CANVAS_HEIGHT and draws to a larger space. It's called at the end of 'main' layer.
+---Apply pixel shader. It's called at the end of 'main' layer in loadAsset.lua.
 ---@alias def.GeometryBase.applyPixelShader fun(self:GeometryBase,viewer:Viewer):nil
+---The canvas used for pixel shader. The pixel shader reads from this canvas and draws to the screen. Vertex shader will need to consider its size instead of screen size if using pixel shader.
+---@alias def.GeometryBase.canvas love.Canvas|nil
 ---Apply shader for drawing foreground. Like make a rectangle hole to show the gameplay area.
 ---@alias def.GeometryBase.applyForegroundShader fun(self:GeometryBase):nil
 ---From the [position], the distance to the target and the direction facing the [target] (if multiple values are possible, return the shortest distance and the corresponding direction).
@@ -75,6 +77,7 @@
 ---@field applyVertexShader def.GeometryBase.applyVertexShader
 ---@field hasPixelShader boolean whether this geometry has pixel shader. if not, doesn't switch canvas (its different size will change love_ScreenSize and cause problems)
 ---@field applyPixelShader def.GeometryBase.applyPixelShader
+---@field canvas love.Canvas|nil
 ---@field applyForegroundShader def.GeometryBase.applyForegroundShader
 ---@field public viewConfig ViewConfig
 --------below are methods defaulted to be composed by using the above methods, but you can override them for better performance if you want.
