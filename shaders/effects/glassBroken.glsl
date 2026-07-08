@@ -1,5 +1,5 @@
-extern float progress;
-extern float seed;
+uniform float progress;
+uniform float seed;
 
 const float SHARD_SCALE = 13.8;
 

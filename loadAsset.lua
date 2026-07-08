@@ -474,33 +474,81 @@ end
 ---@field name string
 ---@field active fun(self):boolean
 ---@field shader love.Shader
----@field sendArgs fun(self,shader:love.Shader):nil
+---@field sendArgs fun(self):nil
 
 ---@class callableShoveEffect:shoveEffect effect that can be easily used by call its run() method. Generally it will create an event to manage its args
 ---@field run fun(self:callableShoveEffect):nil
 ---@field args table
 
----@type callableShoveEffect
-local glassBrokenEffect={
+---@class SimpleCallableShoveEffect:callableShoveEffect use fixed active() and sendArgs() methods, only need to define run() method.
+---@field shaderArgs table
+
+---@overload fun(args:SimpleCallableShoveEffectArgs):SimpleCallableShoveEffect
+local SimpleCallableShoveEffect=Object:extend()
+
+---@class SimpleCallableShoveEffectArgs
+---@field name string
+---@field shader love.Shader
+---@field shaderArgs table
+---@field args table
+---@field run fun(self:SimpleCallableShoveEffect):nil
+function SimpleCallableShoveEffect:new(args)
+    self.name=args.name
+    self.args=args.args or {}
+    self.shaderArgs=args.shaderArgs or {}
+    self.shader=args.shader
+    self.run=args.run
+end
+
+function SimpleCallableShoveEffect:active()
+    return self.args.active
+end
+
+function SimpleCallableShoveEffect:reset()
+    self.args.active=false
+end
+
+function SimpleCallableShoveEffect:sendArgs()
+    local shader=self.shader
+    for k,v in pairs(self.shaderArgs) do
+        shader:send(k,v)
+    end
+end
+
+local glassBrokenEffect=SimpleCallableShoveEffect{
     name='glassBroken',
     shader=ShaderScan:load_shader('shaders/effects/glassBroken.glsl'),
-    active=function(self)
-        return true
-    end,
-    sendArgs=function(self,shader)
-        shader:send('progress',self.args.progress)
-        shader:send('seed',self.args.seed)
-    end,
-    args={progress=0,seed=0},
+    args={active=false},
+    shaderArgs={progress=0,seed=0},
     run=function(self)
-        self.args.progress=0
-        Event.EaseEvent{easeObj=self.args,aims={progress=1},duration=60}
-        self.args.seed=math.pseudoRandom(G.frame or 0)
+        self.args.active=true
+        self.shaderArgs.progress=0
+        Event.EaseEvent{easeObj=self.shaderArgs,aims={progress=1},duration=60,afterFunc=function()
+            self.args.active=false
+        end}
+        self.shaderArgs.seed=math.pseudoRandom(G.frame or 0)
+    end
+}
+
+local deathEffect=SimpleCallableShoveEffect{
+    name='death',
+    shader=ShaderScan:load_shader('shaders/effects/death.glsl'),
+    args={active=false},
+    shaderArgs={progress=0},
+    run=function(self)
+        self.args.active=true
+        local screenCenter=G.runInfo.geometry.viewConfig.screenCenter
+        self.shaderArgs.screenCenter={screenCenter.x,screenCenter.y}
+        self.shaderArgs.progress=0
+        Event.EaseEvent{easeObj=self.shaderArgs,aims={progress=1},duration=300,afterFunc=function()
+            self.args.active=false
+        end}
     end
 }
 ---@type shoveEffect[]
 Asset.mainEffects={
-    glassBrokenEffect
+    glassBrokenEffect,
+    deathEffect
 }
 
 Asset.mainEffectsByName={}
@@ -550,10 +598,12 @@ Asset.drawBatches=function(self)
             love.graphics.setShader()
             -- add shoveEffects before ending main layer
             shove.clearEffects('main')
-            for i, effect in pairs(self.mainEffects) do
-                if effect:active() then
-                    effect:sendArgs(effect.shader)
-                    shove.addEffect('main',effect.shader)
+            if G.STATE==G.STATES.IN_GAME or G.STATE==G.STATES.PAUSE then
+                for i, effect in pairs(self.mainEffects) do
+                    if effect:active() then
+                        effect:sendArgs()
+                        shove.addEffect('main',effect.shader)
+                    end
                 end
             end
             shove.endLayer()

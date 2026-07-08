@@ -162,6 +162,11 @@ return {
     enter=function(self,lastState)
         if lastState~=G.STATES.PAUSE then
             self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
+            for i,mainEffect in pairs(Asset.mainEffects) do
+                if mainEffect.reset then
+                    mainEffect:reset()
+                end
+            end
         end
         base.frame=0
         G.runInfo.exitToState=G.runInfo.exitToState or G.STATES.CHOOSE_PLAYER

@@ -319,9 +319,6 @@ end
 EventManager.listenTo(EventManager.EVENTS.PLAYER_GRAZE,Player.grazeEffect)
 
 function Player:hitEffect(damage)
-    if self.invincibleFrame>0 then
-        return
-    end
     damage=damage or 1
     self.hitFrame=self.frame
     G.runInfo.lives=G.runInfo.lives-damage
@@ -362,14 +359,21 @@ function Player:hitEffect(damage)
 end
 
 function Player:enterDeathbombing(damage)
+    if self.invincibleFrame>0 or self.duringDeathbombWindow then
+        return
+    end
+    local deathbombWindow=8
     SFX:play('playerHit',true,3)
     self.duringDeathbombWindow=true
     -- should have some visual effect here
+    Asset.mainEffectsByName.death:run()
     Event{obj=self,action=function()
-        wait(8)
+        wait(deathbombWindow)
         if self.duringDeathbombWindow then
             self.duringDeathbombWindow=false
             self:hitEffect(damage)
+        else -- has deathbombed and prevented death
+            Asset.mainEffectsByName.death.args.active=false -- stop the effect
         end
     end}
 end
