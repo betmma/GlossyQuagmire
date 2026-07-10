@@ -24,6 +24,12 @@ function math.rTheta2xy(r,theta)
     return r*math.cos(theta),r*math.sin(theta)
 end
 
+function math.rThetaAdd(r1,theta1,r2,theta2)
+    local x1,y1=math.rTheta2xy(r1,theta1)
+    local x2,y2=math.rTheta2xy(r2,theta2)
+    return math.xy2rTheta(x1+x2,y1+y2)
+end
+
 ---@param a number
 ---@param b number
 ---@param t number
@@ -230,6 +236,38 @@ function math.formatTime(seconds)
     local minutes = math.floor((seconds % 3600) / 60)
     local seconds = math.floor(seconds % 60)
     return string.format("%02d:%02d:%02d", hours, minutes, seconds)
+end
+
+function math.hsvToRgb(h, s, v)
+    -- If there is no saturation, the color is a shade of gray
+    if s <= 0 then
+        return v, v, v
+    end
+
+    -- Map Hue to one of 6 sectors
+    local sector = (h * 6) % 6
+    local i = math.floor(sector)
+    local f = sector - i
+
+    -- Calculate intermediate values
+    local p = v * (1 - s)
+    local q = v * (1 - s * f)
+    local t = v * (1 - s * (1 - f))
+
+    -- Assign RGB values based on the sector
+    if i == 0 then
+        return v, t, p
+    elseif i == 1 then
+        return q, v, p
+    elseif i == 2 then
+        return p, v, t
+    elseif i == 3 then
+        return p, q, v
+    elseif i == 4 then
+        return t, p, v
+    else -- i == 5
+        return v, p, q
+    end
 end
 
 function indexOf(tbl, value)

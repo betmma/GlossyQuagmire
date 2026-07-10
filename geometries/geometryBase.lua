@@ -106,6 +106,13 @@ function GeometryBase:zoomFactorToScreen(position)
     return screenDistance
 end
 
+function GeometryBase:reflect(point,linePoint1,linePoint2)
+    local nearest=self:nearestToLine(point,linePoint1,linePoint2)
+    local r,theta=self:rThetaTo(nearest,point)
+    local newPos,newTheta=self:rThetaGo(nearest,r,theta+math.pi)
+    return newPos,math.modClamp(newTheta+self:to(point,newPos)+math.pi)
+end
+
 local geometries={
     -- GeometryBase=GeometryBase,
     Euclidean=GeometryBase,

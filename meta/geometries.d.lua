@@ -60,6 +60,8 @@
 ---@alias def.GeometryBase.rThetaTo fun(self:GeometryBase,position:Position,target:Position):number,number
 ---Returns the zoom factors at the screen space of the position (one for each toScreen results). It's used to draw quads (only a square) where distortion is negligible (and with prerequisite that the geometry is conformal). The default implementation calls toScreen on position and position+small value to estimate.
 ---@alias def.GeometryBase.zoomFactorToScreen fun(self:GeometryBase,position:Position):number[]
+---Reflect a point across a line. Second return value is the delta direction (or, the direction of reflection when the previous direction is 0). Calculate the reflection direction by delta - previous direction.
+---@alias def.GeometryBase.reflect fun(self:GeometryBase,point:Position,linePoint1:Position,linePoint2:Position):Position,number
 ---@alias def.MovingGeometryBase.setZoomSpeed fun(self:MovingGeometryBase,value:number,duration:number):nil
 
 ---@class GeometryBase:Object base class for all geometries. is actually euclidean geometry as an example (and also because lua annotation doesnt support abstract classes). should not be instantiated as only its methods are used.
@@ -83,6 +85,7 @@
 --------below are methods defaulted to be composed by using the above methods, but you can override them for better performance if you want.
 ---@field rThetaTo def.GeometryBase.rThetaTo
 ---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen
+---@field reflect def.GeometryBase.reflect
 
 ---@class MovingGeometryBase:GeometryBase base class for all moving geometries.
 ---@field setZoomSpeed def.MovingGeometryBase.setZoomSpeed

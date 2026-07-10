@@ -1,10 +1,32 @@
 local Action={}
 
+Action.init=function(obj,actions)
+    for _, func in ipairs(actions) do
+        if type(func)=='table' and func.isAction and func.init then
+            func.init(obj, func.params)
+        end
+    end
+end
+
+--- extra update logic is common among different shapes, but not needed for every shape, so it's separated from the main update function. subclasses can call self:executeExtraUpdate(dt) in their update function to execute the extra update logic.
+---@param obj GameObject
+---@param extraUpdate ExtraUpdate
+---@param dt number
+function Action.executeExtraUpdate(obj,extraUpdate,dt)
+    for k, func in ipairs(extraUpdate or {}) do
+        if type(func)=='function' then
+            func(obj,dt)
+        elseif type(func)=='table' and func.isAction then
+            func.func(obj,func.params)
+        end
+    end
+end
+
 ---@class Action
 ---@field isAction true
 ---@field params table<string, any>
----@field func fun(self:Bullet, params:table<string, any>):nil it should not modify the params as this table may be shared among multiple objects. store into self if needed.
----@field init (fun(self:Bullet, params:table<string, any>):nil)|nil an optional function to initialize the action, called at bullet:new. 
+---@field func fun(self:GameObject, params:table<string, any>):nil it should not modify the params as this table may be shared among multiple objects. store into self if needed.
+---@field init (fun(self:GameObject, params:table<string, any>):nil)|nil an optional function to initialize the action, called at bullet:new. 
 
 
 local fadeOut=function(self,params)

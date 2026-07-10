@@ -97,11 +97,7 @@ function Bullet:new(args)
         self.spriteRotationSpeed=0.01
     end
 
-    for _, func in ipairs(self.extraUpdate) do
-        if type(func)=='table' and func.isAction and func.init then
-            func.init(self, func.params)
-        end
-    end
+    Action.init(self, self.extraUpdate)
     if args.events then
         for _, eventFunc in ipairs(args.events) do
             eventFunc(self, args)
@@ -143,7 +139,7 @@ function Bullet:meshDrawQuad(pos,w,h,rotation,quad,color,meshBatch,sideNum)
 end
 
 function Bullet:update(dt)
-    self:executeExtraUpdate(dt)
+    Action.executeExtraUpdate(self,self.extraUpdate,dt)
     Shape.update(self,dt)
     if #Effect.Shockwave.objects>0 then self:checkShockwaveRemove() end
     self:checkHitPlayer()

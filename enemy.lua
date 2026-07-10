@@ -37,11 +37,7 @@ function Enemy:new(args)
         self.extraUpdate={self.extraUpdate--[[@as function]]}
     end
     self.dropItems=args.dropItems or {}
-    for _, func in ipairs(self.extraUpdate) do
-        if type(func)=='table' and func.isAction and func.init then
-            func.init(self, func.params)
-        end
-    end
+    Action.init(self, self.extraUpdate)
 end
 
 Enemy.presetActions={
@@ -49,7 +45,7 @@ Enemy.presetActions={
 }
 
 function Enemy:update(dt)
-    self:executeExtraUpdate(dt)
+    Action.executeExtraUpdate(self,self.extraUpdate,dt)
     Enemy.super.update(self,dt)
     Bullet.checkHitPlayer(self)
     if not self.invincible then 
