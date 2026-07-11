@@ -1,4 +1,4 @@
-VERSION="0.3.2.2"
+VERSION="0.3.2.3"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
@@ -34,6 +34,7 @@ function love.load()
     BulletSpawner=require"bulletSpawner"
     Enemy=require"enemy"
     Boss=Enemy.Boss
+    require "stages.stage3.mirror"
     Asset=require"loadAsset"
     ---@type AssetBulletSpritesCollection
     BulletSprites,BulletBatch,SpriteData=Asset.bulletSprites,Asset.bulletBatch,Asset.SpriteData

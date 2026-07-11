@@ -671,7 +671,7 @@ return {
             STAGE_TITLE = {
                 stage1 = {
                     main = {
-                        en_us = 'Twisted Twig',
+                        en_us = 'Twisted Twigs',
                         zh_cn = '纠葛的枝梢',
                     },
                     small = {
@@ -687,6 +687,16 @@ return {
                     small = {
                         en_us = 'STAGE 2   Secret Path',
                         zh_cn = 'STAGE 2   秘密道路',
+                    }
+                },
+                stage3 = {
+                    main = {
+                        en_us = 'Dispersed Sunlight',
+                        zh_cn = '晞日月之光烈',
+                    },
+                    small = {
+                        en_us = 'STAGE 3   Pavilion of Visual Splendor',
+                        zh_cn = 'STAGE 3   观艳馆',
                     }
                 }
             },

@@ -238,6 +238,12 @@ function math.formatTime(seconds)
     return string.format("%02d:%02d:%02d", hours, minutes, seconds)
 end
 
+---@param h number
+---@param s number
+---@param v number
+---@return number r
+---@return number g
+---@return number b
 function math.hsvToRgb(h, s, v)
     -- If there is no saturation, the color is a shade of gray
     if s <= 0 then

@@ -29,7 +29,7 @@ local Bullet = Shape:extend()
 ---@class BulletArgs:ShapeArgs
 ---@field size number|nil The scale/zoom factor of the bullet. Default is 1.
 ---@field sprite Sprite
----@field spriteColor rgbaColor|nil RGBA table for tinting the sprite.
+---@field spriteColor rgbColor|rgbaColor|nil RGBA table for tinting the sprite.
 ---@field safe boolean|nil If true, the bullet will not damage the player. Default is false.
 ---@field invincible boolean|nil If true, normal shockwaves won't remove this bullet. Default is false.
 ---@field fromPlayer boolean|nil Another flag to exclude from shockwave's remove. Note that this flag does not make the bullet damage enemies. enemies loop through PlayerShot.objects.

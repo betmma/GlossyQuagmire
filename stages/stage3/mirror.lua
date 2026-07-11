@@ -51,6 +51,8 @@ end
 ---@field pos Position
 ---@field deltaDir number calculate new dir by deltaDir+oldDir*(rotateReverse and -1 or 1)
 ---@field rotateReverse boolean
+---@field reflectionCount integer
+---@field color rgbColor
 
 ---@return reflection[]
 function Mirror.getReflections(pos,maxNum)
@@ -64,7 +66,7 @@ function Mirror.getReflections(pos,maxNum)
     end
     local ret={}
     ---@type {[1]:reflection,[2]:(Mirror|nil)}[]
-    local queue={{{pos=pos,deltaDir=0,rotateReverse=false},nil}}
+    local queue={{{pos=pos,deltaDir=0,rotateReverse=false,color={1,1,1},reflectionCount=0},nil}}
     local current=1
     while #queue>=current and #ret<maxNum do
         local currentRef,currentMirror=queue[current][1],queue[current][2]
@@ -73,7 +75,7 @@ function Mirror.getReflections(pos,maxNum)
             if mirror~=currentMirror and mirror:inside(currentRef.pos) then
                 local reflectedPos, deltaDir=geo:reflect(currentRef.pos,mirror.pos1,mirror.pos2)
                 if reflectedPos then
-                    local reflection={pos=reflectedPos,deltaDir=deltaDir-currentRef.deltaDir,rotateReverse=not currentRef.rotateReverse}
+                    local reflection={pos=reflectedPos,deltaDir=deltaDir-currentRef.deltaDir,rotateReverse=not currentRef.rotateReverse,reflectionCount=currentRef.reflectionCount+1,color={math.hsvToRgb((Mirror.hsv[1]+(currentRef.reflectionCount+1)*Mirror.dh)%1,Mirror.hsv[2],Mirror.hsv[3])},}
                     table.insert(ret,reflection)
                     table.insert(queue,{reflection,mirror})
                 end
@@ -81,4 +83,58 @@ function Mirror.getReflections(pos,maxNum)
         end
     end
     return ret
+end
+
+local shaders={
+    Euclidean=ShaderScan:load_shader('shaders/effects/euclideanMirror.glsl'),
+}
+
+local geo2Shader=function()
+    if G.runInfo.geometry==G.geometries.Euclidean then
+        return shaders.Euclidean
+    end
+end
+
+Mirror.hsv={0,0,1}
+Mirror.dh=0.3
+
+Mirror.mainEffect={
+    name='Mirror',
+}
+
+function Mirror.mainEffect:active()
+    if #Mirror.objects>0  then
+        local shader=geo2Shader()
+        if shader then 
+            self.shader=shader
+            return true
+        end
+    end
+    return false
+end
+
+function Mirror.mainEffect:sendArgs()
+    local mirrors=Mirror.objects
+    local numMirrors=#mirrors
+    self.shader:send('numMirrors',numMirrors)
+    local pos1s,pos2s,posIns={}, {}, {}
+    local transparency=1
+    for i,mirror in ipairs(mirrors) do
+        ---@cast mirror Mirror
+        pos1s[i]={mirror.pos1.x,mirror.pos1.y}
+        pos2s[i]={mirror.pos2.x,mirror.pos2.y}
+        posIns[i]={mirror.posIn.x,mirror.posIn.y}
+        transparency=math.min(transparency,mirror.spriteTransparency)
+    end
+    self.shader:send('pos1s',unpack(pos1s))
+    self.shader:send('pos2s',unpack(pos2s))
+    self.shader:send('posIns',unpack(posIns))
+    self.shader:send('transparency',transparency)
+    self.shader:send('hsv',Mirror.hsv)
+    self.shader:send('dh',Mirror.dh)
+end
+
+function Mirror.setHSV(hsv,dh)
+    Mirror.hsv=hsv
+    Mirror.dh=dh
 end

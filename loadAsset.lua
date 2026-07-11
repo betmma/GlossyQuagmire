@@ -547,6 +547,7 @@ local deathEffect=SimpleCallableShoveEffect{
 }
 ---@type shoveEffect[]
 Asset.mainEffects={
+    Mirror.mainEffect,
     glassBrokenEffect,
     deathEffect
 }
@@ -598,7 +599,7 @@ Asset.drawBatches=function(self)
             love.graphics.setShader()
             -- add shoveEffects before ending main layer
             shove.clearEffects('main')
-            if G.STATE==G.STATES.IN_GAME or G.STATE==G.STATES.PAUSE then
+            if G.STATE==G.STATES.IN_GAME or G.STATE==G.STATES.PAUSE or G.STATE==G.STATES.TRANSITION_FADE then
                 for i, effect in pairs(self.mainEffects) do
                     if effect:active() then
                         effect:sendArgs()
