@@ -4,7 +4,7 @@ return{
         if G.runInfo.geometry==G.geometries.Euclidean then
             local border=Border.XYBorder{minx=20,maxx=500,miny=30,maxy=560}
             G.runInfo.player.border=border
-            G:replaceBackgroundPatternIfNot(BackgroundPattern.Planes)
+            G:replaceBackgroundPatternIfNot(BackgroundPattern.Corridor)
         end
         BGM:play('level2',true)
         DynamicUIObjs.showSoundtrack()
@@ -116,9 +116,9 @@ return{
                         mirrorPattern()
                     end
                 end}
-                wait(600)
+                wait(540)
                 DynamicUIObjs.showStageTitle('stage3')
-                wait(270)
+                wait(330)
             end
         },
     }

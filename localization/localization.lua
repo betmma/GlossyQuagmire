@@ -698,7 +698,7 @@ return {
                         en_us = 'STAGE 3   Pavilion of Visual Splendor',
                         zh_cn = 'STAGE 3   观艳馆',
                     }
-                }
+                },
             },
             hiScore = {
                 en_us = 'Hi-Score',

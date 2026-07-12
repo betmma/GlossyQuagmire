@@ -279,15 +279,16 @@ function WalkerShader:new()
     self.cam_roll=0
     self.camMoveRange={0.3,0.0}
     self.camMoveSpeed=0.2
+    self.reverseX=true -- don't know why but previous H^3 shaders reverse left and right key
     self.paramSendFunction=function(self,shader)
         shader:send("time", self.frame/60)
         local trans=self.cam_translation or {0,0,0}
-        shader:send("cam_translation", trans)
+        shader:send("translation", trans)
         local pitch=self.cam_pitch or 0
-        shader:send("cam_pitch", pitch)
-        shader:send("cam_yaw", self.cam_yaw or 0)
+        shader:send("pitch", pitch)
+        shader:send("yaw", self.cam_yaw or 0)
         local roll=self.cam_roll or 0
-        shader:send("cam_roll", roll)
+        shader:send("roll", roll)
     end
 end
 WalkerShader.update=function(self,dt)
@@ -327,11 +328,12 @@ WalkerShader.update=function(self,dt)
     if G.runInfo.player then
         keyIsDown=G.runInfo.player.keyIsDown -- nmhjyuik aren't recorded in player, so these keys use love.keyboard.isDown. arrow keys use player to restore in replay
     end
+    local reverseX=self.reverseX and -1 or 1
     if keyIsDown("right") then
-        self.cam_translation[1] = math.clamp(self.cam_translation[1] - xyStep,-xRange+xCenter,xRange+xCenter)
+        self.cam_translation[1] = math.clamp(self.cam_translation[1] + xyStep * reverseX,-xRange+xCenter,xRange+xCenter)
     end
     if keyIsDown("left") then
-        self.cam_translation[1] = math.clamp(self.cam_translation[1] + xyStep,-xRange+xCenter,xRange+xCenter)
+        self.cam_translation[1] = math.clamp(self.cam_translation[1] - xyStep * reverseX,-xRange+xCenter,xRange+xCenter)
     end
     if keyIsDown("up") then
         self.cam_translation[2] = math.clamp(self.cam_translation[2] - xyStep,-yRange+yCenter,yRange+yCenter)
@@ -463,4 +465,19 @@ function Planes:update(dt)
 end
 
 BackgroundPattern.Planes=Planes
+
+local corridorShader=ShaderScan:load_shader('shaders/backgrounds/corridor.glsl')
+local Corridor=WalkerShader:extend()
+function Corridor:new(args)
+    Corridor.super.new(self,args)
+    self.cam_translation={0,0,0}
+    self.camMoveRange={1,1}
+    self.camMoveSpeed=-0.5
+    self.shader=corridorShader
+end
+
+function Corridor:update(dt)
+    Corridor.super.update(self,dt)
+end
+BackgroundPattern.Corridor=Corridor
 return BackgroundPattern
