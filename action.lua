@@ -54,12 +54,13 @@ end
 
 local fadeIn=function(self,params)
     local fadeFrame=params.fadeFrame or 30
-    if self.frame<=fadeFrame then
+    local frame=self.frame-self.fadeInBaseFrame
+    if frame<=fadeFrame then
         if params.setSafe then
             self.safe=true
         end
-        self.spriteTransparency=(params.fadeTransparency or 1) * self.frame/fadeFrame
-    elseif self.frame==fadeFrame+1 then
+        self.spriteTransparency=(params.fadeTransparency or 1) * frame/fadeFrame
+    elseif frame==fadeFrame+1 then
         if params.setSafe then
             self.safe=false
         end
@@ -67,6 +68,7 @@ local fadeIn=function(self,params)
 end
 
 local fadeInInit=function(self,params)
+    self.fadeInBaseFrame=self.frame -- to deal with mirror reflection: if not copying bullet's frame, would need extra logic on lifeFrame and extraUpdate that uses frame. if copying, fadeIn won't work since initial frames have passed. so use this to effectively let fadeIn use its own frame count. 
     self.spriteTransparency=0
     if params.setSafe then
        self.safe=true
@@ -160,10 +162,18 @@ local actionPack=function(self,params)
     end
 end
 
+local actionPackInit=function(self,params)
+    for k,action in ipairs(params) do
+        if action.init then
+            action.init(self,action.params)
+        end
+    end
+end
+
 --- execute multiple actions. a way to nest actions and make preset action combinations.
 --- @param actions table<string, Action> a table of actions to be executed.
 Action.Pack=function(actions)
-    return {isAction=true,params=actions,func=actionPack}
+    return {isAction=true,params=actions,func=actionPack,init=actionPackInit}
 end
 
 return Action

@@ -13,7 +13,7 @@ return{
         {
             key='3-1',
             type='midStage',
-            func=function() -- 
+            func=function() -- 15s. midboss should appear at 41s
                 wait(30)
                 local geo=G.runInfo.geometry
                 local base=geo:init().pos
