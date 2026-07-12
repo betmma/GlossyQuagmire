@@ -85,6 +85,59 @@ function Mirror.getReflections(pos,maxNum)
     return ret
 end
 
+---@return table<string,any> callAttributes
+---@return table<string,any> setAttributes
+local function getSpawnPresets(obj)
+    if obj:is(Bullet) then
+        return {size=obj.size,sprite=obj.sprite,batch=obj.batch,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=obj.frame,extraUpdate=obj.extraUpdate}, {}
+    elseif obj:is(Enemy) then
+        return {maxhp=obj.maxhp,hp=obj.hp,sprite=obj.sprite,spriteTransparency=obj.spriteTransparency,extraUpdate=obj.extraUpdate}, {dieEffect=obj.dieEffect}
+    end
+    return {}, {}
+end
+
+-- conveniently create reflections for an obj.
+---@param obj Shape
+---@param maxNum integer
+---@param callAttributes nil|table<string, boolean|any> extra attributes to copy from obj in objClass{} call. kinematicState and getSpawnPresets' return values are automatically handled. if not boolean, the value will be used as the attribute value.
+---@param setAttributes nil|table<string, boolean|any> attributes to set after creating reflection object. 
+function Mirror.spawnReflections(obj,maxNum,callAttributes,setAttributes)
+    callAttributes=callAttributes or {}
+    setAttributes=setAttributes or {}
+    local callPresets,setPresets=getSpawnPresets(obj)
+    for k,v in pairs(setAttributes) do
+        setPresets[k]=v
+    end
+    local reflections=Mirror.getReflections(obj.kinematicState.pos,maxNum)
+    for i,reflection in ipairs(reflections) do
+        local newDir=reflection.deltaDir+obj.kinematicState.dir*(reflection.rotateReverse and -1 or 1)
+        local newPos=reflection.pos
+        local newKinematicState={pos=newPos,dir=newDir,speed=obj.kinematicState.speed}
+        local objClass=getmetatable(obj)
+        local newObjArgs=callPresets
+        newObjArgs.kinematicState=newKinematicState
+        newObjArgs.spriteColor=reflection.color
+        for k,v in pairs(callAttributes or {}) do
+            if type(v) == "boolean" then
+                newObjArgs[k]=obj[k]
+            else
+                newObjArgs[k]=v
+            end
+        end
+        local newObj=objClass(newObjArgs)
+        for k,v in pairs(setAttributes or {}) do
+            if type(v) == "boolean" then
+                newObj[k]=obj[k]
+            else
+                newObj[k]=v
+            end
+        end
+    end
+end
+
+
+--- below are mirror's shader and mainEffect
+
 local shaders={
     Euclidean=ShaderScan:load_shader('shaders/effects/euclideanMirror.glsl'),
 }

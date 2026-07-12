@@ -21,7 +21,7 @@ function Shape:new(args)
     self.kinematicState=args.kinematicState or G.runInfo.geometry:init()
     self.lifeFrame=args.lifeFrame or 1000
     self.time=0
-    self.frame=0
+    self.frame=args.frame or 0
     -- self.removeDistance=args.removeDistance or Shape.removeDistance
 end
 

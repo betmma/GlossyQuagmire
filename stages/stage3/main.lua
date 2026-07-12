@@ -73,8 +73,7 @@ return{
                     SFX:play('enemyCharge')
                     local pos=fairy.kinematicState.pos
                     local extra=function(self)
-                        local t=self.t or 0
-                        self.t=t+1
+                        local t=self.frame
                         if t<60 then
                             self.kinematicState.speed=self.kinematicState.speed*0.95
                         elseif t>90 then
@@ -86,15 +85,7 @@ return{
                         cir.speedRef=cir.kinematicState.speed
                         Event{obj=cir,action=function()
                             wait(60)
-                            local reflections=Mirror.getReflections(cir.kinematicState.pos,48)
-                            for i,reflection in ipairs(reflections) do
-                                local newDir=reflection.deltaDir+cir.kinematicState.dir*(reflection.rotateReverse and -1 or 1)
-                                local newPos=reflection.pos
-                                local newKinematicState={pos=newPos,dir=newDir,speed=cir.kinematicState.speed}
-                                local cir2=Bullet{kinematicState=newKinematicState,sprite=cir.sprite,size=cir.size,batch=cir.batch,spriteTransparency=cir.spriteTransparency,lifeFrame=cir.lifeFrame,spriteColor=reflection.color,extraUpdate={Action.FadeIn(30,true),extra}}
-                                cir2.t=cir.t
-                                cir2.speedRef=cir.speedRef
-                            end
+                            Mirror.spawnReflections(cir,48,{extraUpdate={Action.FadeIn(30,true),extra}},{speedRef=true})
                         end}
                     end}}
                     local angle=math.eval(0,999)
