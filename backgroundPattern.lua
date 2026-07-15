@@ -474,10 +474,14 @@ function Corridor:new(args)
     self.camMoveRange={1,1}
     self.camMoveSpeed=-0.5
     self.shader=corridorShader
+    self.lightColor={0.8,0.8,0.8} -- it's too bright
 end
 
 function Corridor:update(dt)
     Corridor.super.update(self,dt)
+    local bulletNum=#Bullet.objects
+    local brightness=math.clamp(1-(bulletNum)/3000,0.6,0.8)
+    self.lightColor={brightness,brightness,brightness}
 end
 BackgroundPattern.Corridor=Corridor
 return BackgroundPattern

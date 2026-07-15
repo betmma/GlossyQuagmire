@@ -35,14 +35,14 @@ local fadeOut=function(self,params)
         if params.setSafe then
             self.safe=true
         end
-        self.spriteTransparency=(self.lifeFrame - self.frame)/fadeFrame*(params.fadeOutTransparency or 1)
+        self.spriteTransparency=(self.lifeFrame - self.frame)/fadeFrame*(self.fadeOutTransparency or 1)
     else
-        params.fadeOutTransparency=self.spriteTransparency
+        self.fadeOutTransparency=self.spriteTransparency
     end
 end
 
 local fadeOutInit=function(self,params)
-    params.fadeOutTransparency=self.spriteTransparency
+    self.fadeOutTransparency=self.spriteTransparency
 end
 
 ---@param fadeFrame integer number of frames for the fade out animation, default 30

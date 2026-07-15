@@ -91,7 +91,9 @@ local function getSpawnPresets(obj)
     if obj:is(Bullet) then
         return {size=obj.size,sprite=obj.sprite,batch=obj.batch,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=obj.frame,extraUpdate=obj.extraUpdate}, {}
     elseif obj:is(Enemy) then
-        return {maxhp=obj.maxhp,hp=obj.hp,sprite=obj.sprite,spriteTransparency=obj.spriteTransparency,extraUpdate=obj.extraUpdate}, {dieEffect=obj.dieEffect}
+        return {maxhp=obj.maxhp,hp=obj.hp,sprite=obj.sprite,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=obj.frame,extraUpdate=obj.extraUpdate,dropItems=obj.dropItems}, {dieEffect=obj.dieEffect}
+    elseif obj:is(Item) then
+        return {type=obj.type}, {}
     end
     return {}, {}
 end
@@ -117,7 +119,7 @@ function Mirror.spawnReflections(obj,maxNum,callAttributes,setAttributes)
         local newObjArgs=callPresets
         newObjArgs.kinematicState=newKinematicState
         newObjArgs.spriteColor=reflection.color
-        for k,v in pairs(callAttributes or {}) do
+        for k,v in pairs(callAttributes) do
             if type(v) == "boolean" then
                 newObjArgs[k]=obj[k]
             else
@@ -125,7 +127,8 @@ function Mirror.spawnReflections(obj,maxNum,callAttributes,setAttributes)
             end
         end
         local newObj=objClass(newObjArgs)
-        for k,v in pairs(setAttributes or {}) do
+        newObj.mirrored=true
+        for k,v in pairs(setPresets) do
             if type(v) == "boolean" then
                 newObj[k]=obj[k]
             else

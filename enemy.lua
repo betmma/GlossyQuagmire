@@ -14,6 +14,7 @@ local Enemy=Shape:extend()
 ---@field invincible boolean|nil default false
 ---@field sprite Sprite
 ---@field extraUpdate ExtraUpdate|function|nil
+---@field spriteColor rgbColor|rgbaColor|nil default {1,1,1,1}
 ---@field spriteTransparency number|nil default 1
 
 ---@param args EnemyArgs
@@ -28,6 +29,10 @@ function Enemy:new(args)
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.sprite=args.sprite
+    self.spriteColor=args.spriteColor or {1,1,1,1}
+    if self.spriteColor[4]==nil then
+        self.spriteColor[4]=1
+    end
     self.spriteTransparency=args.spriteTransparency or 1
     if self.sprite and self.sprite.is and self.sprite:is(Asset.MovingSprite) then
         self.sprite=shallowCopyTable(self.sprite)
@@ -194,7 +199,7 @@ function Enemy:drawSprite()
             rotation=orientation,
             zoom=self.size,
             normalBatch=Asset.fairyBatch,
-            color={1,1,1,self.spriteTransparency or 1},
+            color={self.spriteColor[1],self.spriteColor[2],self.spriteColor[3],self.spriteTransparency*self.spriteColor[4]},
             -- meshBatch=Asset.bigBulletMeshes,
         }
     end

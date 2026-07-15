@@ -161,6 +161,21 @@ return {
                     zh_cn = '花符「紫色的沉静」',
                 }
             }
+        },
+        ['kora-cosmos'] = {
+            EASY = {
+                name = {
+                    en_us = 'Reflection Sign "Colorful Daisy"',
+                    zh_cn = '映符「多彩雏菊」',
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Reflected Flower "Colorful Cosmos"',
+                    zh_cn = '映花「多彩波斯菊」',
+                }
+            }
         }
     },
     levelData = {
@@ -220,6 +235,16 @@ return {
             nickname = {
                 en_us = 'Misleading Brown Fox',
                 zh_cn = '误导人的棕色狐狸',
+            }
+        },
+        kora = {
+            name = {
+                en_us = 'Kora Kurekagami',
+                zh_cn = '吴镜珂络',
+            },
+            nickname = {
+                en_us = 'Colorful Doppelganger',
+                zh_cn = '多彩的二重身',
             }
         }
     },
@@ -1129,6 +1154,16 @@ return {
                 en_us = 'Tooshi Katsuyama\'s theme.\nA playful and bouncy composition. The whole song keeps using similar rhythm patterns, but the switching of instruments and melodies makes it feel fresh and interesting the whole time. The fox gave herself a stoic name to mislead people (^^;',
                 zh_cn = '堪山远志的主题曲。\n一个有趣且弹跳的曲子。整首歌持续使用相似的节奏模式，但乐器和旋律的切换使曲子新鲜又有趣。狐狸给自己起了一个坚忍的名字来误导人们(^^;',
             },
+        },
+        level3 = {
+            name = {
+                en_us = 'Interactive Modern Art Museum',
+                zh_cn = '互动式现代艺术馆',
+            },
+            description = {
+                en_us = 'Stage 3\'s theme.\nFrom solemn corridor to lively exhibitions, the sudden bass does the transition well. The theme had changed a lot during the development. For example, the current transition part was intro and used to give a sense of broken TV.',
+                zh_cn = '第三面的主题曲。\n从庄严的走廊到生动的展览，突如其来的低音很好地完成了过渡。开发过程中这首曲子发生了很大变化。例如，现在的过渡部分曾经是前奏，并且有种坏掉的电视的感觉。',
+            }
         },
         level5 = {
             name = {

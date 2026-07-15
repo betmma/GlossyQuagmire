@@ -195,7 +195,11 @@ Asset.playerSprites=Asset.playerSprites
 ---@type AssetItemSpritesCollection
 Asset.itemSprites=Asset.itemSprites
 
+---@type table<spectrum,spectrum2>
 Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yellow='yellow',green='green',teal='green',cyan='blue',blue='blue',purple='magenta',magenta='magenta',black='gray'}
+
+---@type table<spectrum,fairySpectrum>
+Asset.spectrum1MapFairySpectrum={white='white',gray='black',red='red',orange='orange',yellow='orange',green='green',teal='green',cyan='blue',blue='blue',purple='purple',magenta='purple',black='black'}
 
 local bgImage = love.graphics.newImage( "assets/bg.png" )
 Asset.backgroundImage=bgImage
