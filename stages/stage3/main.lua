@@ -242,6 +242,234 @@ return{
                 wait(510)
             end
         },
-        kora.midboss
+        kora.midboss,
+        {
+            key='3-4',
+            type='midStage',
+            func=function () -- 34s
+                local geo=G.runInfo.geometry
+                local base=geo:init().pos
+                local pos1,dir1=geo:rThetaGo(base,600,-math.pi/2)
+                dir1=dir1+math.pi
+                local function smallFairy(pos,dir,sign,color)
+                    local fairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=150},sprite=Asset.fairySprites.small[color],maxhp=50,lifeFrame=600,dropItems={powerSmall=1,point=1},extraUpdate={Enemy.presetActions.fadeAndHint}}
+                    fairy:addHPProtection(60,3)
+                    local spawner=BulletSpawner{firstPeriod=100,period=DSWITCH{40,30,20,20},lifeFrame=9999,bulletNumber=1,range=math.pi/2,angle=dir,bulletSpeed=150,bulletSprite=BulletSprites.giant[color],highlight=true,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeIn(20,true),Action.FadeOut(10,true)}}
+                    spawner:bindState(fairy)
+                    Event.LoopEvent{obj=spawner,period=1,executeFunc=function ()
+                        spawner.angle=fairy.kinematicState.dir
+                        -- spawner.range=math.pi/2--+math.sin(fairy.frame/60*math.pi)*0.5
+                        -- spawner.bulletNumber=(spawner.frame%60<40)and 1 or 0
+                        if spawner.frame>60 and spawner.frame<200 then
+                            fairy.kinematicState.speed=math.lerp(fairy.kinematicState.speed,30,0.015)
+                        end
+                        if spawner.frame>200 and spawner.frame<300 then
+                            fairy.kinematicState.speed=math.lerp(fairy.kinematicState.speed,150,0.015)
+                        end
+                        if spawner.frame>200 then
+                            fairy.kinematicState.dir=fairy.kinematicState.dir+sign*0.02
+                        end
+                    end}
+                end
+                local function smallwave(n,color)
+                    color=color or 'black'
+                    for i=1,n do
+                        local d=450*((i-0.5)/n-0.5)
+                        local pos,dir=geo:rThetaGo(pos1,d,dir1-math.pi/2)
+                        dir=dir+math.pi/2
+                        Event{action=function ()
+                            wait(math.abs(i-n/2-0.5)*40)
+                            smallFairy(pos,dir,(i-0.5)>n/2 and 1 or -1,color)
+                        end}
+                    end
+                end
+                local function bigFairy(color,pos,dir,id)
+                    local extraUpdate=function(self)
+                        local rd1,rd2=self.rd1,self.rd2
+                        self.kinematicState.dir=self.kinematicState.dir+(math.sin(self.frame/(30+30*rd1)+rd2*99)*0.005+math.sin(self.frame/(50+40*rd2)+rd1*99)*0.005)*math.mod2Sign(self.index)
+                    end
+                    local lifeFrame=1200
+                    if color=='white' then
+                        lifeFrame=360
+                    end
+                    local flag=color~='white'
+                    local fairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=400},sprite=Asset.fairySprites.large[color],maxhp=flag and 400 or 700,lifeFrame=lifeFrame,dropItems={powerSmall=flag and 5 or 10,point=flag and 5 or 10},extraUpdate={Enemy.presetActions.fadeAndHint,function (self)
+                        if self.frame<60 then
+                            self.kinematicState.speed=self.kinematicState.speed*0.95
+                        elseif self.frame==60 then
+                            self.kinematicState.speed=0
+                        end
+                        if self.frame==self.lifeFrame-30 then
+                            SFX:play('enemyPowerfulShot')
+                            self:addHPProtection(30,999)
+                            BulletSpawner{period=999,firstPeriod=1,lifeFrame=2,bulletNumber=DSWITCH{29,49,69,89},bulletSpeed=200,bulletSize=1.5,angle='player',bulletSprite=BulletSprites.bigStar[color],bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(10,true)},bulletEvents={function (cir,args,self_)
+                                cir.spriteRotationSpeed=0.01
+                                cir.spriteColor=self.spriteColor
+                                cir.kinematicState.speed=cir.kinematicState.speed*(1-(args.index*math.mod2Sign(self.index))%3*0.1)
+                            end}}:bindState(self)
+                        end
+                        if self.frame==60 or self.mirrored then
+                            self.mirrored=false
+                            local spawner=BulletSpawner{period=5,lifeFrame=9999,bulletNumber=DSWITCH{4,6,8,10},range=math.pi*2,angle=math.eval(0,9),bulletSpeed=130,bulletSprite=BulletSprites.bigStar[color],bulletLifeFrame=DSWITCH{200,200,260,260},bulletExtraUpdate={Action.FadeIn(10,true),Action.FadeOut(10,true),extraUpdate},bulletEvents={function(cir,args,self_)
+                                if (self_.spawnTimes)%10>4 then
+                                    cir.lifeFrame=30
+                                end
+                                cir.index=args.index
+                                if cir.index%2==0 then
+                                    cir.kinematicState.dir=-cir.kinematicState.dir
+                                end
+                                cir.rd1,cir.rd2=math.pseudoRandom(self.index),math.pseudoRandom(self.index,2)
+                                cir.spriteColor=self.spriteColor
+                            end}}
+                            Event.EaseEvent{obj=spawner,aims={bulletSpeed=250},duration=1200}
+                            Event.EaseEvent{obj=spawner,aims={angle=spawner.angle+18*math.mod2Sign(self.index)},duration=1200}
+                            spawner:bindState(self)
+                        end
+                    end}}
+                    fairy:addHPProtection(60,3)
+                    fairy.dieEffect=function(self)
+                        Enemy.dieEffect(self)
+                        Effect.Shockwave{kinematicState={pos=copyTable(self.kinematicState.pos),dir=0,speed=0},lifeFrame=20,radius=10,growSpeed=0.4,spriteTransparency=1,color=color,canRemove={bullet=true}}
+                    end
+                    fairy.index=id
+                    return fairy
+                end
+                smallwave(5)
+                wait(120)
+                bigFairy('white',pos1,dir1,0)
+                smallwave(6)
+                wait(120)
+                smallwave(5)
+                wait(300)
+                local posl,dirl=geo:rThetaGo(pos1,100,dir1+math.pi/2)
+                dirl=dirl-math.pi/2
+                local posr,dirr=geo:rThetaGo(pos1,100,dir1-math.pi/2)
+                dirr=dirr+math.pi/2
+                local posd=geo:rThetaGo(base,200,math.pi/2)
+                local fairyl=bigFairy('black',posl,dirl,1)
+                local fairyr=bigFairy('black',posr,dirr,2)
+                Event.Event{action=function()
+                    local h=math.eval(0,1)
+                    local id=3
+                    while not (fairyl.removed and fairyr.removed) do
+                        local live
+                        if fairyl.removed or fairyr.removed and (fairyl.frame<fairyl.lifeFrame-60) then
+                            live=fairyl.removed and fairyr or fairyl
+                            SFX:play('enemyCharge')
+                            Mirror.setHSV({h,0.7,1},0)
+                            h=h-0.3
+                            wait(90)
+                            Mirror(posd,pos1,live.kinematicState.pos,{extraUpdate={Action.FadeIn(30,false,0.5),Action.FadeOut(30,false)},lifeFrame=120})
+                            wait(30)
+                            if not live.removed then
+                                local new=Mirror.spawnReflections(live,1,nil,nil,true)[1]
+                                new.hp=new.maxhp
+                                if live==fairyl then
+                                    fairyr=new
+                                else
+                                    fairyl=new
+                                end
+                                new.index=id
+                                id=id+1
+                                wait(30)
+                            end
+                        end
+                        wait()
+                    end
+                end}
+                Event.Event{action=function()
+                    local t=0
+                    while not (fairyl.removed and fairyr.removed) do
+                        wait()
+                        t=t+1
+                        if t%180==1 then
+                            smallwave(math.ceil(t/180)%2+5)
+                        end
+                    end
+                    SFX:play('enemyPowerfulShot')
+                    local colors={'red','blue','green','orange'}
+                    while t<1140 do
+                        wait()
+                        t=t+1
+                        if t%90==1 then
+                            smallwave(math.ceil(t/90)%2+5, colors[math.ceil(t/90)%4 + 1])
+                        end
+                    end
+                end}
+                wait(1500)
+            end
+        },
+        {
+            key='3-5',
+            type='midStage',
+            func=function() -- 15s
+                local geo=G.runInfo.geometry
+                local base=geo:init().pos
+                local pos1,dir1=geo:rThetaGo(base,350,-math.pi/2)
+                local function group(pos,dir,sign)
+                    local bigFairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=0},sprite=Asset.fairySprites.large.white,maxhp=400,lifeFrame=900,dropItems={powerSmall=10,point=10},extraUpdate={Enemy.presetActions.fadeAndHint,function (self)
+                        if self.frame>=self.lifeFrame-60 then
+                            self.kinematicState.speed=self.kinematicState.speed+5
+                        end
+                    end}}
+                    local spawner=BulletSpawner{firstPeriod=100,period=DSWITCH{120,90,60,60},lifeFrame=9999,bulletNumber=DSWITCH{1,1,3,3},angle='player',bulletSpeed=100,bulletSprite=BulletSprites.giant.white,highlight=true,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(20,true),Action.FadeOut(10,true)}}
+                    spawner:bindState(bigFairy)
+                    bigFairy:addHPProtection(200,3)
+                    local n=3
+                    for i=1,n do
+                        local angle=dir+math.pi*2/n*(i-1)
+                        local smallFairy=Enemy{sprite=Asset.fairySprites.small.white,maxhp=350,lifeFrame=900,dropItems={powerSmall=1,point=1},extraUpdate={Enemy.presetActions.fadeAndHint}}
+                        smallFairy:addHPProtection(200,3)
+                        DanmakuFuncs.orbitBind(smallFairy,bigFairy,function (self, centerObj)
+                            return {r=math.min(50,self.frame),theta=self.frame/20*sign+angle}
+                        end)
+                        local spawner=BulletSpawner{lifeFrame=9999,period=4,bulletNumber=3,range=math.pi/15,angle=0,bulletSpeed=60,bulletSprite=BulletSprites.rice.white,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(10,true),Action.FadeOut(10,true)}}
+                        spawner:bindState(smallFairy)
+                        Event.LoopEvent{obj=spawner,period=1,executeFunc=function ()
+                            spawner.angle=geo:to(spawner.kinematicState.pos,bigFairy.kinematicState.pos)+math.pi/6*sign
+                            spawner.bulletNumber=spawner.frame%120<20 and DSWITCH{1,2,3,4} or 0
+                        end}
+                    end
+                    return bigFairy
+                end
+                local bigFairies={}
+                for i=-1,1,2 do
+                    local pos,dir=geo:rThetaGo(pos1,100,dir1+i*math.pi/2)
+                    local bigFairy=group(pos,dir,i)
+                    table.insert(bigFairies, bigFairy)
+                end
+                Event.LoopEvent{period=180,times=4,executeFunc=function ()
+                    local posc,dirc=geo:rThetaGo(base,200,-math.pi/2)
+                    local mirrorData={
+                        {{pos1=geo:rThetaGo(posc,300,dirc-math.pi/2),pos2=geo:rThetaGo(posc,300,dirc+math.pi/2),posin=pos1},},
+                        {{pos1=posc,pos2=geo:rThetaGo(posc,400,dirc+math.pi/4),posin=pos1},
+                        {pos1=posc,pos2=geo:rThetaGo(posc,400,dirc-math.pi/4),posin=pos1}}
+                    }
+                    for i=1,2 do
+                        if not bigFairies[i].removed then
+                            local posin=bigFairies[i].kinematicState.pos
+                            table.insert(mirrorData, {{pos1=posc,pos2=geo:rThetaGo(posc,300,dirc+math.pi/2*(i-1)),posin=posin},
+                            {pos1=posc,pos2=geo:rThetaGo(posc,300,dirc+math.pi/2*(i-2)),posin=posin}})
+                        end
+                    end
+                    local id=math.random(1,#mirrorData)
+                    Mirror.setHSV({math.eval(0,1),0.7,1},0.3)
+                    for i=1,#mirrorData[id] do
+                        local data=mirrorData[id][i]
+                        Mirror(data.pos1,data.pos2,data.posin,{extraUpdate={Action.FadeIn(60,false,0.5),Action.FadeOut(30,false)},lifeFrame=120})
+                    end
+                    Event{action=function()
+                        wait(85)
+                        for i,bullet in ipairs(Bullet.objects) do
+                            if not bullet.mirrored and not bullet.fromPlayer and geo:distance(bullet.kinematicState.pos, posc) < 400 then
+                                Mirror.spawnReflections(bullet,3)
+                            end
+                        end
+                    end}
+                end}
+                wait(900)
+            end
+        },
+        kora.boss
     }
 }

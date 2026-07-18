@@ -99,18 +99,23 @@ local function getSpawnPresets(obj)
 end
 
 -- conveniently create reflections for an obj.
----@param obj Shape
+---@generic T:Shape
+---@param obj T
 ---@param maxNum integer
 ---@param callAttributes nil|table<string, boolean|any> extra attributes to copy from obj in objClass{} call. kinematicState and getSpawnPresets' return values are automatically handled. if not boolean, the value will be used as the attribute value.
 ---@param setAttributes nil|table<string, boolean|any> attributes to set after creating reflection object. 
-function Mirror.spawnReflections(obj,maxNum,callAttributes,setAttributes)
+---@param returnReflections boolean|nil if true, will return the created reflections, otherwise will return empty table
+---@return T[]
+function Mirror.spawnReflections(obj,maxNum,callAttributes,setAttributes,returnReflections)
     callAttributes=callAttributes or {}
     setAttributes=setAttributes or {}
     local callPresets,setPresets=getSpawnPresets(obj)
     for k,v in pairs(setAttributes) do
         setPresets[k]=v
     end
+    ---@cast obj Shape luals is really broken??
     local reflections=Mirror.getReflections(obj.kinematicState.pos,maxNum)
+    local ret={}
     for i,reflection in ipairs(reflections) do
         local newDir=reflection.deltaDir+obj.kinematicState.dir*(reflection.rotateReverse and -1 or 1)
         local newPos=reflection.pos
@@ -135,7 +140,11 @@ function Mirror.spawnReflections(obj,maxNum,callAttributes,setAttributes)
                 newObj[k]=v
             end
         end
+        if returnReflections then
+            table.insert(ret, newObj)
+        end
     end
+    return ret
 end
 
 

@@ -10,7 +10,7 @@ function BulletSpawner:new(args)
     self.size=args.size or 0.2
     self.visible=args.visible
     if self.visible==nil then
-       self.visible=(self.lifeFrame>60 and true or false)
+       self.visible=(false)
     end
     self.sprite=BulletSprites.lotus[args.bulletSprite and Asset.spectrum1MapSpectrum2[args.bulletSprite.data.color] or 'gray']
     self.period=args.period or 60
