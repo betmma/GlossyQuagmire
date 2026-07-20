@@ -176,6 +176,14 @@ return {
                     zh_cn = '映花「多彩波斯菊」',
                 }
             }
+        },
+        ['kora-manifest'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Manifest Sign "Reveal the True Colors"',
+                    zh_cn = '显现「照妖镜」',
+                }
+            },
         }
     },
     levelData = {
@@ -239,7 +247,7 @@ return {
         },
         kora = {
             name = {
-                en_us = 'Kora Kurekagami',
+                en_us = 'Cora Kurekagami',
                 zh_cn = '吴镜珂络',
             },
             nickname = {

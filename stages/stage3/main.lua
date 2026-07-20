@@ -2,6 +2,8 @@
 2 fairies, if one dies, mirror appears to revive the dead one by reflecting the alive one. must control hp to kill them in a short time.
 midboss drops 1 item but uses mirror to copy many
 spellcard have one bullet inside rotating mirrors and keep spawing reflections
+use reflection as visual block
+mirrors around player
 ]]
 
 local kora=require"stages.stage3.kora"

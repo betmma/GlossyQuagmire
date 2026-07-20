@@ -14,8 +14,13 @@ local function getSegmentType(stageKey,segmentKey)
     return 'available'
 end
 local stageSwitcher,segmentSwitcher,modeSwitcher
+local lastStageIndex
 local function segmentSwitcherRemake()
-    segmentSwitcher.currentOptionIndex=1
+    local stageIndex=stageSwitcher.currentOptionIndex
+    if stageIndex~=lastStageIndex then
+        segmentSwitcher.currentOptionIndex=1
+    end
+    lastStageIndex=stageIndex
     segmentSwitcher:remakeOptions()
     segmentSwitcher.transparency=0
 end
