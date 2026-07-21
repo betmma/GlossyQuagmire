@@ -178,10 +178,32 @@ return {
             }
         },
         ['kora-manifest'] = {
+            EASY = {
+                name = {
+                    en_us = 'Manifest Sign "Reveal the Spirits"',
+                    zh_cn = '显现「照妖镜」',
+                }
+            },
+            NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
                     en_us = 'Manifest Sign "Reveal the True Colors"',
-                    zh_cn = '显现「照妖镜」',
+                    zh_cn = '显现「魍魉现形」',
+                }
+            },
+        },
+        ['kora-self'] = {
+            EASY = {
+                name = {
+                    en_us = 'Self Sign "Self Reflection"',
+                    zh_cn = '自我「自我映照」',
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Self Sign "Narcissistic Personality"',
+                    zh_cn = '自我「自恋人格」',
                 }
             },
         }

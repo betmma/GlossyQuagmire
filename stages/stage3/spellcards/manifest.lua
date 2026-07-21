@@ -30,7 +30,12 @@ return BossManager.SpellcardPhase{
             local pos,dir=sidepos(side)
             DanmakuFuncs.moveToInTime(boss,pos,60,Event.sineOProgressFunc)
             SFX:play('enemyCharge')
-            local mirror=Mirror(posm,posm2,pos, {lifeFrame=350,extraUpdate={Action.FadeIn(20,false,1),Action.FadeOut(20,false),}})
+            local mirror=Mirror(posm,posm2,pos, {lifeFrame=350,extraUpdate={Action.FadeIn(20,false,1),Action.FadeOut(20,false),function(self)
+                if sentry.removed and not self.flag then
+                    self.flag=true
+                    self.lifeFrame=self.frame+20
+                end
+            end}})
             Event.LoopEvent{obj=sentry,period=80,times=3,executeFunc=function (self, index, total)
                 Event{action=function()
                     local dh=(sixColors and math.random(1,2)/6 or 1/3)*math.randomSign()/20
