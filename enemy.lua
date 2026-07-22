@@ -190,6 +190,7 @@ function Enemy:drawSprite()
             rotation=orientation,
             zoom=self.size,
             normalBatch=Asset.bossBatch,
+            color={self.spriteColor[1],self.spriteColor[2],self.spriteColor[3],self.spriteTransparency*self.spriteColor[4]},
             meshBatch=Asset.bossMeshes,
             isSquare=true
         }
@@ -342,11 +343,12 @@ function Boss:drawHexagram()
         {hexagramPoints[1],hexagramPoints[3],hexagramPoints[5],hexagramPoints[1]},
         {hexagramPoints[2],hexagramPoints[4],hexagramPoints[6],hexagramPoints[2]}
     }
+    local color={1,0.5,0.5,0.8*self.spriteTransparency}
     for _,triangle in ipairs(triangles) do
-        MeshFuncs.polylineMesh(triangle,width,BulletSprites.laser.red.quad,{1,0.5,0.5,0.8},nil,10,Asset.bossEffectMeshes)
+        MeshFuncs.polylineMesh(triangle,width,BulletSprites.laser.red.quad,color,nil,10,Asset.bossEffectMeshes)
     end
     local ringWidth=30
-    MeshFuncs.ringMesh(selfPos,hexagramSize,hexagramSize+ringWidth,self.time*6/5,BulletSprites.laserDark.red.quad,48,{1,0.5,0.5,0.8},nil,Asset.bossEffectMeshes)
+    MeshFuncs.ringMesh(selfPos,hexagramSize,hexagramSize+ringWidth,self.time*6/5,BulletSprites.laserDark.red.quad,48,color,nil,Asset.bossEffectMeshes)
 end
 Enemy.Boss=Boss
 return Enemy

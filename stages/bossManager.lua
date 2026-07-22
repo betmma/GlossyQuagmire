@@ -340,7 +340,9 @@ end
 
 function SpellcardPhase:update(boss)
     SpellcardPhase.super.update(self, boss)
-    self.currentBonus=math.max(0, self.currentBonus - self.bonusScore/self.time)
+    if not self.isTimeout then
+        self.currentBonus=math.max(0, self.currentBonus - self.bonusScore/self.time)
+    end
     DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText(),true)
 end
 

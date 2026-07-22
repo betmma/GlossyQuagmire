@@ -206,6 +206,21 @@ return {
                     zh_cn = '自我「自恋人格」',
                 }
             },
+        },
+        ['kora-tear'] = {
+            EASY = {
+                name = {
+                    en_us = 'Tear Sign "Broken Screen"',
+                    zh_cn = '撕裂「破碎的屏幕」',
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Tear Sign "Hole in the Mirror"',
+                    zh_cn = '撕裂「镜中的洞」',
+                }
+            },
         }
     },
     levelData = {

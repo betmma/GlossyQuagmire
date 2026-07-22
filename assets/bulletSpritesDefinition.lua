@@ -33,7 +33,7 @@ local Asset=...
 ---butterfly: spectrum, flame: spectrum, human: spectrum, dog: spectrum, dogMirrored: spectrum, bird: spectrum, frog: spectrum, note: spectrum, \
 ---snake: spectrum, \
 ---rest: spectrum, \
----stick: spectrum, stickBlack: spectrum, stone: spectrum, egg: spectrum, fog: spectrum, \
+---stick: spectrum, stickDark: spectrum, stone: spectrum, egg: spectrum, fog: spectrum, \
 ---moon: Sprite, anchor: Sprite, playerFocus: Sprite, \
 ---nuke: Sprite}
 
@@ -129,7 +129,7 @@ spectrum{
 }:addToAsset()
 matrix{
     unit=single{sizeX=32,sizeY=32},
-    names={'stick','stickBlack','stone','egg','fog'},colors=colors,
+    names={'stick','stickDark','stone','egg','fog'},colors=colors,
     nameOffsetFunc=simpleOffsetFunc(0,32),
     colorOffsetFunc=simpleOffsetFunc(32,0),
     baseX=0,baseY=32*27,

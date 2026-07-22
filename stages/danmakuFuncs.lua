@@ -62,3 +62,12 @@ function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
         end
     end
 end
+
+---create a sentry bullet (invisible, invincible, safe) at pos that is used to check if current boss phase ends (the end shockwave removes this bullet)
+---@param pos Position
+---@return Bullet
+function DanmakuFuncs.sentry(pos)
+    local sentry=Bullet{kinematicState={pos=copyTable(pos),speed=0,dir=0},sprite=BulletSprites.round.red,lifeFrame=99999,invincible=true,safe=true,spriteTransparency=0}
+    sentry.removeEffect=function()end
+    return sentry
+end

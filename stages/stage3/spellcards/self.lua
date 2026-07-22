@@ -30,7 +30,7 @@ return BossManager.SpellcardPhase{
                 local playerPos=player.kinematicState.pos
                 if G.runInfo.geometry==G.geometries.Euclidean then
                     playerPos=copyTable(playerPos)
-                    local edge=r1/2+20
+                    local edge=math.min(r/2+20,250)
                     playerPos.x=math.clamp(playerPos.x,edge,500-edge)
                     playerPos.y=math.clamp(playerPos.y,edge,600-edge)
                 end
