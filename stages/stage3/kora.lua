@@ -171,7 +171,9 @@ local boss=BossManager.BossSegment{
                                 end
                             end},lifeFrame=133})
                         end
-                        wait(206)
+                        wait(103)
+                        SFX:play('enemyPowerfulShot')
+                        wait(103)
                     end
                 end
             },
@@ -210,7 +212,7 @@ local boss=BossManager.BossSegment{
                         end
                     end
                     for i=1,6 do
-                        local pos1=geo:rThetaGo(pos0,math.eval(30,30),math.eval(0,99))
+                        local pos1=geo:rThetaGo(pos0,math.eval(20,20),math.eval(0,99))
                         DanmakuFuncs.moveToInTime(boss,pos1,60)
                         local bullets={}
                         SFX:play('enemyShot')
@@ -257,7 +259,9 @@ local boss=BossManager.BossSegment{
                                 end
                             end},lifeFrame=173})
                         end
-                        wait(230)
+                        wait(142)
+                        SFX:play('enemyPowerfulShot')
+                        wait(88)
                     end
                 end
             },
@@ -345,12 +349,17 @@ local boss=BossManager.BossSegment{
                                 end
                             end},lifeFrame=173})
                         end
-                        wait(230)
+                        wait(142)
+                        SFX:play('enemyPowerfulShot')
+                        wait(88)
                     end
                 end
             },
             require('stages.stage3.spellcards.tear'),
-        }}
+        }},
+        BossManager.BossRound{phases={
+            require('stages.stage3.spellcards.world'),
+        }},
     }
 }
 

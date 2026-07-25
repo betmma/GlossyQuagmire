@@ -122,7 +122,7 @@ function makeDynamicUIObjs()
     ---@field removeStar fun(self):nil remove a star, if there is any
     local bossStars=bossNameBase:child(UI.Arranger{
         x=0,y=20,arrange=function(self,index)
-            return (index-1)*30,0
+            return (index-1)*20,0
         end,
         extraUpdates={
             strategy(

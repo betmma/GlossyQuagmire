@@ -221,6 +221,14 @@ return {
                     zh_cn = '撕裂「镜中的洞」',
                 }
             },
+        },
+        ['kora-world'] = {
+            __default__ = {
+                name = {
+                    en_us = '"World of Trinity"',
+                    zh_cn = '「三生万物的世界」',
+                }
+            },
         }
     },
     levelData = {
@@ -289,7 +297,7 @@ return {
             },
             nickname = {
                 en_us = 'Colorful Doppelganger',
-                zh_cn = '多彩的二重身',
+                zh_cn = '多彩的分身',
             }
         }
     },
