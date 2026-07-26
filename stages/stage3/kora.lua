@@ -212,7 +212,7 @@ local boss=BossManager.BossSegment{
                         end
                     end
                     for i=1,6 do
-                        local pos1=geo:rThetaGo(pos0,math.eval(20,20),math.eval(0,99))
+                        local pos1=geo:rThetaGo(pos0,math.eval(20,10),math.eval(0,99))
                         DanmakuFuncs.moveToInTime(boss,pos1,60)
                         local bullets={}
                         SFX:play('enemyShot')

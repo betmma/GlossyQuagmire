@@ -1,6 +1,6 @@
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
-    key='marisa-light',SKIP_INCLUDE=true,
+    key='marisa-light',
     bonusScore=10000,
     time=1800,
     hp=2800,

@@ -56,7 +56,7 @@ local marisaBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='1-boss-marisa-non-1',
                 time=1500,
@@ -110,7 +110,7 @@ local marisaBoss=BossManager.BossSegment{
             require'stages.stage1.spellcards.star',
         }},
         BossManager.BossRound{SKIP_INCLUDE=true,phases={
-            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
+            BossManager.NonSpellPhase{
                 key='1-boss-marisa-non-2',
                 time=1500,
                 hp=2200,

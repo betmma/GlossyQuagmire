@@ -323,8 +323,12 @@ function StageManager:update(dt)
         if not nextStageKey or not StageData[nextStageKey] then
             self.callback='end'
         else
-            -- todo: need an image transition during switching stage
-            self:load(nextStageKey,nil,nil,'nextStage',nil,true) -- wont need skip for full game
+            -- cannot use an event here.
+            G:switchState(G.STATES.IN_GAME,{
+            transitionState=G.STATES.TRANSITION_IMAGE,
+            onHalfway=function()
+                self:load(nextStageKey,nil,nil,'nextStage',nil,true)
+            end})
         end
     end
     if self.callback=='end' then

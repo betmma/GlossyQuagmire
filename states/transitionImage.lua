@@ -14,6 +14,11 @@ return {
         local args=self.currentUI.transitionArgs
         self.currentUI.duration=self.currentUI.duration+1
         if self.currentUI.duration*2>=args.duration and self.currentUI.duration*2-2<args.duration then -- half point, execute nextState:enter()
+            if args.onHalfway then
+                local onHalfway=args.onHalfway
+                args.onHalfway=nil
+                onHalfway()
+            end
             local currentUI=self.currentUI
             self.currentUI=self.UIDEF[args.nextState]
             self.currentUI.enter(self,args.lastState)

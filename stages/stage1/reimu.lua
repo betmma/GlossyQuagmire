@@ -1,4 +1,4 @@
-local midboss=BossManager.BossSegment{SKIP_INCLUDE=true,
+local midboss=BossManager.BossSegment{
     bossName='reimu',
     players={KOTOBA=true},
     key='1-mid-reimu',
