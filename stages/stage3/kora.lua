@@ -1,5 +1,5 @@
 local midboss=BossManager.BossSegment{
-    bossName='kora',
+    bossName='cora',
     key='3-mid',
     getBossSpawnPos=function(self)
         local geo=G.runInfo.geometry
@@ -84,8 +84,14 @@ local midboss=BossManager.BossSegment{
 }
 
 local boss=BossManager.BossSegment{
-    bossName='kora',
+    bossName='cora',
     key='3-boss',
+    beforeDialogueKey=function ()
+        return G.runInfo.playerType..'S3BossBefore'
+    end,
+    afterDialogueKey=function ()
+        return G.runInfo.playerType..'S3BossAfter'
+    end,
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
         local pos,dir=geometry:rThetaGo(geometry:init().pos,300,G.runInfo.player.viewDirection-math.pi/2)

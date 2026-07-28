@@ -507,6 +507,102 @@ local KOTOBAS2BossAfter={
     }
 }
 
+local REIMUS3BossBefore={
+    name='REIMUS3BossBefore',
+    defaultSpeakerPosition={
+        reimu='left',
+        cora='right',
+    },
+    lines={
+        line('reimu','surprised','thePavilionIsSoBeautiful'),
+        line('reimu','normal','whoWouldBeTheOwner'),
+        line('cora','happy','aVisitor'),
+        line('cora','happy','thisCorridorIsMyPlace'),
+        line('reimu','normal','iNeverSeenSuchModernPlaceInGensokyo'),
+        line('cora','normal','youKnowInteractiveArt'),
+        line('reimu','surprised','what'),
+        line('cora','happy','letsHaveFun',{playBGM=true}),
+    }
+}
+
+local REIMUS3BossAfter={
+    name='REIMUS3BossAfter',
+    defaultSpeakerPosition={
+        reimu='left',
+        cora='right',
+    },
+    lines={
+        line('reimu','frustrated','notGoodForMyEyes'),
+        line('cora','normal','theNextExhibition'),
+        line('reimu','normal','bye'),
+    }
+}
+
+local MARISAS3BossBefore={
+    name='MARISAS3BossBefore',
+    defaultSpeakerPosition={
+        marisa='left',
+        cora='right',
+    },
+    lines={
+        line('marisa','surprised','soManyMirrors'),
+        line('marisa','surprised','infinityMirrorAtCertainAngle'),
+        line('cora','happy','enjoying'),
+        line('cora','happy','thisCorridorIsMyPlace'),
+        line('marisa','happy','thisIsAmazing'),
+        line('cora','normal','youKnowInteractiveArt'),
+        line('marisa','happy','likeBodyPaintingThing'),
+        line('cora','frustrated','notQuiteThat'),
+        line('cora','happy','butYoullSeeNow',{playBGM=true}),
+    }
+}
+
+local MARISAS3BossAfter={
+    name='MARISAS3BossAfter',
+    defaultSpeakerPosition={
+        marisa='left',
+        cora='right',
+    },
+    lines={
+        line('marisa','happy','iHaveToLearnSuchMagic'),
+        line('marisa','happy','iCanPlayWithItAllDay'),
+        line('cora','normal','yeahYouCanTry'),
+        line('marisa','normal','imHeadingToTheNextExhibition'),
+    }
+}
+
+local KOTOBAS3BossBefore={
+    name='KOTOBAS3BossBefore',
+    defaultSpeakerPosition={
+        kotoba='left',
+        cora='right',
+    },
+    lines={
+        line('kotoba','normal','paintingsOnTheWall'),
+        line('kotoba','normal','theirContentIsOnlyVisibleFromMirrors'),
+        line('cora','happy','yeahItsFunny'),
+        line('cora','happy','thisCorridorIsMyPlace'),
+        line('kotoba','happy','ohThatsTrueReflectionOfYourSkills'),
+        line('cora','happy','haha'),
+        line('cora','normal','youKnowInteractiveArt'),
+        line('kotoba','normal','iGuessThatWouldBeCool'),
+        line('cora','happy','ofCourse',{playBGM=true}),
+    }
+}
+
+local KOTOBAS3BossAfter={
+    name='KOTOBAS3BossAfter',
+    defaultSpeakerPosition={
+        kotoba='left',
+        cora='right',
+    },
+    lines={
+        line('kotoba','frustrated','ughhIFeelDizzy'),
+        line('kotoba','frustrated','butItsTrulyInteresting'),
+        line('kotoba','normal','imConsideringAddingMirrorsToHyperbolicDomain')
+    }
+}
+
 ---@type table<string,Dialogue>
 Dialogue.data={
     REIMUS1BossBefore=REIMUS1BossBefore,
@@ -524,6 +620,12 @@ Dialogue.data={
     MARISAS2BossAfter=MARISAS2BossAfter,
     KOTOBAS2BossBefore=KOTOBAS2BossBefore,
     KOTOBAS2BossAfter=KOTOBAS2BossAfter,
+    REIMUS3BossBefore=REIMUS3BossBefore,
+    REIMUS3BossAfter=REIMUS3BossAfter,
+    MARISAS3BossBefore=MARISAS3BossBefore,
+    MARISAS3BossAfter=MARISAS3BossAfter,
+    KOTOBAS3BossBefore=KOTOBAS3BossBefore,
+    KOTOBAS3BossAfter=KOTOBAS3BossAfter,
 }
 
 

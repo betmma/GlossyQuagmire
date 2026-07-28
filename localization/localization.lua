@@ -290,7 +290,7 @@ return {
                 zh_cn = '误导人的棕色狐狸',
             }
         },
-        kora = {
+        cora = {
             name = {
                 en_us = 'Cora Kurekagami',
                 zh_cn = '吴镜珂络',
@@ -1613,6 +1613,162 @@ return {
                 en_us = 'Whatever. I\'m heading there.',
                 zh_cn = '随便啦，我是要去那里。',
             }
+        },
+        REIMUS3BossBefore={
+            thePavilionIsSoBeautiful = {
+                en_us = 'The pavilion is so beautiful!',
+                zh_cn = '观艳馆好漂亮呀！',
+            },
+            whoWouldBeTheOwner = {
+                en_us = 'Who would be the owner of this pavilion?',
+                zh_cn = '观艳馆的主人会是谁呢？',
+            },
+            aVisitor = {
+                en_us = 'A visitor!',
+                zh_cn = '有访客来了！',
+            },
+            thisCorridorIsMyPlace = {
+                en_us = 'This corridor is my place.',
+                zh_cn = '这条走廊是我的地盘。',
+            },
+            iNeverSeenSuchModernPlaceInGensokyo = {
+                en_us = 'I never seen such a modern place in Gensokyo.',
+                zh_cn = '我在幻想乡还从没见过这么摩登的地方。',
+            },
+            youKnowInteractiveArt = {
+                en_us = 'There\'s more! You know interactive art?',
+                zh_cn = '还有更多好东西呢！你知道互动艺术吗？',
+            },
+            what = {
+                en_us = 'What is that?',
+                zh_cn = '那是什么？',
+            },
+            letsHaveFun = {
+                en_us = 'Let\'s have fun!',
+                zh_cn = '我们来玩吧！',
+            }
+        },
+        REIMUS3BossAfter = {
+            notGoodForMyEyes = {
+                en_us = 'I\'m afraid this is not good for my eyes...',
+                zh_cn = '这怕是对我的眼睛不好……',
+            },
+            theNextExhibition = {
+                en_us = 'The next exhibition is in this way.',
+                zh_cn = '下一场展览在这边。',
+            },
+            bye = {
+                en_us = 'Bye!',
+                zh_cn = '拜拜！',
+            }
+        },
+        MARISAS3BossBefore = {
+            soManyMirrors = {
+                en_us = 'So many mirrors!',
+                zh_cn = '这么多镜子！',
+            },
+            infinityMirrorAtCertainAngle = {
+                en_us = 'Infinity mirror at certain angle!',
+                zh_cn = '在某个角度可以看到无穷镜像！',
+            },
+            enjoying = {
+                en_us = 'Enjoying the exhibition?',
+                zh_cn = '在欣赏展览吗？',
+            },
+            thisCorridorIsMyPlace = {
+                en_us = 'This corridor is my place.',
+                zh_cn = '这条走廊是我的地盘。',
+            },
+            thisIsAmazing = {
+                en_us = 'This is amazing!',
+                zh_cn = '太神奇了！',
+            },
+            youKnowInteractiveArt = {
+                en_us = 'There\'s more! You know interactive art?',
+                zh_cn = '还有更多好东西呢！你知道互动艺术吗？',
+            },
+            likeBodyPaintingThing = {
+                en_us = 'Like smearing pigment on your body thing?',
+                zh_cn = '像是在身上涂抹颜料这种东西？',
+            },
+            notQuiteThat = {
+                en_us = 'Not quite that, but similar.',
+                zh_cn = '不完全是那样，但有点类似。',
+            },
+            butYoullSeeNow = {
+                en_us = 'But you\'ll see now!',
+                zh_cn = '不过你现在就会看到的！',
+            }
+        },
+        MARISAS3BossAfter = {
+            iHaveToLearnSuchMagic = {
+                en_us = 'I have to learn such magic!',
+                zh_cn = '我必须学会这种魔法！',
+            },
+            iCanPlayWithItAllDay = {
+                en_us = 'I can play with it all day.',
+                zh_cn = '我可以玩一整天呢。',
+            },
+            yeahYouCanTry = {
+                en_us = 'Yeah, you can try it.',
+                zh_cn = '嗯，你可以试试。',
+            },
+            imHeadingToTheNextExhibition = {
+                en_us = 'I\'m heading to the next exhibition.',
+                zh_cn = '我去下一场展览了。',
+            }
+        },
+        KOTOBAS3BossBefore = {
+            paintingsOnTheWall = {
+                en_us = 'Paintings on the wall...',
+                zh_cn = '墙上的画……',
+            },
+            theirContentIsOnlyVisibleFromMirrors = {
+                en_us = 'Their content is only visible from mirrors.',
+                zh_cn = '它们的内容只能从镜子里看到。',
+            },
+            yeahItsFunny = {
+                en_us = 'Yeah, it\'s funny.',
+                zh_cn = '是呀，很有趣。',
+            },
+            thisCorridorIsMyPlace = {
+                en_us = 'This corridor is my place.',
+                zh_cn = '这条走廊是我的地盘。',
+            },
+            ohThatsTrueReflectionOfYourSkills = {
+                en_us = 'Oh, that\'s true reflection of your skills.',
+                zh_cn = '哦，那的确“反映”了你的技艺。',
+            },
+            haha = {
+                en_us = 'Haha, I see what you mean.',
+                zh_cn = '哈哈，我明白你的意思了。',
+            },
+            youKnowInteractiveArt = {
+                en_us = 'There\'s more! You know interactive art?',
+                zh_cn = '还有更多好东西呢！你知道互动艺术吗？',
+            },
+            iGuessThatWouldBeCool = {
+                en_us = 'I guess that would be cool.',
+                zh_cn = '我猜那会很酷。',
+            },
+            ofCourse = {
+                en_us = 'Of course! Enjoy with me.',
+                zh_cn = '当然啦！和我一起享受吧。',
+            }
+        },
+        KOTOBAS3BossAfter = {
+            ughhIFeelDizzy = {
+                en_us = 'Ughh, I feel dizzy...',
+                zh_cn = '呃，我有点头晕……',
+            },
+            butItsTrulyInteresting = {
+                en_us = 'But it\'s truly interesting.',
+                zh_cn = '不过这确实很有趣。',
+            },
+            imConsideringAddingMirrorsToHyperbolicDomain = {
+                en_us = 'I\'m considering adding mirrors to Hyperbolic Domain.',
+                zh_cn = '我要考虑在双曲域里加上镜子。',
+            },
         }
     },
 }

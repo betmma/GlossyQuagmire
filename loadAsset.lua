@@ -232,7 +232,7 @@ local portraitHeight=2000
 Asset.portraitWidth,Asset.portraitHeight=portraitWidth,portraitHeight
 ---@type table<string,table<string,love.Quad>> speaker -> expression -> quad
 Asset.portraitQuads={}
-local speakerList={'kotoba','marisa','reimu','tooshi'}
+local speakerList={'cora','kotoba','marisa','reimu','tooshi'}
 local speakerExpressionList={'angry','cunning','frustrated','happy','normal','sad','surprised'}
 for i,speaker in ipairs(speakerList) do
     Asset.portraitQuads[speaker]={}

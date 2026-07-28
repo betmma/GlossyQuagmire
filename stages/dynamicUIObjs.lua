@@ -343,6 +343,7 @@ function makeDynamicUIObjs()
 
     local itemComboData={combo=0,duration=0,remainingFrames=0,active=false}
     local baseWidth=50
+    local baseHeight=20
     local remainingFrameMax=60
     local bonuses={{value=20,items={bombPiece=1}},{value=40,items={lifePiece=1}},{value=80,items={bomb=1}},{value=150,items={life=1}},{value=250,items={life=2}}}
     local function durationBonus()
@@ -352,6 +353,11 @@ function makeDynamicUIObjs()
         return itemComboData.combo*durationBonus()
     end
     local function pickItem()
+        local duringBomb=G.runInfo.player.duringBomb
+        if duringBomb then
+            itemComboData.remainingFrames=remainingFrameMax
+            return
+        end
         if not itemComboData.active then
             itemComboData.active=true
             itemComboData.combo=0
@@ -402,7 +408,8 @@ function makeDynamicUIObjs()
         end
     ),function(self)
         self.transparency=math.lerpCondition(self.transparency,itemComboData.active,1,0,0.1)
-        if itemComboData.active then
+        local duringBomb=G.runInfo.player.duringBomb
+        if itemComboData.active and not duringBomb then
             itemComboData.duration=itemComboData.duration+1/60
             itemComboData.remainingFrames=itemComboData.remainingFrames-1
             if itemComboData.remainingFrames==0 then
@@ -417,8 +424,25 @@ function makeDynamicUIObjs()
             end
         end
     end}}
+    local fadePanelShaderCode=[[
+    extern vec4 xywh; // x,y,width,height of the panel
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
+    {
+        vec4 colorBase=Texel(texture, texture_coords)*color;
+        float xratio=(pixel_coords.x-xywh.x)/xywh.z*2.0-1.0;
+        float yratio=(pixel_coords.y-xywh.y)/xywh.w*2.0-1.0;
+        float r=sqrt(xratio*xratio+yratio*yratio);
+        float alphaMultiplier=1.0-smoothstep(0.8,1.0,r);
+        return colorBase*vec4(1.0,1.0,1.0,alphaMultiplier);
+    }
+    ]]
+    local fadePanelShader=love.graphics.newShader(fadePanelShaderCode)
+    local freezePanel=UI.Panel{parent=itemComboArea,x=-baseWidth,y=-baseHeight,width=baseWidth*2,height=baseHeight+30,edgeColor={1,1,1,0},fillColor={0.3,0.3,1,1},transparency=0,extraUpdates={function(self)
+        local duringBomb=G.runInfo.player.duringBomb
+        self.transparency=math.lerpCondition(self.transparency,duringBomb,0.5,0,0.1)
+    end},shader=fadePanelShader}
     local comboColors={{amount=0,color={0,0,0,1},suffix='',size=14},{amount=20,color={1,1,0,1},suffix='!',size=15},{amount=40,color={1,0.6,0,1},suffix='?!',size=16},{amount=80,color={1,0,0,1},suffix='!!',size=18}}
-    local itemComboText=UI.Text{parent=itemComboArea,y=-20,x=-10,align='right',color={0,0,0,1},text='',updateText=function (self)
+    local itemComboText=UI.Text{parent=itemComboArea,y=-baseHeight,x=-10,align='right',color={0,0,0,1},text='',updateText=function (self)
         local combo=itemComboData.combo
         local text='x'..combo
         local finalIndex=1
@@ -434,11 +458,13 @@ function makeDynamicUIObjs()
         text=text..comboColors[finalIndex].suffix
         return text
     end}
-    local itemMultipleSignText=UI.Text{parent=itemComboArea,y=-20,x=0,align='center',color={1,1,1,1},text='x'}
-    local itemComboTimeText=UI.Text{parent=itemComboArea,y=-20,x=10,align='left',color={1,1,1,1},text='',updateText=function (self)
+    local itemMultipleSignText=UI.Text{parent=itemComboArea,y=-baseHeight,x=0,align='center',color={1,1,1,1},text='x'}
+    local itemComboTimeText=UI.Text{parent=itemComboArea,y=-baseHeight,x=10,align='left',color={1,1,1,1},text='',updateText=function (self)
         return string.format("%.2f", durationBonus())
     end}
     local itemComboRemainingTime=UI.Panel{parent=itemComboArea,x=-baseWidth,y=-3,width=0,height=2,edgeColor={1,1,0,0},fillColor={1,1,0,1},extraUpdates={function(self)
+        local duringBomb=G.runInfo.player.duringBomb
+        self.fillColor=duringBomb and {0.3,0.3,1,1} or {1,1,0,1}
         local ratio=itemComboData.remainingFrames/remainingFrameMax
         self.width=baseWidth*2*ratio
     end}}
