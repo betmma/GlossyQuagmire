@@ -1218,6 +1218,16 @@ return {
                 zh_cn = '第三面的主题曲。\n从庄严的走廊到生动的展览，突如其来的低音很好地完成了过渡。开发过程中这首曲子发生了很大变化。例如，现在的过渡部分曾经是前奏，并且有种坏掉的电视的感觉。',
             }
         },
+        level3b = {
+            name = {
+                en_us = 'Art of Kaleidoscope ~ Stacked Reflections',
+                zh_cn = '万花筒艺术　～ Stacked Reflections',
+            },
+            description = {
+                en_us = 'Cora Kurekagami\'s theme.\nI always think that "kaleidoscope" is somewhat cliche, but she literally creates kaleidoscopes and fun danmaku so there\'s no other choice.',
+                zh_cn = '吴镜珂络的主题曲。\n我一直觉得“万花筒”这个词是陈词滥调，但她的机制确实是万花筒，并且弹幕也挺有趣，所以就这么叫吧。',
+            }
+        },
         level5 = {
             name = {
                 en_us = 'Radio Signal Across the Ether',

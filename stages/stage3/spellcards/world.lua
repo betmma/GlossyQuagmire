@@ -3,7 +3,7 @@ return BossManager.SpellcardPhase{
     key='kora-world',SKIP_INCLUDE=true,
     bonusScore=20000,
     time=3000,
-    hp=7200,
+    hp=6600,
     dropItems={powerSmall=15,point=15},
     func=function(self, boss)
         Event.EaseEvent{obj=boss,aims={spriteTransparency=1},duration=60,afterFunc=function()

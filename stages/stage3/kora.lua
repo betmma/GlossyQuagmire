@@ -86,6 +86,7 @@ local midboss=BossManager.BossSegment{
 local boss=BossManager.BossSegment{
     bossName='cora',
     key='3-boss',
+    BGM='level3b',
     beforeDialogueKey=function ()
         return G.runInfo.playerType..'S3BossBefore'
     end,
