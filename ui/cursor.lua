@@ -82,10 +82,16 @@ function UICursor:getFluctuationXYWH()
     return x,y,w,h
 end
 
+function UICursor:getAlpha()
+    local colorref={love.graphics.getColor()}
+    return self.color[4]*colorref[4]*self.transparency/math.max(0.01,self.parent and self.parent.transparency or 1) -- cancel out parent's transparency. for example, UI.option can have half transparent option as disabled, but cursor on it should be fully visible.
+end
+
 function UICursor:drawTextFaceStyle()
     local x,y,w,h=self:getFluctuationXYWH()
     local colorref={love.graphics.getColor()}
-    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*self.transparency)
+    local alpha=self:getAlpha()
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3],alpha)
     love.graphics.rectangle('fill',x,y,w,h)
     love.graphics.setColor(colorref[1],colorref[2],colorref[3],colorref[4])
 end
@@ -93,7 +99,8 @@ end
 function UICursor:drawTextLineStyle()
     local x,y,w,h=self:getFluctuationXYWH()
     local colorref={love.graphics.getColor()}
-    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.color[4]*self.transparency)
+    local alpha=self:getAlpha()
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3],alpha)
     local lineLengthX=self.lineLengthRatio*w/2
     local lineLengthY=self.lineLengthRatio*h/2
     if self.useShortSide then

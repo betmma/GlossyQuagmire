@@ -362,6 +362,7 @@ local GAME_TYPE_TO_REPLAY_CLASS={
 ---@field saveToSlot fun(self:ReplayManager, replay:replayBase, slot: integer)
 ---@field getDisplayLineOfReplay fun(self:ReplayManager, replay:replayBase, slot:integer): string concat No.aaa with replay:getDisplayLine
 ---@field getDisplayLineAtSlot fun(self:ReplayManager, slot: integer): string pass ReplayManager.replays[slot] to getDisplayLineOfReplay, doesnt read from disk
+---@field getStagesAndScores fun(self:ReplayManager, slot: integer): {stageKey: StageKey, score: integer}[] returns the stages and scores of a full game replay at this slot, if not full game replay returns empty table
 ---@field runReplayAtSlot fun(self:ReplayManager, slot: integer, startStage: StageKey|nil): boolean returns whether replay is running (isn't empty)
 local replayManager={}
 replayManager.replays={}
@@ -423,6 +424,19 @@ end
 
 function replayManager:getDisplayLineAtSlot(slot)
     return self:getDisplayLineOfReplay(self.replays[slot], slot)
+end
+
+function replayManager:getStagesAndScores(slot)
+    local replay=self.replays[slot]
+    if not replay or replay.data.type ~= G.CONSTANTS.GAME_TYPES.FULL_GAME then
+        return {}
+    end
+    ---@cast replay fullGameReplay
+    local stagesAndScores={}
+    for _, stageData in ipairs(replay.data.stages) do
+        table.insert(stagesAndScores, {stageKey = stageData.stageKey, score = stageData.score})
+    end
+    return stagesAndScores
 end
 
 function replayManager:runReplayAtSlot(slot,stageKey)

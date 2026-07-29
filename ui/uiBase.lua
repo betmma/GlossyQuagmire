@@ -149,6 +149,7 @@ function UIBase:canChildHaveFocus(childIndex)
 end
 
 function UIBase:updateHierarchy()
+    -- intended to save self.focused before self:update, so that if an element wants to give up its focus but not its children, can achieve by setting self.focused=false in an extraUpdate function. If want to stop children having focus, use canChildHaveFocus.
     local hasFocus=self.focused
     self:update()
     self.focused=false

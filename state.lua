@@ -398,6 +398,9 @@ G={
             SPELL_PRACTICE={
                 transitionState='TRANSITION_IMAGE',
             },
+            LOAD_REPLAY={
+                transitionState='TRANSITION_IMAGE',
+            },
             IN_GAME={
                 transitionState='TRANSITION_FADE',
                 from={duration=30,target='fade',doUpdate=true},
