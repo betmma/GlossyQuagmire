@@ -54,7 +54,7 @@ local tooshiBoss=BossManager.BossSegment{
                         end}}
                         spawner:bindState(boss)
                         Event.EaseEvent{obj=spawner,aims={angle=spawner.angle+math.pi*0.7*sign,bulletSpeed=0},duration=lifeFrame}
-                        Event.EaseEvent{obj=spawner,aims={range=math.pi/2,bulletSize=1},duration=lifeFrame,progressFunc=Event.sineBackProgressFunc}
+                        Event.EaseEvent{obj=spawner,aims={range=math.pi/2,bulletSize=DSWITCH{0.5,0.5,0.6,0.7}},duration=lifeFrame,progressFunc=Event.sineBackProgressFunc}
                         wait(180)
                     end
                 end

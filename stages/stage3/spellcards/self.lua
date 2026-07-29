@@ -43,7 +43,7 @@ return BossManager.SpellcardPhase{
             end}})
         end
         local bias=math.random(1,99)
-        Event.LoopEvent{obj=sentry,period=DSWITCH{120,100,80,60},firstPeriod=10,executeFunc=function (self, index, total)
+        Event.LoopEvent{obj=sentry,period=DSWITCH{100,80,70,60},firstPeriod=10,executeFunc=function (self, index, total)
             SFX:play('enemyShot')
             local pos0,dir0=geo:rThetaGo(basePos,500,player.viewDirection-math.pi/2)
             local tiltN=4

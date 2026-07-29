@@ -59,12 +59,13 @@ local midboss=BossManager.BossSegment{
                             local ovalangle=dangle-math.pi/2*flip
                             local r=((math.sin(ovalangle)*80)^2+(math.cos(ovalangle)*120)^2)^0.5
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r,angle+dangle)
+                            local lifeFrame=DSWITCH{38,40,44,50}
                             for k=-1,1,2 do
-                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=50,extraUpdate={Action.Trail(30,3)}}
+                                local warningBullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir+math.pi/2*k,speed=500},sprite=BulletSprites.ellipse.red,spriteColor={1,0.3,0.3,0.8},safe=true,invincible=true,lifeFrame=lifeFrame,extraUpdate={Action.Trail(30,3)}}
                             end
                             local spawner=BulletSpawner{
                                 kinematicState={pos=pos,dir=dir,speed=0},
-                                period=1,firstPeriod=30,lifeFrame=DSWITCH{38,40,50,55},bulletNumber=2,bulletSpeed=90,range=math.pi*2,bulletSize=1,angle=dir,bulletSprite=BulletSprites.ellipse.gray,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={
+                                period=1,firstPeriod=30,lifeFrame=lifeFrame,bulletNumber=2,bulletSpeed=90,range=math.pi*2,bulletSize=1,angle=dir,bulletSprite=BulletSprites.ellipse.gray,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={
                                     function(cir,args,self)
                                         cir.index=self.spawnTimes
                                         self.bulletSpeed=self.bulletSpeed+10
@@ -181,7 +182,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
                                                 cir:changeSprite(BulletSprites.stone.purple)
                                                 cir.kinematicState.dir=cir.kinematicState.dir-sign*math.pi*flip
                                                 cir.kinematicState.speed=speedRef/2
-                                                if DIFF()==G.EASY then
+                                                if DIFF()==G.EASY or index%5==0 then
                                                     cir.lifeFrame=cir.frame+60
                                                 end
                                                 -- wait(140)
@@ -242,6 +243,9 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
                                                 local div=4
                                                 cir.kinematicState.speed=speedRef/div*(0.5+0.5*math.sin(index/2))
                                                 Event.EaseEvent{obj=cir.kinematicState,aims={speed=speedRef/div},duration=120}
+                                                if index%5==0 then
+                                                    cir.lifeFrame=cir.frame+60
+                                                end
                                             else
                                                 cir:changeSprite(BulletSprites.stone.purple)
                                                 cir.kinematicState.dir=cir.kinematicState.dir-sign*math.pi*flip

@@ -95,7 +95,7 @@ return BossManager.SpellcardPhase{
             if distx<xmax and math.abs(disty-y)<20 then
                 self:remove()
                 local dir=math.eval(0,999)
-                local spawner=BulletSpawner{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},period=3,lifeFrame=7,bulletNumber=DSWITCH{2,3,4,6},bulletSpeed=20,range=math.pi*2,angle=dir,bulletSprite=BulletSprites.ellipse.black,bulletLifeFrame=600,highlight=true,bulletEvents={function(cir,args)
+                local spawner=BulletSpawner{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},period=3,lifeFrame=7,bulletNumber=DSWITCH{2,3,4,5},bulletSpeed=20,range=math.pi*2,angle=dir,bulletSprite=BulletSprites.ellipse.black,bulletLifeFrame=600,highlight=true,bulletEvents={function(cir,args)
                     cir.forceQuad=true
                 end},bulletExtraUpdate={speedup}}
                 Event{obj=spawner,action=function()

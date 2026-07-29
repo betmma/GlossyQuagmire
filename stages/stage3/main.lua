@@ -404,7 +404,7 @@ return{
         {
             key='3-5',
             type='midStage',
-            func=function() -- 15s
+            func=function() -- 16s
                 local geo=G.runInfo.geometry
                 local base=geo:init().pos
                 local pos1,dir1=geo:rThetaGo(base,350,-math.pi/2)
@@ -435,6 +435,12 @@ return{
                     return bigFairy
                 end
                 local bigFairies={}
+                for i=-1,1,2 do
+                    local pos,dir=geo:rThetaGo(pos1,100,dir1+i*math.pi/2)
+                    local size,duration=3,60
+                    Effect.Larger{kinematicState={pos=copyTable(pos),dir=dir,speed=0},sprite=BulletSprites.shockwave.red,size=size,growSpeed=-size/duration,animationFrame=duration,spriteTransparency=0.8}
+                end
+                wait(60)
                 for i=-1,1,2 do
                     local pos,dir=geo:rThetaGo(pos1,100,dir1+i*math.pi/2)
                     local bigFairy=group(pos,dir,i)

@@ -26,7 +26,7 @@ local midboss=BossManager.BossSegment{
                     local n=DSWITCH{10,16,17,21}
                     local spawner=BulletSpawner{period=5,firstPeriod=30,lifeFrame=1200,bulletNumber=n,angle='player',bulletSpeed=DSWITCH{180,210,240,270},bulletLifeFrame=240,bulletSprite=BulletSprites.bill.red}
                     Event.LoopEvent{obj=spawner,period=1,executeFunc=function()
-                        if (spawner.frame-30)%60>40 then
+                        if (spawner.frame-30)%60>30 then
                             spawner.bulletNumber=0
                         else
                             spawner.bulletNumber=n

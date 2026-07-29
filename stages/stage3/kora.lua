@@ -196,11 +196,12 @@ local boss=BossManager.BossSegment{
                     local pos0=geo:rThetaGo(basePos,250,G.runInfo.player.viewDirection-math.pi/2)
                     local sentry=DanmakuFuncs.sentry(pos0)
                     local extraUpdate=function(self)
+                        self.lifeFrame=600
                         if self.mirrored then
                             if not self.t0 then
                                 self.spriteTransparency=0.5
                                 self.t0=self.frame
-                                self.aimDir=math.modClamp(self.kinematicState.dir+math.pi*0.5*math.mod2Sign(math.ceil(self.t0/DSWITCH{16,16,10,6}))*math.mod2Sign(self.i),self.kinematicState.dir)
+                                self.aimDir=math.modClamp(self.kinematicState.dir+math.pi*0.5*math.mod2Sign(math.ceil(self.t0/DSWITCH{16,10,10,6}))*math.mod2Sign(self.i),self.kinematicState.dir)
                             end
                             if self.frame<82 then
                                 self.safe=true
@@ -228,6 +229,9 @@ local boss=BossManager.BossSegment{
                         BulletSpawner{period=99,firstPeriod=60,lifeFrame=61,bulletNumber=n2,bulletSpeed=320,angle=angle,bulletSprite=BulletSprites.arrow.black,bulletLifeFrame=600,bulletEvents={function(cir,args,self)
                             cir.index=args.index
                             cir.i=i
+                            if cir.index==1 then
+                                cir.lifeFrame=120
+                            end
                             -- local sign=cir.index>self.bulletNumber/2 and 1 or -1
                             -- cir.kinematicState.dir=cir.kinematicState.dir+sign*math.pi/8
                             table.insert(bullets,cir)
@@ -259,7 +263,7 @@ local boss=BossManager.BossSegment{
                                     end
                                     for i,bullet in ipairs(bullets) do
                                         if not bullet.removed then
-                                            Mirror.spawnReflections(bullet,DSWITCH{4,6,6,6},nil,{index=true,i=true})
+                                            Mirror.spawnReflections(bullet,DSWITCH{2,4,6,6},nil,{index=true,i=true})
                                         end
                                     end
                                 end

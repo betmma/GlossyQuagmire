@@ -49,7 +49,7 @@ return BossManager.SpellcardPhase{
                     for j=1,5 do -- warning bullets
                         local pos,dir=geo:rThetaGo(posmi,petalR*(j-0.5)/5,dir0)
                         local sprite=BulletSprites.cross.red
-                        Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=sprite,lifeFrame=60,extraUpdate={Action.FadeIn(5,true),Action.FadeOut(30,true)},invincible=true,safe=true,spriteColor={r,g,b,0.6},highlight=true,size=(j-0.5)}
+                        Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=sprite,lifeFrame=60,extraUpdate={Action.FadeIn(5,false),Action.FadeOut(30,true)},invincible=true,safe=true,spriteColor={r,g,b,0.6},highlight=true,size=(j-0.5)}
                     end
                     wait(30)
                     SFX:play('enemyPowerfulShot')
@@ -63,7 +63,7 @@ return BossManager.SpellcardPhase{
                                 sprite=BulletSprites.ellipse.white
                                 dir=dir+math.pi/2*sign
                             end
-                            local new=Bullet{kinematicState={pos=pos,dir=dir+t*sign*DSWITCH{1,2,3,4},speed=0},sprite=sprite,lifeFrame=700,extraUpdate={Action.FadeIn(30,true),petalUpdate}}
+                            local new=Bullet{kinematicState={pos=pos,dir=dir+t*sign*DSWITCH{1,2,3,4},speed=0},sprite=sprite,lifeFrame=700,extraUpdate={Action.FadeIn(90,true),petalUpdate}}
                         end
                         wait(DSWITCH{2,2,2,1})
                     end
