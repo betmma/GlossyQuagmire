@@ -42,9 +42,9 @@ return {
             return inChooseStageMenu
         end
         -- choose stage menu for full game replay
-        local width,height=300,200
-        local panel=UI.Panel{width=width,height=height,x=(WINDOW_WIDTH-width)/2,y=(WINDOW_HEIGHT-height)/2,parent=chooseStageLayer,edgeColor={1,1,1,0.5},fillColor={0.5,0.5,0.5,0.8},transparency=0,extraUpdates={function(self)
-            self.transparency=math.lerpCondition(self.transparency,inChooseStageMenu,1,0,0.1)
+        local width,height=300,200 -- this height will be adjusted according to the number of stages in the replay
+        local panel=UI.Panel{width=width,height=height,x=(WINDOW_WIDTH-width)/2,y=(WINDOW_HEIGHT-height)/2,parent=chooseStageLayer,edgeColor={1,1,1,0.5},fillColor={0.8,0.8,0.8,0.8},transparency=0,extraUpdates={function(self)
+            self.transparency=math.lerpCondition(self.transparency,inChooseStageMenu,1,0,0.15)
         end},shader=crossShader}
         local options=UI.Options{arrange=function(self, index)
             return 0,index*30-15
@@ -55,6 +55,8 @@ return {
         local gap=10
         local function addOptions()
             options:clearOptions()
+            panel.height=gap*2+#ReplayManager:getStagesAndScores(chosenSlot)*30
+            panel.y=(WINDOW_HEIGHT-panel.height)/2
             local stagesAndScores=ReplayManager:getStagesAndScores(chosenSlot)
             for i,stageAndScore in ipairs(stagesAndScores) do
                 local stageKey,score=stageAndScore.stageKey,stageAndScore.score

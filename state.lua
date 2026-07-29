@@ -434,7 +434,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player|nil, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player|nil, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
@@ -453,6 +453,7 @@ G={
         exitToState=nil, -- defaults to G.STATES.CHOOSE_PLAYER
         replay=nil,
         pendingReplay=nil,
+        startStageKey=normalStageOrder[1]
     },
     ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays. it only handles things that persist between stages. things that only matter in a single stage should be initialized in StageManager:load.
     ---@param self G
@@ -461,12 +462,14 @@ G={
     ---@param shotType SHOT_TYPE
     ---@param exitToState STATE
     ---@param replay? replayBase
-    resetRunInfo=function(self,gameType,difficulty,shotType,exitToState,replay)
+    ---@param startStageKey? StageKey
+    resetRunInfo=function(self,gameType,difficulty,shotType,exitToState,replay,startStageKey)
         self.runInfo.gameType=gameType
         self.runInfo.difficulty=difficulty
         self.runInfo.shotType=shotType
         self.runInfo.playerType=G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]
         self.runInfo.exitToState=exitToState
+        self.runInfo.startStageKey=startStageKey or G.CONSTANTS.DIFFICULTIES_TO_STAGES[difficulty][1]
         local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[gameType]
         self.runInfo.lives=startResources.lives
         self.runInfo.bombs=startResources.bombs
@@ -477,14 +480,17 @@ G={
     end,
     ---@param self G
     restart=function(self)
-        self:resetRunInfo(self.runInfo.gameType, self.runInfo.difficulty, self.runInfo.shotType, self.runInfo.exitToState, self.runInfo.replay)
-        self:switchState(self.STATES.IN_GAME)
-        if self.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
-            StageManager:load(G.CONSTANTS.DIFFICULTIES_TO_STAGES[self.runInfo.difficulty][1],nil,nil,'nextStage')
-        else
-            local args=StageManager.args
-            StageManager:load(args.stageKey,args.skipToSegmentKey,args.onlyRunOneSegment,'end',args.segmentFuncArgs)
-        end
+        self:resetRunInfo(self.runInfo.gameType, self.runInfo.difficulty, self.runInfo.shotType, self.runInfo.exitToState, self.runInfo.replay, self.runInfo.startStageKey)
+        self:switchState(self.STATES.IN_GAME,{
+            transitionState=G.STATES.TRANSITION_IMAGE,
+            onHalfway=function()
+                if self.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+                    StageManager:load(self.runInfo.startStageKey,nil,nil,'nextStage')
+                else
+                    local args=StageManager.args
+                    StageManager:load(args.stageKey,args.skipToSegmentKey,args.onlyRunOneSegment,'end',args.segmentFuncArgs)
+                end
+            end})
     end,
     getHighScoreTableAndKey=function(self)
         local highScoreTable={}

@@ -447,7 +447,7 @@ function replayManager:runReplayAtSlot(slot,stageKey)
     local gameType=replay.data.type
     if gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
         ---@cast replay fullGameReplay
-        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay)
+        G:resetRunInfo(gameType,replay.data.difficulty,replay.data.shotType,G.STATES.LOAD_REPLAY,replay,stageKey)
         G:switchState(G.STATES.IN_GAME)
         StageManager:load(stageKey or G.CONSTANTS.DIFFICULTIES_TO_STAGES[replay.data.difficulty][1],nil,nil,'nextStage')
     elseif gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE then
