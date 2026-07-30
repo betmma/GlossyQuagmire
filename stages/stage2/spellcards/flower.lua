@@ -32,8 +32,8 @@ return BossManager.SpellcardPhase{
             size=size or 1
             sign=sign or 1
             local color=choose and c1 or c2
-            for i=1,8 do
-                generalBind(cir,BulletSprites.egg.white,3*size,color,50*size,angle+i*math.pi/4,sign)
+            for i=1,7 do
+                generalBind(cir,BulletSprites.egg.white,3*size,color,50*size,angle+i*math.pi*2/7,sign)
             end
             -- -- 3 egg shaped petals
             -- for i=-1,1,2 do

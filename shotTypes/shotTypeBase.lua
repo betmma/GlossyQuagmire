@@ -629,8 +629,8 @@ local marisabOption=function(angle,damage,freq)
     }
 end
 local marisabOptionUnfocusedDmg=function(self, powerLevel)
-    local values={10,7,6,5}
-    return values[powerLevel] or 5
+    local values={10,9,8,7}
+    return values[powerLevel] or 6
 end
 local mOUD=marisabOptionUnfocusedDmg
 ShotTypes.MARISAB=ShotType{
@@ -707,7 +707,7 @@ end
 
 local kotobaSpellcard={duration=300, canShoot=true, func=kotobaSpellcardFunc}
 
-local kotobaAAimDistance=300
+local kotobaAAimDistance=250
 local scatterExtraUpdate=function(self)
     if self.frame==0 then
         self.aim=G.runInfo.geometry:rThetaGo(self.kinematicState.pos, kotobaAAimDistance, self.kinematicState.dir)

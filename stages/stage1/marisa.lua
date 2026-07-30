@@ -118,7 +118,7 @@ local marisaBoss=BossManager.BossSegment{
                     local function spawner(r,angle,rotateSpeed)
                         local center=G.runInfo.geometry:init().pos
                         local prepTime=100
-                        local period=40
+                        local period=60
                         local bigStar=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),speed=0,dir=0},sprite=BulletSprites.bigStar.red,lifeFrame=1800,invincible=true,safe=true,size=2,spriteTransparency=0.5,extraUpdate={function(self)
                             if self.frame%15==0 then
                                 self:changeSpriteColor()

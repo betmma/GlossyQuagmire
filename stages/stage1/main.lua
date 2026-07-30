@@ -27,7 +27,7 @@ return{
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)
         end
-        BGM:play('level1')
+        BGM:play('level1',true)
         DynamicUIObjs.showSoundtrack()
     end,
     segments={

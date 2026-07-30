@@ -226,7 +226,7 @@ local boss=BossManager.BossSegment{
                         SFX:play('enemyShot')
                         local n1,n2=4,2
                         local angle=geo:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)-math.pi/2
-                        angle=math.clamp(angle,-0.1,0.1)
+                        angle=math.clamp(angle,-0.07,0.07)
                         BulletSpawner{period=99,firstPeriod=60,lifeFrame=61,bulletNumber=n2,bulletSpeed=320,angle=angle,bulletSprite=BulletSprites.arrow.black,bulletLifeFrame=600,bulletEvents={function(cir,args,self)
                             cir.index=args.index
                             cir.i=i
@@ -278,9 +278,9 @@ local boss=BossManager.BossSegment{
             },
             require('stages.stage3.spellcards.self')
         }},
-        BossManager.BossRound{phases={
+        BossManager.BossRound{SKIP_INCLUDE=true,phases={
             BossManager.NonSpellPhase{
-                key='3-boss-kora-non-3',
+                key='3-boss-kora-non-3',SKIP_INCLUDE=true,
                 time=1500,
                 hp=2600,
                 func=function(self, boss)

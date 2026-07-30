@@ -1689,13 +1689,25 @@ return {
                 en_us = 'This corridor is my place.',
                 zh_cn = '这条走廊是我的地盘。',
             },
-            thisIsAmazing = {
-                en_us = 'This is amazing!',
-                zh_cn = '太神奇了！',
+            whyYouHaveYourBackToMe = {
+                en_us = 'Why do you have your back to me? That\'s strange.',
+                zh_cn = '你为什么背对着我啊？好奇怪。',
+            },
+            imNot = {
+                en_us = 'I\'m not.',
+                zh_cn = '并非如此。',
+            },
+            myReflectionIsFacingYou = {
+                en_us = 'Isn\'t my reflection facing you?',
+                zh_cn = '我在镜中的像难道不是面向你的吗？',
+            },
+            ughhYeah = {
+                en_us = 'Ughh, yeah. Still weird to me.',
+                zh_cn = '呃，是啊。我还是觉得奇怪。',
             },
             youKnowInteractiveArt = {
-                en_us = 'There\'s more! You know interactive art?',
-                zh_cn = '还有更多好东西呢！你知道互动艺术吗？',
+                en_us = 'There\'s weirder thing. You know interactive art?',
+                zh_cn = '还有更奇怪的呢。你知道互动艺术吗？',
             },
             likeBodyPaintingThing = {
                 en_us = 'Like smearing pigment on your body thing?',
@@ -1717,7 +1729,7 @@ return {
             },
             iCanPlayWithItAllDay = {
                 en_us = 'I can play with it all day.',
-                zh_cn = '我可以玩一整天呢。',
+                zh_cn = '我可以玩一整天。',
             },
             yeahYouCanTry = {
                 en_us = 'Yeah, you can try it.',
