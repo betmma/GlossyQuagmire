@@ -26,7 +26,7 @@ G={
                 Asset.titleBatch:setColor(1,1,1,1)
                 Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
             end
-            GameObject:drawAll() -- including directly calling love.graphics functions like .circle and adding sprite into corresponding batch.
+            GameObject:drawAll() -- adding sprite into corresponding batch.
             local ui=uiToDrawBatch and self.UIDEF[uiToDrawBatch] or self.currentUI
             if ui.base then
                 ui.base:drawHierarchy() -- UI elements that need batches. currently only UI.Image.

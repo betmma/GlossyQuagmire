@@ -20,7 +20,7 @@ return BossManager.SpellcardPhase{
         Mirror.setHSV({0,0,1},0)
         local mirrorn=4
         local r0=600
-        local r1=DSWITCH{150,100,80,60}
+        local r1=DSWITCH{100,90,80,60}
         for i=1,mirrorn do
             local angle=math.pi*2/mirrorn*i+player.viewDirection
             local pos1=geo:rThetaGo(player.kinematicState.pos,r0,angle-math.pi/mirrorn)

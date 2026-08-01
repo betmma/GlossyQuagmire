@@ -428,7 +428,7 @@ end
 
 function replayManager:getStagesAndScores(slot)
     local replay=self.replays[slot]
-    if not replay or replay.data.type ~= G.CONSTANTS.GAME_TYPES.FULL_GAME then
+    if not replay.data or replay.data.type ~= G.CONSTANTS.GAME_TYPES.FULL_GAME then
         return {}
     end
     ---@cast replay fullGameReplay

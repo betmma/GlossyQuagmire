@@ -1,9 +1,9 @@
 local G=...
 local crossShaderCode=[[
 extern vec4 xywh; // x,y,width,height of the panel
-uniform float gridSize = 30.0; 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
 {
+    float gridSize = 30.0; 
     float c = 0.70710678+xywh.x*0.00000001; // use xywh variable
     float s = 0.70710678;
     vec2 rotatedCoords = vec2(

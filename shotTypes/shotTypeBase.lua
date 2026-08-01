@@ -682,7 +682,7 @@ local function kotobaSpellcardFunc(playerState, isFocused)
             local dir
             if enemy then
                 dir=G.runInfo.geometry:to(bullet.kinematicState.pos,enemy.kinematicState.pos)
-                local playerShot=PlayerShot{kinematicState={pos=copyTable(bullet.kinematicState.pos), speed=800, dir=dir},sprite=bullet.sprite,size=bullet.size,damage=2,lifeFrame=120,batch=bullet.batch,meshBatch=bullet.meshBatch,extraUpdate={Action.FadeOut(5,false)},forceQuad=bullet.forceQuad,forceMesh=bullet.forceMesh,fromPlayer=true,invincible=true}
+                local playerShot=PlayerShot{kinematicState={pos=copyTable(bullet.kinematicState.pos), speed=800, dir=dir},sprite=bullet.sprite,size=bullet.size,damage=4,lifeFrame=120,batch=bullet.batch,meshBatch=bullet.meshBatch,extraUpdate={Action.FadeOut(5,false)},forceQuad=bullet.forceQuad,forceMesh=bullet.forceMesh,fromPlayer=true,invincible=true}
                 bullet:remove()
             else
                 local dirTouch=G.runInfo.geometry:to(bullet.kinematicState.pos, self.kinematicState.pos)+math.pi
