@@ -12,7 +12,7 @@ GeometryBase.Dummy={dummy=true} -- for toScreen to return when there is no corre
 
 GeometryBase.viewConfig={
     following=false,
-    screenCenter={x=WINDOW_WIDTH/2,y=WINDOW_HEIGHT/2},
+    screenCenter={x=WINDOW_WIDTH/40*13,y=WINDOW_HEIGHT/2},
 }
 
 function GeometryBase:init()
@@ -75,8 +75,8 @@ GeometryBase.MESH_MAX_SIDES=64
 
 function GeometryBase:applyVertexShader(viewer)
     -- needs translation if viewConfig.following is true.
-    if GeometryBase.viewConfig.following then
-        love.graphics.translate(GeometryBase.viewConfig.screenCenter.x-viewer.kinematicState.pos.x,GeometryBase.viewConfig.screenCenter.y-viewer.kinematicState.pos.y)
+    if self.viewConfig.following then
+        love.graphics.translate(self.viewConfig.screenCenter.x-viewer.kinematicState.pos.x,self.viewConfig.screenCenter.y-viewer.kinematicState.pos.y)
     end
 end
 
@@ -111,6 +111,27 @@ function GeometryBase:reflect(point,linePoint1,linePoint2)
     local r,theta=self:rThetaTo(nearest,point)
     local newPos,newTheta=self:rThetaGo(nearest,r,theta+math.pi)
     return newPos,math.modClamp(newTheta+self:to(point,newPos)+math.pi)
+end
+
+function GeometryBase:distanceToLine(position,linePoint1,linePoint2)
+    local nearest=self:nearestToLine(position,linePoint1,linePoint2)
+    return self:distance(position,nearest),math.angleDiff(self:to(nearest,linePoint1),self:to(nearest,linePoint2))>math.pi/2
+end
+
+function GeometryBase:distanceToSegment(position,segPoint1,segPoint2)
+    local nearest=self:nearestToLine(position,segPoint1,segPoint2)
+    local onSegment=math.angleDiff(self:to(nearest,segPoint1),self:to(nearest,segPoint2))>math.pi/2
+    if onSegment then
+        return self:distance(position,nearest)
+    else
+        local dist1=self:distance(position,segPoint1)
+        local dist2=self:distance(position,segPoint2)
+        return math.min(dist1,dist2)
+    end
+end
+
+function GeometryBase:enterPhase(phase)
+    -- default does nothing
 end
 
 local geometries={

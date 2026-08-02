@@ -11,7 +11,21 @@ function math.atanh(x)
     return 0.5*math.log((1+x)/(1-x))
 end
 
+function math.sigmoid(x)
+    return 1/(1+math.exp(-x))
+end
+
+function math.smoothstep(x)
+    if x<0 then
+        return 0
+    elseif x>1 then
+        return 1
+    end
+    return x*x*(3-2*x)
+end
+
 -- return 1 if x>0, -1 if x<0, 0 if x=0
+---@return 1|-1|0
 function math.sign(x)
     return x>0 and 1 or x<0 and -1 or 0
 end
@@ -311,6 +325,30 @@ function copyTable(O)
         setmetatable(copy, getmetatable(O))
     else
         copy = O
+    end
+    return copy
+end
+
+---@generic T
+---@param orig T
+---@return T
+function copyRecursiveTable(orig, copies)
+    copies = copies or {}
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        if copies[orig] then
+            copy = copies[orig]
+        else
+            copy = {}
+            copies[orig] = copy
+            for orig_key, orig_value in next, orig, nil do
+                copy[copyRecursiveTable(orig_key, copies)] = copyRecursiveTable(orig_value, copies)
+            end
+            setmetatable(copy, copyRecursiveTable(getmetatable(orig), copies))
+        end
+    else -- number, string, boolean, etc
+        copy = orig
     end
     return copy
 end

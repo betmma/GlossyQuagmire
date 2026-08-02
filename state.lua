@@ -130,7 +130,7 @@ G={
         },
         ---@type table<StageKey, string>
         STAGE_TO_DEFAULT_GEOMETRY_NAME={
-            stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean'
+            stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean',stage4='Euclidean'
         }
     },
 }
@@ -434,7 +434,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player|nil, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
@@ -449,7 +449,7 @@ G={
         power=0,
         grazes=0,
         geometry=geometries.Hyperbolic,
-        player=nil,
+        player={},
         exitToState=nil, -- defaults to G.STATES.CHOOSE_PLAYER
         replay=nil,
         pendingReplay=nil,
@@ -615,6 +615,7 @@ G:switchState(G.STATES.MAIN_MENU)
 
 
 G.update=function(self,dt)
+    self.runInfo.geometry:enterPhase('update')
     if DEV_MODE then
         if isPressed('f9') then
             SKIP_MODE=not SKIP_MODE
@@ -652,6 +653,7 @@ G.update=function(self,dt)
     UI.Base:cleanObjects() -- to remove removed elements in class.objects
 end
 G.draw=function(self)
+    self.runInfo.geometry:enterPhase('draw')
     Asset:clearBatches()
     shove.beginLayer('main')
     self.currentUI=self.UIDEF[self.STATE]

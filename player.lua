@@ -267,8 +267,13 @@ function Player:draw()
     local drawColor={1,1,1,self.transparency*color[4]}
     local drawFocusColor={1,1,1,self.transparency*self.focusPointTransparency*color[4]}
     local focalSizeFactor=1
+    ---@type any
+    local normalBatch=Asset.playerFocusBatch
+    if G.runInfo.geometry==G.geometries.Hyperbolic or G.runInfo.geometry==G.geometries.Spherical then
+        normalBatch=nil -- force mesh
+    end
     self:drawQuad{quad=BulletSprites.playerFocus.quad,rotation=focusOrientation,zoom=focalSizeFactor,meshBatch=Asset.playerFocusMeshes,color=drawFocusColor
-        ,normalBatch=nil} -- force mesh
+        ,normalBatch=normalBatch}
     local sizeFactor=1
     if self.sprite then
         self:drawQuad{quad=self.sprite.quad,rotation=orientation,zoom=sizeFactor,normalBatch=Asset.playerBatch,meshBatch=nil,color=drawColor}

@@ -525,6 +525,10 @@ local glassBrokenEffect=SimpleCallableShoveEffect{
     args={active=false},
     shaderArgs={progress=0,seed=0},
     run=function(self)
+        if IS_WEB then
+            -- web version is too slow to run this effect, so just skip it
+            return
+        end
         self.args.active=true
         self.shaderArgs.progress=0
         Event.EaseEvent{easeObj=self.shaderArgs,aims={progress=1},duration=60,afterFunc=function()
@@ -565,7 +569,7 @@ Asset.drawBatches=function(self)
     if G.runInfo.geometry.hasPixelShader then
         activeCanvas=love.graphics.getCanvas() -- shove is lying. it does not preserve canvas so must save and call setCanvas(activeCanvas) later
         love.graphics.setCanvas(G.runInfo.geometry.canvas)
-        love.graphics.clear({0,0,0,1})
+        love.graphics.clear(G.runInfo.geometry.pixelShaderCanvasClearColor or {0,0,0,1})
     end
     if G.runInfo.player then
         G.runInfo.geometry:applyVertexShader(G.runInfo.player)
@@ -594,11 +598,18 @@ Asset.drawBatches=function(self)
         if layer=='MAIN' then
             if G.runInfo.geometry.hasPixelShader then
                 love.graphics.setShader()
+                -- applyVertexShader may use the transform stack. The canvas itself
+                -- must be drawn in screen coordinates or the camera is applied twice.
+                love.graphics.origin()
                 if G.runInfo.player then
                     G.runInfo.geometry:applyPixelShader(G.runInfo.player)
                 end
                 love.graphics.setCanvas(activeCanvas)
+                -- A transparent pixel-shader canvas stores premultiplied color.
+                -- Use the matching alpha mode when compositing it over the background.
+                love.graphics.setBlendMode('alpha','premultiplied')
                 love.graphics.draw(G.runInfo.geometry.canvas)
+                love.graphics.setBlendMode('alpha')
             end
             love.graphics.setShader()
             -- add shoveEffects before ending main layer

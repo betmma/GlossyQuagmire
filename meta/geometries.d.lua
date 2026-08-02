@@ -62,10 +62,18 @@
 ---@alias def.GeometryBase.zoomFactorToScreen fun(self:GeometryBase,position:Position):number[]
 ---Reflect a point across a line. Second return value is the delta direction (or, the direction of reflection when the previous direction is 0). Calculate the reflection direction by delta - previous direction.
 ---@alias def.GeometryBase.reflect fun(self:GeometryBase,point:Position,linePoint1:Position,linePoint2:Position):Position,number
+---Returns the distance from the position to the line formed by linePoint1 and linePoint2, and whether the perpendicular foot is on the line segment. If not, the distance is still to the line, not the segment.
+---@alias def.GeometryBase.distanceToLine fun(self:GeometryBase,position:Position,linePoint1:Position,linePoint2:Position):number,boolean
+---Returns the distance from the position to the line segment formed by segPoint1 and segPoint2.
+---@alias def.GeometryBase.distanceToSegment fun(self:GeometryBase,position:Position,segPoint1:Position,segPoint2:Position):number
+---@alias phase 'update'|'draw'
+---What the geometry does before other things in love.update or love.draw. Portal geometry needs to replace rThetaGo only when the phase is 'update'. 'draw' phase should use original rThetaGo. this is really cursed.
+---@alias def.GeometryBase.enterPhase fun(self:GeometryBase,phase:phase):nil
 ---@alias def.MovingGeometryBase.setZoomSpeed fun(self:MovingGeometryBase,value:number,duration:number):nil
 
 ---@class GeometryBase:Object base class for all geometries. is actually euclidean geometry as an example (and also because lua annotation doesnt support abstract classes). should not be instantiated as only its methods are used.
 ---@field name string same as the key in geometries, for saving to replay data.
+---@field portal boolean whether this geometry has portals. if true, to and distance are not correct and places like placing player options could consider this and directly set position using rThetaGo instead of lerping.
 ---@field init def.GeometryBase.init
 ---@field update def.GeometryBase.update
 ---@field rThetaGo def.GeometryBase.rThetaGo
@@ -86,9 +94,18 @@
 ---@field rThetaTo def.GeometryBase.rThetaTo
 ---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen
 ---@field reflect def.GeometryBase.reflect
+---@field distanceToLine def.GeometryBase.distanceToLine
+---@field distanceToSegment def.GeometryBase.distanceToSegment
+---@field enterPhase def.GeometryBase.enterPhase
 
 ---@class MovingGeometryBase:GeometryBase base class for all moving geometries.
 ---@field setZoomSpeed def.MovingGeometryBase.setZoomSpeed
+
+---@class PortalGeometryBase:GeometryBase base class for all portal geometries.
+---@field rThetaGoRef def.GeometryBase.rThetaGo the original rThetaGo function of the geometry.
+---@field rThetaGo def.GeometryBase.rThetaGo:Position,number the injected rThetaGo function of the geometry that splits the path into segments and calls the original rThetaGo function for each segment.
+---@field distanceRef def.GeometryBase.distance the original distance function of the geometry.
+---@field toRef def.GeometryBase.to the original to function of the geometry.
 
 ---@class Hyperbolic:GeometryBase
 ---@field curvature number
