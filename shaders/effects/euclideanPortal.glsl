@@ -4,7 +4,7 @@ uniform vec2 pos1s[16];
 uniform vec2 pos2s[16];
 uniform float signs[16];
 uniform int linkeds[16];
-uniform float range;
+uniform float ranges[16];
 uniform vec2 offset;
 uniform vec2 canvas_size; // cannot use love_ScreenSize as canvas size is not same as window size (the size drawn to)
 
@@ -46,6 +46,17 @@ float segmentSign(int wantedIndex) {
     for(int index=0; index<16; index++) {
         if(index == wantedIndex) {
             result = signs[index];
+            break;
+        }
+    }
+    return result;
+}
+
+float segmentRange(int wantedIndex) {
+    float result = 0.0;
+    for(int index=0; index<16; index++) {
+        if(index == wantedIndex) {
+            result = ranges[index];
             break;
         }
     }
@@ -138,8 +149,8 @@ vec4 effect(vec4 color, Image tex, vec2 textureCoords, vec2 screenCoords) {
         float remainingDistance = rayLength * (1.0 - hitT);
 
         // Objects are teleported by their centers. While a center is within
-        // Portal.range, retain pixels which extend just beyond the entrance.
-        if(remainingDistance < range) {
+        // this entrance's range, retain pixels which extend just beyond it.
+        if(remainingDistance < segmentRange(hitIndex)) {
             exceedingColor = alphaOver(exceedingColor,sampleScreen(tex,oldRayEnd+offset));
         }
 
@@ -182,5 +193,60 @@ vec4 effect(vec4 color, Image tex, vec2 textureCoords, vec2 screenCoords) {
     }
 
     vec4 portalColor = sampleScreen(tex,rayEnd+offset);
+
+    // A sprite whose center has not crossed an entrance yet can still extend
+    // through it. The crossed-ray case above keeps the part at the entrance;
+    // this is the complementary case at the exit. If the final point is just
+    // in front of a portal, sample the point just behind its linked portal
+    // which would teleport here.
+    for(int outputIndex=0; outputIndex<16; outputIndex++) {
+        if(outputIndex >= numSegments) {
+            break;
+        }
+
+        vec2 outputStart = pos1s[outputIndex];
+        vec2 outputLine = pos2s[outputIndex] - outputStart;
+        float outputLength = length(outputLine);
+        if(outputLength <= 0.000001) {
+            continue;
+        }
+
+        vec2 outputTangent = outputLine / outputLength;
+        vec2 outputOutward = signs[outputIndex] * leftNormal(outputTangent);
+        vec2 outputOffset = rayEnd - outputStart;
+        float outputU = dot(outputOffset,outputTangent) / outputLength;
+        float outputDistance = dot(outputOffset,outputOutward);
+        if(outputU < 0.0 || outputU > 1.0 || outputDistance < 0.0) {
+            continue;
+        }
+
+        int inputIndex = linkedSegment(outputIndex);
+        if(inputIndex < 0 || inputIndex >= numSegments) {
+            continue;
+        }
+
+        vec2 inputStart = segmentPos1(inputIndex);
+        vec2 inputEnd = segmentPos2(inputIndex);
+        vec2 inputLine = inputEnd - inputStart;
+        float inputLength = length(inputLine);
+        if(inputLength <= 0.000001) {
+            continue;
+        }
+
+        float inputDistance = outputDistance * inputLength / outputLength;
+        if(inputDistance >= segmentRange(inputIndex)) {
+            continue;
+        }
+
+        vec2 inputTangent = inputLine / inputLength;
+        vec2 inputOutward = -segmentSign(inputIndex) * leftNormal(inputTangent);
+        vec2 inputPoint = mix(inputStart,inputEnd,outputU);
+        vec2 preTeleportPoint = inputPoint + inputOutward * inputDistance;
+        exceedingColor = alphaOver(
+            exceedingColor,
+            sampleScreen(tex,preTeleportPoint+offset)
+        );
+    }
+
     return alphaOver(portalColor,exceedingColor) * color;
 }

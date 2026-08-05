@@ -1,5 +1,6 @@
 ---@class PortalArgs:strict
 ---@field draw boolean whether to draw the portal, default true
+---@field range? number distance behind this portal which triggers teleportation, default Portal.range
 
 ---@class Portal:GameObject
 ---@field pos1 Position
@@ -7,9 +8,10 @@
 ---@field size number distance between pos1 and pos2
 ---@field side boolean
 ---@field sign 1|-1 whether pos1 to posIn is larger or smaller than pos1 to pos2. for convenience.
+---@field range number distance behind this portal which triggers teleportation
 ---@field linked Portal
 ---@field args PortalArgs
----@overload fun(pos1:Position,pos2:Position,posInOrSign:Position|1|-1):Portal
+---@overload fun(pos1:Position,pos2:Position,posInOrSign:Position|1|-1,args:PortalArgs):Portal
 Portal=GameObject:extend()
 
 Portal.range=20
@@ -48,8 +50,21 @@ function Portal:new(pos1,pos2,posInOrSign,args)
     if self.args.draw==nil then
         self.args.draw=true
     end
+    self.range=self.args.range or Portal.range
+    assert(self.range>0,"Portal range must be greater than zero.")
     self:set(pos1,pos2,posInOrSign)
     Portal.enableShader(G.runInfo.geometry)
+end
+
+---@return number minimumRange
+function Portal.getMinimumRange()
+    local minimumRange
+    for _,portal in ipairs(Portal.objects) do
+        if not portal.removed then
+            minimumRange=math.min(minimumRange or portal.range,portal.range)
+        end
+    end
+    return minimumRange or Portal.range
 end
 
 ---@param pos1 Position|nil
@@ -106,7 +121,7 @@ function Portal.considerTeleport(pos)
             if geo:sideToLine(pos,portal.pos1,portal.pos2)~=portal.side then
                 local nearest=geo:nearestToLine(pos,portal.pos1,portal.pos2)
                 local distance, onSegment=geo:distanceRef(pos,nearest),math.angleDiff(geo:toRef(nearest,portal.pos1),geo:toRef(nearest,portal.pos2))>math.pi/2
-                if distance<Portal.range and onSegment then
+                if distance<portal.range and onSegment then
                     teleported=true
                     local nearest=geo:nearestToLine(pos,portal.pos1,portal.pos2)
                     local r=geo:distanceRef(nearest,pos)
@@ -199,7 +214,6 @@ function Portal.applyPixelShader(geo,viewer)
 
     shader:send('screenCenter',{center.x,center.y})
     shader:send('numSegments',numSegments)
-    shader:send('range',Portal.range)
 
     if numSegments==0 then
         return
@@ -210,19 +224,21 @@ function Portal.applyPixelShader(geo,viewer)
         indexes[portals[i]]=i
     end
 
-    local pos1s,pos2s,signs,linkeds={},{},{},{}
+    local pos1s,pos2s,signs,linkeds,ranges={},{},{},{},{}
     for i=1,numSegments do
         local portal=portals[i]
         pos1s[i]=positionToShaderScreen(portal.pos1,viewer,geo,zoom)
         pos2s[i]=positionToShaderScreen(portal.pos2,viewer,geo,zoom)
         signs[i]=portal.sign
         linkeds[i]=indexes[portal.linked] or i
+        ranges[i]=portal.range*zoom
     end
 
     shader:send('pos1s',unpack(pos1s))
     shader:send('pos2s',unpack(pos2s))
     shader:send('signs',unpack(signs))
     shader:send('linkeds',unpack(linkeds))
+    shader:send('ranges',unpack(ranges))
 
     shader:send('offset',{geo.viewConfig.offset.x,geo.viewConfig.offset.y})
     shader:send('canvas_size',{CANVAS_WIDTH,CANVAS_HEIGHT})

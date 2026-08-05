@@ -364,9 +364,21 @@ function ShotType:update(playerState, isFocused, isShooting, powerLevel, frame, 
     for i, optionState in pairs(optionStates) do
         local nowPos=options[i].kinematicState.pos
         local aimPos=optionState.pos
-        local distance=G.runInfo.geometry:distance(nowPos, aimPos)
-        local dir=G.runInfo.geometry:to(nowPos, aimPos)
-        options[i].kinematicState.pos=G.runInfo.geometry:rThetaGo(nowPos, distance*0.3, dir)
+        local geo=G.runInfo.geometry
+        -- it's very difficult and inefficient to have a precise to and distance function just for option arrangement. so has to hardcode alternate logic here.
+        if geo.portal then
+            ---@cast geo PortalGeometryBase
+            local bestDir,bestDistance=geo:to(nowPos, aimPos), geo:distance(nowPos, aimPos)
+            if bestDistance<60 then -- option radius is 30. <60 means it's likely to be correct
+                options[i].kinematicState.pos=G.runInfo.geometry:rThetaGo(nowPos, bestDistance*0.3, bestDir)
+            else -- just snap to the position
+                options[i].kinematicState.pos=aimPos
+            end
+        else
+            local distance=G.runInfo.geometry:distance(nowPos, aimPos)
+            local dir=G.runInfo.geometry:to(nowPos, aimPos)
+            options[i].kinematicState.pos=G.runInfo.geometry:rThetaGo(nowPos, distance*0.3, dir)
+        end
         options[i].kinematicState.dir=optionState.dir
     end
     if isShooting then

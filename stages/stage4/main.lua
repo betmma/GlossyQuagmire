@@ -35,7 +35,7 @@ local function injectGeometry()
     local rThetaGoRef=geo.rThetaGo
     geo.rThetaGoRef=rThetaGoRef
     local rThetaGo=function(self,position,length,direction)
-        local segment=math.ceil(length/Portal.range)
+        local segment=math.ceil(length/Portal.getMinimumRange())
         local stepLength=length/segment
         for i=1,segment do
             position, direction=rThetaGoRef(self,position,stepLength,direction)
@@ -49,6 +49,7 @@ local function injectGeometry()
     local distanceRef=geo.distance
     geo.distanceRef=distanceRef
     local rThetaToRef=geo.rThetaTo
+    geo.rThetaToRef=rThetaToRef
     --- compare direct distance and distances through every portal. ignore zoom effect.
     local rThetaTo=function(self,position,target)
         local bestDistance=distanceRef(self,position,target)
@@ -78,7 +79,7 @@ local function injectGeometry()
             local totalDistance=geo:distanceRef(position,posIn2)+geo:distanceRef(posOut2,target)
             if totalDistance<bestDistance then
                 bestDistance=totalDistance
-                bestDirection=geo:toRef(position,posIn)
+                bestDirection=geo:toRef(position,posIn2)
             end
             ::continue::
         end
@@ -120,7 +121,7 @@ return{
                 if i>2 then
                     pos1,pos2=pos2,pos1
                 end
-                local portal=Portal(pos1,pos2,base.pos)
+                local portal=Portal(pos1,pos2,base.pos,{draw=false,range=999})
                 table.insert(portals,portal)
             end
             portals[1]:link(portals[3])

@@ -106,6 +106,7 @@
 ---@field rThetaGo def.GeometryBase.rThetaGo:Position,number the injected rThetaGo function of the geometry that splits the path into segments and calls the original rThetaGo function for each segment.
 ---@field distanceRef def.GeometryBase.distance the original distance function of the geometry.
 ---@field toRef def.GeometryBase.to the original to function of the geometry.
+---@field rThetaToRef def.GeometryBase.rThetaTo the original rThetaTo function of the geometry.
 
 ---@class Hyperbolic:GeometryBase
 ---@field curvature number
