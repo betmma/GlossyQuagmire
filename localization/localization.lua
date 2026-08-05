@@ -777,6 +777,16 @@ return {
                         zh_cn = 'STAGE 3   观艳馆',
                     }
                 },
+                stage4 = {
+                    main = {
+                        en_us = 'Finite and Borderless Trap',
+                        zh_cn = '有限无界的陷阱',
+                    },
+                    small = {
+                        en_us = 'STAGE 4   Another Exhibition?',
+                        zh_cn = 'STAGE 4   另一场展览？',
+                    }
+                }
             },
             hiScore = {
                 en_us = 'Hi-Score',
@@ -908,7 +918,19 @@ return {
                         en_us = '2-Boss',
                         zh_cn = '2-Boss',
                     }
-                }
+                },
+                ['3-mid'] = {
+                    name = {
+                        en_us = '3-MidBoss',
+                        zh_cn = '3-道中Boss',
+                    }
+                },
+                ['3-boss'] = {
+                    name = {
+                        en_us = '3-Boss',
+                        zh_cn = '3-Boss',
+                    }
+                },
             }
         },
         SPELL_PRACTICE = {

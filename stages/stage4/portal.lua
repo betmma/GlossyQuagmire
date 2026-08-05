@@ -1,3 +1,6 @@
+---@class PortalArgs:strict
+---@field draw boolean whether to draw the portal, default true
+
 ---@class Portal:GameObject
 ---@field pos1 Position
 ---@field pos2 Position
@@ -5,19 +8,32 @@
 ---@field side boolean
 ---@field sign 1|-1 whether pos1 to posIn is larger or smaller than pos1 to pos2. for convenience.
 ---@field linked Portal
+---@field args PortalArgs
 ---@overload fun(pos1:Position,pos2:Position,posInOrSign:Position|1|-1):Portal
 Portal=GameObject:extend()
 
 Portal.range=20
 Portal.MAX_SEGMENTS=16
 Portal.shader=ShaderScan:load_shader('shaders/effects/euclideanPortal.glsl')
-Portal.canvas=love.graphics.newCanvas(WINDOW_WIDTH,WINDOW_HEIGHT)
+local CANVAS_WIDTH, CANVAS_HEIGHT = 1500, 1800
+-- larger than the original 800x600 canvas to record more data for the pixel shader, centered at geometry.viewConfig.screenCenter
+Portal.canvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 
 ---Enable the Euclidean portal post-process on a geometry instance. This is
 ---done when the first portal is constructed so stage setup does not have to
 ---own any rendering details.
 ---@param geo PortalGeometryBase
 function Portal.enableShader(geo)
+    if geo.hasPixelShader then
+        return
+    end
+    geo.viewConfig.offset={x=-geo.viewConfig.screenCenter.x+CANVAS_WIDTH/2,y=-geo.viewConfig.screenCenter.y+CANVAS_HEIGHT/2}
+    -- add the offset translation to vertex shader
+    local applyVertexShaderRef=geo.applyVertexShader
+    geo.applyVertexShader=function(self,viewer)
+        love.graphics.translate(geo.viewConfig.offset.x,geo.viewConfig.offset.y)
+        applyVertexShaderRef(self,viewer)
+    end
     geo.hasPixelShader=true
     geo.canvas=Portal.canvas
     geo.pixelShaderCanvasClearColor={0,0,0,0}
@@ -27,7 +43,11 @@ end
 ---@param pos1 Position
 ---@param pos2 Position
 ---@param posInOrSign Position|1|-1
-function Portal:new(pos1,pos2,posInOrSign)
+function Portal:new(pos1,pos2,posInOrSign,args)
+    self.args=args or {}
+    if self.args.draw==nil then
+        self.args.draw=true
+    end
     self:set(pos1,pos2,posInOrSign)
     Portal.enableShader(G.runInfo.geometry)
 end
@@ -80,8 +100,12 @@ function Portal.considerTeleport(pos)
         teleported=false
         for i,portal in ipairs(Portal.objects) do
             ---@cast portal Portal
+            if not portal.linked then
+                error("Portal "..i.." is not linked to another portal.")
+            end
             if geo:sideToLine(pos,portal.pos1,portal.pos2)~=portal.side then
-                local distance, onSegment=geo:distanceToLine(pos,portal.pos1,portal.pos2)
+                local nearest=geo:nearestToLine(pos,portal.pos1,portal.pos2)
+                local distance, onSegment=geo:distanceRef(pos,nearest),math.angleDiff(geo:toRef(nearest,portal.pos1),geo:toRef(nearest,portal.pos2))>math.pi/2
                 if distance<Portal.range and onSegment then
                     teleported=true
                     local nearest=geo:nearestToLine(pos,portal.pos1,portal.pos2)
@@ -110,22 +134,38 @@ function Portal.zoomFactor(pos)
     ---@cast geo PortalGeometryBase
     -- calculate zoom factor. Π(F^-sigmoid(-distance/C))
     local C=50
-    local smoothZoomFactor=1
+    local smoothZoomFactor=0
     for i,portal in ipairs(Portal.objects) do
         ---@cast portal Portal
         local distance=geo:distanceToSegment(pos,portal.pos1,portal.pos2)
         local size=portal.size
         local linkedPortal=portal.linked
+        if not linkedPortal then
+            error("Portal "..i.." is not linked to another portal.")
+        end
         local linkedSize=linkedPortal.size
-        local F=linkedSize/size
-        smoothZoomFactor=smoothZoomFactor*F^(-math.smoothstep(0.5-0.5*distance/C))
+        local F=math.log(linkedSize/size)*-0.5
+        smoothZoomFactor=smoothZoomFactor+F*(-math.smoothstep(0.5-0.5*distance/C))
     end
-    return smoothZoomFactor
+    return math.exp(smoothZoomFactor)
 end
 
 function Portal:draw()
-    local size=self.size
-    MeshFuncs.polylineMesh({self.pos1,self.pos2},size/20,BulletSprites.laser.black.quad,{1,1,1,1},nil,10,Asset.bigBulletMeshes)
+    if not self.args.draw then
+        return
+    end
+    local size=self.size/20
+    MeshFuncs.polylineMesh({self.pos1,self.pos2},size,BulletSprites.laser.black.quad,{1,1,1,1},nil,10,Asset.bigBulletMeshes)
+    local geo=G.runInfo.geometry
+    ---@cast geo PortalGeometryBase
+    -- local dir=geo:toRef(self.pos1,self.pos2)
+    -- -- use different color for different side. for debug
+    -- for i=-1,1,2 do
+    --     local dir2=dir+self.sign*math.pi/2*i
+    --     local pos1=geo:rThetaGoRef(self.pos1,size/6,dir2)
+    --     local pos2=geo:rThetaGoRef(self.pos2,size/6,dir2)
+    --     MeshFuncs.polylineMesh({pos1,pos2},size,BulletSprites.laser.black.quad,i==1 and{1,0,0,1} or {0,0,1,1},nil,10,Asset.bigBulletMeshes)
+    -- end
 end
 
 local function positionToShaderScreen(position,viewer,geo,zoom)
@@ -159,7 +199,7 @@ function Portal.applyPixelShader(geo,viewer)
 
     shader:send('screenCenter',{center.x,center.y})
     shader:send('numSegments',numSegments)
-    shader:send('range',Portal.range*zoom)
+    shader:send('range',Portal.range)
 
     if numSegments==0 then
         return
@@ -183,4 +223,7 @@ function Portal.applyPixelShader(geo,viewer)
     shader:send('pos2s',unpack(pos2s))
     shader:send('signs',unpack(signs))
     shader:send('linkeds',unpack(linkeds))
+
+    shader:send('offset',{geo.viewConfig.offset.x,geo.viewConfig.offset.y})
+    shader:send('canvas_size',{CANVAS_WIDTH,CANVAS_HEIGHT})
 end

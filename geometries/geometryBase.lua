@@ -120,12 +120,12 @@ end
 
 function GeometryBase:distanceToSegment(position,segPoint1,segPoint2)
     local nearest=self:nearestToLine(position,segPoint1,segPoint2)
-    local onSegment=math.angleDiff(self:to(nearest,segPoint1),self:to(nearest,segPoint2))>math.pi/2
+    local onSegment=math.angleDiff(GeometryBase:to(nearest,segPoint1),GeometryBase:to(nearest,segPoint2))>math.pi/2
     if onSegment then
-        return self:distance(position,nearest)
+        return GeometryBase:distance(position,nearest)
     else
-        local dist1=self:distance(position,segPoint1)
-        local dist2=self:distance(position,segPoint2)
+        local dist1=GeometryBase:distance(position,segPoint1)
+        local dist2=GeometryBase:distance(position,segPoint2)
         return math.min(dist1,dist2)
     end
 end

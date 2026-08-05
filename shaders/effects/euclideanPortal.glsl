@@ -5,6 +5,8 @@ uniform vec2 pos2s[16];
 uniform float signs[16];
 uniform int linkeds[16];
 uniform float range;
+uniform vec2 offset;
+uniform vec2 canvas_size; // cannot use love_ScreenSize as canvas size is not same as window size (the size drawn to)
 
 float cross2(vec2 a, vec2 b) {
     return a.x * b.y - a.y * b.x;
@@ -63,14 +65,14 @@ int linkedSegment(int wantedIndex) {
 
 bool insideTexture(vec2 point) {
     return point.x >= 0.0 && point.y >= 0.0
-        && point.x < love_ScreenSize.x && point.y < love_ScreenSize.y;
+        && point.x < canvas_size.x && point.y < canvas_size.y;
 }
 
 vec4 sampleScreen(Image tex, vec2 point) {
     if(!insideTexture(point)) {
         return vec4(0.0);
     }
-    return Texel(tex, point / love_ScreenSize.xy);
+    return Texel(tex, point / canvas_size.xy);
 }
 
 vec4 alphaOver(vec4 bottom, vec4 top) {
@@ -86,7 +88,7 @@ vec4 effect(vec4 color, Image tex, vec2 textureCoords, vec2 screenCoords) {
 
     // A fixed upper bound is required by WebGL. Breaking keeps the effective
     // loop conditional and also prevents cyclic portal layouts from hanging.
-    for(int iteration=0; iteration<32; iteration++) {
+    for(int iteration=0; iteration<48; iteration++) {
         vec2 ray = rayEnd - rayStart;
         float rayLength = length(ray);
         if(rayLength <= 0.000001) {
@@ -138,7 +140,7 @@ vec4 effect(vec4 color, Image tex, vec2 textureCoords, vec2 screenCoords) {
         // Objects are teleported by their centers. While a center is within
         // Portal.range, retain pixels which extend just beyond the entrance.
         if(remainingDistance < range) {
-            exceedingColor = alphaOver(exceedingColor,sampleScreen(tex,oldRayEnd));
+            exceedingColor = alphaOver(exceedingColor,sampleScreen(tex,oldRayEnd+offset));
         }
 
         int linkedIndex = linkedSegment(hitIndex);
@@ -179,6 +181,6 @@ vec4 effect(vec4 color, Image tex, vec2 textureCoords, vec2 screenCoords) {
         rayEnd = linkedPoint + outputDirection * remainingDistance * zoom;
     }
 
-    vec4 portalColor = sampleScreen(tex,rayEnd);
+    vec4 portalColor = sampleScreen(tex,rayEnd+offset);
     return alphaOver(portalColor,exceedingColor) * color;
 }
