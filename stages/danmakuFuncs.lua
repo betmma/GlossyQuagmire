@@ -37,7 +37,8 @@ end
 ---@param centerObj Shape
 ---@param rtheta rThetaRet|fun(self:Shape, centerObj:Shape): rThetaRet
 ---@param onCenterRemoved fun(self:Shape)|nil a function to be called when the centerObj is removed. can choose to remove the shape or do something else. if nil does nothing
-function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
+---@param zoomInProgressFunc nil|fun(x:integer):number a multiplier to the radius. function input is frame
+function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved, zoomInProgressFunc)
 ---@diagnostic disable-next-line: inject-field
     shape.centerObj=centerObj
     local rthetaRef=rtheta
@@ -55,8 +56,12 @@ function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved)
             return
         end
         local rthetanew=rtheta(self, centerObj)
+        local r=rthetanew.r
+        if zoomInProgressFunc then
+            r=r*zoomInProgressFunc(self.frame)
+        end
         local centerPos=centerObj.kinematicState.pos
-        self.kinematicState.pos,self.kinematicState.dir=G.runInfo.geometry:rThetaGo(centerPos,rthetanew.r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
+        self.kinematicState.pos,self.kinematicState.dir=G.runInfo.geometry:rThetaGo(centerPos,r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
         if rthetanew.extraTheta then
             self.kinematicState.dir=self.kinematicState.dir+rthetanew.extraTheta
         end

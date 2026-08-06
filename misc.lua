@@ -24,6 +24,23 @@ function math.smoothstep(x)
     return x*x*(3-2*x)
 end
 
+---@param n integer sides of polygon
+---@param theta number
+---@param r number|nil
+---@param dir0 number|nil direction of polygon
+---@return number radius multiplier or multiplier*r if r is provided
+---@return number adjusted theta
+function math.polygonize(n,theta,r,dir0)
+    r=r or 1
+    dir0=dir0 or 0
+    theta=theta-dir0
+    local unit=math.pi/n
+    local thetau=theta/unit
+    thetau=thetau%2-1
+    local theta2=math.atan(thetau*math.tan(unit))
+    return math.cos(math.pi/n)/math.cos(theta2)*r,theta+dir0+(theta2-thetau*unit)
+end
+
 -- return 1 if x>0, -1 if x<0, 0 if x=0
 ---@return 1|-1|0
 function math.sign(x)

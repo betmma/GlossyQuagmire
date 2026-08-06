@@ -779,12 +779,22 @@ return {
                 },
                 stage4 = {
                     main = {
-                        en_us = 'Finite and Borderless Trap',
+                        en_us = 'Finite and Borderless',
                         zh_cn = '有限无界的陷阱',
                     },
                     small = {
                         en_us = 'STAGE 4   Another Exhibition?',
                         zh_cn = 'STAGE 4   另一场展览？',
+                    }
+                },
+                stage6 = {
+                    main = {
+                        en_us = 'Head in the Clouds',
+                        zh_cn = '怀宁一之心，处阒寂之地',
+                    },
+                    small = {
+                        en_us = 'STAGE 6   Core of the Clouds',
+                        zh_cn = 'STAGE 6   闲云内部',
                     }
                 }
             },
