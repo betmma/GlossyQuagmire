@@ -111,31 +111,57 @@ local function injectGeometry()
     end
 end
 
+--[[
+idea:
+||, enemy at top, shooting giants downwards. portals at side are not aligned, so player moves aside and goes through the gap
+]]
+
+local portalR=350
+local outerPortals={}
+local function outerPortalPoses(basePos)
+    local poses={}
+    for i=1,4 do
+        local posc,dirc=G.runInfo.geometry:rThetaGo(basePos,portalR,i*math.pi/2)
+        local pos1=G.runInfo.geometry:rThetaGo(posc,portalR*3,dirc+math.pi/2)
+        local pos2=G.runInfo.geometry:rThetaGo(posc,portalR*3,dirc-math.pi/2)
+        if i>2 then
+            pos1,pos2=pos2,pos1
+        end
+        table.insert(poses,{pos1=pos1,pos2=pos2})
+    end
+    return poses
+end
+local function setOuterPortals(basePos)
+    local poses=outerPortalPoses(basePos)
+    if #outerPortals==0 then
+        for i=1,4 do
+            local pos1,pos2=poses[i].pos1,poses[i].pos2
+            local portal=Portal(pos1,pos2,basePos,{draw=false,range=999})
+            table.insert(outerPortals,portal)
+        end
+        outerPortals[1]:link(outerPortals[3])
+        outerPortals[2]:link(outerPortals[4])
+    else
+        for i=1,4 do
+            local pos1,pos2=poses[i].pos1,poses[i].pos2
+            outerPortals[i]:set(pos1,pos2)
+        end
+    end
+    return outerPortals
+end
 ---@type OneStageDataRaw
 return{
     init=function()
+        outerPortals={}
         if G.runInfo.geometry==G.geometries.Euclidean then
             injectGeometry()
             local base=G.runInfo.geometry:init()
-            local portals={}
-            local r=350
-            for i=1,4 do
-                local posc,dirc=G.runInfo.geometry:rThetaGo(base.pos,r,i*math.pi/2)
-                local pos1=G.runInfo.geometry:rThetaGo(posc,r*3,dirc+math.pi/2)
-                local pos2=G.runInfo.geometry:rThetaGo(posc,r*3,dirc-math.pi/2)
-                if i>2 then
-                    pos1,pos2=pos2,pos1
-                end
-                local portal=Portal(pos1,pos2,base.pos,{draw=false,range=999})
-                table.insert(portals,portal)
-            end
-            portals[1]:link(portals[3])
-            portals[2]:link(portals[4])
+            setOuterPortals(base.pos)
             -- local border=Border.CircleBorder{center=base.pos,radius=400}
             -- G.runInfo.player.border=border
             -- G:replaceBackgroundPatternIfNot(BackgroundPattern.Corridor)
         end
-        BGM:play('level3',true)
+        BGM:play('level4',true)
         DynamicUIObjs.showSoundtrack()
     end,
     segments={
@@ -189,7 +215,7 @@ return{
         {
             key='4-2',
             type='midStage',
-            func=function() -- 20s
+            func=function() -- 19.15s
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
                 local pos0=geo:init().pos
@@ -289,8 +315,222 @@ return{
                 wave(1,3,300,'red',pos2,900)
                 wait(120)
                 wave(1,3,300,'blue',pos3,780)
-                wait(300)
-                wait(660)
+                wait(819)
+                wait(90)
+            end
+        },
+        {
+            key='4-3',
+            type='midStage',
+            func=function() -- 11.85s
+                BGM.data[BGM.currentAudio]:seek(39.15,'seconds')
+                local geo=G.runInfo.geometry
+                ---@cast geo PortalGeometryBase
+                local pos=G.runInfo.player.kinematicState.pos
+                pos=geo:rThetaGo(pos,100,math.eval(0,99))
+                setOuterPortals(pos) -- so the shrouding bullets are ensured to not touch portals
+                local sentry=DanmakuFuncs.sentry(pos)
+                --- shrouding bullets
+                local r0={r=400,size=1}
+                local function shrinkR(delta,duration)
+                    SFX:play('hit2',true,2)
+                    r0.size=1.5
+                    Event.EaseEvent{duration=duration,obj=sentry,easeObj=r0,aims={r=r0.r-delta,size=1},progressFunc=Event.sineOProgressFunc}
+                end
+                local rthetaf=function (self, centerObj, dir)
+                    local r=r0.r
+                    local theta=dir
+                    local t=centerObj.frame
+                    if t>90 then
+                        theta=theta+math.smoothstep((t-90)/30)*(t-90)/300
+                    end
+                    r,theta=math.polygonize(4,theta,r,math.pi/4)
+                    return r,theta
+                end
+                Event{action=function()
+                    for j=1,4 do
+                        SFX:play('hit2',true,2)
+                        for i=j,200,4 do
+                            local dir=math.pi*2*i/200
+                            local pos1,dir1=geo:rThetaGo(pos,r0.r,dir)
+                            local bullet=Bullet{kinematicState={pos=pos1,speed=0,dir=dir1},sprite=BulletSprites.kunaiDark.red,lifeFrame=820-18*(j-1),extraUpdate={Action.ZoomIn(30),Action.FadeIn(20,true),Action.FadeOut(30,true),function(self)
+                                local r,theta=rthetaf(self,sentry,dir)
+                                self.kinematicState.pos,self.kinematicState.dir=geo:rThetaGoRef(sentry.kinematicState.pos,r,theta)
+                                self.kinematicState.dir=self.kinematicState.dir+math.pi
+                                self.size=r0.size
+                                if self.frame%261==99 then -- every 11, 12, 13, 14th beat
+                                    if i<5 then
+                                        SFX:play('enemyShot',true)
+                                    end
+                                    if math.ceil(i/4)%DSWITCH{7,5,3,2}==0 then 
+                                        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),speed=150,dir=self.kinematicState.dir},sprite=BulletSprites.kunai.red,lifeFrame=r*60/150+30,extraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true)}}
+                                    end
+                                end
+                            end},invincible=true,size=1}
+                        end
+                        wait(18)
+                    end
+                    wait(9)
+                    -- local d,n,g=120,3,3
+                    -- for j=0,n do
+                    --     SFX:play('hit2',true,2)
+                    --     local r=j*d
+                    --     local num=math.ceil(r/50+1)*4
+                    --     if j==0 then
+                    --         num=1
+                    --     end
+                    --     for i=1,num do
+                    --         local dir=math.pi*2*i/num
+                    --         local r2,dir2=math.polygonize(4,dir,r,math.pi/4)
+                    --         local pos1,dir1=geo:rThetaGo(pos,r2,dir2)
+                    --         local bullet=Bullet{kinematicState={pos=pos1,speed=0,dir=dir1},sprite=BulletSprites.explosion.gray,lifeFrame=820-27*g,extraUpdate={Action.ZoomIn(30),Action.FadeIn(20,false),Action.ZoomOut(30),function(self)
+                    --             if self.kinematicState.pos~=pos1 then
+                    --                 self:remove()
+                    --             end
+                    --             local aimColor={0,1,0,0.3}
+                    --             if r<r0.r then
+                    --                 aimColor={1,0,0,0.3}
+                    --             end
+                    --             self.spriteColor=math.lerpTable(self.spriteColor,aimColor,0.1)
+                    --         end},invincible=true,safe=true,size=1,highlight=false,spriteColor={1,1,1,1}}
+                    --         bullet.r=r
+                    --     end
+                    --     if math.ceil(j*g/n)~=math.ceil((j+1)*g/n) then
+                    --         wait(18)
+                    --     end
+                    -- end
+                end}
+                Event{action=function()
+                    wait(171) -- 42s, at 9+19/29 bar
+                    for i=1,3 do
+                        shrinkR(50,25)
+                        wait(27) -- 27 frames = 0.45s = 3/29 bars
+                    end
+                    wait(9)
+                    -- portals appear
+                    local dir=geo:to(sentry.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.pi/4
+                    dir=dir-dir%(math.pi/2)
+                    local color={1,0.5,0.5,1}
+                    local function segment(pos,dir,len)
+                        return geo:rThetaGoRef(pos,len,dir+math.pi/2),geo:rThetaGoRef(pos,len,dir-math.pi/2)
+                    end
+                    local t=54
+                    local l={l=0.1}
+                    local deltal=0.3
+                    local posm,dirm=geo:rThetaGoRef(sentry.kinematicState.pos,-150,dir)
+                    local args={}
+                    local portals={}
+                    local portalArgs={draw=true,color={0,0,0,0},range=50}
+                    for i=1,4 do
+                        local diri=dirm+(i-1)*math.pi/2
+                        local dist=i%2==1 and 100 or 55
+                        local length=i%2==1 and 50 or 105
+                        local posi,diri2=geo:rThetaGoRef(posm,dist,diri)
+                        if i>2 then
+                            diri2=diri2+math.pi
+                        end
+                        local posOut=geo:rThetaGoRef(posm,dist+30,diri)
+                        if i%2==0 then
+                            for j=-10,10 do
+                                local pos,dir=geo:rThetaGoRef(posi,length*j/10,diri2+math.pi/2)
+                                Bullet{kinematicState={pos=pos,speed=0,dir=dir},sprite=BulletSprites.kunaiDark.green,lifeFrame=400,extraUpdate={Action.ZoomIn(30),Action.FadeIn(20,false),Action.ZoomOut(30)},invincible=true,size=1,}
+                            end
+                        else
+                            local pos1,pos2=segment(posi,diri2,length*0.1)
+                            table.insert(args,{posi,diri2,length})
+                            table.insert(portals,Portal(pos1,pos2,posOut,portalArgs))
+                        end
+                    end
+                    portals[1]:link(portals[2])
+                    -- portals[2]:link(portals[4])
+                    for j=1,t do
+                        if j%18==1 then
+                            SFX:play('hit2',true,2)
+                            Event.EaseEvent{duration=17,obj=sentry,easeObj=l,aims={l=l.l+deltal},progressFunc=Event.sineOProgressFunc}
+                        end
+                        for i,portal in ipairs(portals) do
+                            local pos1,pos2=segment(args[i][1],args[i][2],args[i][3]*l.l)
+                            local colori={color[1],color[2],color[3],j/t}
+                            portal:set(pos1,pos2)
+                            portal.args.color=colori
+                        end
+                        wait()
+                    end
+                    wait(27)
+                    -- hint arrow
+                    local function arrow(pos,size,num,dir,part,args)
+                        part=part or 0
+                        if part==0 or part==1 then
+                            for i=-num,num do
+                                local pos,dir=geo:rThetaGoRef(pos,size*i,dir)
+                                Bullet(table.update(args,{kinematicState={pos=pos,speed=0,dir=dir}}))
+                            end
+                        end
+                        local posHead,dirHead=geo:rThetaGoRef(pos,size*num,dir)
+                        local side2part={[-1]=2,[1]=3}
+                        for side=-1,1,2 do
+                            if part==0 or part==side2part[side] then
+                                local dir2=dirHead+side*math.pi/4+math.pi
+                                for i=1,num do
+                                    local pos,dir=geo:rThetaGoRef(posHead,i*size,dir2)
+                                    Bullet(table.update(args,{kinematicState={pos=pos,speed=0,dir=dir}}))
+                                end
+                            end
+                        end
+                    end
+                    local size,num=8,5
+                    local arrowArgs={sprite=BulletSprites.rimDark.green,lifeFrame=320,extraUpdate={Action.ZoomIn(20),Action.FadeIn(20,false,0.4),Action.FadeOut(30,false)},invincible=true,safe=true,spriteTransparency=0.4}
+                    local arrowDir=dir+math.pi
+                    for i=1,3 do
+                        SFX:play('hit2',true,2)
+                        arrow(sentry.kinematicState.pos,size,num,arrowDir,i,arrowArgs)
+                        wait(9)
+                        arrowArgs.lifeFrame=arrowArgs.lifeFrame-9
+                    end
+                    local arrow2Pos,arrow2Dir=geo:rThetaGoRef(sentry.kinematicState.pos,400,arrowDir)
+                    wait(9)
+                    arrowArgs.lifeFrame=arrowArgs.lifeFrame-9
+                    for i=1,3 do
+                        SFX:play('hit2',true,2)
+                        arrow(arrow2Pos,size,num,arrow2Dir,i,arrowArgs)
+                        wait(18)
+                        arrowArgs.lifeFrame=arrowArgs.lifeFrame-18
+                    end
+                    for i=1,3 do
+                        shrinkR(15,25)
+                        wait(27)
+                    end
+                    wait(9) -- end of 11th bar
+                    for i=1,4 do
+                        SFX:play('hit2',true,2)
+                        shrinkR(10,17)
+                        wait(18)
+                    end
+                    wait(9)
+                    t=27
+                    for j=1,t do
+                        if j%9==1 then
+                            SFX:play('hit2',true,2)
+                            Event.EaseEvent{duration=7,obj=sentry,easeObj=l,aims={l=l.l-deltal},progressFunc=Event.sineOProgressFunc}
+                        end
+                        for i,portal in ipairs(portals) do
+                            local pos1,pos2=segment(args[i][1],args[i][2],args[i][3]*l.l)
+                            local colori={color[1],color[2],color[3],1-j/t}
+                            portal:set(pos1,pos2)
+                            portal.args.color=colori
+                        end
+                        wait()
+                    end
+                    for i,portal in ipairs(portals) do
+                        portal:remove()
+                    end
+                    wait(9)
+                    for i=1,3 do
+                        shrinkR(i*20,17)
+                        wait(18)
+                    end
+                end}
+                wait(711)
             end
         }
     }

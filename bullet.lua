@@ -197,7 +197,8 @@ function Bullet:grazeValue()
 end
 
 function Bullet:removeEffect()
-    Effect.Larger{kinematicState=copyTable(self.kinematicState),sprite=Asset.shards.dot,radius=1,growSpeed=0.1,animationFrame=20}
+    local color=self.sprite.data.color or 'white'
+    Effect.Larger{kinematicState=copyTable(self.kinematicState),sprite=BulletSprites.dot[color],radius=1,growSpeed=0.1,animationFrame=20,spriteTransparency=0.5}
 end
 
 function Bullet:changeSpriteColor(color)

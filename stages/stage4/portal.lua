@@ -1,11 +1,14 @@
 ---@class PortalArgs:strict
 ---@field draw boolean whether to draw the portal, default true
+---@field color? rgbaColor
 ---@field range? number distance behind this portal which triggers teleportation, default Portal.range
+---@field width? number width of the portal, default 5
 
 ---@class Portal:GameObject
 ---@field pos1 Position
 ---@field pos2 Position
 ---@field size number distance between pos1 and pos2
+---@field width number width of the portal, default 5. will auto change if is zooming portal
 ---@field side boolean
 ---@field sign 1|-1 whether pos1 to posIn is larger or smaller than pos1 to pos2. for convenience.
 ---@field range number distance behind this portal which triggers teleportation
@@ -50,6 +53,8 @@ function Portal:new(pos1,pos2,posInOrSign,args)
     if self.args.draw==nil then
         self.args.draw=true
     end
+    self.args.color=self.args.color or {1,1,1,1}
+    self.args.width=self.args.width or 5
     self.range=self.args.range or Portal.range
     assert(self.range>0,"Portal range must be greater than zero.")
     self:set(pos1,pos2,posInOrSign)
@@ -111,7 +116,9 @@ function Portal.considerTeleport(pos)
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
     local teleported=true
-    while teleported do
+    local count=0
+    while teleported and count<20 do
+        count=count+1
         teleported=false
         for i,portal in ipairs(Portal.objects) do
             ---@cast portal Portal
@@ -169,8 +176,8 @@ function Portal:draw()
     if not self.args.draw then
         return
     end
-    local size=self.size/20
-    MeshFuncs.polylineMesh({self.pos1,self.pos2},size,BulletSprites.laser.black.quad,{1,1,1,1},nil,10,Asset.bigBulletMeshes)
+    local size=self.args.width*(self.linked.size/self.size)^0.5
+    MeshFuncs.polylineMesh({self.pos1,self.pos2},size,BulletSprites.laser.black.quad,self.args.color,nil,10,Asset.bigBulletMeshes)
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
     -- local dir=geo:toRef(self.pos1,self.pos2)
