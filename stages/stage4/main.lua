@@ -38,7 +38,7 @@ local function injectGeometry()
         if length==0 then
             return copyTable(position),direction
         end
-        local segment=math.ceil(length/Portal.getMinimumRange())
+        local segment=math.ceil(math.abs(length)/Portal.getMinimumRange())
         local stepLength=length/segment
         for i=1,segment do
             position, direction=rThetaGoRef(self,position,stepLength,direction)
@@ -119,11 +119,13 @@ idea:
 local portalR=350
 local outerPortals={}
 local function outerPortalPoses(basePos)
+    local geo=G.runInfo.geometry
+    ---@cast geo PortalGeometryBase
     local poses={}
     for i=1,4 do
-        local posc,dirc=G.runInfo.geometry:rThetaGo(basePos,portalR,i*math.pi/2)
-        local pos1=G.runInfo.geometry:rThetaGo(posc,portalR*3,dirc+math.pi/2)
-        local pos2=G.runInfo.geometry:rThetaGo(posc,portalR*3,dirc-math.pi/2)
+        local posc,dirc=geo:rThetaGoRef(basePos,portalR,i*math.pi/2)
+        local pos1=geo:rThetaGoRef(posc,portalR*3,dirc+math.pi/2)
+        local pos2=geo:rThetaGoRef(posc,portalR*3,dirc-math.pi/2)
         if i>2 then
             pos1,pos2=pos2,pos1
         end
@@ -144,11 +146,15 @@ local function setOuterPortals(basePos)
     else
         for i=1,4 do
             local pos1,pos2=poses[i].pos1,poses[i].pos2
-            outerPortals[i]:set(pos1,pos2)
+            outerPortals[i]:set(pos1,pos2,basePos)
         end
     end
     return outerPortals
 end
+Portal.setOuterPortals=setOuterPortals
+
+local shouji=require"stages.stage4.shouji"
+
 ---@type OneStageDataRaw
 return{
     init=function()
@@ -168,7 +174,7 @@ return{
         {
             key='4-1',
             type='midStage',
-            func=function() -- 20s. midboss should appear at 52.5s
+            func=function() -- 20s. midboss should appear at 52.2s
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
                 local pos0=geo:init().pos
@@ -322,8 +328,8 @@ return{
         {
             key='4-3',
             type='midStage',
-            func=function() -- 11.85s
-                BGM.data[BGM.currentAudio]:seek(39.15,'seconds')
+            func=function() -- 12.05s
+                -- BGM.data[BGM.currentAudio]:seek(39.15,'seconds')
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
                 local pos=G.runInfo.player.kinematicState.pos
@@ -371,34 +377,6 @@ return{
                         wait(18)
                     end
                     wait(9)
-                    -- local d,n,g=120,3,3
-                    -- for j=0,n do
-                    --     SFX:play('hit2',true,2)
-                    --     local r=j*d
-                    --     local num=math.ceil(r/50+1)*4
-                    --     if j==0 then
-                    --         num=1
-                    --     end
-                    --     for i=1,num do
-                    --         local dir=math.pi*2*i/num
-                    --         local r2,dir2=math.polygonize(4,dir,r,math.pi/4)
-                    --         local pos1,dir1=geo:rThetaGo(pos,r2,dir2)
-                    --         local bullet=Bullet{kinematicState={pos=pos1,speed=0,dir=dir1},sprite=BulletSprites.explosion.gray,lifeFrame=820-27*g,extraUpdate={Action.ZoomIn(30),Action.FadeIn(20,false),Action.ZoomOut(30),function(self)
-                    --             if self.kinematicState.pos~=pos1 then
-                    --                 self:remove()
-                    --             end
-                    --             local aimColor={0,1,0,0.3}
-                    --             if r<r0.r then
-                    --                 aimColor={1,0,0,0.3}
-                    --             end
-                    --             self.spriteColor=math.lerpTable(self.spriteColor,aimColor,0.1)
-                    --         end},invincible=true,safe=true,size=1,highlight=false,spriteColor={1,1,1,1}}
-                    --         bullet.r=r
-                    --     end
-                    --     if math.ceil(j*g/n)~=math.ceil((j+1)*g/n) then
-                    --         wait(18)
-                    --     end
-                    -- end
                 end}
                 Event{action=function()
                     wait(171) -- 42s, at 9+19/29 bar
@@ -530,8 +508,9 @@ return{
                         wait(18)
                     end
                 end}
-                wait(711)
+                wait(723)
             end
-        }
+        },
+        shouji.midboss
     }
 }
