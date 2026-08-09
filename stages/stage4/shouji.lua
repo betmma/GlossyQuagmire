@@ -16,6 +16,7 @@ local midboss=BossManager.BossSegment{
                 hp=1800,
                 dropItems={point=15,powerSmall=15},
                 func=function(self, boss)
+                    boss.showHexagram=false
                     boss:addHPProtection(600,10)
                     -- BGM.data[BGM.currentAudio]:seek(52.2,'seconds')
                     local geo=G.runInfo.geometry
@@ -90,6 +91,7 @@ local midboss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage4.spellcards.bridge'),
         }}
     }
 }

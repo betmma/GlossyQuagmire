@@ -229,6 +229,32 @@ return {
                     zh_cn = '「三生万物的世界」',
                 }
             },
+        },
+        ['shouji-bridge'] = {
+            EASY = {
+                name = {
+                    en_us = 'Cross Sign "The Floating Bridge of Heaven"',
+                    zh_cn = '渡符「天浮桥」',
+                }
+            },
+            NORMAL = {
+                name = {
+                    en_us = 'Judgement "The Chinvat Bridge"',
+                    zh_cn = '审判「钦瓦特桥」',
+                }
+            },
+            HARD = {
+                name = {
+                    en_us = 'Vision "The Vision of Adamnan"',
+                    zh_cn = '启示「阿当南的异象」',
+                }
+            },
+            __default__ = {
+                name = {
+                    en_us = 'Purgatory "The Brig o\' Dread"',
+                    zh_cn = '譬喻「二河白道」',
+                }
+            },
         }
     },
     levelData = {

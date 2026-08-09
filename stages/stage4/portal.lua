@@ -3,6 +3,9 @@
 ---@field color? rgbaColor
 ---@field range? number distance behind this portal which triggers teleportation, default Portal.range
 ---@field width? number width of the portal, default 5
+---@field spriteTransparency? number transparency of the portal sprite, default 1
+---@field extraUpdate? ExtraUpdate|nil
+---@field lifeFrame? number after which the portal will be removed, default 99999
 
 ---@class Portal:GameObject
 ---@field pos1 Position
@@ -13,11 +16,18 @@
 ---@field sign 1|-1 whether pos1 to posIn is larger or smaller than pos1 to pos2. for convenience.
 ---@field range number distance behind this portal which triggers teleportation
 ---@field linked Portal
+---@field spriteTransparency number
+---@field extraUpdate ExtraUpdate
+---@field frame number
+---@field lifeFrame number
 ---@field args PortalArgs
 ---@overload fun(pos1:Position,pos2:Position,posInOrSign:Position|1|-1,args:PortalArgs):Portal
 Portal=GameObject:extend()
 
+-- range of the back side of the portal used to trigger teleportation.
 Portal.range=20
+-- the range of a portal's zoom factor effect in the front side.
+Portal.zoomC=30
 Portal.MAX_SEGMENTS=16
 Portal.shader=ShaderScan:load_shader('shaders/effects/euclideanPortal.glsl')
 local CANVAS_WIDTH, CANVAS_HEIGHT = 1500, 1800
@@ -57,8 +67,27 @@ function Portal:new(pos1,pos2,posInOrSign,args)
     self.args.width=self.args.width or 5
     self.range=self.args.range or Portal.range
     assert(self.range>0,"Portal range must be greater than zero.")
+    self.lifeFrame=args.lifeFrame or 99999
+    self.spriteTransparency=args.spriteTransparency or 1
+    self.frame=0
+    self.extraUpdate=args.extraUpdate or {}
+    Action.init(self, self.extraUpdate)
     self:set(pos1,pos2,posInOrSign)
     Portal.enableShader(G.runInfo.geometry)
+end
+
+function Portal:update(dt)
+    self.frame=self.frame+1
+    if self.frame>self.lifeFrame then
+        self:remove()
+    end
+    Action.executeExtraUpdate(self,self.extraUpdate,dt)
+end
+
+function Portal.segment(pos,dir,len)
+    local geo=G.runInfo.geometry
+    ---@cast geo PortalGeometryBase
+    return geo:rThetaGoRef(pos,len,dir+math.pi/2),geo:rThetaGoRef(pos,len,dir-math.pi/2)
 end
 
 ---@return number minimumRange
@@ -155,7 +184,7 @@ function Portal.zoomFactor(pos)
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
     -- calculate zoom factor. Π(F^-sigmoid(-distance/C))
-    local C=50
+    local C=Portal.zoomC
     local smoothZoomFactor=0
     for i,portal in ipairs(Portal.objects) do
         ---@cast portal Portal
@@ -167,7 +196,7 @@ function Portal.zoomFactor(pos)
         end
         local linkedSize=linkedPortal.size
         local F=math.log(linkedSize/size)*-0.5
-        smoothZoomFactor=smoothZoomFactor+F*(-math.smoothstep(0.5-0.5*distance/C))
+        smoothZoomFactor=smoothZoomFactor+F*(2*math.smoothstep(0.5-0.5*distance/C))
     end
     return math.exp(smoothZoomFactor)
 end
@@ -177,7 +206,8 @@ function Portal:draw()
         return
     end
     local size=self.args.width*(self.linked.size/self.size)^0.5
-    MeshFuncs.polylineMesh({self.pos1,self.pos2},size,BulletSprites.laser.black.quad,self.args.color,nil,10,Asset.bigBulletMeshes)
+    local color={self.args.color[1],self.args.color[2],self.args.color[3],self.args.color[4]*self.spriteTransparency}
+    MeshFuncs.polylineMesh({self.pos1,self.pos2},size,BulletSprites.laser.black.quad,color,nil,10,Asset.bigBulletMeshes)
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
     -- local dir=geo:toRef(self.pos1,self.pos2)

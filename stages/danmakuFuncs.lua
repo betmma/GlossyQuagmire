@@ -76,3 +76,26 @@ function DanmakuFuncs.sentry(pos)
     sentry.removeEffect=function()end
     return sentry
 end
+
+---@param pos1 Position
+---@param pos2 Position
+---@param maxDist? number
+---@param maxNum? integer
+---@return Position[], number[]
+function DanmakuFuncs.midPoints(pos1,pos2,maxDist,maxNum)
+    maxNum=maxNum or 100
+    maxDist=maxDist or 1
+    local geo=G.runInfo.geometry
+    local dist=geo:distance(pos1,pos2)
+    local dir=geo:to(pos1,pos2)
+    local num=math.min(maxNum,math.ceil(dist/maxDist))
+    local points={}
+    local dirs={}
+    for i=0,num do
+        local progress=i/(num)
+        local pos,dirnew=geo:rThetaGo(pos1,dist*progress,dir)
+        table.insert(points,pos)
+        table.insert(dirs,dirnew)
+    end
+    return points,dirs
+end
