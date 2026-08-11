@@ -231,6 +231,7 @@ local ShootingPattern=Object:extend()
 ---@field homingArg number|nil
 ---@field transformShootState nil|fun(self: ShootingPattern, shooter: KinematicState): KinematicState
 ---@field fadeIn boolean|nil
+---@field transparency number|nil
 ---@field extraUpdate function|nil
 
 function ShootingPattern:new(args)
@@ -246,6 +247,7 @@ function ShootingPattern:new(args)
     self.homingArg=args.homingArg
     self.transformShootState=args.transformShootState or function(self, shooter) return shooter end
     self.fadeIn=args.fadeIn~=false
+    self.transparency=args.transparency or 1
     self.extraUpdate=args.extraUpdate
     self.frame=0
     self.shotCount=0
@@ -271,7 +273,7 @@ function ShootingPattern:shoot(shooter, powerLevel, optionIndex)
     local direction=shootState.dir
     direction=direction+math.eval(self.angle)
     local useMesh=useMesh[self.sprite.data.key]
-    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=self.lifeFrame,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeOut(2,false),self.fadeIn and Action.FadeIn(1,false) or nil},forceQuad=not useMesh}
+    local bullet=PlayerShot{kinematicState={pos=copyTable(shootState.pos), speed=self.speed, dir=direction},sprite=self.sprite,size=self.size,damage=self:damage(powerLevel),lifeFrame=self.lifeFrame,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeOut(2,false),self.fadeIn and Action.FadeIn(1,false,self.transparency) or nil},forceQuad=not useMesh,spriteTransparency=self.transparency}
     bullet.shotCount=self.shotCount
     bullet.optionIndex=optionIndex
     if self.sprite.data.key=='amuletHuge' then
@@ -492,6 +494,7 @@ local ShotTypes={
             homingMode=HOMING_MODE.PORTION,
             homingArg=0.2,
         }}, unfocused={ShootingPattern{
+            transparency=0.6,
             sprite=Asset.playerShotSprites.burst.orange,
             frequency=5,
             damage=function(self, powerLevel) return 4 end,
@@ -564,6 +567,22 @@ end
 
 local marisaSpellcard={duration=300, canShoot=true, func=marisaSpellcardFunc}
 
+ -- evenly scatter on the line radius distance to player
+local function MarisaAFocusedOptionCalc(powerLevel, playerState, radius, angle, geo)
+    ---@type KinematicState[]
+    local returnStates={}
+    local pos1,dir1=geo:rThetaGo(playerState.pos, radius, angle)
+    dir1=dir1+math.pi/2
+    local posAim=geo:rThetaGo(playerState.pos, 250, angle)
+    for i=1,powerLevel do
+        local distance=40*(i-powerLevel/2-0.5)
+        local optionPos=geo:rThetaGo(pos1, distance, dir1)
+        local optionAngle=geo:to(optionPos, posAim)
+        table.insert(returnStates,{pos=optionPos, dir=optionAngle, speed=0})
+    end
+    return returnStates
+end
+
 ShotTypes.MARISAA=ShotType{
     mainShot=buildMainShot{
         size=1,
@@ -577,14 +596,12 @@ ShotTypes.MARISAA=ShotType{
         ---@type KinematicState[]
         local returnStates={}
         if isFocused then -- evenly scatter on the line radius distance to player
-            local pos1,dir1=G.runInfo.geometry:rThetaGo(playerState.pos, radius, angle)
-            dir1=dir1+math.pi/2
-            local posAim=G.runInfo.geometry:rThetaGo(playerState.pos, 250, angle)
-            for i=1,powerLevel do
-                local distance=40*(i-powerLevel/2-0.5)
-                local optionPos=G.runInfo.geometry:rThetaGo(pos1, distance, dir1)
-                local optionAngle=G.runInfo.geometry:to(optionPos, posAim)
-                table.insert(returnStates,{pos=optionPos, dir=optionAngle, speed=0})
+            local returnStates=MarisaAFocusedOptionCalc(powerLevel, playerState, radius, angle, G.runInfo.geometry)
+            if G.runInfo.geometry.portal then -- with portal, 250 distance forward could land backward or other places. so use Euclidean dir result.
+                local returnStates2=MarisaAFocusedOptionCalc(powerLevel, playerState, radius, angle, G.geometries.Euclidean)
+                for i,state in ipairs(returnStates) do
+                    state.dir=returnStates2[i].dir
+                end
             end
             return returnStates
         end
@@ -598,12 +615,14 @@ ShotTypes.MARISAA=ShotType{
         return returnStates
     end,
     optionShot={focused={ShootingPattern{
+        transparency=0.5,
         sprite=Asset.playerShotSprites.laser,
         frequency=2,
         damage=function(self, powerLevel) return 2 end, -- straight shot similar to reimu b but with higher dps (note freq is 4x of reimu b) due to laser smaller than big amulet
         angle=0,
         size=1.5,fadeIn=false
     }}, unfocused={ShootingPattern{
+        transparency=0.3,
         sprite=Asset.playerShotSprites.laser,
         frequency=2,
         damage=function(self, powerLevel) return 1.5 end,
@@ -614,6 +633,7 @@ ShotTypes.MARISAA=ShotType{
             end
         end
         },ShootingPattern{
+        transparency=0.3,
         sprite=Asset.playerShotSprites.laser,
         frequency=2,
         damage=function(self, powerLevel) return 1.5 end,
@@ -633,6 +653,7 @@ local marisabOption=function(angle,damage,freq)
         func=function(self, powerLevel) return damage end
     end
     return ShootingPattern{
+        transparency=0.5,
         sprite=Asset.playerShotSprites.explosive.blue,
         frequency=freq or 8,
         damage=func,

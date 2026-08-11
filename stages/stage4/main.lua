@@ -159,6 +159,7 @@ local shouji=require"stages.stage4.shouji"
 return{
     init=function()
         outerPortals={}
+        portalR=350
         if G.runInfo.geometry==G.geometries.Euclidean then
             injectGeometry()
             local base=G.runInfo.geometry:init()
@@ -511,6 +512,59 @@ return{
                 wait(723)
             end
         },
-        shouji.midboss
+        shouji.midboss,
+        {
+            key='4-4',
+            type='midStage',
+            func=function()
+                local geo=G.runInfo.geometry
+                ---@cast geo PortalGeometryBase
+                local pos=G.runInfo.player.kinematicState.pos
+                portalR=200
+                setOuterPortals(pos)
+                outerPortals[1]:link(outerPortals[4])
+                outerPortals[2]:link(outerPortals[3])
+                local pos1,dir1=geo:rThetaGo(pos,50,-math.pi/2)
+                local pos2,dir2=geo:rThetaGo(pos1,-350,dir1-math.pi/2)
+                local extraUpdate=function(self)
+                    local aimSpeed=250
+                    if self.frame+60>self.lifeFrame then
+                        aimSpeed=0
+                    end
+                    self.kinematicState.speed=math.lerp(self.kinematicState.speed,aimSpeed,0.05)
+                end
+                for i=-4,5 do
+                    local pos2,dir2=geo:rThetaGo(pos1,-40*i+20,dir1-math.pi/2)
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=150},maxhp=200,sprite=Asset.fairySprites.medium.blue,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
+                    fairy:addHPProtection(120,5)
+                    local BulletSpawner=BulletSpawner{useRelativeAngle=true,period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=250,bulletNumber=12,angle=dir2+math.pi/2,range=math.pi*12,bulletSprite=BulletSprites.scale.blue,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
+                        cir.index=self.spawnTimes
+                        cir.kinematicState.speed=cir.kinematicState.speed-args.index*20
+                        -- cir.kinematicState.dir=cir.kinematicState.dir+(math.abs(cir.index%10-5))*0.01
+                    end}}
+                    BulletSpawner:bindState(fairy)
+                    -- wait(10)
+                end
+                wait(120)
+                for i=-4,5 do
+                    if math.abs(i-0.5)<3 then
+                        goto continue
+                    end
+                    local pos2,dir2=geo:rThetaGo(pos1,-40*i+20,dir1-math.pi/2)
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=150},maxhp=200,sprite=Asset.fairySprites.medium.orange,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
+                    fairy:addHPProtection(120,5)
+                    local BulletSpawner=BulletSpawner{period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=50,bulletNumber=12,angle='player',range=math.pi*12,bulletSprite=BulletSprites.scale.yellow,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
+                        cir.index=self.spawnTimes
+                        cir:changeSpriteColor('red')
+                        cir.kinematicState.speed=cir.kinematicState.speed-args.index*20
+                        cir.kinematicState.dir=cir.kinematicState.dir+math.pi/2
+                    end}}
+                    BulletSpawner:bindState(fairy)
+                    -- wait(60)
+                    ::continue::
+                end
+                wait(780)
+            end
+        }
     }
 }

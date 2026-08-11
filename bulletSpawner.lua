@@ -18,6 +18,7 @@ function BulletSpawner:new(args)
     self.times=args.times or nil -- if not nil, means spawn [times] times
     self.bulletNumber=args.bulletNumber and math._extractABfromstr(args.bulletNumber) or 10
     self.angle=args.angle and (args.angle=='player' and args.angle or math._extractABfromstr(args.angle)) or 0
+    self.useRelativeAngle=args.useRelativeAngle or false
     self.range=args.range and math._extractABfromstr(args.range) or math.pi*2
     self.spawnCircleRadius=args.spawnCircleRadius and math._extractABfromstr(args.spawnCircleRadius) or 0
     self.spawnCircleAngle=args.spawnCircleAngle and math._extractABfromstr(args.spawnCircleAngle) or 0
@@ -74,7 +75,7 @@ function BulletSpawner:new(args)
         SFX:play('enemyShot',true,self.spawnSFXVolume)
         local num=math.eval(self.bulletNumber)
         local range=math.eval(self.range)
-        local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos) or math.eval(self.angle)
+        local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos) or (math.eval(self.angle)+(self.useRelativeAngle and self.kinematicState.dir or 0))
         local spawnCircleAngle=math.eval(self.spawnCircleAngle)
         local spawnCircleRange=math.eval(self.spawnCircleRange)
         local spawnCircleRadius=math.eval(self.spawnCircleRadius)
