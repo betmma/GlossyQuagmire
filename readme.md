@@ -1,8 +1,23 @@
 This game is a touhou fan-game.
-It's in very early stage now.
+It's in early stage now.
 
 ### Game System
 Collect items consecutively to keep combo. Combo count × (1 + Combo duration / 30) is the Combo score and decides what bonus you get.
+
+### How to play
+
+##### Direct Download
+
+[Itch page](https://betmma.itch.io/glossy-quagmire)
+
+##### Or Run from Source
+
+If you don't trust executable files:
+
+It's a love2d game so you can follow [love2d tutorial](https://love2d.org/wiki/Getting_Started). Or follow steps below
+1. Download [love2d](https://love2d.org/) and install
+2. Download source code from this repo (click the green "Code" button near top of this page then click "Download Zip")
+3. Unzip and drag the `glossy-quagmire` folder onto `love.exe` (default install path is `C:\Program Files\LOVE`)
 
 ### Todo
 #### Code
