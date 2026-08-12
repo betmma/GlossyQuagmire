@@ -1,7 +1,7 @@
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
     key='shouji-bridge',SKIP_INCLUDE=true,
-    bonusScore=20000,
+    bonusScore=25000,
     time=1800,
     hp=4600,
     dropItems={bomb=1},

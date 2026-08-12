@@ -26,8 +26,10 @@ local function injectGeometry()
     end
     local updateRef=geo.update
     geo.update=function(self,kinematicState,dt)
+        local skip=kinematicState.skipPortal
         local zoomFromPortal=Portal.zoomFactor(kinematicState.pos)
         updateRef(self,kinematicState,dt*zoomFromPortal)
+        if skip then return end
         local pos,delta=Portal.considerTeleport(kinematicState.pos)
         kinematicState.pos=pos
         kinematicState.dir=kinematicState.dir+delta
@@ -114,10 +116,24 @@ end
 --[[
 idea:
 ||, enemy at top, shooting giants downwards. portals at side are not aligned, so player moves aside and goes through the gap
+——
+--, two half width portals at bottom connects to the full width portal at top. then bullet wall moving downwards
+
+a moving portal on a moving danmaku train connected to a stationary portal. when viewed from the stationary side, the other side seems to be stationary, but player need to run along when teleporting
+
+life gate: green house shaped portals
+/\
+||
+
+-_-_
+_-_- bullet wall moving downwards, gaps appear
+
+infinite zooming portals: 
 ]]
 
 local portalR=350
 local outerPortals={}
+local basePos
 local function outerPortalPoses(basePos)
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
@@ -133,12 +149,16 @@ local function outerPortalPoses(basePos)
     end
     return poses
 end
-local function setOuterPortals(basePos)
-    local poses=outerPortalPoses(basePos)
+local function setOuterPortals(newBasePos,newPortalR)
+    if newPortalR then
+        portalR=newPortalR
+    end
+    basePos=copyTable(newBasePos)
+    local poses=outerPortalPoses(newBasePos)
     if #outerPortals==0 then
         for i=1,4 do
             local pos1,pos2=poses[i].pos1,poses[i].pos2
-            local portal=Portal(pos1,pos2,basePos,{draw=false,range=999})
+            local portal=Portal(pos1,pos2,newBasePos,{draw=false,range=999})
             table.insert(outerPortals,portal)
         end
         outerPortals[1]:link(outerPortals[3])
@@ -146,7 +166,7 @@ local function setOuterPortals(basePos)
     else
         for i=1,4 do
             local pos1,pos2=poses[i].pos1,poses[i].pos2
-            outerPortals[i]:set(pos1,pos2,basePos)
+            outerPortals[i]:set(pos1,pos2,newBasePos)
         end
     end
     return outerPortals
@@ -159,11 +179,10 @@ local shouji=require"stages.stage4.shouji"
 return{
     init=function()
         outerPortals={}
-        portalR=350
         if G.runInfo.geometry==G.geometries.Euclidean then
             injectGeometry()
             local base=G.runInfo.geometry:init()
-            setOuterPortals(base.pos)
+            setOuterPortals(base.pos,350)
             -- local border=Border.CircleBorder{center=base.pos,radius=400}
             -- G.runInfo.player.border=border
             -- G:replaceBackgroundPatternIfNot(BackgroundPattern.Corridor)
@@ -516,14 +535,17 @@ return{
         {
             key='4-4',
             type='midStage',
-            func=function()
-                local geo=G.runInfo.geometry
-                ---@cast geo PortalGeometryBase
+            init=function()
                 local pos=G.runInfo.player.kinematicState.pos
                 portalR=200
                 setOuterPortals(pos)
                 outerPortals[1]:link(outerPortals[4])
                 outerPortals[2]:link(outerPortals[3])
+            end,
+            func=function() -- 15s
+                local geo=G.runInfo.geometry
+                ---@cast geo PortalGeometryBase
+                local pos=G.runInfo.player.kinematicState.pos
                 local pos1,dir1=geo:rThetaGo(pos,50,-math.pi/2)
                 local pos2,dir2=geo:rThetaGo(pos1,-350,dir1-math.pi/2)
                 local extraUpdate=function(self)
@@ -533,11 +555,13 @@ return{
                     end
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,aimSpeed,0.05)
                 end
-                for i=-4,5 do
+                local n=DSWITCH{3,3,4,5}
+                local bulletNumber=DSWITCH{4,6,8,12}
+                for i=-(n-1),n do
                     local pos2,dir2=geo:rThetaGo(pos1,-40*i+20,dir1-math.pi/2)
                     local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=150},maxhp=200,sprite=Asset.fairySprites.medium.blue,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
                     fairy:addHPProtection(120,5)
-                    local BulletSpawner=BulletSpawner{useRelativeAngle=true,period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=250,bulletNumber=12,angle=dir2+math.pi/2,range=math.pi*12,bulletSprite=BulletSprites.scale.blue,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
+                    local BulletSpawner=BulletSpawner{useRelativeAngle=true,period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=250,bulletNumber=bulletNumber,angle=dir2+math.pi/2,range=math.pi*bulletNumber,bulletSprite=BulletSprites.scale.blue,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
                         cir.index=self.spawnTimes
                         cir.kinematicState.speed=cir.kinematicState.speed-args.index*20
                         -- cir.kinematicState.dir=cir.kinematicState.dir+(math.abs(cir.index%10-5))*0.01
@@ -546,14 +570,20 @@ return{
                     -- wait(10)
                 end
                 wait(120)
-                for i=-4,5 do
-                    if math.abs(i-0.5)<3 then
+                for i=-(n-1),n do
+                    local skipCondition
+                    if DIFF()>=G.HARD then
+                        skipCondition=math.abs(i-0.5)<3
+                    else
+                        skipCondition=math.abs(i-0.5)>1
+                    end
+                    if skipCondition then
                         goto continue
                     end
                     local pos2,dir2=geo:rThetaGo(pos1,-40*i+20,dir1-math.pi/2)
                     local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=150},maxhp=200,sprite=Asset.fairySprites.medium.orange,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
                     fairy:addHPProtection(120,5)
-                    local BulletSpawner=BulletSpawner{period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=50,bulletNumber=12,angle='player',range=math.pi*12,bulletSprite=BulletSprites.scale.yellow,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
+                    local BulletSpawner=BulletSpawner{period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=50,bulletNumber=bulletNumber,angle='player',range=math.pi*bulletNumber,bulletSprite=BulletSprites.scale.yellow,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
                         cir.index=self.spawnTimes
                         cir:changeSpriteColor('red')
                         cir.kinematicState.speed=cir.kinematicState.speed-args.index*20
@@ -565,6 +595,97 @@ return{
                 end
                 wait(780)
             end
-        }
+        },
+        {
+            key='4-5',
+            type='midStage',
+            func=function() -- 18s
+                local geo=G.runInfo.geometry
+                ---@cast geo PortalGeometryBase
+                local pos=basePos
+                local function extraUpdate(self)
+                    if self.frame>=60 and self.frame<150 then
+                        self.kinematicState.speed=self.kinematicState.speed+1.5
+                    end
+                    if self.frame+90>self.lifeFrame then
+                        self.kinematicState.speed=math.lerp(self.kinematicState.speed,0,0.05)
+                    end
+                end
+                local function stretch(pos)
+                    BulletSpawner{kinematicState={pos=copyTable(pos),speed=0,dir=0},period=999,firstPeriod=1,lifeFrame=2,bulletSpeed=30,bulletNumber=100,angle='player',range=math.pi*2,bulletSprite=BulletSprites.bullet.green,bulletLifeFrame=240,bulletExtraUpdate={Action.FadeOut(20,true),extraUpdate}}
+                end
+                local time=720
+                local function spawnFairy(pos)
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos,dir=0,speed=0},maxhp=200,sprite=Asset.fairySprites.large.green,lifeFrame=time,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=5,point=5}}
+                    fairy:addHPProtection(60,99)
+                    Event{obj=fairy,action=function()
+                        wait(time-30)
+                        SFX:play('enemyPowerfulShot')
+                        stretch(fairy.kinematicState.pos)
+                        fairy:addHPProtection(120,9999)
+                    end}
+                    fairy.dieEffect=function (self)
+                        Enemy.dieEffect(self)
+                        SFX:play('enemyPowerfulShot')
+                        stretch(self.kinematicState.pos)
+                    end
+                    return fairy
+                end
+                local sentry=DanmakuFuncs.sentry(pos)
+                local thetaFunc=function(frame)
+                    local x=frame/60
+                    local theta=(x+math.exp(-x)-1)
+                    return theta
+                end
+                for i=1,8 do
+                    local pos1,dir1=geo:rThetaGo(pos,100,math.pi*2*i/8)
+                    local fairy=spawnFairy(pos1)
+                    DanmakuFuncs.orbitBind(fairy,sentry,function (self, centerObj)
+                        local r=100
+                        local theta=thetaFunc(centerObj.frame)+math.pi*2*i/8
+                        return {r=r,theta=theta}
+                    end)
+                    --- hakke spawners
+                    local hakkes={4,5,6,7,3,2,1,0}
+                    local hakke=hakkes[i]
+                    for j=1,3 do -- inner to outer
+                        local value=bit.rshift(hakke,3-j)%2
+                        local bulletNumber=value==0 and 6 or 9
+                        local speedUnit=20
+                        local BulletSpawner=BulletSpawner{period=240,firstPeriod=120-i*10,lifeFrame=time,bulletSpeed=speedUnit*5,bulletNumber=bulletNumber,angle=-value*math.pi/2,useRelativeAngle=true,range=math.pi*bulletNumber,bulletSprite=BulletSprites.bill[value==0 and 'white' or 'black'],bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
+                            local index=args.index
+                            local side=math.mod2Sign(index)
+                            local n=math.ceil(index/2)
+                            cir.kinematicState.speed=cir.kinematicState.speed-n*speedUnit
+                            cir.spriteTransparency=0.5
+                            cir.safe=true
+                            Event{obj=cir,action=function()
+                                wait(25)
+                                cir.kinematicState.speed=0
+                                wait(30)
+                                cir.spriteTransparency=1
+                                cir.safe=false
+                                cir.kinematicState.dir=cir.kinematicState.dir-side*math.pi/2
+                                cir.kinematicState.speed=50
+                                for i=1,60 do
+                                    cir.kinematicState.speed=cir.kinematicState.speed+1
+                                    wait()
+                                end
+                            end}
+                        end}}
+                        local spawnerSentry=DanmakuFuncs.sentry(pos1)
+                        BulletSpawner:bindState(spawnerSentry)
+                        DanmakuFuncs.orbitBind(spawnerSentry,sentry,function (self, centerObj)
+                            local r=100+(j-2)*20
+                            local theta=thetaFunc(centerObj.frame)+math.pi*2*i/8
+                            return {r=r,theta=theta}
+                        end)
+                    end
+                    wait(10)
+                end
+                wait(1000)
+            end
+        },
+        shouji.boss
     }
 }

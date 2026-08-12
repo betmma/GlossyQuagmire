@@ -463,6 +463,7 @@ local reimuSpellcard={duration=300, canShoot=true, func=reimuSpellcardFunc}
 local ShotTypes={
     REIMUA=ShotType{
         mainShot=buildMainShot{
+            transparency=0.5,
             sprite=Asset.playerShotSprites.amuletMid.red,
             damage=function(self, powerLevel) return 10-powerLevel end
         },
@@ -486,6 +487,7 @@ local ShotTypes={
             return returnStates
         end,
         optionShot={focused={ShootingPattern{
+            transparency=0.5,
             sprite=Asset.playerShotSprites.amuletNarrow.purple,
             frequency=5,
             damage=function(self, powerLevel) return 3 end,
@@ -585,6 +587,7 @@ end
 
 ShotTypes.MARISAA=ShotType{
     mainShot=buildMainShot{
+        transparency=0.5,
         size=1,
         sprite=Asset.playerShotSprites.explosive.green,
         damage=function(self, powerLevel) return 10-powerLevel end
@@ -760,6 +763,7 @@ local scatterExtraUpdate=function(self)
 end
 ShotTypes.KOTOBAA=ShotType{
     mainShot=buildMainShot{
+        transparency=0.5,
         size=1,
         sprite=Asset.playerShotSprites.poker.purple,
         damage=function(self, powerLevel) return 10-powerLevel end
@@ -790,12 +794,14 @@ ShotTypes.KOTOBAA=ShotType{
         return returnStates
     end,
     optionShot={focused={ShootingPattern{
+        transparency=0.5,
         sprite=Asset.playerShotSprites.poker.blue,
         frequency=2,
         damage=function(self, powerLevel) return 3 end,
         angle=0,
         size=1,extraUpdate=scatterExtraUpdate
     }}, unfocused={ShootingPattern{
+        transparency=0.5,
         sprite=Asset.playerShotSprites.poker.blue,
         frequency=2,
         damage=function(self, powerLevel) return 2 end,

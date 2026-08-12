@@ -82,6 +82,7 @@ Event.LoopEvent = LoopEvent
 
 
 Event.sineIOProgressFunc = function(x) return math.sin((x - 0.5) * math.pi) * 0.5 + 0.5 end
+Event.sineIProgressFunc = function(x) return 1 - math.cos(x * math.pi / 2) end
 Event.sineOProgressFunc = function(x) return math.sin(x * math.pi / 2) end
 Event.sineBackProgressFunc = function(x) return math.sin(x * math.pi) end
 

@@ -255,6 +255,14 @@ return {
                     zh_cn = '譬喻「二河白道」',
                 }
             },
+        },
+        ['shouji-death'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Death Gate "Final Nails in the Coffin"',
+                    zh_cn = '死门「最后的棺材钉」',
+                }
+            }
         }
     },
     levelData = {
@@ -965,6 +973,18 @@ return {
                     name = {
                         en_us = '3-Boss',
                         zh_cn = '3-Boss',
+                    }
+                },
+                ['4-mid'] = {
+                    name = {
+                        en_us = '4-MidBoss',
+                        zh_cn = '4-道中Boss',
+                    }
+                },
+                ['4-boss'] = {
+                    name = {
+                        en_us = '4-Boss',
+                        zh_cn = '4-Boss',
                     }
                 },
             }

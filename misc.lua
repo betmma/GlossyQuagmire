@@ -25,9 +25,9 @@ function math.smoothstep(x)
 end
 
 ---@param n integer sides of polygon
----@param theta number
----@param r number|nil
----@param dir0 number|nil direction of polygon
+---@param theta number angle of point
+---@param r number|nil radius of polygon's circumscribed circle. defaults to 1
+---@param dir0 number|nil direction of polygon. 0 means a vertex is at angle 0.
 ---@return number radius multiplier or multiplier*r if r is provided
 ---@return number adjusted theta
 function math.polygonize(n,theta,r,dir0)

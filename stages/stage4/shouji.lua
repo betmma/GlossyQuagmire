@@ -96,4 +96,23 @@ local midboss=BossManager.BossSegment{
     }
 }
 
-return {midboss=midboss}
+local boss=BossManager.BossSegment{
+    bossName='shouji',
+    key='4-boss',
+    getBossSpawnPos=function(self)
+        local geo=G.runInfo.geometry
+        local playerPos=G.runInfo.player.kinematicState.pos
+        local outerPortals=Portal.setOuterPortals(playerPos,350)
+        outerPortals[1]:link(outerPortals[3])
+        outerPortals[2]:link(outerPortals[4])
+        local pos,dir=geo:rThetaGo(playerPos,200,G.runInfo.player.viewDirection-math.pi/2)
+        return pos
+    end,
+    rounds={
+        BossManager.BossRound{phases={
+            require('stages.stage4.spellcards.death'),
+        }}
+    }
+}
+
+return {midboss=midboss, boss=boss}
