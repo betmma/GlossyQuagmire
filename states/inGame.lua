@@ -160,7 +160,7 @@ return {
         }
     end,
     enter=function(self,lastState)
-        if lastState~=G.STATES.PAUSE then
+        if lastState~=G.STATES.PAUSE and lastState~=G.STATES.GAME_END then
             self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
             for i,mainEffect in pairs(Asset.mainEffects) do
                 if mainEffect.reset then

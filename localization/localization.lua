@@ -1102,6 +1102,10 @@ return {
                 en_us = 'Practice End',
                 zh_cn = '练习结束'
             },
+            continue = {
+                en_us = 'Continue ({continues} left)',
+                zh_cn = '续关 (剩余{continues}次)'
+            },
             saveReplay = {
                 __default__= {
                     en_us = 'Save Replay',

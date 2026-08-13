@@ -1,6 +1,7 @@
 ---@class _pauseBase:UIBase
 local base=UI.Base()
 local playingReplay
+local remakeOptions
 return {
     base=base,
     init=function(self)
@@ -40,8 +41,23 @@ return {
             end}
         }
         local options={
+            {key='continue',func=function()
+                if G.runInfo.remainingContinues<=0 then
+                    SFX:play('cancel')
+                    return
+                end
+                SFX:play('select')
+                G.runInfo.remainingContinues=G.runInfo.remainingContinues-1
+                G.runInfo.continued=true
+                local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[G.runInfo.gameType]
+                G.runInfo.lives=startResources.lives
+                G.runInfo.bombs=startResources.bombs
+                G.runInfo.score=0
+                G.runInfo.grazes=0
+                G:switchState(G.STATES.IN_GAME)
+            end},
             {key='saveReplay',func=function()
-                if playingReplay then
+                if playingReplay or G.runInfo.continued then
                     SFX:play('cancel')
                     return
                 end
@@ -58,26 +74,51 @@ return {
                 G:switchState(G.runInfo.exitToState)
             end}
         }
-        for i,option in ipairs(options) do
-            optionsUI:addOption(UI.Text{
-                text='',fontSize=24,color={1,1,1,1},autoSize=true,
-                updateText=function (self)
-                    return Localize{'ui','GAME_END',option.key,playingReplay and 'playingReplay' or 'normal'}
-                end,
-                events={
-                    [UI.EVENTS.SELECT]=option.func
-                },
-                extraUpdates={function (self)
-                    if option.key=='saveReplay' then
-                        self.transparency=playingReplay and 0.5 or 1
+        -- used to store whether it contains continue option. remakeOption will save and check lastCallFlag. if it's the same, can skip remake to keep the cursor position. if different clear all options and remake them.
+        local lastCallFlag
+        remakeOptions=function()
+            local newFlag=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and not playingReplay
+            if newFlag==lastCallFlag then
+                return
+            end
+            lastCallFlag=newFlag
+            optionsUI:clearOptions()
+            for i,option in ipairs(options) do
+                if option.key=='continue' then
+                    if not newFlag then
+                        goto continue
                     end
-                end}
-            })
+                end
+                optionsUI:addOption(UI.Text{
+                    text='',fontSize=24,color={1,1,1,1},autoSize=true,
+                    updateText=function (self)
+                        if option.key=='continue' then
+                            return Localize{'ui','GAME_END',option.key,continues=G.runInfo.remainingContinues}
+                        end
+                        return Localize{'ui','GAME_END',option.key,playingReplay and 'playingReplay' or 'normal'}
+                    end,
+                    events={
+                        [UI.EVENTS.SELECT]=option.func
+                    },
+                    extraUpdates={function (self)
+                        if option.key=='continue' then
+                            self.transparency=G.runInfo.remainingContinues<=0 and 0.5 or 1
+                        end
+                        if option.key=='saveReplay' then
+                            self.transparency=(playingReplay or G.runInfo.continued) and 0.5 or 1
+                        end
+                    end}
+                })
+                ::continue::
+            end
         end
+        remakeOptions()
     end,
     enter=function(self,lastState)
         base.frame=0
         playingReplay=G.runInfo.replay~=nil
+        -- remakeOptions needs to know most recent playingReplay so cannot swap order
+        remakeOptions()
         -- if player dies during a stage, stageManager:update part after stage coroutine ends wont be executed which includes adding current stage keyrecords and things into replay source data.
         if lastState==G.STATES.IN_GAME and not playingReplay then
             if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.stageKey then

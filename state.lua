@@ -93,6 +93,14 @@ G={
             LUNATIC=normalStageOrder,
             EXTRA={'stageEX'},
         },
+        ---@type table<DIFFICULTY, integer> how many continues for each difficulty. only for full game mode.
+        DIFFICULTIES_TO_CONTINUES={
+            EASY=5,
+            NORMAL=5,
+            HARD=5,
+            LUNATIC=5,
+            EXTRA=0,
+        },
         ---@alias PLAYER 'REIMU'|'MARISA'|'KOTOBA'
         PLAYERS={'REIMU','MARISA','KOTOBA'},
         PLAYERS_DATA={
@@ -434,7 +442,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey, remainingContinues: integer, continued:boolean}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
@@ -453,7 +461,9 @@ G={
         exitToState=nil, -- defaults to G.STATES.CHOOSE_PLAYER
         replay=nil,
         pendingReplay=nil,
-        startStageKey=normalStageOrder[1]
+        startStageKey=normalStageOrder[1],
+        remainingContinues=0,
+        continued=false,
     },
     ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays. it only handles things that persist between stages. things that only matter in a single stage should be initialized in StageManager:load.
     ---@param self G
@@ -477,6 +487,11 @@ G={
         self.runInfo.score=0
         self.runInfo.grazes=0
         self.runInfo.replay=replay
+        self.runInfo.remainingContinues=0
+        if gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME then
+            self.runInfo.remainingContinues=G.CONSTANTS.DIFFICULTIES_TO_CONTINUES[difficulty]
+        end
+        self.runInfo.continued=false
     end,
     ---@param self G
     restart=function(self)
