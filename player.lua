@@ -14,7 +14,7 @@
 ---@field shotType ShotType
 ---@field options Bullet[]
 ---@field duringDeathbombWindow boolean whether player is in deathbomb window, which is a short time after hit where player can still bomb to avoid death.
----@field duringDeath boolean whether player is in death animation.
+---@field duringDeath boolean whether player is in death animation. currently unused. prior to 0.4.2.2 player cannot shoot or bomb during death animation, but now player can shoot and bomb during death animation after immobile frames.
 ---@field duringBomb boolean whether player is in bomb animation. if true, player cannot bomb again. 
 ---@field border Border|nil
 local Player = Shape:extend()
@@ -142,9 +142,10 @@ function Player:calculateShoot(dt)
     end
     local powerLevel=math.floor(G.runInfo.power/100)
     local kinematicState={pos=self.kinematicState.pos,dir=self.viewDirection-math.pi/2, speed=0} -- note that the dir must not be self.kinematicState.dir, because that value is the moving direction, not the shooting (facing) direction. viewDirection is the right hand side direction, so shooting direction is viewDirection-math.pi/2
-    local shooting=self.keyIsDown(KEYS.SELECT) and not self.duringDeath and (not self.duringBomb or self.shotType.spellcard.canShoot)
+    local immobile=self.immobileFrame>0
+    local shooting=self.keyIsDown(KEYS.SELECT) and not immobile and (not self.duringBomb or self.shotType.spellcard.canShoot)
     self.shotType:update(kinematicState, self.keyIsDown(KEYS.SLOW), shooting, powerLevel, self.frame, dt, self.options, self.transparency)
-    if not self.duringBomb and not self.duringDeath and self.keyIsDown(KEYS.CANCEL) and G.runInfo.bombs>=1 then
+    if not self.duringBomb and not immobile and self.keyIsDown(KEYS.CANCEL) and G.runInfo.bombs>=1 then
         EventManager.post(EventManager.EVENTS.PLAYER_BOMB)
         self.duringDeathbombWindow=false -- exit deathbomb window to prevent death
         self.invincibleFrame=self.shotType.spellcard.duration
