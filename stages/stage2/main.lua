@@ -216,7 +216,7 @@ return{
                 local function warning(pos,transparency,duration)
                     duration=duration or 120
                     transparency=transparency or 0.5
-                    Bullet{kinematicState={pos=copyTable(pos),dir=math.pi/4,speed=0,skipZoom=true},lifeFrame=duration,sprite=BulletSprites.cross.red,safe=true,invincible=true,extraUpdate={Action.FadeIn(duration/4,false),Action.FadeOut(duration/4,true)},spriteColor={1,0.2,0.2,transparency},size=3,forceQuad=true}
+                    Bullet{kinematicState={pos=copyTable(pos),dir=math.pi/4,speed=0,skipZoom=true},lifeFrame=duration,sprite=BulletSprites.cross.red,safe=true,invincible=true,extraUpdate={Action.FadeIn(duration/6,false),Action.FadeOut(duration/4,true)},spriteColor={1,0.2,0.2,transparency},size=3,forceQuad=true}
                 end
                 -- show fairy danger zone
                 for i=1,3 do
@@ -231,19 +231,20 @@ return{
                     end
                 end
                 wait(30)
+                local extraAngle=0.5
                 local function sideWarning(side,duration)
                     duration=duration or 120
-                    for i=-20,3 do
-                        local jmin=(side==-1) and -3 or 0
-                        local jmax=(side==-1) and 0 or 3
+                    for i=-15,3 do
+                        local jmin=(side==-1) and -6 or 0
+                        local jmax=(side==-1) and 0 or 6
                         for j=jmin,jmax do
-                            local pos1,dir1=geo:rThetaGo(basePos,i*30+40,math.pi/2)
+                            local pos1,dir1=geo:rThetaGo(pos0,i*30+40,math.pi/2+extraAngle*side)
                             dir1=dir1-math.pi/2
                             local pos2,dir2=geo:rThetaGo(pos1,j*30,dir1)
                             local jabs=math.abs(j)
                             Event{action=function()
                                 wait(jabs*duration/12)
-                                warning(pos2,0.5-jabs*0.12,duration)
+                                warning(pos2,0.5-jabs*0.06,duration)
                             end}
                         end
                     end
@@ -258,16 +259,19 @@ return{
                         if side==1 then
                             cir.kinematicState.speed=5*(self.bulletNumber+1)-cir.kinematicState.speed
                         end
-                        cir.kinematicState.dir=cir.kinematicState.dir+self.range/2*side
+                        cir.kinematicState.dir=cir.kinematicState.dir+(self.range/2+extraAngle)*side
                     end}
                 }
                 spawner:bindState(fairy)
+                local spawnTimes=0
                 Event.LoopEvent{obj=spawner,period=1,executeFunc=function()
                     local jumpPeriod=60/130*60*2
                     local frame=spawner.frame+90 -- has waited 90 frames before this event
                     if math.ceil(frame/jumpPeriod)~=math.ceil((frame-1)/jumpPeriod) then
+                        spawnTimes=spawnTimes+1
                         local duration,size=10,2
                         Effect.Larger{kinematicState=spawner.kinematicState,sprite=BulletSprites.shockwave.red,size=0,growSpeed=size/duration,animationFrame=duration,spriteTransparency=0.8}
+                        extraAngle=math.max(0,0.5-spawnTimes*0.05)
                         spawner:spawnBatchFunc()
                         side=-side
                         if math.ceil((spawner.lifeFrame+90)/jumpPeriod)==math.ceil(frame/jumpPeriod) then -- no more spawns

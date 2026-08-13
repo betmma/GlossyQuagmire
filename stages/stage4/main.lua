@@ -119,16 +119,16 @@ idea:
 ——
 --, two half width portals at bottom connects to the full width portal at top. then bullet wall moving downwards
 
-a moving portal on a moving danmaku train connected to a stationary portal. when viewed from the stationary side, the other side seems to be stationary, but player need to run along when teleporting
+injure gate: a moving portal on a moving danmaku train connected to a stationary portal. when viewed from the stationary side, the other side seems to be stationary, but player need to run along when teleporting
 
-life gate: green house shaped portals
+life gate: green house shaped portals 红杏出墙
 /\
 ||
 
 -_-_
 _-_- bullet wall moving downwards, gaps appear
 
-infinite zooming portals: 
+infinite zooming portals: scenery gate
 ]]
 
 local portalR=350
