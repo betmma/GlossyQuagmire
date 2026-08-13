@@ -77,7 +77,7 @@ return {
         -- used to store whether it contains continue option. remakeOption will save and check lastCallFlag. if it's the same, can skip remake to keep the cursor position. if different clear all options and remake them.
         local lastCallFlag
         remakeOptions=function()
-            local newFlag=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and not playingReplay
+            local newFlag=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and not playingReplay and G.runInfo.lives<0 -- exclude clearing the game
             if newFlag==lastCallFlag then
                 return
             end
