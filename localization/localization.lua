@@ -263,6 +263,21 @@ return {
                     zh_cn = '死门「最后的棺材钉」',
                 }
             }
+        },
+        ['shouji-scenery'] = {
+            EASY = {
+                name = {
+                    en_us = 'Scenery Gate "Intertwined Red Ropes"',
+                    zh_cn = '景门「交织的红绳」',
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Scenery Gate "The Red Thread of Fate"',
+                    zh_cn = '景门「命运的红线」',
+                }
+            }
         }
     },
     levelData = {
@@ -1308,6 +1323,16 @@ return {
             description = {
                 en_us = 'Cora Kurekagami\'s theme.\nI always think that "kaleidoscope" is somewhat cliche, but she literally creates kaleidoscopes and fun danmaku so there\'s no other choice.',
                 zh_cn = '吴镜珂络的主题曲。\n我一直觉得“万花筒”这个词是陈词滥调，但她的机制确实是万花筒，并且弹幕也挺有趣，所以就这么叫吧。',
+            }
+        },
+        level4 = {
+            name = {
+                en_us = 'Lost in the Solaris',
+                zh_cn = '索拉里斯的迷途',
+            },
+            description = {
+                en_us = 'Stage 4\'s theme.\nDrenched in dreamy state, with a dangerous sounding transition. The craziness of the geometry has reached a new level, as well as the numerator of the time signature.',
+                zh_cn = '第四面的主题曲。\n沉浸在梦幻的状态中，伴随着危险感的过渡。几何的疯狂达到了一个新的高度，就和拍号的分子一样。',
             }
         },
         level5 = {

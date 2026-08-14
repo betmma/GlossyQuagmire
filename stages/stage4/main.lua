@@ -113,6 +113,8 @@ local function injectGeometry()
     end
 end
 
+-- player can escape two portals forming an angle by moving towards the vertex, due to the point on exterior angle bisector does not fall into either portal's teleportation range. the fix is to extend portals past the vertex.
+
 --[[
 idea:
 ||, enemy at top, shooting giants downwards. portals at side are not aligned, so player moves aside and goes through the gap
