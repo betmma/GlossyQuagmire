@@ -525,8 +525,8 @@ local glassBrokenEffect=SimpleCallableShoveEffect{
     args={active=false},
     shaderArgs={progress=0,seed=0},
     run=function(self)
-        if IS_WEB then
-            -- web version is too slow to run this effect, so just skip it
+        if G.save.options.reduceVisualQuality then
+            -- skip it
             return
         end
         self.args.active=true

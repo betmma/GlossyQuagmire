@@ -460,6 +460,9 @@ function Localize(args)
     local rawString,success=getRawLocalizeString(args)
     local result=rawString
     for key, value in pairs(args) do
+        if type(value)~="string" and type(value)~="number" then
+            value=tostring(value)
+        end
         result=result:gsub('{'..key..'}',value)
     end
     if result:find('{.-}') then

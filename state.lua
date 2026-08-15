@@ -540,7 +540,7 @@ end
 ---@alias spellcardHistoryKey 'ingame'|'practice'
 -- an example of its structure
 ---@class Save
----@field options {master_volume: integer, music_volume: integer, sfx_volume: integer, language: string, resolution: {width: integer, height: integer}}
+---@field options {master_volume: integer, music_volume: integer, sfx_volume: integer, language: string, resolution: {width: integer, height: integer}, reduceVisualQuality: boolean}
 ---@field defaultName string
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
 ---@field spellcardHistory table<string, table<DIFFICULTY, {unlocked:boolean, [SHOT_TYPE]: table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>}>>>

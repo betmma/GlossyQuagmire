@@ -426,6 +426,18 @@ return {
                 en_us = 'Resolution',
                 zh_cn = '分辨率',
             },
+            reduceVisualQuality = {
+                en_us = 'Reduce Visuals',
+                zh_cn = '降低视觉质量',
+            },
+            [false] = {
+                en_us = 'No',
+                zh_cn = '否',
+            },
+            [true] = {
+                en_us = 'Yes',
+                zh_cn = '是',
+            },
         },
         CHOOSE_DIFFICULTY = {
             chooseDifficulty = {
@@ -1327,7 +1339,7 @@ return {
         },
         level4 = {
             name = {
-                en_us = 'Lost in the Solaris',
+                en_us = 'Lost in Solaris',
                 zh_cn = '索拉里斯的迷途',
             },
             description = {

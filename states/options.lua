@@ -31,6 +31,7 @@ return {
             }
         )
         -- each option is a base with a left aligned text child for the name and a right aligned text child for the value (except for EXIT). also, there is an empty base before exit to have empty space between exit and the other options
+        local textWidth=500
         local function createOption(name,switcher)
             local previewDecayRadius=switcher and switcher.previewDecayRadius or 0
             local option=UI.Base{width=600,height=50,
@@ -81,7 +82,7 @@ return {
                     return UI.Text{
                         text=tostring(index),
                         fontSize=36,color={1,1,1,1},
-                        width=500,
+                        width=textWidth,
                         align='right',toggleX=false,
                     }
                 end,
@@ -117,7 +118,7 @@ return {
                 return UI.Text{
                     text=languageValues[index].text,
                     fontName=Fonts[languageValues[index].value],fontSize=36,color={1,1,1,1},
-                    width=500,
+                    width=textWidth,
                     align='right',toggleX=false,
                 }
             end,
@@ -155,7 +156,7 @@ return {
                 return UI.Text{
                     text=resolutionValues[index].text,
                     fontSize=36,color={1,1,1,1},
-                    width=500,
+                    width=textWidth,
                     align='right',toggleX=false,
                 }
             end,
@@ -167,6 +168,32 @@ return {
                     local index=args.index
                     self.save.options.resolution=resolutionValues[index].value
                     shove.setWindowMode(self.save.options.resolution.width,self.save.options.resolution.height, {resizable = true})
+                end
+            }
+        })
+        local booleanValues={false,true}
+        createOption(Localize{'ui','OPTIONS','reduceVisualQuality'},UI.Switcher{
+            arrange=function(_,index)
+                return 100*index,0
+            end,
+            optionConstructor=function(_,index)
+                if index<1 or index>2 then
+                    return nil
+                end
+                return UI.Text{
+                    text=Localize{'ui','OPTIONS',booleanValues[index]},
+                    fontSize=36,color={1,1,1,1},
+                    width=textWidth,
+                    align='right',toggleX=false,
+                }
+            end,
+            preview=2,
+            canHold=false,
+            currentOptionIndex=indexOf(booleanValues,self.save.options.reduceVisualQuality),
+            events={
+                [UI.EVENTS.SWITCHED]=function(_self,args)
+                    local index=args.index
+                    self.save.options.reduceVisualQuality=booleanValues[index]
                 end
             }
         })

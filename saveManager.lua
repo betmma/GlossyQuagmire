@@ -129,6 +129,7 @@ SaveManager.defaultSaveData=DefaultRoot{
         sfx_volume=100,
         language='en_us',
         resolution={width=WINDOW_WIDTH,height=WINDOW_HEIGHT},
+        reduceVisualQuality=IS_WEB and true or false,
     },
     defaultName='', -- the default name when saving replay
     playTimeTable={ -- unit is seconds

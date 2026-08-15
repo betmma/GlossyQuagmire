@@ -72,7 +72,7 @@ return BossManager.SpellcardPhase{
         local bulletSpawner
         if DIFF()<=G.NORMAL then -- rope
             local orb=Bullet{kinematicState={pos=copyTable(fairyPos),dir=math.pi/3+math.eval(1,0.5)*math.randomSign()/100,speed=0},sprite=BulletSprites.giant.red,lifeFrame=9999,invincible=true,size=1,extraUpdate={Action.ZoomIn(30,0.3,1),Action.FadeIn(30,false),Action.FadeOut(30,false)},highlight=false}
-            bulletSpawner=BulletSpawner{period=6,firstPeriod=60,lifeFrame=9999,bulletLifeFrame=400,bulletSprite=BulletSprites.round.red,bulletSpeed=90,bulletNumber=1,useRelativeAngle=true,angle=0,bulletEvents={function(cir,args,self)
+            bulletSpawner=BulletSpawner{period=6,firstPeriod=60,lifeFrame=9999,bulletLifeFrame=DSWITCH{300,400,'<','<'},bulletSprite=BulletSprites.round.red,bulletSpeed=90,bulletNumber=1,useRelativeAngle=true,angle=0,bulletEvents={function(cir,args,self)
                 if self.spawnTimes%6~=0 then
                     cir:changeSprite(BulletSprites.dot.red)
                     cir.spriteColor={1,0.2,0.2,0.5}
@@ -130,14 +130,15 @@ return BossManager.SpellcardPhase{
                 orb.ratio=1
                 table.insert(orbs,orb)
                 bulletSpawner=BulletSpawner{period=6,firstPeriod=60,lifeFrame=9999,bulletLifeFrame=300,bulletSprite=BulletSprites.scale.red,highlight=true,bulletSpeed=90,bulletNumber=2,useRelativeAngle=true,angle=math.pi,range=math.pi*2/3,bulletEvents={function(cir,args,self)
+                    local h=(i-2)*0.2
                     if self.spawnTimes%6~=0 then
                         cir:changeSprite(BulletSprites.stick.red)
-                        local r,g,b=math.hsvToRgb(i*0.2-0.4,0.8,1)
+                        local r,g,b=math.hsvToRgb(h,0.8,1)
                         cir.spriteColor={r,g,b,0.5}
                         cir.kinematicState.speed=cir.kinematicState.speed*1.5
                         cir.safe=true
                     else
-                        local r,g,b=math.hsvToRgb(i*0.2-0.4,0.2,1)
+                        local r,g,b=math.hsvToRgb(h,0.2,1)
                         cir.spriteColor={r,g,b,1}
                     end
                     cir.targetOrbIndex=(i-1+(args.index==1 and 1 or -1))%3+1

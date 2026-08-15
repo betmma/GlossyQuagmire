@@ -32,6 +32,9 @@ function Shader:update(dt)
     end
 end
 function Shader:draw()
+    if G.save.options.reduceVisualQuality then
+        return
+    end
     local colorref={love.graphics.getColor()}
     love.graphics.setColor(self.color[1],self.color[2],self.color[3])
     -- love.graphics.rectangle('fill',0,0,800,600)
