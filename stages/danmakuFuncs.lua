@@ -31,6 +31,7 @@ end
 ---@field theta number
 ---@field absolute boolean|nil whether the theta is absolute or relative to centerObj's direction. default false (relative)
 ---@field extraTheta number|nil an extra value to be added to shape.kinematicState.dir
+---@field ref boolean|nil whether to use rThetaGoRef or rThetaGo. default false (use rThetaGo)
 
 ---add an extraUpdate function to [shape] to make it orbit around [centerObj] with radius and angle determined by [rtheta]. it will not set position if centerObj is removed.
 ---@param shape Shape
@@ -61,7 +62,13 @@ function DanmakuFuncs.orbitBind(shape, centerObj, rtheta, onCenterRemoved, zoomI
             r=r*zoomInProgressFunc(self.frame)
         end
         local centerPos=centerObj.kinematicState.pos
-        self.kinematicState.pos,self.kinematicState.dir=G.runInfo.geometry:rThetaGo(centerPos,r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
+        local geo=G.runInfo.geometry
+        local func=geo.rThetaGo
+        if rthetanew.ref then
+            ---@cast geo PortalGeometryBase
+            func=geo.rThetaGoRef
+        end
+        self.kinematicState.pos,self.kinematicState.dir=func(geo,centerPos,r,rthetanew.theta+(rthetanew.absolute and 0 or centerObj.kinematicState.dir))
         if rthetanew.extraTheta then
             self.kinematicState.dir=self.kinematicState.dir+rthetanew.extraTheta
         end

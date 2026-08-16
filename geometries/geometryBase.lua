@@ -25,7 +25,19 @@ function GeometryBase:update(state,dt)
     state.pos.y=state.pos.y+state.speed*math.sin(state.dir)*dt
 end
 
+--- why the f autocomplete get wrong with this?
+R_THETA_GO_WRONG_COUNT=0
+
+function CHECK_R_THETA_GO_WRONG(position,length,direction)
+    if math.abs(direction)>100 and math.abs(length)<10 then -- check for potential flipped length and direction
+        R_THETA_GO_WRONG_COUNT=R_THETA_GO_WRONG_COUNT+1
+    end
+end
+
 function GeometryBase:rThetaGo(position,length,direction)
+    if DEV_MODE then
+        CHECK_R_THETA_GO_WRONG(position,length,direction)
+    end
     local newPosition={
         x=position.x+length*math.cos(direction),
         y=position.y+length*math.sin(direction),

@@ -158,7 +158,7 @@ function Enemy:calculateMovingTransitionSprite()
     end
 end
 
--- originally it's designed to calculate to make the sprite upward, how much to rotate the sprite. but it would require an equivalent lua function of shaders used by geometry and feel ugly, currently it just faces player in hyperbolic and spherical geometry. in euclidean geometry, it only needs to consider player.viewDirection
+-- originally it's designed to calculate to make the sprite upward, how much to rotate the sprite. but it would require an equivalent lua function of shaders used by geometry and feel ugly, currently it just faces player in hyperbolic and spherical geometry. in euclidean geometry, returns 0
 function Enemy:upwardDeltaOrientation()
     local player=G.runInfo.player
     if not player then
@@ -170,7 +170,7 @@ function Enemy:upwardDeltaOrientation()
         -- local playerToSelf=G.runInfo.geometry:to(player.kinematicState.pos,self.kinematicState.pos)
         return selfToPlayer-math.pi/2
     end
-    return player.viewDirection
+    return 0--player.viewDirection
 end
 
 function Enemy:draw()

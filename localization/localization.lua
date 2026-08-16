@@ -256,6 +256,14 @@ return {
                 }
             },
         },
+        ['shouji-life'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Life Gate "Red Apricot Out of the Wall"',
+                    zh_cn = '生门「红杏出墙」',
+                }
+            }
+        },
         ['shouji-death'] = {
             __default__ = {
                 name = {

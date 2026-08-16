@@ -152,7 +152,7 @@ function Portal.considerTeleport(pos)
         for i,portal in ipairs(Portal.objects) do
             ---@cast portal Portal
             if not portal.linked then
-                error("Portal "..i.." is not linked to another portal.")
+                goto continue
             end
             if geo:sideToLine(pos,portal.pos1,portal.pos2)~=portal.side then
                 local nearest=geo:nearestToLine(pos,portal.pos1,portal.pos2)
@@ -174,6 +174,7 @@ function Portal.considerTeleport(pos)
                     break
                 end
             end
+            ::continue::
         end
     end
     return pos,deltaAngle
@@ -192,11 +193,12 @@ function Portal.zoomFactor(pos)
         local size=portal.size
         local linkedPortal=portal.linked
         if not linkedPortal then
-            error("Portal "..i.." is not linked to another portal.")
+            goto continue
         end
         local linkedSize=linkedPortal.size
         local F=math.log(linkedSize/size)*-0.5
         smoothZoomFactor=smoothZoomFactor+F*(2*math.smoothstep(0.5-0.5*distance/C))
+        ::continue::
     end
     return math.exp(smoothZoomFactor)
 end

@@ -691,6 +691,9 @@ G.draw=function(self)
         if SKIP_MODE then
             love.graphics.print("SKIP MODE ON", 0, 39)
         end
+        if R_THETA_GO_WRONG_COUNT>60 then
+            love.graphics.print("R_THETA_GO_WRONG_COUNT: "..R_THETA_GO_WRONG_COUNT..". It's very likely that r and theta are flipped.", 0, 52)
+        end
     end
     shove.endLayer()
 end
