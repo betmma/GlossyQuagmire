@@ -286,6 +286,14 @@ return {
                     zh_cn = '景门「命运的红线」',
                 }
             }
+        },
+        ['shouji-fear'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Fear Gate "Scraping Dragon\'s Reverse Scales"',
+                    zh_cn = '惊门「批逆龙鳞」',
+                }
+            },
         }
     },
     levelData = {

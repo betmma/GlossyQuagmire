@@ -118,6 +118,7 @@ end
 ---@field subclasses GameObject[] 
 ---@field removed boolean|nil Internal flag set when `remove()` is called on an instance.
 ---@field notRespondToDrawAll boolean|nil If true on an instance, it will be skipped by `drawAll`.
+---@field any any a variable to store any data. it's very common to store some data upon creation and use it in extraUpdate. if want to prevent luaLS from complaining, use this field.
 local GameObject=Object:extend()
 
 --- Marks an instance for removal during the next update cycle.

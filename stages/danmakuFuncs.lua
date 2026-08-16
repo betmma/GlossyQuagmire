@@ -106,3 +106,89 @@ function DanmakuFuncs.midPoints(pos1,pos2,maxDist,maxNum)
     end
     return points,dirs
 end
+
+---@class PortalSentry:Bullet
+---@field any {portal:Portal, ratio:number} ratio stores the ratio of the portal length to the original halfLength, for zoom in animation.
+
+---return a sentry with a portal and possible back bullets bind to it
+---@param pos Position initial pos
+---@param dir number
+---@param halfLength number
+---@param halfWidth number
+---@param reverse boolean whether to flip portal vertices. false maps to sign=1, true maps to sign=-1. though, posIn is always at the direction of dir.
+---@param zoomInTime integer|nil
+---@param portalArgs PortalArgs|nil will auto set range and add an extraUpdate that removes the portal when sentry is removed
+---@param backBulletArgs BulletArgs|nil
+---@param backBulletGap number|nil the gap between back bullets. default 10
+---@return PortalSentry
+function DanmakuFuncs.PortalOnSentry(pos,dir,halfLength,halfWidth,reverse,zoomInTime,portalArgs,backBulletArgs,backBulletGap)
+    local geo=G.runInfo.geometry--[[@as PortalGeometryBase]]
+    if not geo.portal then
+        error("calling DanmakuFuncs.PortalOnSentry but current geometry is not portal")
+    end
+    local sentry=DanmakuFuncs.sentry(pos)
+    sentry.kinematicState.skipPortal=true
+    sentry.kinematicState.dir=dir
+    sentry.any={ratio=0.1}
+    if zoomInTime then
+        Event.EaseEvent{obj=sentry,easeObj=sentry.any,aims={ratio=1},duration=zoomInTime}
+        if portalArgs and portalArgs.lifeFrame then
+            Event{obj=sentry,action=function()
+                wait(portalArgs.lifeFrame-zoomInTime)
+                Event.EaseEvent{obj=sentry,easeObj=sentry.any,aims={ratio=0.1},duration=zoomInTime}
+            end}
+        end
+    else
+        sentry.any.ratio=1
+    end
+    local function getPos()
+        local posnow,dirnow=sentry.kinematicState.pos,sentry.kinematicState.dir
+        local width=halfWidth
+        local pos2,dir2=geo:rThetaGoRef(posnow,width,dirnow)
+        local length=halfLength*sentry.any.ratio
+        local posa,posb=Portal.segment(pos2,dir2,length)
+        if reverse then
+            posa,posb=posb,posa
+        end
+        return posa,posb
+    end
+    local posa,posb=getPos()
+    portalArgs=portalArgs or {}
+    portalArgs.range=portalArgs.range or halfWidth
+    portalArgs.extraUpdate=portalArgs.extraUpdate or {}
+    portalArgs.extraUpdate[#portalArgs.extraUpdate+1]=function(self)
+        if sentry.removed then
+            self:remove()
+        else
+            local posa,posb=getPos()
+            self:set(posa,posb)
+        end
+    end
+    local portal=Portal(posa,posb,reverse and -1 or 1,portalArgs)
+    portal.any={sentry=sentry}
+    sentry.any.portal=portal
+    if backBulletArgs then
+        local gap=backBulletGap or 10
+        local lengthN=math.ceil(halfLength/gap)
+        for j=-lengthN,lengthN do
+            local bullet=Bullet(copyTable(backBulletArgs))
+            DanmakuFuncs.orbitBind(bullet,sentry,function (self, centerObj)
+                local x=-halfWidth
+                local y=j/lengthN*halfLength*sentry.any.ratio
+                return {r=math.sqrt(x*x+y*y),theta=math.atan2(y,x),ref=true}
+            end)
+        end
+        local widthN=math.ceil(halfWidth/gap)
+        for side=-1,1,2 do
+            for j=-widthN,widthN do
+                local bullet=Bullet(copyTable(backBulletArgs))
+                DanmakuFuncs.orbitBind(bullet,sentry,function (self, centerObj)
+                    local x=halfWidth*j/widthN
+                    local y=side*halfLength*sentry.any.ratio*(1+1/lengthN)
+                    return {r=math.sqrt(x*x+y*y),theta=math.atan2(y,x),ref=true}
+                end)
+            end
+        end
+    end
+    return sentry
+end

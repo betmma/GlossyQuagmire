@@ -30,9 +30,10 @@ local function injectGeometry()
         local zoomFromPortal=Portal.zoomFactor(kinematicState.pos)
         updateRef(self,kinematicState,dt*zoomFromPortal)
         if skip then return end
-        local pos,delta=Portal.considerTeleport(kinematicState.pos)
+        local pos,delta,teleportedPortal=Portal.considerTeleport(kinematicState.pos)
         kinematicState.pos=pos
         kinematicState.dir=kinematicState.dir+delta
+        kinematicState.teleportedPortal=teleportedPortal
     end
     local rThetaGoRef=geo.rThetaGo
     geo.rThetaGoRef=rThetaGoRef

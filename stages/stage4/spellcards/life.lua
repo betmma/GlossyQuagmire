@@ -92,46 +92,10 @@ return BossManager.SpellcardPhase{
         for i=1,4 do
             local ds={-250,-150,150,250}
             local pos,dir=geo:rThetaGoRef(pos1,ds[i],dir1+math.pi/2)
-            -- free portals need a [ shape moving along
-            local sentryi=DanmakuFuncs.sentry(pos)
-            sentryi.kinematicState.skipPortal=true
+            dir=dir-math.pi/2
+            local sentryi=DanmakuFuncs.PortalOnSentry(pos,dir,portalLength,portalWidth,false,30,{draw=draw},{sprite=BulletSprites.round.blue,size=1,lifeFrame=9999,extraUpdate={Action.ZoomIn(30)}},20)
             freePortalSentries[i]=sentryi
-            sentryi.kinematicState.dir=dir-math.pi/2
-            -- local front,back=Portal.segment(pos,dir-math.pi/2,10)
-            local n1=2
-            for j=-n1,n1 do
-                local bullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir-math.pi/2,speed=0},sprite=BulletSprites.round.blue,size=1,lifeFrame=9999,extraUpdate={Action.ZoomIn(30)}}
-                DanmakuFuncs.orbitBind(bullet,sentryi,function (self, centerObj)
-                    local x=-portalWidth
-                    local y=j/n1*portalLength*portalRatio
-                    return {r=math.sqrt(x*x+y*y),theta=math.atan2(y,x),ref=true}
-                end)
-            end
-            local n2=1
-            for side=-1,1,2 do
-                for j=-n2,n2 do
-                    local bullet=Bullet{kinematicState={pos=copyTable(pos),dir=dir-math.pi/2,speed=0},sprite=BulletSprites.round.blue,size=1,lifeFrame=9999,extraUpdate={Action.ZoomIn(30)}}
-                    DanmakuFuncs.orbitBind(bullet,sentryi,function (self, centerObj)
-                        local x=portalWidth*j/n2
-                        local y=side*portalLength*portalRatio*(1+1/n1)
-                        return {r=math.sqrt(x*x+y*y),theta=math.atan2(y,x),ref=true}
-                    end)
-                end
-            end
-            local getPoses=function()
-                local angle=sentryi.kinematicState.dir
-                local front=geo:rThetaGoRef(sentryi.kinematicState.pos,portalWidth,angle)
-                local posa,posb=Portal.segment(front,angle,portalLength*portalRatio)
-                return posa,posb
-            end
-            local posa,posb=getPoses()
-            local portal=Portal(posa,posb,1,{range=portalWidth,draw=draw,extraUpdate={function (self)
-                if sentryi.removed then
-                    self:remove()
-                end
-                local posa,posb=getPoses()
-                self:set(posa,posb)
-            end}})
+            local portal=sentryi.any.portal
             portal:link(housePortals[i])
             table.insert(freePortals, portal)
         end

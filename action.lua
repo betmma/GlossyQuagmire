@@ -144,7 +144,8 @@ end
 local trail=function(self,params)
     local lifeFrame=params.lifeFrame or 30
     local period=params.period or 2
-    if self.frame%period==0 then
+    local minimumSpeed=params.minimumSpeed or 0
+    if self.frame%period==0 and self.kinematicState.speed >= minimumSpeed then
         Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,invincible=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
     end
 end
@@ -152,8 +153,41 @@ end
 --- leave a fading and shrinking trail behind.
 --- @param lifeFrame integer|nil number of frames for the trail bullets to fade out and shrink, default 30
 --- @param period integer|nil how many frames between each trail bullet, default 2
-Action.Trail=function(lifeFrame,period)
-    return {isAction=true,params={lifeFrame=lifeFrame,period=period},func=trail}
+--- @param minimumSpeed number|nil minimum speed for the trail bullets, default 0. if bullet speed is below this, no trail bullet will be created.
+Action.Trail=function(lifeFrame,period,minimumSpeed)
+    return {isAction=true,params={lifeFrame=lifeFrame,period=period,minimumSpeed=minimumSpeed},func=trail}
+end
+
+local aimAt=function(self,params)
+    if self.aimCompleted then
+        return
+    end
+    local aim=params.aim
+    local moveSpeedRatio=params.moveSpeedRatio or 1.5
+    local moveLerp=params.moveLerp or 0.05
+    local rotateSpeed=params.rotateSpeed or 0.1
+    local geo=G.runInfo.geometry
+    local dir=self.kinematicState.dir
+    local to=math.modClamp(geo:to(self.kinematicState.pos,aim),dir)
+    local dist=geo:distance(self.kinematicState.pos,aim)
+    if dist<2 then
+        self.kinematicState.pos=copyTable(aim)
+        self.kinematicState.speed=0
+        self.aimCompleted=true
+        return
+    end
+    self.kinematicState.dir=math.clamp(to,dir-rotateSpeed,dir+rotateSpeed)
+    self.kinematicState.speed=math.lerp(self.kinematicState.speed,dist*moveSpeedRatio,moveLerp)
+end
+
+---let it aim at a position. generally used for building a static shape like wall or a circle. will disable once arrived at the position.
+---@param aim Position
+---@param moveSpeedRatio? number the moving speed is [distance to aim]*[moveSpeedRatio], default 1.5
+---@param moveLerp? number the moving speed is lerped to the target speed with this ratio, default 0.05
+---@param rotateSpeed? number the rotation speed is clamped to this value, default 0.1
+---@return Action
+Action.AimAt=function(aim,moveSpeedRatio,moveLerp,rotateSpeed)
+    return {isAction=true,params={aim=aim,moveSpeedRatio=moveSpeedRatio,moveLerp=moveLerp,rotateSpeed=rotateSpeed},func=aimAt}
 end
 
 local actionPack=function(self,params)

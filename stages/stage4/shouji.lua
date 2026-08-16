@@ -110,6 +110,7 @@ local boss=BossManager.BossSegment{
     end,
     rounds={
         BossManager.BossRound{phases={
+            require('stages.stage4.spellcards.fear'),
             require('stages.stage4.spellcards.life'),
             require('stages.stage4.spellcards.scenery'),
             require('stages.stage4.spellcards.death'),
