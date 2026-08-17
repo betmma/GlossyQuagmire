@@ -2,7 +2,7 @@ local BackgroundPattern=...
 
 -- love2d draws a white rectangle then shader draws pattern.
 local Shader=BackgroundPattern:extend()
----@class ShaderBackground
+---@class ShaderBackground:BackgroundPattern
 ---@class love.Shader
 ---@class ShaderBackgroundArgs
 ---@field shader love.Shader the shader to use for drawing the background

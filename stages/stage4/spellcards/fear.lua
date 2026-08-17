@@ -77,7 +77,7 @@ return BossManager.SpellcardPhase{
             elseif geo:distanceRef(posj,boss.kinematicState.pos)<100 then
                 return
             end
-            local bullet=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),dir=math.eval(posd,1),speed=280},sprite=BulletSprites.scale.gray,size=0.4,lifeFrame=9999,extraUpdate={Action.AimAt(posj),Action.FadeOut(20,true),update},highlight=false,invincible=true,safe=true,spriteTransparency=0.3,spriteColor=color}
+            local bullet=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),dir=math.eval(posd,1),speed=280},sprite=BulletSprites.scale.gray,size=0.8,lifeFrame=9999,extraUpdate={Action.AimAt(posj),Action.FadeOut(20,true),update},highlight=false,invincible=true,safe=true,spriteTransparency=0.3,spriteColor=color}
             bullet.any={i=i,j=j}
         end
         for i=-halfN,halfN do
