@@ -116,24 +116,6 @@ end
 
 -- player can escape two portals forming an angle by moving towards the vertex, due to the point on exterior angle bisector does not fall into either portal's teleportation range. the fix is to extend portals past the vertex.
 
---[[
-idea:
-||, enemy at top, shooting giants downwards. portals at side are not aligned, so player moves aside and goes through the gap
-——
---, two half width portals at bottom connects to the full width portal at top. then bullet wall moving downwards
-
-injure gate: a moving portal on a moving danmaku train connected to a stationary portal. when viewed from the stationary side, the other side seems to be stationary, but player need to run along when teleporting
-
-life gate: green house shaped portals 红杏出墙
-/\
-||
-
--_-_
-_-_- bullet wall moving downwards, gaps appear
-
-infinite zooming portals: scenery gate
-]]
-
 local portalR=350
 local outerPortals={}
 local basePos

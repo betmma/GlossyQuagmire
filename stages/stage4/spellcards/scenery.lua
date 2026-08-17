@@ -67,7 +67,7 @@ return BossManager.SpellcardPhase{
         portals[2]:link(portals[4])
         -- spawn the fairy
         local fairyPos=geo:rThetaGo(posp,35,math.pi/3)
-        local warning=Bullet{kinematicState={pos=fairyPos,dir=0,speed=0},sprite=BulletSprites.giant.white,lifeFrame=120,invincible=true,safe=true,size=1,extraUpdate={Action.ZoomIn(30,0.5,2),Action.FadeIn(30,false),Action.FadeOut(30,false)},spriteColor={1,0,0,0.9},highlight=true}
+        local warning=Bullet{kinematicState={pos=fairyPos,dir=0,speed=0},sprite=BulletSprites.giant.white,lifeFrame=120,invincible=true,safe=true,size=1,extraUpdate={Action.ZoomIn(30,0.5,2),Action.FadeIn(30,false),Action.FadeOut(30,false)},spriteColor={1,0,0,0.9},highlight=false}
         wait(90)
         local bulletSpawner
         if DIFF()<=G.NORMAL then -- rope

@@ -294,6 +294,21 @@ return {
                     zh_cn = '惊门「批逆龙鳞」',
                 }
             },
+        },
+        ['shouji-rest'] = {
+            EASY = {
+                name = {
+                    en_us = 'Rest Gate "Water Ripples"',
+                    zh_cn = '休门「水波纹」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Rest Gate "Black Turtle-Snake Pattern"',
+                    zh_cn = '休门「玄武纹」',
+                }
+            }
         }
     },
     levelData = {
