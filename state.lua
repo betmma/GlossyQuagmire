@@ -635,6 +635,12 @@ G.update=function(self,dt)
         if isPressed('f9') then
             SKIP_MODE=not SKIP_MODE
         end
+        if self.frame%60==0 then
+            if R_THETA_GO_WRONG_COUNT_LAST==R_THETA_GO_WRONG_COUNT then -- the counter didn't increase for a second. consider it's normal now
+                R_THETA_GO_WRONG_COUNT=0
+            end
+            R_THETA_GO_WRONG_COUNT_LAST=R_THETA_GO_WRONG_COUNT
+        end
     end
     self.frame=self.frame+1
     self.currentUI=self.UIDEF[self.STATE]
@@ -692,13 +698,7 @@ G.draw=function(self)
             love.graphics.print("SKIP MODE ON", 0, 39)
         end
         if R_THETA_GO_WRONG_COUNT>60 then
-            love.graphics.print("R_THETA_GO_WRONG_COUNT: "..R_THETA_GO_WRONG_COUNT..". It's very likely that r and theta are flipped.", 0, 52)
-            if self.frame%60==0 then
-                if R_THETA_GO_WRONG_COUNT_LAST==R_THETA_GO_WRONG_COUNT then -- the counter didn't increase for a second. consider it's normal now
-                    R_THETA_GO_WRONG_COUNT=0
-                end
-                R_THETA_GO_WRONG_COUNT_LAST=R_THETA_GO_WRONG_COUNT
-            end
+            -- love.graphics.print("R_THETA_GO_WRONG_COUNT: "..R_THETA_GO_WRONG_COUNT..". It's very likely that r and theta are flipped.", 0, 52)
         end
     end
     shove.endLayer()

@@ -309,6 +309,21 @@ return {
                     zh_cn = '休门「玄武纹」',
                 }
             }
+        },
+        ['shouji-open'] = {
+            EASY = {
+                name = {
+                    en_us = 'Open Gate "Nested Boxes of Gold and Silver"',
+                    zh_cn = '开门「嵌套的金银箱」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Open Gate "Duplex Barrier of Sun and Moon"',
+                    zh_cn = '开门「日月二重结界」',
+                }
+            }
         }
     },
     levelData = {

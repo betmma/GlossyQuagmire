@@ -131,6 +131,9 @@ function DanmakuFuncs.PortalOnSentry(pos,dir,length,width,reverse,zoomInTime,por
     sentry.kinematicState.skipPortal=true
     sentry.kinematicState.dir=dir
     sentry.any={length=length,width=width,ratio=0.1}
+    if portalArgs and portalArgs.lifeFrame then
+        sentry.lifeFrame=portalArgs.lifeFrame
+    end
     if zoomInTime then
         Event.EaseEvent{obj=sentry,easeObj=sentry.any,aims={ratio=1},duration=zoomInTime}
         if portalArgs and portalArgs.lifeFrame then
