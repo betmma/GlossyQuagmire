@@ -693,6 +693,12 @@ G.draw=function(self)
         end
         if R_THETA_GO_WRONG_COUNT>60 then
             love.graphics.print("R_THETA_GO_WRONG_COUNT: "..R_THETA_GO_WRONG_COUNT..". It's very likely that r and theta are flipped.", 0, 52)
+            if self.frame%60==0 then
+                if R_THETA_GO_WRONG_COUNT_LAST==R_THETA_GO_WRONG_COUNT then -- the counter didn't increase for a second. consider it's normal now
+                    R_THETA_GO_WRONG_COUNT=0
+                end
+                R_THETA_GO_WRONG_COUNT_LAST=R_THETA_GO_WRONG_COUNT
+            end
         end
     end
     shove.endLayer()

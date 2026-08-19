@@ -93,7 +93,7 @@ return BossManager.SpellcardPhase{
             local ds={-250,-150,150,250}
             local pos,dir=geo:rThetaGoRef(pos1,ds[i],dir1+math.pi/2)
             dir=dir-math.pi/2
-            local sentryi=DanmakuFuncs.PortalOnSentry(pos,dir,portalLength,portalWidth,false,30,{draw=draw},{sprite=BulletSprites.round.blue,size=1,lifeFrame=9999,extraUpdate={Action.ZoomIn(30)}},20)
+            local sentryi=DanmakuFuncs.PortalOnSentry(pos,dir,portalLength,portalWidth,false,30,{draw=draw},{sprite=BulletSprites.round.blue,size=1,lifeFrame=9999,invincible=true,extraUpdate={Action.ZoomIn(30)}},20)
             freePortalSentries[i]=sentryi
             local portal=sentryi.any.portal
             portal:link(housePortals[i])

@@ -379,6 +379,15 @@ return {
                 en_us = 'Colorful Doppelganger',
                 zh_cn = '多彩的分身',
             }
+        },
+        shouji = {
+            name = {
+                en_us = 'Shouji Yaeme',
+                zh_cn = '八重目障子'
+            },
+            nickname = {
+                en_us = ''
+            }
         }
     },
     ui = {

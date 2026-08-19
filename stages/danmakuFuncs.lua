@@ -118,7 +118,7 @@ end
 ---@param reverse boolean whether to flip portal vertices. false maps to sign=1, true maps to sign=-1. though, posIn is always at the direction of dir.
 ---@param zoomInTime integer|nil
 ---@param portalArgs PortalArgs|nil will auto set range and add an extraUpdate that removes the portal when sentry is removed
----@param backBulletArgs BulletArgs|nil
+---@param backBulletArgs BulletArgs|nil invincible defaults to true.
 ---@param backBulletGap number|nil the gap between back bullets. default 10
 ---@return PortalSentry
 function DanmakuFuncs.PortalOnSentry(pos,dir,length,width,reverse,zoomInTime,portalArgs,backBulletArgs,backBulletGap)
@@ -169,6 +169,9 @@ function DanmakuFuncs.PortalOnSentry(pos,dir,length,width,reverse,zoomInTime,por
     portal.any={sentry=sentry}
     sentry.any.portal=portal
     if backBulletArgs then
+        if not backBulletArgs.invincible then
+            backBulletArgs.invincible=true
+        end
         local gap=backBulletGap or 10
         local lengthN=math.ceil(length/gap)
         for j=-lengthN,lengthN do

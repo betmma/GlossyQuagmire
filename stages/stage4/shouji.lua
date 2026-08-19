@@ -42,7 +42,8 @@ local midboss=BossManager.BossSegment{
                     end
                     local function slash(pos1,pos2,releaseFrame,color,side)
                         local dist=geo:distanceRef(pos1,pos2)
-                        local step=15
+                        local step=8
+                        local remainingRatio=DSWITCH{5,4,3,2}
                         local n=math.floor(dist/step)
                         local dir0=geo:toRef(pos1,pos2)
                         for i=1,n do
@@ -51,6 +52,9 @@ local midboss=BossManager.BossSegment{
                             local size=Event.sineBackProgressFunc(progress)+0.5
                             local deltadir=progress*0.3+math.ceil(progress*4)*0.1
                             local bullet=Bullet{kinematicState={pos=pos,dir=dir+side*deltadir,speed=0},sprite=BulletSprites.round[color],size=size,lifeFrame=540,extraUpdate={Action.ZoomIn(math.ceil(i/n*10)),Action.FadeIn(20,false),Action.FadeOut(20,true),releaseUpdate},highlight=true,safe=true}
+                            if i%remainingRatio~=0 then
+                                bullet.lifeFrame=120
+                            end
                             bullet.release=releaseFrame
                         end
                     end

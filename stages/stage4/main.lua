@@ -541,7 +541,7 @@ return{
                 outerPortals[2]:link(outerPortals[3])
             end,
             func=function() -- 15s
-            wait(999999)
+            -- wait(999999)
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
                 local pos=G.runInfo.player.kinematicState.pos
@@ -558,7 +558,9 @@ return{
                 local bulletNumber=DSWITCH{4,6,8,12}
                 for i=-(n-1),n do
                     local pos2,dir2=geo:rThetaGo(pos1,-40*i+20,dir1-math.pi/2)
-                    local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=150},maxhp=200,sprite=Asset.fairySprites.medium.blue,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=0},maxhp=200,sprite=Asset.fairySprites.medium.blue,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint,function (self)
+                        self.kinematicState.speed=math.lerp(self.kinematicState.speed,150,0.04)
+                    end},dropItems={powerSmall=3,point=3}}
                     fairy:addHPProtection(120,5)
                     local BulletSpawner=BulletSpawner{useRelativeAngle=true,period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=250,bulletNumber=bulletNumber,angle=dir2+math.pi/2,range=math.pi*bulletNumber,bulletSprite=BulletSprites.scale.blue,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
                         cir.index=self.spawnTimes
