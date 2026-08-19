@@ -278,4 +278,6 @@ BackgroundPattern.Planes=love.filesystem.load("backgrounds/planes.lua")(WalkerSh
 
 BackgroundPattern.Corridor=love.filesystem.load("backgrounds/corridor.lua")(WalkerShader)
 
+BackgroundPattern.Stage4Rooms=love.filesystem.load("backgrounds/stage4Rooms.lua")(WalkerShader)
+
 return BackgroundPattern

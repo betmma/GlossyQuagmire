@@ -164,6 +164,8 @@ local shouji=require"stages.stage4.shouji"
 return{
     init=function()
         outerPortals={}
+        G:replaceBackgroundPatternIfNot(BackgroundPattern.Stage4Rooms)
+        G.backgroundPattern:setRoomChanges(0,1)
         if G.runInfo.geometry==G.geometries.Euclidean then
             injectGeometry()
             local base=G.runInfo.geometry:init()
@@ -179,6 +181,9 @@ return{
         {
             key='4-1',
             type='midStage',
+            init=function()
+                G.backgroundPattern:setRoomChanges(0,1)
+            end,
             func=function() -- 20s. midboss should appear at 52.2s
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
@@ -226,6 +231,9 @@ return{
         {
             key='4-2',
             type='midStage',
+            init=function()
+                G.backgroundPattern:setRoomChanges(math.pi/12,1)
+            end,
             func=function() -- 19.15s
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
@@ -333,6 +341,9 @@ return{
         {
             key='4-3',
             type='midStage',
+            init=function()
+                G.backgroundPattern:setRoomChanges(math.pi/12,4)
+            end,
             func=function() -- 12.05s
                 -- BGM.data[BGM.currentAudio]:seek(39.15,'seconds')
                 local geo=G.runInfo.geometry
@@ -521,6 +532,8 @@ return{
             key='4-4',
             type='midStage',
             init=function()
+                G.backgroundPattern:setRoomChanges(math.pi/12,4)
+                G.backgroundPattern:setProjectionMode(true)
                 local pos=G.runInfo.player.kinematicState.pos
                 portalR=200
                 setOuterPortals(pos)
@@ -528,6 +541,7 @@ return{
                 outerPortals[2]:link(outerPortals[3])
             end,
             func=function() -- 15s
+            wait(999999)
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
                 local pos=G.runInfo.player.kinematicState.pos
