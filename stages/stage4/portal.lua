@@ -30,9 +30,15 @@ Portal.range=20
 Portal.zoomC=30
 Portal.MAX_SEGMENTS=16
 Portal.shader=ShaderScan:load_shader('shaders/effects/euclideanPortal.glsl')
-local CANVAS_WIDTH, CANVAS_HEIGHT = 2200, 1800
+local CANVAS_WIDTH, CANVAS_HEIGHT = 1500, 1800
 -- larger than the original 800x600 canvas to record more data for the pixel shader, centered at geometry.viewConfig.screenCenter
 Portal.canvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
+Portal.canvasOffset={x=0,y=0} -- can be used to toggle canvas's position. it won't change where player will be drawn. for example, if there's an extra area to the right and portal connects here, it will be good to set ex a negative number to slide canvas rightward, so the extra area stays on the canvas.
+
+local function getCanvasOffset()
+    local geo=G.runInfo.geometry
+    return geo.viewConfig.offset.x+Portal.canvasOffset.x,geo.viewConfig.offset.y+Portal.canvasOffset.y
+end
 
 ---Enable the Euclidean portal post-process on a geometry instance. This is
 ---done when the first portal is constructed so stage setup does not have to
@@ -46,7 +52,8 @@ function Portal.enableShader(geo)
     -- add the offset translation to vertex shader
     local applyVertexShaderRef=geo.applyVertexShader
     geo.applyVertexShader=function(self,viewer)
-        love.graphics.translate(geo.viewConfig.offset.x,geo.viewConfig.offset.y)
+        local x,y=getCanvasOffset()
+        love.graphics.translate(x,y)
         applyVertexShaderRef(self,viewer)
     end
     geo.hasPixelShader=true
@@ -73,7 +80,6 @@ function Portal:new(pos1,pos2,posInOrSign,args)
     self.extraUpdate=args.extraUpdate or {}
     Action.init(self, self.extraUpdate)
     self:set(pos1,pos2,posInOrSign)
-    Portal.enableShader(G.runInfo.geometry)
 end
 
 function Portal:update(dt)
@@ -257,6 +263,10 @@ function Portal.applyPixelShader(geo,viewer)
     shader:send('screenCenter',{center.x,center.y})
     shader:send('numSegments',numSegments)
 
+    local x,y=getCanvasOffset()
+    shader:send('offset',{x,y})
+    shader:send('canvas_size',{CANVAS_WIDTH,CANVAS_HEIGHT})
+
     if numSegments==0 then
         return
     end
@@ -281,7 +291,4 @@ function Portal.applyPixelShader(geo,viewer)
     shader:send('signs',unpack(signs))
     shader:send('linkeds',unpack(linkeds))
     shader:send('ranges',unpack(ranges))
-
-    shader:send('offset',{geo.viewConfig.offset.x,geo.viewConfig.offset.y})
-    shader:send('canvas_size',{CANVAS_WIDTH,CANVAS_HEIGHT})
 end

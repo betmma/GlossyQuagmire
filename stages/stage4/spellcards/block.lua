@@ -1,6 +1,6 @@
 ---@return SpellcardPhase
 return BossManager.SpellcardPhase{
-    key='shouji-open',
+    key='shouji-block',
     bonusScore=25000,
     time=1800,
     isTimeout=true,
@@ -27,6 +27,7 @@ return BossManager.SpellcardPhase{
         boss.safe=true
         Event{obj=boss,action=function ()
             wait(1800)
+            Portal.canvasOffset.x=0
             Event.EaseEvent{obj=boss,aims={spriteTransparency=1},duration=60}
             wait(60)
             boss.safe=false
@@ -62,6 +63,8 @@ return BossManager.SpellcardPhase{
         if DIFF()<=G.NORMAL then -- shrinking=false is more difficult as player is teleported at the moment of open, and has very limited view of the current side. but by adding shockwave to clear bullets for a while it should be fine for easy and normal
             shrinking=false
         end
+        local canvasOffsetValue=500
+        Portal.canvasOffset.x=-canvasOffsetValue
         local function open()
             local portals={}
             local pos0=copyTable(player.kinematicState.pos)
@@ -85,10 +88,12 @@ return BossManager.SpellcardPhase{
                 angle=math.mod2Sign(sideRef)*Event.sineIOProgressFunc(progress)*math.pi
                 if times+1==t and shrinking then
                     player.kinematicState.pos=posWrap(player.kinematicState.pos,1-sideRef)
+                    Portal.canvasOffset.x=canvasOffsetValue*math.mod2Sign(sideRef)
                 end
             end}
             if not shrinking then -- teleport now, switch side
                 player.kinematicState.pos=posWrap(pos0,1-sideRef)
+                Portal.canvasOffset.x=canvasOffsetValue*math.mod2Sign(sideRef)
                 player.invincibleFrame=player.invincibleFrame+20
                 Effect.Shockwave{kinematicState={pos=posWrap(pos0,1-sideRef),dir=0,speed=0,skipPortal=true},lifeFrame=60,radius=3,growSpeed=0,spriteTransparency=1,color=sideRef==0 and 'gray' or 'yellow',canRemove={bullet=true}}:bindState(player)
             end

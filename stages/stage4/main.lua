@@ -112,6 +112,7 @@ local function injectGeometry()
             self.rThetaTo=rThetaToRef
         end
     end
+    Portal.enableShader(geo)
 end
 
 -- player can escape two portals forming an angle by moving towards the vertex, due to the point on exterior angle bisector does not fall into either portal's teleportation range. the fix is to extend portals past the vertex.

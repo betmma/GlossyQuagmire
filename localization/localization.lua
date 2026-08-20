@@ -310,18 +310,18 @@ return {
                 }
             }
         },
-        ['shouji-open'] = {
+        ['shouji-block'] = {
             EASY = {
                 name = {
-                    en_us = 'Open Gate "Nested Boxes of Gold and Silver"',
-                    zh_cn = '开门「嵌套的金银箱」'
+                    en_us = 'Block Gate "Puzzle Boxes of Buxus and Silver Birch"',
+                    zh_cn = '杜门「黄杨与白桦的机关盒」'
                 }
             },
             NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
-                    en_us = 'Open Gate "Duplex Barrier of Sun and Moon"',
-                    zh_cn = '开门「日月二重结界」',
+                    en_us = 'Block Gate "Duplex Barrier of Sun and Moon"',
+                    zh_cn = '杜门「日月韬光二重结界」',
                 }
             }
         }

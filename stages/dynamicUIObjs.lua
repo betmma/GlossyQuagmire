@@ -197,26 +197,46 @@ function makeDynamicUIObjs()
 
     local spellcardNameText=spellcardInfoMoveUp:child(DynamicText{
         text='',fontSize=20,color={1,1,1,1},autoSize=true,
-        x=0,y=0,align='right',toggleX=true,transparency=0
-    })
-
-    local spellcardLineBelowName=spellcardNameText:child(UI.Panel{
-        x=-50,y=25,width=100,height=1,edgeColor={0.8,0.8,1,1},fillColor={0.8,0.8,1,1},transparency=0.3,
-        extraUpdates={function(self)
-            self.width=spellcardNameText.width+50
+        x=0,y=0,align='right',toggleX=true,transparency=0,extraUpdates={function(self)
+            local updateWidth=false
+            if self.width>350 then
+                self.fontSize=math.floor(self.fontSize*350/self.width)
+                updateWidth=true
+            elseif self.width<300 and self.fontSize<20 then
+                self.fontSize=20
+                updateWidth=true
+            end
+            if updateWidth then
+                self:setText(self.text)
+            end
         end}
     })
 
-    local spellcardBonusHistoryText=spellcardInfoMoveUp:child(DynamicText{
+    -- dynamically change y based on name text height
+    local spellcardInfoBelowNameText=spellcardNameText:child(UI.Base{
+        extraUpdates={function(self)
+            self.x=spellcardNameText.width
+            self.y=spellcardNameText.height
+        end}})
+
+    local spellcardLineBelowName=spellcardInfoBelowNameText:child(UI.Panel{
+        x=0,y=0,width=100,height=1,edgeColor={0.8,0.8,1,1},fillColor={0.8,0.8,1,1},transparency=0.3,
+        extraUpdates={function(self)
+            self.width=spellcardNameText.width+50
+            self.x=-self.width
+        end}
+    })
+
+    local spellcardBonusHistoryText=spellcardInfoBelowNameText:child(DynamicText{
         text='',fontSize=14,color={1,1,1,1},autoSize=true,
         x=30,y=30,align='right',toggleX=true,transparency=0,
         extraUpdates={
             strategy(
                 function(self, centerXY, radius)
-                    self.x,self.y=30,30
+                    self.x,self.y=30,5
                 end,
                 function(self, xywh)
-                    self.x,self.y=0,30
+                    self.x,self.y=0,5
                 end
             )}
     })
