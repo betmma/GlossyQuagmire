@@ -128,15 +128,16 @@ local appearingHint=function(self,params)
     end
     self.appearingHintexecuted=true
     local size=params.size or self.size*2
-    local duration=params.duration or 10
+    local duration=params.duration or 20
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
     local shockwaveColor=Asset.spectrum1MapSpectrum2[spriteColor] or 'gray'
     Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=size,growSpeed=-size/duration,animationFrame=duration,spriteTransparency=0.8}
+    Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=size*0.5,growSpeed=-size*0.5/duration,animationFrame=duration,spriteTransparency=1}
 end
 
 --- a shrinking shockwave to hint something appears.
 --- @param size number|nil size of the hint, default self.size*2
---- @param duration integer|nil number of frames for the hint animation, default 10
+--- @param duration integer|nil number of frames for the hint animation, default 20
 Action.AppearingHint=function(size,duration)
     return {isAction=true,params={size=size,duration=duration},func=appearingHint}
 end

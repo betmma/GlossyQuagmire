@@ -7,6 +7,9 @@ return BossManager.SpellcardPhase{
     hp=4000,
     dropItems={powerSmall=15,point=15},
     func=function(self, boss)
+        if DIFF()>=G.HARD then -- 10 seconds longer for hard and lunatic
+            self.remainingFrames=self.remainingFrames+600
+        end
         boss.showHexagram=false
         local geo=G.runInfo.geometry
         ---@cast geo PortalGeometryBase
@@ -174,7 +177,7 @@ return BossManager.SpellcardPhase{
                 end}}
                 warningArrow:bindState(orb)
                 Event{obj=orb,action=function ()
-                    for i=1,5 do
+                    for i=1,7 do
                         SFX:play('enemyPowerfulShot')
                         flagRemove=true
                         for t=1,40 do
@@ -185,6 +188,9 @@ return BossManager.SpellcardPhase{
                         wait(20)
                         flagRemove=false
                         wait(160)
+                        if i>=5 then
+                            wait((i-4)*40)
+                        end
                     end
                 end}
             end

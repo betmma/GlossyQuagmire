@@ -62,7 +62,7 @@ return BossManager.SpellcardPhase{
         local rows=DSWITCH{1,2,2,3}
         local columns=DSWITCH{64,32,48,48}
         local sprite=DIFF()<=G.HARD and 'round' or 'roundDark'
-        local spawner=BulletSpawner{lifeFrame=9999,bulletSprite=BulletSprites[sprite].cyan,bulletSpeed=columns*5/2,bulletNumber=columns*rows,bulletLifeFrame=600,period=480,firstPeriod=60,angle='player',range=0,bulletExtraUpdate={Action.FadeOut(30,true),Action.ZoomOut(30)},bulletEvents={function(cir,args,self)
+        local spawner=BulletSpawner{lifeFrame=9999,bulletSprite=BulletSprites[sprite].cyan,bulletSpeed=columns*4/2,bulletNumber=columns*rows,bulletLifeFrame=600,period=480,firstPeriod=60,angle='player',range=0,bulletExtraUpdate={Action.FadeOut(30,true),Action.ZoomOut(30)},bulletEvents={function(cir,args,self)
             if self.spawnTimes%2==0 then
                 cir:changeSpriteColor('blue')
             end
@@ -72,7 +72,7 @@ return BossManager.SpellcardPhase{
             end
             local row,col=index%rows,math.ceil(index/rows)
             cir.kinematicState.pos=geo:rThetaGo(cir.kinematicState.pos,40*(row-rows/2+0.5),cir.kinematicState.dir+math.pi/2)
-            cir.kinematicState.speed=cir.kinematicState.speed-col*5
+            cir.kinematicState.speed=cir.kinematicState.speed-col*4
         end}}
         spawner:bindState(boss)
         Event.LoopEvent{obj=mainSentry,period=480,firstPeriod=1,executeFunc=function(self,times)

@@ -19,8 +19,10 @@ return BossManager.SpellcardPhase{
         Event.EaseEvent{obj=boss,aims={spriteTransparency=0},duration=30}
         wait(30)
         G.runInfo.player.immobileFrame=30
+        G.runInfo.player.viewDirection=math.modClamp(G.runInfo.player.viewDirection)
         Event.EaseEvent{obj=G.runInfo.player,aims={viewDirection=0},duration=30,progressFunc=Event.sineIOProgressFunc}
         wait(30)
+        G.runInfo.player.viewDirection=0
         local dir0=G.runInfo.player.viewDirection
         boss.safe=true
         Event{obj=boss,action=function ()

@@ -2,8 +2,8 @@
 return BossManager.SpellcardPhase{
     key='shouji-death',
     bonusScore=25000,
-    time=1920,
-    hp=2000,
+    time=2880,
+    hp=3000,
     dropItems={powerSmall=15,point=15},
     func=function(self, boss)
         boss.showHexagram=false

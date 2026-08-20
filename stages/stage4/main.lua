@@ -548,7 +548,7 @@ return{
                 local pos1,dir1=geo:rThetaGo(pos,50,-math.pi/2)
                 local pos2,dir2=geo:rThetaGo(pos1,-350,dir1-math.pi/2)
                 local extraUpdate=function(self)
-                    local aimSpeed=250
+                    local aimSpeed=150
                     if self.frame+60>self.lifeFrame then
                         aimSpeed=0
                     end
@@ -562,7 +562,7 @@ return{
                         self.kinematicState.speed=math.lerp(self.kinematicState.speed,150,0.04)
                     end},dropItems={powerSmall=3,point=3}}
                     fairy:addHPProtection(120,5)
-                    local BulletSpawner=BulletSpawner{useRelativeAngle=true,period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=250,bulletNumber=bulletNumber,angle=dir2+math.pi/2,range=math.pi*bulletNumber,bulletSprite=BulletSprites.scale.blue,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
+                    local BulletSpawner=BulletSpawner{useRelativeAngle=true,period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=250,bulletNumber=bulletNumber,angle=dir2+math.pi/2,range=math.pi*bulletNumber,bulletSprite=BulletSprites.scale.blue,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomOut(30),Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
                         cir.index=self.spawnTimes
                         cir.kinematicState.speed=cir.kinematicState.speed-args.index*20
                         -- cir.kinematicState.dir=cir.kinematicState.dir+(math.abs(cir.index%10-5))*0.01
@@ -584,9 +584,8 @@ return{
                     local pos2,dir2=geo:rThetaGo(pos1,-40*i+20,dir1-math.pi/2)
                     local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2+math.pi/2,speed=150},maxhp=200,sprite=Asset.fairySprites.medium.orange,lifeFrame=500,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
                     fairy:addHPProtection(120,5)
-                    local BulletSpawner=BulletSpawner{period=72,firstPeriod=90,lifeFrame=430,bulletSpeed=50,bulletNumber=bulletNumber,angle='player',range=math.pi*bulletNumber,bulletSprite=BulletSprites.scale.yellow,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
+                    local BulletSpawner=BulletSpawner{period=96,firstPeriod=90,lifeFrame=430,bulletSpeed=50,bulletNumber=bulletNumber,angle='player',range=math.pi*bulletNumber,bulletSprite=BulletSprites.flame.red,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true),extraUpdate},highlight=true,bulletEvents={function(cir,args,self)
                         cir.index=self.spawnTimes
-                        cir:changeSpriteColor('red')
                         cir.kinematicState.speed=cir.kinematicState.speed-args.index*20
                         cir.kinematicState.dir=cir.kinematicState.dir+math.pi/2
                     end}}
@@ -612,8 +611,10 @@ return{
                         self.kinematicState.speed=math.lerp(self.kinematicState.speed,0,0.05)
                     end
                 end
+                local count=0
                 local function stretch(pos)
-                    BulletSpawner{kinematicState={pos=copyTable(pos),speed=0,dir=0},period=999,firstPeriod=1,lifeFrame=2,bulletSpeed=30,bulletNumber=100,angle='player',range=math.pi*2,bulletSprite=BulletSprites.bullet.green,bulletLifeFrame=240,bulletExtraUpdate={Action.FadeOut(20,true),extraUpdate}}
+                    count=count+1
+                    BulletSpawner{kinematicState={pos=copyTable(pos),speed=0,dir=0},period=999,firstPeriod=1,lifeFrame=2,bulletSpeed=count*10-50,bulletNumber=100,angle='player',range=math.pi*2,bulletSprite=BulletSprites.bullet.green,bulletLifeFrame=240,bulletExtraUpdate={Action.FadeOut(20,true),extraUpdate}}
                 end
                 local time=720
                 local function spawnFairy(pos)
