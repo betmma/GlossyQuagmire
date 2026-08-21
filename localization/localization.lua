@@ -313,7 +313,7 @@ return {
         ['shouji-block'] = {
             EASY = {
                 name = {
-                    en_us = 'Block Gate "Puzzle Boxes of Buxus and Silver Birch"',
+                    en_us = 'Block Gate "Puzzle Boxes of Boxwood and Silver Birch"',
                     zh_cn = '杜门「黄杨与白桦的机关盒」'
                 }
             },
@@ -322,6 +322,14 @@ return {
                 name = {
                     en_us = 'Block Gate "Duplex Barrier of Sun and Moon"',
                     zh_cn = '杜门「日月韬光二重结界」',
+                }
+            }
+        },
+        ['shouji-injury'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Injury Gate "Intergalactic War"',
+                    zh_cn = '伤门「星系际大战」'
                 }
             }
         }

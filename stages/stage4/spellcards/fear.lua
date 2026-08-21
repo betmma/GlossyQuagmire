@@ -59,6 +59,7 @@ return BossManager.SpellcardPhase{
             self.lastPos=copyTable(self.kinematicState.pos)
         end
         spawnIJ=function(i,j)
+            -- if you observe a bullet rotating around at a point and cannot reach the target, it's because target point is out of reach (only using rThetaGoRef)
             local posi,diri=geo:rThetaGoRef(centerPos,i*gap,centerDir)
             local posj,dirj=geo:rThetaGoRef(posi,j*gap,diri+math.pi/2)
             local color={1,1,1,1}
@@ -74,7 +75,7 @@ return BossManager.SpellcardPhase{
                     strength=-0.6
                 end
                 color={0.7+strength*shade,0.7+strength*shade,0.7+strength*shade,1}
-            elseif geo:distanceRef(posj,boss.kinematicState.pos)<100 then
+            elseif geo:distanceRef(posj,posb)<100 then
                 return
             end
             local bullet=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),dir=math.eval(posd,1),speed=280},sprite=BulletSprites.scale.gray,size=0.8,lifeFrame=9999,extraUpdate={Action.AimAt(posj),Action.FadeOut(20,true),update},highlight=false,invincible=true,safe=true,spriteTransparency=0.3,spriteColor=color}

@@ -125,7 +125,7 @@ local function outerPortalPoses(basePos)
     ---@cast geo PortalGeometryBase
     local poses={}
     for i=1,4 do
-        local posc,dirc=geo:rThetaGoRef(basePos,portalR,i*math.pi/2)
+        local posc,dirc=geo:rThetaGoRef(basePos,portalR,i*math.pi/2+G.runInfo.player.viewDirection)
         local pos1=geo:rThetaGoRef(posc,portalR*3,dirc+math.pi/2)
         local pos2=geo:rThetaGoRef(posc,portalR*3,dirc-math.pi/2)
         if i>2 then

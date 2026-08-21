@@ -30,7 +30,7 @@ Portal.range=20
 Portal.zoomC=30
 Portal.MAX_SEGMENTS=16
 Portal.shader=ShaderScan:load_shader('shaders/effects/euclideanPortal.glsl')
-local CANVAS_WIDTH, CANVAS_HEIGHT = 1500, 1800
+local CANVAS_WIDTH, CANVAS_HEIGHT = 1800, 1800
 -- larger than the original 800x600 canvas to record more data for the pixel shader, centered at geometry.viewConfig.screenCenter
 Portal.canvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 Portal.canvasOffset={x=0,y=0} -- can be used to toggle canvas's position. it won't change where player will be drawn. for example, if there's an extra area to the right and portal connects here, it will be good to set ex a negative number to slide canvas rightward, so the extra area stays on the canvas.
