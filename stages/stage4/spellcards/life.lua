@@ -43,7 +43,7 @@ return BossManager.SpellcardPhase{
                 local midPoints=DanmakuFuncs.midPoints(posa,posb,15)
                 for j=1,#midPoints-1 do
                     local posm=midPoints[j]
-                    Bullet{kinematicState={pos=copyTable(pos1),dir=math.eval(0,99),speed=100,skipPortal=true},sprite=BulletSprites.rim.yellow,size=1,lifeFrame=9999,extraUpdate={function (self)
+                    Bullet{kinematicState={pos=copyTable(pos1),dir=math.eval(0,99),speed=100,skipPortal=true},sprite=BulletSprites.rim.yellow,size=1,lifeFrame=9999,invincible=true,extraUpdate={function (self)
                         local dir=self.kinematicState.dir
                         local to=math.modClamp(geo:toRef(self.kinematicState.pos,posm),dir)
                         local dist=geo:distanceRef(self.kinematicState.pos,posm)
