@@ -65,13 +65,13 @@ return BossManager.SpellcardPhase{
             local down=dir0+math.pi/2
             local shortDir=down+tilt
             -- ellipse
-            local n=100
+            local n=DSWITCH{70,80,90,100}
             local range=math.pi*2
             local waitFrames=0
             for i=1,n do
                 local angle=range*(i/n-0.5)
                 local x,y=math.cos(angle),math.sin(angle)
-                x=x/5
+                x=x/DSWITCH{9,7,6,5}
                 local length,dir=math.xy2rTheta(x,y)
                 dir=dir+shortDir
                 local speed=length*250
@@ -95,7 +95,7 @@ return BossManager.SpellcardPhase{
         end
         local function sideAttack()
             SFX:play('enemyPowerfulShot')
-            local spawner=BulletSpawner{lifeFrame=4,period=9,firstPeriod=1,bulletNumber=100,bulletSpeed=100,bulletSprite=BulletSprites.bigStar.yellow,highlight=true,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(20,true),Action.ZoomIn(30),Action.FadeOut(20,true),function (self)
+            local spawner=BulletSpawner{lifeFrame=4,period=9,firstPeriod=1,bulletNumber=DSWITCH{50,60,80,100},bulletSpeed=DSWITCH{70,80,90,100},bulletSprite=BulletSprites.bigStar.yellow,highlight=true,bulletLifeFrame=DSWITCH{450,500,550,600},bulletExtraUpdate={Action.FadeIn(20,true),Action.ZoomIn(30),Action.FadeOut(20,true),function (self)
                 if self.frame>60 then
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,self.speed0,0.1)
                 end

@@ -332,6 +332,21 @@ return {
                     zh_cn = '伤门「星系际大战」'
                 }
             }
+        },
+        ['shouji-open'] = {
+            EASY = {
+                name = {
+                    en_us = 'Open Gate "Circular Heaven Light"',
+                    zh_cn = '开门「循环的天光」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Open Gate "Chained Eightfold Heaven Light"',
+                    zh_cn = '开门「连环八重天光」'
+                }
+            }
         }
     },
     levelData = {
