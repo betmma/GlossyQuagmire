@@ -256,6 +256,14 @@ return {
                 }
             },
         },
+        ['shouji-trick'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Trick "Through the Revolving Trapdoor"',
+                    zh_cn = '技法「机关门的背后」',
+                }
+            },
+        },
         ['shouji-life'] = {
             __default__ = {
                 name = {

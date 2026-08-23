@@ -146,14 +146,14 @@ end
 ---@param pos Position
 ---@return Position newPos
 ---@return number deltaAngle
----@return integer[]|nil teleportedPortal
+---@return integer[]|nil teleportedPortals
 function Portal.considerTeleport(pos)
     local deltaAngle=0
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
     local teleported=true
     local count=0
-    local teleportedPortal={}
+    local teleportedPortals={}
     while teleported and count<20 do
         count=count+1
         teleported=false
@@ -167,7 +167,7 @@ function Portal.considerTeleport(pos)
                 local distance, onSegment=geo:distanceRef(pos,nearest),math.angleDiff(geo:toRef(nearest,portal.pos1),geo:toRef(nearest,portal.pos2))>math.pi/2
                 if distance<portal.range and onSegment then
                     teleported=true
-                    teleportedPortal[#teleportedPortal+1] = i
+                    teleportedPortals[#teleportedPortals+1] = i
                     local nearest=geo:nearestToLine(pos,portal.pos1,portal.pos2)
                     local r=geo:distanceRef(nearest,pos)
                     local size=portal.size
@@ -186,7 +186,7 @@ function Portal.considerTeleport(pos)
             ::continue::
         end
     end
-    return pos,deltaAngle,#teleportedPortal>0 and teleportedPortal or nil
+    return pos,deltaAngle,#teleportedPortals>0 and teleportedPortals or nil
 end
 
 ---@return number smoothZoomFactor

@@ -156,7 +156,8 @@ local boss=BossManager.BossSegment{
                             local pos,dir=geo:rThetaGo(pos1,dist*progress,dir0+progress*side*0.1)
                             local size=Event.sineBackProgressFunc(progress)*1+0.5
                             local deltadir=progress*0.8-(progress*64)%1*0.3+0.5
-                            local bullet=Bullet{kinematicState={pos=pos,dir=dir+side*deltadir,speed=0},sprite=BulletSprites.round[color],size=size,lifeFrame=540,extraUpdate={Action.ZoomIn(math.ceil(i/n*10)),Action.FadeIn(20,false),Action.FadeOut(20,true),releaseUpdate},highlight=true,safe=true,spriteTransparency=0.3}
+                            dir=dir+side*deltadir
+                            local bullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.round[color],size=size,lifeFrame=540,extraUpdate={Action.ZoomIn(math.ceil(i/n*10)),Action.FadeIn(20,false),Action.FadeOut(20,true),releaseUpdate},highlight=true,safe=true,spriteTransparency=0.3}
                             if i%remainingRatio~=0 then
                                 bullet.lifeFrame=120
                             end
@@ -198,16 +199,17 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage4.spellcards.trick'),
         }},
         BossManager.BossRound{phases={
-            require('stages.stage4.spellcards.open'),
+            require('stages.stage4.spellcards.rest'),
+            require('stages.stage4.spellcards.life'),
             require('stages.stage4.spellcards.injury'),
             require('stages.stage4.spellcards.block'),
-            require('stages.stage4.spellcards.rest'),
-            require('stages.stage4.spellcards.fear'),
-            require('stages.stage4.spellcards.life'),
             require('stages.stage4.spellcards.scenery'),
             require('stages.stage4.spellcards.death'),
+            require('stages.stage4.spellcards.fear'),
+            require('stages.stage4.spellcards.open'),
         }}
     }
 }

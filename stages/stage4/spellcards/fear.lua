@@ -31,19 +31,25 @@ return BossManager.SpellcardPhase{
                 Event.EaseEvent{obj=self,easeObj=self.kinematicState,aims={dir=math.modClamp(cellDir,self.kinematicState.dir)},duration=60,progressFunc=Event.sineIOProgressFunc}
                 Event.EaseEvent{obj=self,aims={size=smallSquare and 1 or 2,spriteTransparency=1},duration=60,afterFunc=function()
                     self.safe=false
+                    self.rotateCompleted=true
                 end}
             end
-            if self.kinematicState.teleportedPortal and self.aimCompleted and not self.flag then -- teleported
+            if self.kinematicState.teleportedPortals and self.aimCompleted and not self.flag then -- teleported
                 --- exclude outer portals (without any)
                 local portal
-                for i=1,#self.kinematicState.teleportedPortal do
-                    local p=Portal.objects[self.kinematicState.teleportedPortal[i]]
+                for i=1,#self.kinematicState.teleportedPortals do
+                    local p=Portal.objects[self.kinematicState.teleportedPortals[i]]
                     if p and p.any and p.any.sentry then
                         portal=p
                         break
                     end
                 end
                 if not portal then
+                    self:remove()
+                    return
+                end
+                if not self.rotateCompleted then
+                    spawnIJ(self.any.i,self.any.j)
                     self:remove()
                     return
                 end

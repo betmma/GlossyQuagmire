@@ -18,7 +18,8 @@ return BossManager.SpellcardPhase{
             outerPortals[i]=nil
         end
         local posb,posd=geo:rThetaGo(posp,100,dir0-math.pi/2)
-        DanmakuFuncs.moveToInTime(boss,posb,60)
+        DanmakuFuncs.moveToInTime(boss,posb,30)
+        wait(30)
         local sentry=DanmakuFuncs.sentry(posb)
         local portalAngle=dir0
         local rotateSpeed=math.pi/480
