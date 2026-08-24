@@ -19,11 +19,12 @@ return BossManager.SpellcardPhase{
         end
         Effect.Charge{obj=G.runInfo.player,size=2}
         local dir0=G.runInfo.player.viewDirection
-        local posb,posd=geo:rThetaGo(posp,450,dir0-math.pi/4)
+        local posb,posd=geo:rThetaGo(posp,400,dir0-math.pi/4)
         boss.safe=true
         DanmakuFuncs.moveToInTime(boss,posb,30)
         G.runInfo.player.immobileFrame=30
         wait(30)
+        boss.kinematicState.pos=posb
         boss.safe=false
         local portalArgs={range=50,draw=true,color={0,0,1,1}}
         local polygonN=DSWITCH{4,4,3,3}

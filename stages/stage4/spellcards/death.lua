@@ -49,7 +49,7 @@ return BossManager.SpellcardPhase{
             for layer=1,2 do
                 local life=900
                 -- octagon
-                BulletSpawner{kinematicState={pos=posp,dir=0,speed=0},period=9,firstPeriod=1,lifeFrame=2,bulletNumber=160,range=math.pi*2,angle=0,bulletSpeed=0,spawnCircleRadius=data[layer].r,spawnCircleAngle=data[layer].theta,bulletSprite=BulletSprites.flame.yellow,highlight=true,bulletLifeFrame=life,bulletExtraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true),extraUpdate},bulletEvents={function(cir,args,self)
+                BulletSpawner{kinematicState={pos=posp,dir=0,speed=0},period=9,firstPeriod=1,lifeFrame=2,bulletNumber=160,range=math.pi*2,angle=0,bulletSpeed=0,spawnCircleRadius=data[layer].r,spawnCircleAngle=data[layer].theta,bulletSprite=BulletSprites.flame.yellow,invincible=true,highlight=true,bulletLifeFrame=life,bulletExtraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true),extraUpdate},bulletEvents={function(cir,args,self)
                     cir.layer=layer
                     cir.theta=args.index/160*math.pi*2
                     cir.ratio=0

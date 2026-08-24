@@ -72,8 +72,9 @@ end
 
 function Player:setReplaying()
     self.replaying=true
-    self.keyIsDown=function(key,frame)
-        local record=self.keyRecord[(frame or self.frame)+1] --this is because when recording keys first frame is stored at index 1 (by table.insert), while when playing at first frame key value is loaded from keyRecord before update, so self.frame=0
+    -- during replay, keyIsDown reads from replay data. WARNING: if calling this function from outside of player (like in an attack), should send deltaFrame=-1 as player.frame has been bumped in player's update
+    self.keyIsDown=function(key,deltaFrame)
+        local record=self.keyRecord[self.frame+1+deltaFrame] --this is because when recording keys first frame is stored at index 1 (by table.insert), while when playing at first frame key value is loaded from keyRecord before update, so self.frame=0
         local val=self.key2Value[key]
         if record and val then
             return record%(val*2)>=val
@@ -82,7 +83,7 @@ function Player:setReplaying()
     end
     self.keyIsPressed=function(key)
         local currentDown=self.keyIsDown(key)
-        local lastDown=self.keyIsDown(key,self.frame-1)
+        local lastDown=self.keyIsDown(key,-1)
         return currentDown and not lastDown
     end
 end
@@ -365,7 +366,7 @@ function Player:hitEffect(damage)
 end
 
 function Player:enterDeathbombing(damage)
-    if self.invincibleFrame>0 or self.duringDeathbombWindow then
+    if self.invincibleFrame>0 or self.duringDeathbombWindow or (DEV_MODE and love.keyboard.isDown('f10')) then
         return
     end
     local deathbombWindow=8

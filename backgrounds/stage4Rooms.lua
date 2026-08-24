@@ -116,8 +116,8 @@ function Stage4Rooms:beginTurn()
     self.forwardSpeed=0
     self.turnStartYaw=self.cam_yaw
     self.turnStartPitch=self.cam_pitch
-    self.turnTargetYaw=(math.random()*2-1)*math.pi*2/3
-    self.turnTargetPitch=(math.random()*2-1)*math.pi/3
+    self.turnTargetYaw=(math.pseudoRandom(self.frame)*2-1)*math.pi*2/3
+    self.turnTargetPitch=(math.pseudoRandom(self.frame,99)*2-1)*math.pi/3
     self.turnProgress=0
 end
 

@@ -19,7 +19,10 @@ return BossManager.SpellcardPhase{
         end
         local posb,posd=geo:rThetaGo(posp,100,dir0-math.pi/2)
         DanmakuFuncs.moveToInTime(boss,posb,30)
+        boss.safe=true
         wait(30)
+        boss.safe=false
+        boss.kinematicState.pos=posb
         local sentry=DanmakuFuncs.sentry(posb)
         local portalAngle=dir0
         local rotateSpeed=math.pi/480
@@ -37,7 +40,7 @@ return BossManager.SpellcardPhase{
             if DIFF()<=G.HARD then
                 flipCond=i>4
             end
-            local sentry=DanmakuFuncs.PortalOnSentry(copyTable(posb),dir+portalAngle,150,-r,flipCond,30,{range=100,draw=true,width=15},nil,nil)
+            local sentry=DanmakuFuncs.PortalOnSentry(copyTable(posb),dir+portalAngle,150,-r,flipCond,30,{range=100,draw=true,width=15,color={0,1,1,1}},nil,nil)
             portals[i]=sentry.any.portal
             Event.LoopEvent{obj=sentry,period=1,executeFunc=function ()
                 sentry.kinematicState.dir=dir+portalAngle

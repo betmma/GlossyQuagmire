@@ -14,8 +14,10 @@ return BossManager.SpellcardPhase{
         local dir0=G.runInfo.player.viewDirection
         Portal.setOuterPortals(posp)
         local posb,posd=geo:rThetaGo(posp,200,dir0-math.pi/2)
+        boss.safe=true
         DanmakuFuncs.moveToInTime(boss,posb,60)
         wait(60)
+        boss.safe=false
         -- portals around player
         -- angle of one portal. the other is it + pi
         local portalAngle=G.runInfo.player.keyIsDown(KEYS.SLOW) and 0 or math.pi/2
@@ -43,7 +45,7 @@ return BossManager.SpellcardPhase{
         local mainSentry=DanmakuFuncs.sentry(posb)
         Event.LoopEvent{obj=mainSentry,period=1,executeFunc=function (self,times)
             local newAim=math.pi/2
-            if G.runInfo.player.keyIsDown(KEYS.SLOW) then
+            if G.runInfo.player.keyIsDown(KEYS.SLOW,-1) then
                 newAim=0
             end
             newAim=math.modClamp(newAim,portalAngle+0.2,math.pi/2)
@@ -96,6 +98,7 @@ return BossManager.SpellcardPhase{
         local function sideAttack()
             SFX:play('enemyPowerfulShot')
             local spawner=BulletSpawner{lifeFrame=4,period=9,firstPeriod=1,bulletNumber=DSWITCH{50,60,80,100},bulletSpeed=DSWITCH{70,80,90,100},bulletSprite=BulletSprites.bigStar.yellow,highlight=true,bulletLifeFrame=DSWITCH{450,500,550,600},bulletExtraUpdate={Action.FadeIn(20,true),Action.ZoomIn(30),Action.FadeOut(20,true),function (self)
+                self.spriteRotationSpeed=0.02
                 if self.frame>60 then
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,self.speed0,0.1)
                 end
