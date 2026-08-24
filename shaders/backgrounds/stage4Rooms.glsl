@@ -224,7 +224,7 @@ vec4 rayMarchRoom(vec3 rayOrigin, vec3 rayDirection) {
     float activeProjected = Texel(snapshot, vec2(0.0)).a;
     float portalCount = 0.0;
 
-    for(int stepIndex=0; stepIndex<96; stepIndex++) {
+    for(int stepIndex=0; stepIndex<48; stepIndex++) {
         vec2 scene = roomDistance(point, activeFrontOpen, activeBackOpen);
         float hitEpsilon = HIT_EPSILON * zoom_factor;
         if(scene.x < hitEpsilon) {

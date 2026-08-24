@@ -17,6 +17,7 @@ return BossManager.SpellcardPhase{
             outerPortals[i]=nil
         end
         Event.EaseEvent{obj=boss,aims={spriteTransparency=0},duration=30}
+        boss.safe=true
         wait(30)
         G.runInfo.player.immobileFrame=30
         G.runInfo.player.viewDirection=math.modClamp(G.runInfo.player.viewDirection)
@@ -24,7 +25,6 @@ return BossManager.SpellcardPhase{
         wait(30)
         G.runInfo.player.viewDirection=0
         local dir0=G.runInfo.player.viewDirection
-        boss.safe=true
         Event{obj=boss,action=function ()
             wait(1800)
             Portal.canvasOffset.x=0

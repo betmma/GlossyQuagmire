@@ -10,6 +10,14 @@ return BossManager.SpellcardPhase{
         if DIFF()>=G.HARD then -- 10 seconds longer for hard and lunatic
             self.remainingFrames=self.remainingFrames+600
         end
+        Event.EaseEvent{obj=boss,aims={spriteTransparency=0},duration=30}
+        boss.safe=true
+        Event{obj=boss,action=function ()
+            wait(self.remainingFrames-5)
+            Event.EaseEvent{obj=boss,aims={spriteTransparency=1},duration=60}
+            wait(60)
+            boss.safe=false
+        end}
         boss.showHexagram=false
         local geo=G.runInfo.geometry
         ---@cast geo PortalGeometryBase

@@ -121,7 +121,7 @@ local boss=BossManager.BossSegment{
                 dropItems={point=15,powerSmall=15},
                 func=function(self, boss)
                     boss.showHexagram=false
-                    boss:addHPProtection(600,10)
+                    boss:addHPProtection(300,10)
                     local geo=G.runInfo.geometry
                     ---@cast geo PortalGeometryBase
                     local pos0=boss.kinematicState.pos
@@ -202,6 +202,95 @@ local boss=BossManager.BossSegment{
             require('stages.stage4.spellcards.trick'),
         }},
         BossManager.BossRound{phases={
+            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
+                key='4-boss-shouji-non-2',
+                time=1800,
+                hp=3000,
+                dropItems={point=15,powerSmall=15},
+                func=function(self, boss)
+                    boss.showHexagram=false
+                    boss:addHPProtection(300,10)
+                    local geo=G.runInfo.geometry
+                    ---@cast geo PortalGeometryBase
+                    local pos0=boss.kinematicState.pos
+                    local posp=G.runInfo.player.kinematicState.pos
+                    local dir0=G.runInfo.player.viewDirection
+                    local sentry=DanmakuFuncs.sentry(pos0)
+                    local function releaseUpdate(self)
+                        local t=self.frame-self.release
+                        if t==0 then
+                            self.size=self.size*2
+                            self.kinematicState.speed=0
+                            self:changeSprite(BulletSprites.kunai[self.sprite.data.color])
+                            self.safe=false
+                            self.spriteTransparency=1
+                        elseif t>0 and t<30 then
+                            self.size=self.size*0.97
+                        elseif t>30 and t<100 then
+                            self.size=math.lerp(self.size,1,0.03)
+                        elseif t>100 and t<150 then
+                            self.kinematicState.speed=self.kinematicState.speed*0.98
+                        end
+                        if t>0 and t<60 then
+                            self.kinematicState.speed=self.kinematicState.speed+4
+                        end
+                    end
+                    local function slash(pos1,pos2,releaseFrame,color,side)
+                        local dist=geo:distanceRef(pos1,pos2)
+                        local step=8
+                        local remainingRatio=DSWITCH{5,4,3,2}
+                        local n=math.floor(dist/step)
+                        local dir0=geo:toRef(pos1,pos2)
+                        for i=1,n do
+                            local progress=i/n
+                            local pos,dir=geo:rThetaGo(pos1,dist*progress,dir0+progress*side*0.1)
+                            local size=Event.sineBackProgressFunc(progress)*1+0.5
+                            local deltadir=-progress*0.5+0.5
+                            dir=dir+side*deltadir
+                            local bullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.round[color],size=size,lifeFrame=540,extraUpdate={Action.ZoomIn(math.ceil(i/n*10)),Action.FadeIn(20,false),Action.FadeOut(20,true),releaseUpdate},highlight=true,safe=true,spriteTransparency=0.3}
+                            if i%remainingRatio~=0 then
+                                bullet.lifeFrame=120
+                            end
+                            bullet.release=releaseFrame
+                            if i%8==0 then
+                                wait()
+                                SFX:play('enemyShot')
+                            end
+                        end
+                    end
+                    local function slashBatch(pos1,pos2,releaseFrame,color,side,num)
+                        local dir=geo:toRef(pos1,pos2)+math.pi/2
+                        local dist=geo:distanceRef(pos1,pos2)
+                        for i=1,num do
+                            local d=DSWITCH{25,30,35,40}*(i-0.5-num/2)
+                            local posa,dir2=geo:rThetaGoRef(pos1,d,dir)
+                            dir2=dir2-math.pi/2
+                            local offset=math.eval(0,20)
+                            local posb=geo:rThetaGoRef(posa,offset/2,dir2)
+                            local posc=geo:rThetaGoRef(posa,dist-offset/2,dir2)
+                            Event{obj=sentry,action=function ()
+                                slash(posb,posc,releaseFrame,color,side)
+                            end}
+                        end
+                    end
+                    local function slashAtDir(dir,dir2,releaseFrame,color,side,num)
+                        posp=G.runInfo.player.kinematicState.pos
+                        for i=1,8 do
+                            local pos1,dir1=geo:rThetaGoRef(posp,200,dir+math.pi/4*i)
+                            local pos2,dir2=geo:rThetaGoRef(posp,200,dir+math.pi/4*(i+1))
+                            slashBatch(pos1,pos2,releaseFrame,color,side,num)
+                        end
+                    end
+                    local colors={'red','orange','purple','magenta'}
+                    for i=1,8 do
+                        SFX:play('enemyShot')
+                        slashAtDir(dir0-math.pi/2,math.pi/2*0.8*math.mod2Sign(i),60,colors[(i-1)%4+1],math.mod2Sign(i),5)
+                        wait(60)
+                        SFX:play('enemyShot')
+                        wait(300)
+                    end
+                end
+            },
             require('stages.stage4.spellcards.rest'),
             require('stages.stage4.spellcards.life'),
             require('stages.stage4.spellcards.injury'),

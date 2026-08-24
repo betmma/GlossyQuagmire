@@ -16,6 +16,7 @@ return BossManager.SpellcardPhase{
         local dir0=G.runInfo.player.viewDirection
         local posb=geo:rThetaGo(posp,200,dir0-math.pi/2)
         DanmakuFuncs.moveToInTime(boss,posb,60)
+        boss.safe=true
         local pos1,dir1=geo:rThetaGo(posp,-190,dir0-math.pi/2)
         local function getHousePoints(r)
             local ret={}
@@ -67,6 +68,7 @@ return BossManager.SpellcardPhase{
         local portalRatio=0.1
         local draw=true
         wait(60)
+        boss.safe=false
         -- 4 pairs of portals, 4 form half a house shape at pos1, 4 can move
         local housePortalData={}
         local housePortals={}
@@ -114,7 +116,7 @@ return BossManager.SpellcardPhase{
             Event{obj=sentry,action=function ()
                 for i=1,5 do
                     local diri=dir+math.pi*2/5*i
-                    local warning=Bullet{kinematicState={pos=copyTable(pos),dir=diri,speed=400},sprite=BulletSprites.scale.white,lifeFrame=120,invincible=true,safe=true,size=3,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(30,false),Action.Trail(30,5),function (self)
+                    local warning=Bullet{kinematicState={pos=copyTable(pos),dir=diri,speed=400},sprite=BulletSprites.scale.white,lifeFrame=100,invincible=true,safe=true,size=3,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(30,false),Action.Trail(30,5),function (self)
                         if self.frame+20>self.lifeFrame then
                             self.kinematicState.speed=math.lerp(self.kinematicState.speed,0,0.1)
                         end
