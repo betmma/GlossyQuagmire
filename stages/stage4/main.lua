@@ -210,7 +210,7 @@ return{
                     wait(10)
                 end
                 wait(180)
-                local sign=DSWITCH{1,1,-1,-1}
+                local sign=DSWITCH{-1,-1,1,1}
                 for i=1,20 do
                     local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2,speed=180},maxhp=15,sprite=Asset.fairySprites.small.red,lifeFrame=300,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1}}
                     local fairy2=Enemy{kinematicState=copyTable{pos=pos3,dir=dir3,speed=180},maxhp=15,sprite=Asset.fairySprites.small.blue,lifeFrame=300,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=1}}
@@ -541,6 +541,67 @@ return{
                 outerPortals[1]:link(outerPortals[4])
                 outerPortals[2]:link(outerPortals[3])
             end,
+            func=function() -- 20s
+                local geo=G.runInfo.geometry
+                ---@cast geo PortalGeometryBase
+                local pos0=geo:init().pos
+                local pos1,dir1=geo:rThetaGo(pos0,200,-math.pi/2)
+                local pos2,dir2=geo:rThetaGo(pos1,-100,dir1+math.pi/2)
+                local pos3,dir3=geo:rThetaGo(pos1,-100,dir1-math.pi/2)
+                local function large(pos,color)
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos,dir=dir2,speed=0},maxhp=500,sprite=Asset.fairySprites.large[color],lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=15}}
+                    fairy:addHPProtection(180,99)
+                    local angle0=math.pi/4
+                    local spawner
+                    spawner=BulletSpawner{
+                        period=20,firstPeriod=60,lifeFrame=570,bulletSpeed=150,bulletNumber=DSWITCH{4,6,8,10},angle=angle0,range=math.pi*0,bulletSprite=BulletSprites.bigRound[color],bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(10,true),Action.FadeOut(20,true),function(self)
+                            self.kinematicState.speed=math.lerp(self.kinematicState.speed,180,0.03)
+                        end},bulletEvents={function (cir,args,self)
+                            cir.size=math.cos((args.index-spawner.bulletNumber/2-0.5)/spawner.bulletNumber*math.pi)*0.4+0.6
+                            cir.kinematicState.speed=cir.kinematicState.speed+10*args.index
+                        end},highlight=true,
+                    }
+                    spawner:bindState(fairy)
+                    Event.LoopEvent{period=20,obj=spawner,executeFunc=function ()
+                        spawner.angle=math.pi-spawner.angle--+9/7/spawner.period
+                    end}
+                    local spawner2
+                    spawner2=BulletSpawner{period=120,firstPeriod=60,lifeFrame=570,bulletSpeed=100,bulletNumber=15,angle='player',range=math.pi/DSWITCH{16,12,10,8},bulletSprite=BulletSprites.bullet[color],bulletLifeFrame=240,bulletExtraUpdate={Action.FadeOut(20,true)},bulletEvents={function (cir,args,self)
+                        local angle=((args.index-0.5)/spawner2.bulletNumber-0.5)*spawner2.range
+                        cir.kinematicState.speed,cir.kinematicState.dir=math.polygonize(4,cir.kinematicState.dir,cir.kinematicState.speed,cir.kinematicState.dir-angle)
+                    end}}
+                    spawner2:bindState(fairy)
+                end
+                local types={'dot','round','bigRound','lightRound'}
+                local rand=math.eval(50,39)
+                large(pos1,'red')
+                wait(300)
+                for i=1,20 do
+                    local type=types[(i-1)%#types+1]
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=dir2,speed=180},maxhp=15,sprite=Asset.fairySprites.small.purple,lifeFrame=300,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1}}
+                    local fairy2=Enemy{kinematicState=copyTable{pos=pos3,dir=dir3,speed=180},maxhp=15,sprite=Asset.fairySprites.small.orange,lifeFrame=300,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=1}}
+                    fairy:addHPProtection(60,5)
+                    fairy2:addHPProtection(60,5)
+                    local period=DSWITCH{120,100,90,80}
+                    local bulletNumber=1
+                    BulletSpawner{
+                        period=period,firstPeriod=i+30,lifeFrame=270,bulletSpeed=100,bulletNumber=bulletNumber,angle='player',range=math.pi*2,bulletSprite=BulletSprites[type].purple,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true)},
+                    }:bindState(fairy)
+                    BulletSpawner{
+                        period=period,firstPeriod=i+30,lifeFrame=270,bulletSpeed=100,bulletNumber=bulletNumber,angle='player',range=math.pi*2,bulletSprite=BulletSprites[type].orange,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true)},
+                    }:bindState(fairy2)
+                    wait(10)
+                end
+                wait(180)
+                large(pos2,'orange')
+                wait(120)
+                large(pos3,'green')
+                wait(580)
+            end
+        },
+        {
+            key='4-5',
+            type='midStage',
             func=function() -- 15s
             -- wait(999999)
                 local geo=G.runInfo.geometry
@@ -598,7 +659,7 @@ return{
             end
         },
         {
-            key='4-5',
+            key='4-6',
             type='midStage',
             func=function() -- 18s
                 local geo=G.runInfo.geometry
