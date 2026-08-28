@@ -142,6 +142,25 @@ Action.AppearingHint=function(size,duration)
     return {isAction=true,params={size=size,duration=duration},func=appearingHint}
 end
 
+local finale=function(self,params)
+    if self.frame==self.lifeFrame-params.finalFrames then
+        if not self.extraDieEffects then -- though, shouldn't use this action on non Enemy objects.
+            return
+        end
+        for _,effect in ipairs(self.extraDieEffects) do
+            effect(self)
+        end
+        self.extraDieEffects={}
+    end
+end
+
+---for a fairy to call extraDieEffects when self.frame==self.lifeFrame-finalFrames and empty the extraDieEffects table so it works like a finale that will always trigger once.
+---@param finalFrames integer
+---@return Action
+Action.Finale=function(finalFrames)
+    return {isAction=true,params={finalFrames=finalFrames},func=finale}
+end
+
 local trail=function(self,params)
     local lifeFrame=params.lifeFrame or 30
     local period=params.period or 2

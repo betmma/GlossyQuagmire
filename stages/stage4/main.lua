@@ -370,10 +370,25 @@ return{
                     r,theta=math.polygonize(4,theta,r,math.pi/4)
                     return r,theta
                 end
+                local portalDir
+                local syncExtraUpdate=function(self)
+                    if self.any.surrounding then
+                        local t=self.frame
+                        if t<=18 then
+                            self.kinematicState.speed=(1-t/18)*self.any.speed
+                        end
+                        if t==(5-self.any.idx)*18 then
+                            self.kinematicState.speed=self.any.speed
+                        end
+                        if t+40>self.lifeFrame then
+                            self.kinematicState.speed=self.kinematicState.speed*0.9
+                        end
+                    end
+                end
                 Event{action=function()
                     for j=1,4 do
                         SFX:play('hit2',true,2)
-                        for i=j,200,4 do
+                        for i=j,200,4 do -- outer wall, divided into 4 batches
                             local dir=math.pi*2*i/200
                             local pos1,dir1=geo:rThetaGo(pos,r0.r,dir)
                             local bullet=Bullet{kinematicState={pos=pos1,speed=0,dir=dir1},sprite=BulletSprites.kunaiDark.red,lifeFrame=820-18*(j-1),extraUpdate={Action.ZoomIn(30),Action.FadeIn(20,true),Action.FadeOut(30,true),function(self)
@@ -385,8 +400,22 @@ return{
                                     if i<5 then
                                         SFX:play('enemyShot',true)
                                     end
-                                    if math.ceil(i/4)%DSWITCH{7,5,3,2}==0 then 
-                                        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),speed=150,dir=self.kinematicState.dir},sprite=BulletSprites.kunai.red,lifeFrame=r*60/150+30,extraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true)}}
+                                    local count=math.ceil(self.frame/261)
+                                    local surrounding=count==2
+                                    if math.ceil(i/4)%DSWITCH{7,5,3,2}==0 or surrounding then
+                                        local bulletDir=self.kinematicState.dir
+                                        local speed=150
+                                        local lifeFrame=r*60/speed+30
+                                        if surrounding then
+                                            if math.angleDiff(bulletDir,portalDir)<math.pi/4 then
+                                                return
+                                            end
+                                            bulletDir=bulletDir+math.pi/4
+                                            bulletDir=bulletDir-bulletDir%(math.pi/2)
+                                            speed=100
+                                            lifeFrame=r0.r*60/2^0.5/speed+(5-j)*18
+                                        end
+                                        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),speed=speed,dir=bulletDir},sprite=BulletSprites.kunai.red,lifeFrame=lifeFrame,extraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true),syncExtraUpdate}}.any={surrounding=surrounding,idx=j,speed=speed}
                                     end
                                 end
                             end},invincible=true,size=1}
@@ -403,8 +432,8 @@ return{
                     end
                     wait(9)
                     -- portals appear
-                    local dir=geo:to(sentry.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.pi/4
-                    dir=dir-dir%(math.pi/2)
+                    portalDir=geo:to(sentry.kinematicState.pos,G.runInfo.player.kinematicState.pos)+math.pi/4
+                    portalDir=portalDir-portalDir%(math.pi/2)
                     local color={1,0.5,0.5,1}
                     local function segment(pos,dir,len)
                         return geo:rThetaGoRef(pos,len,dir+math.pi/2),geo:rThetaGoRef(pos,len,dir-math.pi/2)
@@ -412,7 +441,7 @@ return{
                     local t=54
                     local l={l=0.1}
                     local deltal=0.3
-                    local posm,dirm=geo:rThetaGoRef(sentry.kinematicState.pos,-150,dir)
+                    local posm,dirm=geo:rThetaGoRef(sentry.kinematicState.pos,-150,portalDir)
                     local args={}
                     local portals={}
                     local portalArgs={draw=true,color={0,0,0,0},range=50}
@@ -475,14 +504,14 @@ return{
                     end
                     local size,num=8,5
                     local arrowArgs={sprite=BulletSprites.rimDark.green,lifeFrame=320,extraUpdate={Action.ZoomIn(20),Action.FadeIn(20,false,0.4),Action.FadeOut(30,false)},invincible=true,safe=true,spriteTransparency=0.4}
-                    local arrowDir=dir+math.pi
+                    local arrowDir=portalDir+math.pi
                     for i=1,3 do
                         SFX:play('hit2',true,2)
                         arrow(sentry.kinematicState.pos,size,num,arrowDir,i,arrowArgs)
                         wait(9)
                         arrowArgs.lifeFrame=arrowArgs.lifeFrame-9
                     end
-                    local arrow2Pos,arrow2Dir=geo:rThetaGoRef(sentry.kinematicState.pos,400,arrowDir)
+                    local arrow2Pos,arrow2Dir=geo:rThetaGoRef(sentry.kinematicState.pos,350,arrowDir)
                     wait(9)
                     arrowArgs.lifeFrame=arrowArgs.lifeFrame-9
                     for i=1,3 do
@@ -748,6 +777,137 @@ return{
                     wait(10)
                 end
                 wait(1000)
+            end
+        },
+        {
+            key='4-7',
+            type='midStage',
+            func=function() -- 25s
+                local geo=G.runInfo.geometry
+                ---@cast geo PortalGeometryBase
+                local pos0=geo:init().pos
+                local range=portalR*2
+                local N=DSWITCH{6,6,8,8}
+                local mN=N/2+0.5
+                local gap=range/N
+                local sentry=DanmakuFuncs.sentry(pos0)
+                local turnData={
+                    {frame=-999,dir=0},
+                    {frame=750,dir=math.pi/4},
+                    {frame=1050,dir=math.pi/2}
+                }
+                local currentTurn=1
+                Event.LoopEvent{obj=sentry,period=1,executeFunc=function()
+                    if currentTurn<#turnData and sentry.frame==turnData[currentTurn+1].frame then
+                        currentTurn=currentTurn+1
+                        SFX:play('enemyPowerfulShot')
+                    end
+                end}
+                local maskf=function(i,j)
+                    if DIFF()<=G.NORMAL then
+                        return ((i - j) % 3 == 0) and 1 or -1
+                    end
+                    return math.sign(i-j)
+                end
+                local function slowExtraUpdate(self)
+                    if self.frame<=self.any.moveTime then
+                        self.kinematicState.speed=self.any.speed*(1-self.frame/self.any.moveTime)
+                    end
+                    local t2=sentry.frame-turnData[currentTurn].frame
+                    if t2>0 and t2<=self.any.moveTime/2 then
+                        local x=t2/(self.any.moveTime/2)
+                        self.kinematicState.speed=-self.any.speed*2*math.min(x*2,2-x*2)
+                        if t2==self.any.moveTime/2 then
+                            self.kinematicState.dir=self.kinematicState.dir+turnData[currentTurn].dir*maskf(self.any.i,self.any.j)
+                        end
+                    elseif t2>self.any.moveTime/2 and t2<=self.any.moveTime then
+                        local x=(t2-self.any.moveTime/2)/(self.any.moveTime/2)
+                        self.kinematicState.speed=self.any.speed*2*math.min(x*2,2-x*2)
+                    end
+                end
+                local function angleWall(pos,angle,i,j)
+                    -- square
+                    local length=gap/2/math.cos((angle+math.pi/4)%math.pi/2-math.pi/4)
+                    local n=math.ceil(length/10)+1
+                    for k=1,n do
+                        -- local posi=geo:rThetaGo(pos,i*length/n,angle)
+                        local dist=k*length/n
+                        local moveTime=120
+                        local bullet=Bullet{kinematicState={pos=copyTable(pos),speed=dist*60/moveTime*2,dir=angle},sprite=BulletSprites.round.red,lifeFrame=1500-sentry.frame,extraUpdate={Action.ZoomIn(20),Action.FadeIn(20,true),Action.FadeOut(30,true),slowExtraUpdate},invincible=true,size=1,highlight=true}
+                        bullet.any={speed=bullet.kinematicState.speed,moveTime=moveTime,i=i,j=j}
+                    end
+                end
+                local function wall(fairy,i,j)
+                    local pos=fairy.kinematicState.pos
+                    if DIFF()<=G.NORMAL then
+                        angleWall(pos,math.pi/4,i,j)
+                        angleWall(pos,math.pi*5/4,i,j)
+                        return
+                    end
+                    if i>=j then
+                        local angle=i==N and math.pi/4 or 0
+                        angleWall(pos,angle,i,j)
+                    end
+                    if i<=j then
+                        local angle=j==N and math.pi*3/4 or math.pi/2
+                        angleWall(pos,angle,i,j)
+                    end
+                    if i>j then
+                        angleWall(pos,math.pi,i,j)
+                    end
+                    if i<j then
+                        angleWall(pos,-math.pi/2,i,j)
+                    end
+                end
+                Event{obj=sentry,action=function()
+                    for i=1,N do
+                        local xi=pos0.x+(i-mN)*gap
+                        for j=1,N do
+                            local yi=pos0.y+(j-mN)*gap
+                            local fairy=Enemy{kinematicState=copyTable{pos={x=xi,y=yi},dir=0,speed=0},maxhp=5,sprite=Asset.fairySprites.small.white,lifeFrame=300-sentry.frame,extraUpdate={Enemy.presetActions.fadeAndHint,Action.Finale(20)},dropItems={powerSmall=1},extraDieEffects={function (self)
+                                wall(self,i,j)
+                            end}}
+                            wait(1)
+                        end
+                    end
+                end}
+                wait(360)
+                local times=0
+                local colors={'red','green','blue','orange','purple'}
+                local function summon()
+                    if sentry.removed then
+                        return
+                    end
+                    local color=colors[times%#colors+1]
+                    times=times+1
+                    local best,pos
+                    best=0
+                    local count=0
+                    while count<10 do
+                        local posp=G.runInfo.player.kinematicState.pos
+                        pos1=geo:rThetaGo(posp,math.random(150,250),math.random()*math.pi*2)
+                        local dist=geo:distance(pos1,posp)
+                        if dist>best then
+                            pos=pos1
+                            best=dist
+                        end
+                        count=count+1
+                    end
+                    local bigFairy=Enemy{kinematicState=copyTable{pos=pos,dir=0,speed=0},maxhp=600,sprite=Asset.fairySprites.large[color],lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                        self.kinematicState.dir=geo:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos)
+                        self.kinematicState.speed=50
+                    end},dropItems={powerSmall=5,point=5},extraDieEffects={function()
+                        Event{obj=sentry,action=function()
+                            wait(60)
+                            SFX:play('enemyShot')
+                            summon()
+                        end}
+                    end}}
+                    local spawner=BulletSpawner{period=30,firstPeriod=60,bulletNumber=DSWITCH{1,3,5,7},bulletSpeed=70,angle='player',bulletSprite=BulletSprites.stick[color],bulletSize=2,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(10),Action.FadeOut(10,true)}}
+                    spawner:bindState(bigFairy)
+                end
+                summon()
+                wait(1140)
             end
         },
         shouji.boss

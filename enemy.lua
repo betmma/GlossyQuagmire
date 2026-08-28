@@ -4,6 +4,7 @@
 ---@field damageResistance number a factor that reduces damage taken.
 ---@field invincible boolean
 ---@field dropItems DropItems
+---@field extraDieEffects function[]
 ---@overload fun(args:EnemyArgs):Enemy
 local Enemy=Shape:extend()
 
@@ -16,6 +17,7 @@ local Enemy=Shape:extend()
 ---@field extraUpdate ExtraUpdate|function|nil
 ---@field spriteColor rgbColor|rgbaColor|nil default {1,1,1,1}
 ---@field spriteTransparency number|nil default 1
+---@field extraDieEffects function[]|nil
 
 ---@param args EnemyArgs
 function Enemy:new(args)
@@ -37,6 +39,7 @@ function Enemy:new(args)
     if self.sprite and self.sprite.is and self.sprite:is(Asset.MovingSprite) then
         self.sprite=shallowCopyTable(self.sprite)
     end
+    self.extraDieEffects=args.extraDieEffects or {}
     self.extraUpdate=args.extraUpdate or {}
     if type(self.extraUpdate)=='function' then
         self.extraUpdate={self.extraUpdate--[[@as function]]}
@@ -118,6 +121,9 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
 end
 
 function Enemy:die()
+    for _,effect in ipairs(self.extraDieEffects) do
+        effect(self)
+    end
     self:dieEffect()
     self:remove()
 end
