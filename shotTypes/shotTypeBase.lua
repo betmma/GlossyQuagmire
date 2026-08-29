@@ -656,7 +656,7 @@ local marisabOption=function(angle,damage,freq)
         func=function(self, powerLevel) return damage end
     end
     return ShootingPattern{
-        transparency=0.5,
+        transparency=0.3,
         sprite=Asset.playerShotSprites.explosive.blue,
         frequency=freq or 8,
         damage=func,

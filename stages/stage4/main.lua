@@ -118,6 +118,7 @@ end
 -- player can escape two portals forming an angle by moving towards the vertex, due to the point on exterior angle bisector does not fall into either portal's teleportation range. the fix is to extend portals past the vertex.
 
 local portalR=350
+-- 4 outer portals can be managed with setOuterPortals function. extra portals can be created with DanmakuFuncs.PortalOnSentry that will auto remove portal when the sentry is removed (by shockwave of clearing a boss phase)
 local outerPortals={}
 local basePos
 local function outerPortalPoses(basePos)
@@ -633,7 +634,7 @@ return{
         {
             key='4-5',
             type='midStage',
-            func=function() -- 15s
+            func=function() -- 13s
             -- wait(999999)
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
@@ -686,7 +687,7 @@ return{
                     -- wait(60)
                     ::continue::
                 end
-                wait(780)
+                wait(660)
             end
         },
         {

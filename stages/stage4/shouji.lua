@@ -113,7 +113,7 @@ local boss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-            BossManager.BossRound{phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
                 key='4-boss-shouji-non-1',
                 time=1800,
@@ -208,6 +208,8 @@ local boss=BossManager.BossSegment{
                 hp=3000,
                 dropItems={point=15,powerSmall=15},
                 func=function(self, boss)
+                    local playerPos=G.runInfo.player.kinematicState.pos
+                    Portal.setOuterPortals(playerPos,350)
                     boss.showHexagram=false
                     boss:addHPProtection(300,10)
                     local geo=G.runInfo.geometry

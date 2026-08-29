@@ -16,11 +16,16 @@ return BossManager.SpellcardPhase{
         local dir0=G.runInfo.player.viewDirection
         local posb=geo:rThetaGo(posp,200,dir0-math.pi/2+0.3)
         local outerPortals=Portal.setOuterPortals(posb)
-        outerPortals[1]:remove() -- remove top and bottom
-        outerPortals[3]:remove()
         for i=1,4 do
+            outerPortals[i]:remove()
             outerPortals[i]=nil
         end
+        local outerNew={}
+        for i=1,2 do
+            local sentry=DanmakuFuncs.PortalOnSentry(posb,dir0+(i-1)*math.pi,1050,-350,i==1,nil,{range=999,draw=false})
+            outerNew[i]=sentry.any.portal
+        end
+        outerNew[1]:link(outerNew[2])
         DanmakuFuncs.moveToInTime(boss,posb,40)
         wait(40)
         Portal.zoomC=80
