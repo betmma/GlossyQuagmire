@@ -171,6 +171,7 @@ return{
             injectGeometry()
             local base=G.runInfo.geometry:init()
             setOuterPortals(base.pos,350)
+            Portal.zoomC=30
             -- local border=Border.CircleBorder{center=base.pos,radius=400}
             -- G.runInfo.player.border=border
             -- G:replaceBackgroundPatternIfNot(BackgroundPattern.Corridor)

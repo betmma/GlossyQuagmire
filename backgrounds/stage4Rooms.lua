@@ -52,8 +52,10 @@ function Stage4Rooms:new(args)
     self.cameraSpeed=1.5
     self.cam_roll=0.0
     self.rollPerRoom=0.0
+    self.rollPerRoomAim=0
 
     self.portalZoomBase=1.0
+    self.portalZoomBaseAim=1
     self.previousPortalRatio=1.0
     self.zoomFactor=1.0
     self.frontDoorOpen=0.0
@@ -94,8 +96,8 @@ function Stage4Rooms:new(args)
 end
 
 function Stage4Rooms:setRoomChanges(rollPerRoom,portalZoomBase)
-    self.rollPerRoom=rollPerRoom
-    self.portalZoomBase=portalZoomBase
+    self.rollPerRoomAim=rollPerRoom
+    self.portalZoomBaseAim=portalZoomBase
 end
 
 function Stage4Rooms:setProjectionMode(enabled)
@@ -189,6 +191,8 @@ function Stage4Rooms:enterNextRoom()
 end
 
 function Stage4Rooms:update(dt)
+    self.rollPerRoom=math.lerp(self.rollPerRoom,self.rollPerRoomAim,0.05)
+    self.portalZoomBase=math.lerp(self.portalZoomBase,self.portalZoomBaseAim,0.05)
     self.zoomFactor=self:calculateZoomFactor()
     self.camMoveSpeed=self.baseCamMoveSpeed*self.zoomFactor
     Stage4Rooms.super.update(self,dt)
