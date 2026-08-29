@@ -566,7 +566,8 @@ return{
                 G.backgroundPattern:setProjectionMode(true)
                 local pos=G.runInfo.player.kinematicState.pos
                 portalR=200
-                setOuterPortals(pos)
+                local geo=G.runInfo.geometry
+                setOuterPortals(geo:init().pos)
                 outerPortals[1]:link(outerPortals[4])
                 outerPortals[2]:link(outerPortals[3])
             end,
