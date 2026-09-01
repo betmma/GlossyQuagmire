@@ -16,6 +16,16 @@ local PROJECTED_CAMERA_Z=-3.9
 local NORMAL_SLOW_Z=2.0
 local FORWARD_DECELERATION=2.5
 local TURN_DURATION=3.0
+local OCULUS_LOOK_DURATION=2.4
+local OCULUS_RISE_DURATION=5.0
+local OCULUS_ASCENT_HEIGHT=15.0
+-- Keep synchronized with the corresponding constants in stage4Rooms.glsl.
+local OCTAGON_APOTHEM=13.8
+local OCTAGON_DOME_BASE_Y=-8.4
+local OCTAGON_DOME_RADIUS=OCTAGON_APOTHEM/math.cos(math.pi/8)
+local OCTAGON_OCULUS_RADIUS=3.24
+local OCTAGON_OCULUS_Y=OCTAGON_DOME_BASE_Y
+    -math.sqrt(OCTAGON_DOME_RADIUS^2-OCTAGON_OCULUS_RADIUS^2)
 
 local function portalZoomLog(distance,linkedSizeRatio)
     local F=math.log(linkedSizeRatio)*-0.5
@@ -73,6 +83,10 @@ function Stage4Rooms:new(args)
         shader:send('portal_zoom_base',self.portalZoomBase)
         shader:send('front_door_open',self.frontDoorOpen)
         shader:send('back_door_open',self.backDoorOpen)
+        local inHall=self.backgroundMode=='hall' or self.backgroundMode=='ascent'
+        local hallEntranceActive=self.backgroundMode=='hallEntrance' or inHall
+        shader:send('octagonal_hall',inHall and 1 or 0)
+        shader:send('hall_entrance',hallEntranceActive and 1 or 0)
         shader:send('snapshot',self.snapshotCanvas)
     end
 
@@ -93,6 +107,122 @@ function Stage4Rooms:new(args)
     self.turnTargetYaw=0
     self.turnTargetPitch=0
     self.turnProgress=0
+    self.backgroundMode='rooms'
+    self.ascentTime=0
+    self.ascentStartPitch=0
+    self.ascentStartTranslation={0,0,0}
+end
+
+-- Progression 5 is queued until progression 4 has captured and installed its
+-- screenshot room. That room stays intact while its new front shoji opens.
+function Stage4Rooms:beginOctagonalHallEntrance()
+    if self.backgroundMode~='rooms' then
+        return
+    end
+    self.backgroundMode='hallPendingScreenshot'
+    if self.projectedRoom and not self.capturePending then
+        self:activateOctagonalHallEntrance()
+    end
+end
+
+-- Keep the screenshot on every surface of the replacement room. Only rays
+-- which pass through its opening shoji are allowed to see the hall behind it.
+function Stage4Rooms:activateOctagonalHallEntrance()
+    if self.backgroundMode~='hallPendingScreenshot' then
+        return
+    end
+    self.backgroundMode='hallEntrance'
+    self.projectionEnabled=false
+    self.projectionState='disabled'
+    self.capturePending=false
+    self.forwardSpeed=self.cameraSpeed
+    self.rollPerRoomAim=0
+    self.portalZoomBaseAim=1
+end
+
+-- Called with the distance travelled past the shoji for the seamless path.
+-- With no remainder it also reconstructs the arena directly in practice.
+function Stage4Rooms:enterOctagonalHall(remainder)
+    local continuous=remainder~=nil
+    self.backgroundMode='hall'
+    self.projectionEnabled=false
+    self.projectedRoom=false
+    self.projectionState='disabled'
+    self.capturePending=false
+    self.forwardSpeed=0
+    self.rollPerRoom=0
+    self.rollPerRoomAim=0
+    self.portalZoomBase=1
+    self.portalZoomBaseAim=1
+    self.previousPortalRatio=1
+    self.zoomFactor=1
+    self.frontDoorOpen=0
+    self.backDoorOpen=0
+
+    if continuous then
+        self.cam_translation[3]=-OCTAGON_APOTHEM+remainder
+    else
+        self.cam_translation={0,0,-5.4}
+        self.cam_yaw=0
+        self.cam_pitch=0
+        self.cam_roll=0
+    end
+    self.camMoveCenter={self.cam_translation[1],self.cam_translation[2]}
+    self.camMoveRange={0.7,0.45}
+    self.camMoveSpeed=0.3
+
+    local previousCanvas=love.graphics.getCanvas()
+    love.graphics.setCanvas(self.snapshotCanvas)
+    love.graphics.clear(0,0,0,0)
+    love.graphics.setCanvas(previousCanvas)
+end
+
+-- Progression 6. First center the view on the oculus and look straight up,
+-- then rise through it. Once outside, keep drifting upward into the sky.
+function Stage4Rooms:beginOculusAscent()
+    if self.backgroundMode~='hall' and self.backgroundMode~='ascent' then
+        self:enterOctagonalHall()
+    end
+    if self.backgroundMode=='ascent' then
+        return
+    end
+    self.backgroundMode='ascent'
+    self.ascentTime=0
+    self.ascentStartPitch=self.cam_pitch
+    self.ascentStartTranslation=copyTable(self.cam_translation)
+    self.camMoveRange={0,0}
+    self.camMoveSpeed=0
+end
+
+function Stage4Rooms:updateOculusAscent(dt)
+    self.ascentTime=self.ascentTime+dt
+    local lookProgress=math.min(1,self.ascentTime/OCULUS_LOOK_DURATION)
+    local smoothLook=Event.sineIOProgressFunc(lookProgress)
+    self.cam_pitch=math.interpolate(self.ascentStartPitch,math.pi/2,smoothLook)
+    self.cam_yaw=math.interpolate(self.cam_yaw,0,smoothLook)
+    self.cam_roll=math.interpolate(self.cam_roll,0,smoothLook)
+    self.cam_translation[1]=math.interpolate(self.ascentStartTranslation[1],0,smoothLook)
+    self.cam_translation[3]=math.interpolate(self.ascentStartTranslation[3],0,smoothLook)
+
+    local riseTime=self.ascentTime-OCULUS_LOOK_DURATION
+    if riseTime>0 then
+        local riseProgress=math.min(1,riseTime/OCULUS_RISE_DURATION)
+        local smoothRise=Event.sineIOProgressFunc(riseProgress)
+        self.cam_translation[2]=math.interpolate(
+            self.ascentStartTranslation[2],
+            OCTAGON_OCULUS_Y-OCULUS_ASCENT_HEIGHT,
+            smoothRise
+        )
+        if riseProgress>=1 then
+            self.cam_translation[2]=self.cam_translation[2]
+                -(riseTime-OCULUS_RISE_DURATION)*1.2
+        end
+    end
+end
+
+function Stage4Rooms:isOculusAscentComplete()
+    return self.backgroundMode=='ascent'
+        and self.ascentTime>=OCULUS_LOOK_DURATION+OCULUS_RISE_DURATION
 end
 
 function Stage4Rooms:setRoomChanges(rollPerRoom,portalZoomBase)
@@ -191,6 +321,52 @@ function Stage4Rooms:enterNextRoom()
 end
 
 function Stage4Rooms:update(dt)
+    if self.backgroundMode=='hallPendingScreenshot' and self.projectedRoom and not self.capturePending then
+        self:activateOctagonalHallEntrance()
+    end
+
+    if self.backgroundMode=='hall' or self.backgroundMode=='ascent' then
+        Stage4Rooms.super.update(self,dt)
+        if self.backgroundMode=='ascent' then
+            self:updateOculusAscent(dt)
+        end
+        self.zoomFactor=1
+        local bulletNum=#Bullet.objects
+        local brightness=math.clamp(1-bulletNum/3000,0.62,0.82)
+        self.lightColor={brightness,brightness,brightness}
+        return
+    end
+
+    if self.backgroundMode=='hallEntrance' then
+        self.rollPerRoom=math.lerp(self.rollPerRoom,0,0.04)
+        self.portalZoomBase=math.lerp(self.portalZoomBase,1,0.04)
+        self.zoomFactor=1
+        self.camMoveSpeed=self.baseCamMoveSpeed
+        Stage4Rooms.super.update(self,dt)
+
+        -- Line the camera up with the opening without any discontinuity.
+        self.cam_translation[1]=math.lerp(self.cam_translation[1],0,0.035)
+        self.cam_translation[2]=math.lerp(self.cam_translation[2],0,0.035)
+        self.cam_yaw=math.lerp(self.cam_yaw,0,0.035)
+        self.cam_pitch=math.lerp(self.cam_pitch,0,0.035)
+        self.cam_roll=math.lerp(self.cam_roll,0,0.035)
+        self.forwardSpeed=math.lerp(self.forwardSpeed,self.cameraSpeed,0.05)
+        self.cam_translation[3]=self.cam_translation[3]+self.forwardSpeed*dt
+
+        if self.cam_translation[3]>=ROOM_HALF_LENGTH then
+            local remainder=self.cam_translation[3]-ROOM_HALF_LENGTH
+            self:enterOctagonalHall(remainder)
+        else
+            self.frontDoorOpen=doorOpenAmount(ROOM_HALF_LENGTH-self.cam_translation[3])
+            self.backDoorOpen=doorOpenAmount(self.cam_translation[3]+ROOM_HALF_LENGTH)
+        end
+
+        local bulletNum=#Bullet.objects
+        local brightness=math.clamp(1-bulletNum/3000,0.62,0.82)
+        self.lightColor={brightness,brightness,brightness}
+        return
+    end
+
     self.rollPerRoom=math.lerp(self.rollPerRoom,self.rollPerRoomAim,0.05)
     self.portalZoomBase=math.lerp(self.portalZoomBase,self.portalZoomBaseAim,0.05)
     self.zoomFactor=self:calculateZoomFactor()

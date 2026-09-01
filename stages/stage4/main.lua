@@ -786,6 +786,10 @@ return{
             key='4-7',
             type='midStage',
             func=function() -- 25s
+                -- wait(300)
+                G.backgroundPattern:beginOctagonalHallEntrance()
+                -- wait(900)
+                -- G.backgroundPattern:beginOculusAscent()
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
                 local pos0=geo:init().pos

@@ -103,6 +103,13 @@ local midboss=BossManager.BossSegment{
 local boss=BossManager.BossSegment{
     bossName='shouji',
     key='4-boss',
+    init=function()
+        if G.backgroundPattern:is(BackgroundPattern.Stage4Rooms) then
+            if G.backgroundPattern.backgroundMode~='hall' then
+                G.backgroundPattern:enterOctagonalHall()
+            end
+        end
+    end,
     getBossSpawnPos=function(self)
         local geo=G.runInfo.geometry
         local playerPos=G.runInfo.player.kinematicState.pos
@@ -304,5 +311,4 @@ local boss=BossManager.BossSegment{
         }}
     }
 }
-
 return {midboss=midboss, boss=boss}
