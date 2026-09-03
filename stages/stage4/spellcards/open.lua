@@ -21,7 +21,6 @@ return BossManager.SpellcardPhase{
         DanmakuFuncs.moveToInTime(boss,posb,30)
         boss.safe=true
         wait(30)
-        boss.safe=false
         boss.kinematicState.pos=posb
         local sentry=DanmakuFuncs.sentry(posb)
         local portalAngle=dir0
@@ -105,5 +104,7 @@ return BossManager.SpellcardPhase{
                 wait()
             end
         end}
+        wait(30)
+        boss.safe=false
     end
 }

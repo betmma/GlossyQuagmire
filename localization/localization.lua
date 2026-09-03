@@ -1700,6 +1700,10 @@ return {
                 en_us = 'Yeah. It\'s called Pavilion of Visual Splendor. You can see it from here.',
                 zh_cn = '是呀。它叫“观艳馆”。这里已经可以看到它了。',
             },
+            huhSoTheTrick = {
+                en_us = 'Oh? Ah, to make the prank more convincing, you lead the correct way...',
+                zh_cn = '嗯？哦，为了让恶作剧更可信，其实走的是正确的路吗……',
+            },
             okBye = {
                 en_us = 'Ok, bye.',
                 zh_cn = '好吧，拜拜。',
@@ -1821,8 +1825,12 @@ return {
                 zh_cn = '哦，所以这不是骗局？我还是没明白……',
             },
             ofCourse = {
-                en_us = 'Of course not. I\'m leading you to the Pavilion of Visual Splendor.',
-                zh_cn = '当然不是。我是带你去观艳馆的。',
+                en_us = 'Of course not. As long as you keep the speed, you do reach your destination.',
+                zh_cn = '当然不是。只要速度跟得上，就的确能到达目的地。',
+            },
+            overThere = {
+                en_us = 'The Pavilion of Visual Splendor is over there.',
+                zh_cn = '观艳馆就在那边了。',
             },
             whateverImHeadingThere = {
                 en_us = 'Whatever. I\'m heading there.',
@@ -1996,6 +2004,222 @@ return {
                 en_us = 'I\'m considering adding mirrors to Hyperbolic Domain.',
                 zh_cn = '我要考虑在双曲域里加上镜子。',
             },
+        },
+        REIMUS4BossBefore = {
+            theSpaceIsMoreAndMoreAbnormal = {
+                en_us = 'The space is more and more abnormal.',
+                zh_cn = '空间越来越奇怪了。',
+            },
+            isThisAPotentialIncident = {
+                en_us = 'Is this a potential incident?',
+                zh_cn = '难道是潜在的异变？',
+            },
+            aNewRoomInCageShape = {
+                en_us = 'A new room, in cage shape...',
+                zh_cn = '笼子形状的新房间……',
+            },
+            yeahItsForYou = {
+                en_us = 'Yeah, it\'s for you!',
+                zh_cn = '是啊，是给你准备的！'
+            },
+            ninjaInGensokyo = {
+                en_us = 'Ninja in Gensokyo?!',
+                zh_cn = '幻想乡里出现了忍者？！'
+            },
+            thisIsSurelyAnIncident = {
+                en_us = 'This is surely an incident!',
+                zh_cn = '这的确是异变啊！'
+            },
+            stopTalkingToYourself = {
+                en_us = 'Stop talking to yourself.',
+                zh_cn = '别自言自语了。'
+            },
+            youAreThePerfectTarget = {
+                en_us = 'You are the perfect target...',
+                zh_cn = '你是完美的目标……'
+            },
+            tryNotGetLostInPortals = {
+                en_us = 'Try not to break your gohei in half when crossing the portals!',
+                zh_cn = '可别在穿过传送门时把御币折断了！'
+            }
+        },
+        REIMUS4BossAfter = {
+            iWin = {
+                en_us = 'I win!',
+                zh_cn = '我赢了！',
+            },
+            yeahIllWalkYouOutside = {
+                en_us = 'Yeah, I\'ll walk you outside.',
+                zh_cn = '嗯，我送你出去吧。',
+            },
+            wait = {
+                en_us = 'Wait, there\'s something off...',
+                zh_cn = '等等，有点不对劲……',
+            },
+            aboutThisSpatialAbility = {
+                en_us = 'About this spatial ability, it feels too strong.',
+                zh_cn = '这种空间能力，感觉太强大了。',
+            },
+            itCouldntBeFromYou = {
+                en_us = 'It couldn\'t be yours, right?',
+                zh_cn = '不可能是你的能力吧？',
+            },
+            ohNo = {
+                en_us = 'Oh no...',
+                zh_cn = '不好……',
+            },
+            isntTheHoleInTheCeilingStrange = {
+                en_us = 'Isn\'t the hole in the ceiling strange?',
+                zh_cn = '天花板上的洞不是很奇怪吗？',
+            },
+            illGoThere = {
+                en_us = 'I\'ll go there and check it out.',
+                zh_cn = '我去看看。',
+            }
+        },
+        MARISAS4BossBefore = {
+            iveSeenEnoughWhereIsExit = {
+                en_us = 'I\'ve seen enough. Where is the exit?',
+                zh_cn = '我已经看够了。出口在哪里？',
+            },
+            aStrangeRoomWhoIsIt = {
+                en_us = 'A bigger room. Who is it?',
+                zh_cn = '更大些的房间。那是谁？',
+            },
+            mustBeAnotherVisitor = {
+                en_us = 'Just another visitor.',
+                zh_cn = '只是另一个游客啊。',
+            },
+            thatsABigMistake = {
+                en_us = 'That\'s a big mistake.',
+                zh_cn = '那可是个大错误。',
+            },
+            noYouDontHaveMagicCircle = {
+                en_us = 'It\'s not. You don\'t have a magic circle, so you are not a threat.',
+                zh_cn = '才不是。你没有魔法阵，所以你不是个威胁。',
+            },
+            haGuessWhyIDontCastIt = {
+                en_us = 'Ha! Guess why I don\'t cast one?',
+                zh_cn = '哈哈！猜猜我为什么不施放魔法阵？',
+            },
+            cuzYouDontHaveMagicPowerNotLikeMe = {
+                en_us = 'Cuz you don\'t have magic power! It\'s a privilege to meet a great magician like me.',
+                zh_cn = '因为你没有魔力啊！你能遇到像我这样的大魔法使应该感到很荣幸呢。',
+            },
+            wrongItsForStealth = {
+                en_us = 'Wrong! It\'s for stealth.',
+                zh_cn = '错了！是为了潜行。',
+            },
+            arentYouAlreadyInFrontOfMe = {
+                en_us = 'Aren\'t you already in front of me?',
+                zh_cn = '你不就在我面前吗？',
+            },
+            iWasWatchingYouWhenYouWereWanderingAround = {
+                en_us = 'I was watching you when you were wandering around.',
+                zh_cn = '我在你四处游荡的时候就一直在观察你。',
+            },
+            andIvePreparedPersonalizedAttacks = {
+                en_us = 'I\'ve prepared personalized attacks for you.',
+                zh_cn = '我为你准备了个性化的攻击。',
+            },
+        },
+        MARISAS4BossAfter = {
+            stillBetterThanTheWorstMushroomIHad = {
+                en_us = 'Still better than the worst magic mushroom I had.',
+                zh_cn = '还是比我吃过的最难吃的魔法蘑菇好。',
+            },
+            imGenuinelyCuriousAboutIt = {
+                en_us = 'Well, I\'m genuinely curious about it.',
+                zh_cn = '我真的很好奇。',
+            },
+            whateverYouCanLeave = {
+                en_us = 'Ahem. You can leave now.',
+                zh_cn = '呃，你可以走了。',
+            },
+            theClosestExitIs80RoomsAway = {
+                en_us = 'The closest exit is 80 rooms away. I\'ll walk you there.',
+                zh_cn = '最近的出口在80个房间之外。我送你过去吧。',
+            },
+            really = {
+                en_us = 'Really?',
+                zh_cn = '真的吗？',
+            },
+            aHoleInTheCeiling = {
+                en_us = 'But there is a hole in the ceiling.',
+                zh_cn = '但天花板上有个洞。',
+            },
+            takeThisFasterWay = {
+                en_us = 'I rather take this faster way.',
+                zh_cn = '我走这条更快的路。',
+            },
+            thatsNotTheExit = {
+                en_us = 'That\'s not an exit—',
+                zh_cn = '那不是出口——',
+            },
+        },
+        KOTOBAS4BossBefore = {
+            theRoomsDynamicallyChangeStructure = {
+                en_us = 'The rooms dynamically change structure?',
+                zh_cn = '房间的结构在动态变化？',
+            },
+            finallyADifferentRoom = {
+                en_us = 'Finally, a different room.',
+                zh_cn = '终于，一个不同的房间。',
+            },
+            isntItTheTravelHubManager = {
+                en_us = 'Isn\'t it the travel hub manager?',
+                zh_cn = '那不是交通枢纽的管理员吗？',
+            },
+            yeahWhoAreYou = {
+                en_us = 'Yeah, who are you?',
+                zh_cn = '是啊，你是哪位？',
+            },
+            shouji = {
+                en_us = 'I\'m Shouji Yaeme. The maze is set up by me.',
+                zh_cn = '我是八重目障子。迷宫就是我设置的。',
+            },
+            thisPavillionGetsManyVisitors = {
+                en_us = 'After the appearance of Hyperbolic Domain, this pavilion gets many visitors.',
+                zh_cn = '双曲域出现后，观艳馆有了很多访客呢。',
+            },
+            toPayBackLetsBattle = {
+                en_us = 'To pay back, let\'s battle!',
+                zh_cn = '为了报答，我来和你战斗吧！',
+            },
+        },
+        KOTOBAS4BossAfter = {
+            imExhausted = {
+                en_us = 'I\'m exhausted...',
+                zh_cn = '我累坏了……',
+            },
+            theBattleIsntEnding = {
+                en_us = 'The battle isn\'t ending?',
+                zh_cn = '战斗还没结束吗？',
+            },
+            iStillHaveNineStars = {
+                en_us = 'I still have nine star spellcards—',
+                zh_cn = '我还有九张星符——',
+            },
+            ahhWhatToDo = {
+                en_us = 'Ahh, what to do?',
+                zh_cn = '啊啊，我该怎么办？',
+            },
+            andEightGods = {
+                en_us = '—And eight god spellcards.',
+                zh_cn = '——以及八张神符。',
+            },
+            hmm = {
+                en_us = 'Hmm, I have to think!',
+                zh_cn = '嗯，我得好好想想！',
+            },
+            theresAHoleInTheCeiling = {
+                en_us = 'There\'s a hole in the ceiling!',
+                zh_cn = '天花板上有个洞！',
+            },
+            takeOffNow = {
+                en_us = 'Take off now!',
+                zh_cn = '我要远走高飞！',
+            }
         }
     },
 }

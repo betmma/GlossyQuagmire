@@ -6,12 +6,12 @@
 ---@field expression expression used to pick image
 ---@field textKey string text is in localization.lua
 ---@field position position where to position image (and flip)
----@field autoForwardTime number? if not nil, cannot advance manually and will auto advance after this time (in seconds).
----@field playBGM boolean? if true, will play BGM when this line is displayed. the BGM key is passed on creation of DialogueController.
+---@field extra LineExtra
 
 ---@class LineExtra
----@field playBGM boolean?
----@field autoForwardTime number?
+---@field playBGM boolean? if true, will play BGM when this line is displayed. the BGM key is passed on creation of DialogueController.
+---@field autoForwardTime number? if not nil, cannot advance manually and will auto advance after this time (in seconds).
+---@field callback function? called when this line is displayed. currently, only used in stage 4 to trigger background flying into the hole in the ceiling.
 ---@field position position
 
 --- of course i want to omit "key=" in each line definition
@@ -26,8 +26,7 @@ local function line(speaker,expression,textKey,extra)
         speaker=speaker,
         expression=expression,
         textKey=textKey,
-        playBGM=extra.playBGM,
-        autoForwardTime=extra.autoForwardTime,
+        extra=extra,
         position=extra.position,
     }
 end
@@ -80,7 +79,7 @@ function DialogueController:new(args)
         error("Dialogue key "..tostring(args.key).." not found in Dialogue.data")
     end
     self.BGM=args.BGM
-    if self.data.lines[self.currentLineIndex].playBGM and self.BGM then
+    if self.data.lines[self.currentLineIndex].extra.playBGM and self.BGM then
         BGM:play(self.BGM)
         DynamicUIObjs.showSoundtrack()
     end
@@ -95,7 +94,7 @@ function DialogueController:new(args)
     self.activeCharacters={} -- list of characters that have appeared in this dialogue. once appeared, their portrait will stay on screen (changing transparency based on who is speaking)
 
     self.playerZCallback=function() -- why dont in DialogueController:update directly read player.keyIsPressed? because DialogueController:update could be called after player:update, while player:update bumps player.frame by 1. so in replay player.keyIsPressed call in DialogueController:update could see 1 frame later than the calls in player.update. so let player emit an event in player.update to prevent this issue.
-        if self.timeSinceLastAutoAdvance>0.5 and not self.data.lines[self.currentLineIndex].autoForwardTime then -- > 0.5 check to avoid unintended advance after an auto advance
+        if self.timeSinceLastAutoAdvance>0.5 and not self.data.lines[self.currentLineIndex].extra.autoForwardTime then -- > 0.5 check to avoid unintended advance after an auto advance
             self:advanceDialogue()
         end
     end
@@ -123,7 +122,7 @@ function DialogueController:update(dt)
     self.timeSinceLastAutoAdvance=self.timeSinceLastAutoAdvance+dt
     local player=G.runInfo.player
     if player then
-        local advanceTime=self.data.lines[self.currentLineIndex].autoForwardTime or self.autoAdvanceTime
+        local advanceTime=self.data.lines[self.currentLineIndex].extra.autoForwardTime or self.autoAdvanceTime
         if self.timeSinceLastAdvance>=advanceTime then -- or love.keyboard.isDown('lctrl') then -- press z or hold left ctrl to advance. lctrl isn't in player's replay record keys so cannot add now. and adding lctrl would exceed 8 keys and also need to change replayManager's serialize (currently 8 keys -> 2 hex chars) ughh
             self:advanceDialogue(true)
         end
@@ -170,9 +169,12 @@ function DialogueController:advanceDialogue(isAuto)
         self.currentLineIndex=#self.data.lines -- stay on last line until removed
     else
         local line=self.data.lines[self.currentLineIndex]
-        if line.playBGM and self.BGM then
+        if line.extra.playBGM and self.BGM then
             BGM:play(self.BGM)
             DynamicUIObjs.showSoundtrack()
+        end
+        if line.extra.callback then
+            line.extra.callback()
         end
     end
 end
@@ -434,6 +436,7 @@ local REIMUS2BossAfter={
         line('tooshi','sad','leadPeopleDeepAndAbandonThem'),
         line('reimu','frustrated','soIsThatPlaceReallyHere'),
         line('tooshi','normal','yeahYouSeeItFromHere'),
+        line('reimu','normal','huhSoTheTrick'),
         line('reimu','normal','okBye'),
     }
 }
@@ -503,6 +506,7 @@ local KOTOBAS2BossAfter={
         line('tooshi','sad','itsCloseYouCanSeeItFromHere'),
         line('kotoba','frustrated','ohSoThisIsntAScam'),
         line('tooshi','sad','ofCourse'),
+        line('tooshi','sad','overThere'),
         line('kotoba','frustrated','whateverImHeadingThere'),
     }
 }
@@ -606,6 +610,123 @@ local KOTOBAS3BossAfter={
     }
 }
 
+local function triggerStage4BackgroundFlyingIntoHole()
+    if G.backgroundPattern:is(BackgroundPattern.Stage4Rooms) then
+        G.backgroundPattern:beginOculusAscent()
+    end
+end
+
+local REIMUS4BossBefore={
+    name='REIMUS4BossBefore',
+    defaultSpeakerPosition={
+        reimu='left',
+        shouji='right',
+    },
+    lines={
+        line('reimu','frustrated','theSpaceIsMoreAndMoreAbnormal'),
+        line('reimu','frustrated','isThisAPotentialIncident'),
+        line('reimu','normal','aNewRoomInCageShape'),
+        line('shouji','happy','yeahItsForYou'),
+        line('reimu','surprised','ninjaInGensokyo'),
+        line('reimu','surprised','thisIsSurelyAnIncident'),
+        line('shouji','cunning','stopTalkingToYourself'),
+        line('shouji','cunning','youAreThePerfectTarget',{playBGM=true}),
+        line('shouji','cunning','tryNotGetLostInPortals'),
+    }
+}
+
+local REIMUS4BossAfter={
+    name='REIMUS4BossAfter',
+    defaultSpeakerPosition={
+        reimu='left',
+        shouji='right',
+    },
+    lines={
+        line('reimu','happy','iWin'),
+        line('shouji','sad','yeahIllWalkYouOutside'),
+        line('reimu','normal','wait'),
+        line('reimu','normal','aboutThisSpatialAbility'),
+        line('reimu','cunning','itCouldntBeFromYou'),
+        line('shouji','surprised','ohNo'),
+        line('reimu','normal','isntTheHoleInTheCeilingStrange',{callback=triggerStage4BackgroundFlyingIntoHole}),
+        line('reimu','happy','illGoThere'),
+    }
+}
+
+local MARISAS4BossBefore={
+    name='MARISAS4BossBefore',
+    defaultSpeakerPosition={
+        marisa='left',
+        shouji='right',
+    },
+    lines={
+        line('marisa','normal','iveSeenEnoughWhereIsExit'),
+        line('marisa','surprised','aStrangeRoomWhoIsIt'),
+        line('marisa','normal','mustBeAnotherVisitor'),
+        line('shouji','cunning','thatsABigMistake'),
+        line('marisa','normal','noYouDontHaveMagicCircle'),
+        line('shouji','cunning','haGuessWhyIDontCastIt'),
+        line('marisa','happy','cuzYouDontHaveMagicPowerNotLikeMe'),
+        line('shouji','angry','wrongItsForStealth'),
+        line('marisa','happy','arentYouAlreadyInFrontOfMe'),
+        line('shouji','angry','iWasWatchingYouWhenYouWereWanderingAround',{playBGM=true}),
+        line('shouji','cunning','andIvePreparedPersonalizedAttacks'),
+    }
+}
+
+local MARISAS4BossAfter={
+    name='MARISAS4BossAfter',
+    defaultSpeakerPosition={
+        marisa='left',
+        shouji='right',
+    },
+    lines={
+        line('marisa','happy','stillBetterThanTheWorstMushroomIHad'),
+        line('shouji','frustrated','imGenuinelyCuriousAboutIt'),
+        line('shouji','frustrated','whateverYouCanLeave'),
+        line('shouji','normal','theClosestExitIs80RoomsAway'),
+        line('marisa','surprised','really'),
+        line('marisa','surprised','aHoleInTheCeiling',{callback=triggerStage4BackgroundFlyingIntoHole}),
+        line('marisa','normal','takeThisFasterWay'),
+        line('shouji','normal','thatsNotTheExit'),
+    }
+}
+
+local KOTOBAS4BossBefore={
+    name='KOTOBAS4BossBefore',
+    defaultSpeakerPosition={
+        kotoba='left',
+        shouji='right',
+    },
+    lines={
+        line('kotoba','surprised','theRoomsDynamicallyChangeStructure'),
+        line('kotoba','happy','finallyADifferentRoom'),
+        line('shouji','happy','isntItTheTravelHubManager'),
+        line('kotoba','happy','yeahWhoAreYou'),
+        line('shouji','normal','shouji'),
+        line('shouji','happy','thisPavillionGetsManyVisitors'),
+        line('shouji','cunning','toPayBackLetsBattle',{playBGM=true}),
+    }
+}
+
+local KOTOBAS4BossAfter={
+    name='KOTOBAS4BossAfter',
+    defaultSpeakerPosition={
+        kotoba='left',
+        shouji='right',
+    },
+    lines={
+        line('kotoba','frustrated','imExhausted'),
+        line('kotoba','frustrated','theBattleIsntEnding'),
+        line('shouji','normal','iStillHaveNineStars'),
+        line('kotoba','frustrated','ahhWhatToDo'),
+        line('shouji','cunning','andEightGods'),
+        line('kotoba','frustrated','hmm'),
+        line('kotoba','happy','theresAHoleInTheCeiling',{callback=triggerStage4BackgroundFlyingIntoHole}),
+        line('kotoba','happy','takeOffNow'),
+    }
+}
+
 ---@type table<string,Dialogue>
 Dialogue.data={
     REIMUS1BossBefore=REIMUS1BossBefore,
@@ -629,6 +750,12 @@ Dialogue.data={
     MARISAS3BossAfter=MARISAS3BossAfter,
     KOTOBAS3BossBefore=KOTOBAS3BossBefore,
     KOTOBAS3BossAfter=KOTOBAS3BossAfter,
+    REIMUS4BossBefore=REIMUS4BossBefore,
+    REIMUS4BossAfter=REIMUS4BossAfter,
+    MARISAS4BossBefore=MARISAS4BossBefore,
+    MARISAS4BossAfter=MARISAS4BossAfter,
+    KOTOBAS4BossBefore=KOTOBAS4BossBefore,
+    KOTOBAS4BossAfter=KOTOBAS4BossAfter
 }
 
 

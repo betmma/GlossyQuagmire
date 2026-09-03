@@ -103,6 +103,12 @@ local midboss=BossManager.BossSegment{
 local boss=BossManager.BossSegment{
     bossName='shouji',
     key='4-boss',
+    beforeDialogueKey=function ()
+        return G.runInfo.playerType..'S4BossBefore'
+    end,
+    afterDialogueKey=function ()
+        return G.runInfo.playerType..'S4BossAfter'
+    end,
     init=function()
         if G.backgroundPattern:is(BackgroundPattern.Stage4Rooms) then
             if G.backgroundPattern.backgroundMode~='hall' then
