@@ -708,7 +708,7 @@ return{
                 local count=0
                 local function stretch(pos)
                     count=count+1
-                    BulletSpawner{kinematicState={pos=copyTable(pos),speed=0,dir=0},period=999,firstPeriod=1,lifeFrame=2,bulletSpeed=count*10-50,bulletNumber=100,angle='player',range=math.pi*2,bulletSprite=BulletSprites.bullet.green,bulletLifeFrame=240,bulletExtraUpdate={Action.FadeOut(20,true),extraUpdate}}
+                    BulletSpawner{kinematicState={pos=copyTable(pos),speed=0,dir=0},period=999,firstPeriod=1,lifeFrame=2,bulletSpeed=count*10-50,bulletNumber=DSWITCH{5,20,40,50},angle='player',range=math.pi*2,bulletSprite=BulletSprites.bullet.green,bulletLifeFrame=240,bulletExtraUpdate={Action.FadeOut(20,true),extraUpdate}}
                 end
                 local time=720
                 local function spawnFairy(pos)
@@ -744,13 +744,18 @@ return{
                     --- hakke spawners
                     local hakkes={4,5,6,7,3,2,1,0}
                     local hakke=hakkes[i]
+                    local bulletNumberMax=DSWITCH{6,6,9,9}
                     for j=1,3 do -- inner to outer
                         local value=bit.rshift(hakke,3-j)%2
-                        local bulletNumber=value==0 and 6 or 9
+                        local bulletNumber=bulletNumberMax
+                        if value==0 then
+                            bulletNumber=bulletNumber-bulletNumberMax/3
+                        end
                         local speedUnit=20
-                        local BulletSpawner=BulletSpawner{period=240,firstPeriod=120-i*10,lifeFrame=time,bulletSpeed=speedUnit*5,bulletNumber=bulletNumber,angle=-value*math.pi/2,useRelativeAngle=true,range=math.pi*bulletNumber,bulletSprite=BulletSprites.bill[value==0 and 'white' or 'black'],bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
+                        local BulletSpawner=BulletSpawner{period=240,firstPeriod=120-i*10,lifeFrame=time,bulletSpeed=speedUnit*(bulletNumberMax+1)/2,bulletNumber=bulletNumber,angle=0,useRelativeAngle=true,range=0,bulletSprite=BulletSprites.bill[value==0 and 'white' or 'black'],bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
                             local index=args.index
                             local side=math.mod2Sign(index)
+                            cir.kinematicState.dir=cir.kinematicState.dir+side*math.pi/2
                             local n=math.ceil(index/2)
                             cir.kinematicState.speed=cir.kinematicState.speed-n*speedUnit
                             cir.spriteTransparency=0.5
@@ -826,10 +831,16 @@ return{
                         self.kinematicState.speed=-self.any.speed*2*math.min(x*2,2-x*2)
                         if t2==self.any.moveTime/2 then
                             self.kinematicState.dir=self.kinematicState.dir+turnData[currentTurn].dir*maskf(self.any.i,self.any.j)
+                            self.safe=true
+                            self.spriteTransparency=0.3
                         end
                     elseif t2>self.any.moveTime/2 and t2<=self.any.moveTime then
                         local x=(t2-self.any.moveTime/2)/(self.any.moveTime/2)
                         self.kinematicState.speed=self.any.speed*2*math.min(x*2,2-x*2)
+                        if t2==self.any.moveTime then
+                            self.safe=false
+                            self.spriteTransparency=1
+                        end
                     end
                 end
                 local function angleWall(pos,angle,i,j)
