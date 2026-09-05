@@ -1,7 +1,13 @@
 local function injectGeometry()
+    -- i give up on making portals work for other geometries :P
+    if G.geometries.EuclideanPortal then
+        G.runInfo.geometry=G.geometries.EuclideanPortal
+        return
+    end
     G.runInfo.geometry=copyRecursiveTable(G.runInfo.geometry)
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
+    G.geometries.EuclideanPortal=geo
     geo.portal=true
     geo.viewConfig.following=true
     local applyVertexShaderRef=geo.applyVertexShader

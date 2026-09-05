@@ -5,6 +5,7 @@
 ---@field invincible boolean
 ---@field dropItems DropItems
 ---@field extraDieEffects function[]
+---@field extraOrientation number?
 ---@overload fun(args:EnemyArgs):Enemy
 local Enemy=Shape:extend()
 
@@ -188,7 +189,7 @@ function Enemy:drawSprite()
     if not sprite then
         return
     end
-    local orientation=self.orientation or 0
+    local orientation=(self.orientation or 0)+(self.extraOrientation or 0)
     if sprite.key=='boss' then
         local kinematicState=self.kinematicState
         local offDistance=math.sin(self.time)*3 -- slightly floating

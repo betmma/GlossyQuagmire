@@ -115,6 +115,8 @@ local boss=BossManager.BossSegment{
                 G.backgroundPattern:enterOctagonalHall()
             end
         end
+        G.runInfo.player.viewDirection=math.modClamp(G.runInfo.player.viewDirection)
+        Event.EaseEvent{obj=G.runInfo.player,aims={viewDirection=0},duration=30,progressFunc=Event.sineIOProgressFunc}
     end,
     getBossSpawnPos=function(self)
         local geo=G.runInfo.geometry

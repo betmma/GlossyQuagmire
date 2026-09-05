@@ -102,7 +102,7 @@ return BossManager.SpellcardPhase{
                 local sign=((sideRef==side)~=shrinking) and 1 or -1
                 for i=1,4 do
                     local dir=math.pi/2*(i+side*2)
-                    local sentry=DanmakuFuncs.PortalOnSentry(posSide,dir,r,r*sign,side==0,nil,{lifeFrame=t,draw=true,range=0.1})
+                    local sentry=DanmakuFuncs.PortalOnSentry(posSide,dir,r,r*sign,side==0,nil,{lifeFrame=t,draw=true,range=1})
                     if side==0 then
                         portals[i]=sentry.any.portal
                     else
@@ -176,7 +176,7 @@ return BossManager.SpellcardPhase{
                         cir.side=side
                     end},bulletExtraUpdate={Action.FadeOut(20,true),bulletSideUpdate,function(self)
                         local vx,vy=math.rTheta2xy(self.kinematicState.speed,self.kinematicState.dir)
-                        vy=vy+1
+                        vy=vy+DSWITCH{0.2,0.5,1,1}
                         self.kinematicState.speed,self.kinematicState.dir=math.xy2rTheta(vx,vy)
                     end}}
                 end
