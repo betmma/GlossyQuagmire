@@ -1433,6 +1433,16 @@ return {
                 zh_cn = '第四面的主题曲。\n沉浸在梦幻的状态中，伴随着危险感的过渡。几何的疯狂达到了一个新的高度，就和拍号的分子一样。',
             }
         },
+        level4b = {
+            name = {
+                en_us = 'Doors to Nowhere ~ Stitched Reality',
+                zh_cn = '连通无处之门　～ Stitched Reality',
+            },
+            description = {
+                en_us = 'Shouji Yaeme\'s theme.\nI tried to add some traditional Japanese song elements while it turned out to be weird, messy, and with the urgency of a tough battle. This theme also has a long history. Why koto feels very difficult to use?',
+                zh_cn = '八重目障子的主题曲。\n我试着加入一些传统日本音乐元素，结果奇怪、混乱又有着激烈战斗的紧迫感。这首曲子也有很长一段历史。为什么筝感觉很难用呢？',
+            }
+        },
         level5 = {
             name = {
                 en_us = 'Radio Signal Across the Ether',

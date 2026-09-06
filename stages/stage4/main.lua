@@ -270,7 +270,7 @@ return{
                         local n=math.ceil(r/5)+DSWITCH{6,4,6,14}
                         for j=1,n do
                             local angle=j/n*math.pi*2
-                            local bullet=Bullet{kinematicState={pos=copyTable(fairy.kinematicState.pos),speed=150,dir=angle},sprite=BulletSprites[sprites[i]][color],lifeFrame=fairy.lifeFrame,extraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true),i==3 and layer3Update or nil},highlight=true,invincible=true,spriteTransparency=i<=2 and 0.3 or 1,safe=i<=2}
+                            local bullet=Bullet{kinematicState={pos=copyTable(fairy.kinematicState.pos),speed=100,dir=angle},sprite=BulletSprites[sprites[i]][color],lifeFrame=fairy.lifeFrame,extraUpdate={Action.ZoomIn(30),Action.FadeOut(30,true),i==3 and layer3Update or nil},highlight=true,invincible=true,spriteTransparency=i<=2 and 0.3 or 1,safe=i<=2}
                             DanmakuFuncs.orbitBind(bullet,fairy,function (self, centerObj)
                                 local r1=r*(math.smoothstep(self.frame/r/2+0.5)*2-1)
                                 local theta=angle+self.frame/r*3
@@ -308,7 +308,7 @@ return{
                         for i=1,num do
                             SFX:play(sfx)
                             local ddir=math.pi*2/num*i
-                            local fairy=Enemy{kinematicState=copyTable{pos=pos,dir=dir2+ddir+randDir,speed=100},maxhp=hp,sprite=Asset.fairySprites[fairyType][c],lifeFrame=life-t,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=n*5-3}}
+                            local fairy=Enemy{kinematicState=copyTable{pos=pos,dir=dir2+ddir+randDir,speed=100},maxhp=hp,sprite=Asset.fairySprites[fairyType][c],lifeFrame=life-t,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=n*5-2}}
                             circledFairy(fairy,n,c)
                             if n==3 then
                                 local sentry=DanmakuFuncs.sentry(pos)

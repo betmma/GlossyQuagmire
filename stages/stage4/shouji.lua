@@ -103,6 +103,7 @@ local midboss=BossManager.BossSegment{
 local boss=BossManager.BossSegment{
     bossName='shouji',
     key='4-boss',
+    BGM='level4b',
     beforeDialogueKey=function ()
         return G.runInfo.playerType..'S4BossBefore'
     end,

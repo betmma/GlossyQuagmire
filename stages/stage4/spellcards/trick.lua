@@ -66,7 +66,7 @@ return BossManager.SpellcardPhase{
         local groupN=15
         local compensateFrame=30
         local initPhase=math.eval(0,1)
-        local spawner=BulletSpawner{lifeFrame=9999,period=DSWITCH{4,3,2,1},bulletNumber=1,angle=smallPortalAngle,bulletSprite=BulletSprites.flame.red,bulletSpeed=350,highlight=true,bulletLifeFrame=600,bulletEvents={function (cir,args,self)
+        local spawner=BulletSpawner{lifeFrame=9999,period=DSWITCH{4,3,2,1},bulletNumber=1,angle=smallPortalAngle,bulletSprite=BulletSprites.flame.red,bulletSpeed=300,highlight=true,bulletLifeFrame=600,bulletEvents={function (cir,args,self)
             local groupIndex=self.spawnTimes%groupN
             local phase=math.sin(initPhase+self.spawnTimes%3*math.pi*2/3+math.cos(self.spawnTimes/60))--%2-1
             --cir.kinematicState.speed=cir.kinematicState.speed*math.eval(1,0.05*math.min(1,self.frame/1200))
@@ -91,7 +91,7 @@ return BossManager.SpellcardPhase{
             local phase=self.frame/self.flashPeriod*math.pi*2
             local val=math.sin(phase)*0.2+0.8
             self.spriteColor={1,val,val,1}
-            self.kinematicState.speed=(self.speed0-self.speedRef)*(1-math.min(1,self.frame/compensateFrame))+self.speedRef-math.min((self.teleportCount or 0)*50,280)
+            self.kinematicState.speed=(self.speed0-self.speedRef)*(1-math.min(1,self.frame/compensateFrame))+self.speedRef-math.min((self.teleportCount or 0)*20,280)
         end}}
         spawner:bindState(boss)
         bigPortal:link(smallPortal)
