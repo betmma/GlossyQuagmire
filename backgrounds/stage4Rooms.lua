@@ -9,6 +9,9 @@ local ROOM_HALF_LENGTH=4.0
 local ROOM_WALL_THICKNESS=0.14
 local PORTAL_ZOOM_RANGE=1.5
 local DOOR_OPEN_RANGE=8.0
+-- At 60 Hz, even speed 1 settles below 0.32 per axis under held input.
+-- A 4x portal scale keeps that diagonal offset below 1.8, clear of the walls.
+local CAMERA_CENTER_LERP=0.05
 -- Keep this fixed projected-room value synchronized with the corresponding
 -- constant in shaders/backgrounds/stage4Rooms.glsl.
 local PROJECTED_CAMERA_Z=-3.9
@@ -372,6 +375,9 @@ function Stage4Rooms:update(dt)
     self.zoomFactor=self:calculateZoomFactor()
     self.camMoveSpeed=self.baseCamMoveSpeed*self.zoomFactor
     Stage4Rooms.super.update(self,dt)
+    local centerLerp=1-(1-CAMERA_CENTER_LERP)^(dt*60)
+    self.cam_translation[1]=math.lerp(self.cam_translation[1],0,centerLerp)
+    self.cam_translation[2]=math.lerp(self.cam_translation[2],0,centerLerp)
     self:updateProjectionState(dt)
 
     self.zoomFactor=self:calculateZoomFactor()
