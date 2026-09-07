@@ -648,7 +648,7 @@ return{
                 local pos1,dir1=geo:rThetaGo(pos,50,-math.pi/2)
                 local pos2,dir2=geo:rThetaGo(pos1,-350,dir1-math.pi/2)
                 local extraUpdate=function(self)
-                    local aimSpeed=150
+                    local aimSpeed=100
                     if self.frame+60>self.lifeFrame then
                         aimSpeed=0
                     end

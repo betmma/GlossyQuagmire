@@ -172,6 +172,9 @@ local boss=BossManager.BossSegment{
         local pos,dir=geo:rThetaGo(playerPos,200,G.runInfo.player.viewDirection-math.pi/2)
         return pos
     end,
+    bossSpawnCallback=function (self, boss)
+        boss.showHexagram=false
+    end,
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{

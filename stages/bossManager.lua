@@ -5,6 +5,7 @@
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field BGM? string key for BGM:play(). will be sent to dialogue if has beforeDialogueKey and not in spell practice. otherwise directly played when func is called.
 ---@field getBossSpawnPos fun(self):Position
+---@field bossSpawnCallback? fun(self,boss:Boss):nil
 ---@field rounds BossRound[]
 ---@field beforeDialogueKey? fun():string
 ---@field afterDialogueKey? fun():string
@@ -16,6 +17,7 @@
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field BGM? string key for BGM:play(). will be sent to dialogue if has beforeDialogueKey and not in spell practice. otherwise directly played when func is called.
 ---@field getBossSpawnPos fun(self):Position
+---@field bossSpawnCallback? fun(self,boss:Boss):nil
 ---@field rounds BossRound[]
 ---@field beforeDialogueKey? fun():string it's a function so can route to different dialogue based on shot type or difficulty
 ---@field afterDialogueKey? fun():string
@@ -23,6 +25,7 @@
 ---@overload fun(args:BossSegmentArgs):BossSegment
 local BossSegment=Object:extend()
 
+---@param args BossSegmentArgs
 function BossSegment:new(args)
     self.SKIP_INCLUDE=args.SKIP_INCLUDE
     self.key=args.key
@@ -30,6 +33,7 @@ function BossSegment:new(args)
     self.bossName=args.bossName
     self.BGM=args.BGM
     self.getBossSpawnPos=args.getBossSpawnPos
+    self.bossSpawnCallback=args.bossSpawnCallback
     self.rounds=args.rounds
     self.beforeDialogueKey=args.beforeDialogueKey
     self.afterDialogueKey=args.afterDialogueKey
@@ -69,6 +73,9 @@ function BossSegment:func(args)
         kinematicState={pos=pos,dir=0,speed=0},
         sprite=Asset.boss[self.bossName],maxhp=999999,revivable=true
     }
+    if self.bossSpawnCallback then
+        self:bossSpawnCallback(boss)
+    end
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
     DynamicUIObjs.bossStars:clearStars()
     Event.Event{obj=boss,action=function()
