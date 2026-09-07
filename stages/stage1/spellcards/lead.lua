@@ -132,7 +132,9 @@ end
 return BossManager.SpellcardPhase{
             SKIP_INCLUDE=true,
     key='kotoba-lead',
-    difficulties={HARD=true,LUNATIC=true},
+    condition={
+        difficulties={HARD=true,LUNATIC=true},
+    },
     bonusScore=10000,
     time=2400,
     hp=2400,

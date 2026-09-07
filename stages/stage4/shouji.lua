@@ -99,7 +99,51 @@ local midboss=BossManager.BossSegment{
         }}
     }
 }
+local gateRoutes={
+    EASY={
+        REIMU={'rest','life','block','death'},
+        MARISA={'injury','scenery','death','open'},
+        KOTOBA={'life','block','fear','open'},
+    },
+    NORMAL={
+        REIMU={'life','scenery','death','open'},
+        MARISA={'rest','block','scenery','open'},
+        KOTOBA={'injury','block','death','fear'},
+    },
+    HARD={
+        REIMU={'rest','injury','block','fear'},
+        MARISA={'life','injury','death','fear'},
+        KOTOBA={'rest','life','scenery','open'},
+    },
+    LUNATIC={
+        REIMU={'injury','scenery','fear','open'},
+        MARISA={'rest','life','block','fear'},
+        KOTOBA={'rest','injury','scenery','death'},
+    },
+}
+local function loadGateSpell(name)
+    local condition={}
+    for difficulty, players in pairs(gateRoutes) do
+        for player, gates in pairs(players) do
+            for _, gate in ipairs(gates) do
+                if gate==name then
+                    table.insert(condition,{
+                        difficulties={[difficulty]=true},
+                        players={[player]=true},
+                    })
+                    break
+                end
+            end
+        end
+    end
 
+    -- An empty condition currently means unrestricted.
+    assert(#condition>0, 'Gate has no assigned route: '..name)
+
+    local phase=require('stages.stage4.spellcards.'..name)
+    phase.condition=StageManager.rawConditionTransform(condition)
+    return phase
+end
 local boss=BossManager.BossSegment{
     bossName='shouji',
     key='4-boss',
@@ -309,14 +353,14 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
-            require('stages.stage4.spellcards.rest'),
-            require('stages.stage4.spellcards.life'),
-            require('stages.stage4.spellcards.injury'),
-            require('stages.stage4.spellcards.block'),
-            require('stages.stage4.spellcards.scenery'),
-            require('stages.stage4.spellcards.death'),
-            require('stages.stage4.spellcards.fear'),
-            require('stages.stage4.spellcards.open'),
+            loadGateSpell('rest'),
+            loadGateSpell('life'),
+            loadGateSpell('injury'),
+            loadGateSpell('block'),
+            loadGateSpell('scenery'),
+            loadGateSpell('death'),
+            loadGateSpell('fear'),
+            loadGateSpell('open'),
         }}
     }
 }

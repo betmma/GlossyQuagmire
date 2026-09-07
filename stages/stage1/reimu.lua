@@ -1,6 +1,6 @@
 local midboss=BossManager.BossSegment{
     bossName='reimu',
-    players={KOTOBA=true},
+    condition={players={KOTOBA=true}},
     key='1-mid-reimu',
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
@@ -52,7 +52,9 @@ local midboss=BossManager.BossSegment{
             },
             BossManager.SpellcardPhase{SKIP_INCLUDE=true,
                 key='reimu-dream-seal',
-                difficulties={HARD=true,LUNATIC=true},
+                condition={
+                    difficulties={HARD=true,LUNATIC=true},
+                },
                 bonusScore=10000,
                 time=1200,
                 hp=1200,

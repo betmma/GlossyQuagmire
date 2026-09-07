@@ -8,7 +8,7 @@ local function getSegmentType(stageKey,segmentKey)
     local segmentData=SegmentsData.bySegment[segmentKey]
     local difficulty=G.runInfo.difficulty
     local shotType=G.runInfo.shotType
-    if not segmentData.difficulties[difficulty] or not segmentData.players[G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]] then
+    if not StageManager.checkCondition(segmentData.condition,difficulty,G.CONSTANTS.SHOT_TYPE_TO_PLAYER[shotType]) then
         return 'notMatch'
     end
     return 'available'

@@ -145,7 +145,7 @@ SaveManager.defaultSaveData=DefaultRoot{
             oneSCData[value.difficulty]=oneSCData[value.difficulty] or {}
             local oneDiffData=oneSCData[value.difficulty]
             oneDiffData.unlocked=oneDiffData.unlocked or false
-            for player,_ in pairs(value.players) do
+            for _,player in ipairs(G.CONSTANTS.PLAYERS) do
                 for _,shotType in ipairs(G.CONSTANTS.PLAYER_TO_SHOT_TYPES[player]) do
                     oneDiffData[shotType]=oneDiffData[shotType] or {}
                     for _,type in ipairs({'ingame','practice'}) do

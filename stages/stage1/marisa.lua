@@ -41,7 +41,7 @@ local function starTweak(cir,num)
 end
 local marisaBoss=BossManager.BossSegment{
     bossName='marisa',
-    players={KOTOBA=true},
+    condition={players={KOTOBA=true}},
     key='1-boss-marisa',
     BGM='level1c',
     beforeDialogueKey=function ()

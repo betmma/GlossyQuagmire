@@ -20,8 +20,7 @@ spell practice: jump to specific boss segment, and only run the spellcard phase 
 ---@field type SegmentType
 ---@field init fun(self,segmentFuncArgs)|nil when jumping to later segment like in practice mode, init of all previous segments will be called while func of previous segments will be skipped, so init should include things like setting player border, while func should include things like spawning bullets.
 ---@field skip fun(self,segmentFuncArgs)|nil only called when it's skipped. called after init()
----@field difficulties nil|HasDifficulty
----@field players nil|HasPlayer
+---@field condition PhaseConditionRaw
 
 ---@class SegmentRawNoNext:SegmentRaw
 ---@field func fun(self,segmentFuncArgs):nil the next segment will be the next one in the segments table.
@@ -34,8 +33,7 @@ spell practice: jump to specific boss segment, and only run the spellcard phase 
 ---@class Segment:SegmentRaw
 ---@field func fun(self,segmentFuncArgs):nil|SegmentKey the content of the segment. like spawn some fairies or a boss.
 ---@field next SegmentKey[]|nil
----@field difficulties HasDifficulty
----@field players HasPlayer
+---@field condition PhaseCondition
 
 ---@class OneStageDataRaw the raw data in stages/stageX/main.lua. after loading, StageManager will add other fields and do some processing
 ---@field init fun() to initialize the stage, like setting player border.
@@ -54,7 +52,7 @@ spell practice: jump to specific boss segment, and only run the spellcard phase 
 ---@field callback StageManagerCallback what to do after stage is finished
 ---@field previousStagesData fullGameReplayOneStageData[] to build full game replay data
 ---@field args {stageKey: StageKey, skipToSegmentKey: SegmentKey|nil, onlyRunOneSegment: boolean|nil, segmentFuncArgs: BossSegmentFuncArgs|nil} to build stage / spell practice replay data
-local StageManager={}
+StageManager={}
 
 ALL_DIFFICULTIES={}
 for diff,_ in pairs(G.CONSTANTS.DIFFICULTIES_DATA) do
@@ -63,6 +61,59 @@ end
 ALL_PLAYERS={}
 for player,_ in pairs(G.CONSTANTS.PLAYERS_DATA) do
     ALL_PLAYERS[player]=true
+end
+
+---@class HasDifficulty:strict
+---@field [DIFFICULTY] true
+---@class HasPlayer:strict
+---@field [PLAYER] true
+
+---@class PhaseConditionItem:strict an item acts as condition (difficulies[difficulty] and players[player])
+---@field difficulties HasDifficulty
+---@field players HasPlayer
+
+---@class PhaseCondition:strict OR list of conditions
+---@field [integer] PhaseConditionItem
+
+---@class PhaseConditionItemOuter the condition written in BossSegment or other outer places. can have unset difficulties or players that default to all
+---@field difficulties? HasDifficulty
+---@field players? HasPlayer
+
+---@class PhaseConditionOuter:strict 
+---@field [integer] PhaseConditionItemOuter
+
+---@alias PhaseConditionRaw PhaseConditionOuter|PhaseConditionItemOuter|nil all possibilities of literal things that could be written in condition key. could be list of PhaseConditionItemOuter, or one item, or none.
+
+---@param rawCondition PhaseConditionRaw|PhaseCondition
+---@return PhaseCondition condition
+function StageManager.rawConditionTransform(rawCondition)
+    rawCondition=rawCondition or {}
+    if rawCondition.difficulties or rawCondition.players then
+        ---@cast rawCondition PhaseConditionItemOuter
+        rawCondition={rawCondition}
+    end
+    ---@cast rawCondition PhaseConditionOuter
+    for index, value in ipairs(rawCondition) do
+        value.difficulties=value.difficulties or ALL_DIFFICULTIES
+        value.players=value.players or ALL_PLAYERS
+    end
+    if #rawCondition==0 then
+        rawCondition={{difficulties=ALL_DIFFICULTIES,players=ALL_PLAYERS}}
+    end
+    return rawCondition --[[@as PhaseCondition]]
+end
+
+---check if given difficulty and player satisfy the phaseCondition. it's intended that spell card practice can choose all players and won't check player, so player can be nil to skip player check
+---@param Condition PhaseCondition
+---@param difficulty DIFFICULTY
+---@param player PLAYER|nil
+function StageManager.checkCondition(Condition,difficulty,player)
+    for index, value in ipairs(Condition) do
+        if value.difficulties[difficulty] and (not player or value.players[player]) then
+            return true
+        end
+    end
+    return false
 end
 
 ---@type table<StageKey,OneStageData>
@@ -76,8 +127,7 @@ local function loadStageData()
             if segment.key=='end' then
                 error('segment key cannot be "end" as it is used to indicate the end of the stage. found in stage '..stageKey)
             end
-            segment.difficulties=segment.difficulties or ALL_DIFFICULTIES
-            segment.players=segment.players or ALL_PLAYERS
+            segment.condition=StageManager.rawConditionTransform(segment.condition)
             StageData[stageKey].key2Index[segment.key]=i
         end
         local stageData=StageData[stageKey]
@@ -179,7 +229,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
             if segment.SKIP_INCLUDE and SKIP_MODE then -- during skipping, still run SKIP_INCLUDE segment
                 skipping=false
             end
-            if not segment.difficulties[G.runInfo.difficulty] or not segment.players[G.runInfo.playerType] then -- skip nonmatch segment
+            if not StageManager.checkCondition(segment.condition,G.runInfo.difficulty,G.runInfo.playerType) then -- skip nonmatch segment
                 skipping=true
             end
             if segment.key==skipToSegmentKey then -- for the intended skipToSegment, still run even if not matching (from spell practice, where can ignore player requirement. though build spellcard collection code has spellcard phase.player considered, the boss segment.player is not recorded.)
@@ -343,7 +393,6 @@ end
 ---@field segmentKey string the segment this spellcard belongs to, like '1-mid'. passed as skipToSegmentKey to StageManager:load to jump to the segment
 ---@field phaseKey string same as SpellcardPhase.key
 ---@field difficulty DIFFICULTY every item in SpellcardPhase.difficulties
----@field players table<PLAYER,true> same as SpellcardPhase.players
 ---@field phase SpellcardPhase the original phase object for this spellcard
 
 -- used for spellcard practice menu. the menu has stage-spellcard-difficulty structure
@@ -351,7 +400,6 @@ end
 ---@field phaseKey string same as SpellcardPhase.key
 ---@field stage StageKey the stage this spellcard belongs to
 ---@field difficulties table<DIFFICULTY,integer> difficulty to ID in SpellcardCollection.all
----@field players table<PLAYER,true> same as SpellcardPhase.players
 
 ---@class SpellcardCollection to store all spellcards for spellcard practice and history
 ---@field all SpellcardCollectionItem[] flat table of all spellcards
@@ -380,7 +428,7 @@ function StageManager:buildSpellcardCollection()
                     local diffToID={}
                     -- Create entry for every supported difficulty
                     for i,diff in ipairs(G.CONSTANTS.STAGE_TO_DIFFICULTIES[stageKey]) do
-                        if phase.difficulties[diff] then
+                        if StageManager.checkCondition(phase.condition,diff) then
                             ---@type SpellcardCollectionItem
                             local item={
                                 ID = nextID,
@@ -388,7 +436,6 @@ function StageManager:buildSpellcardCollection()
                                 phaseKey = phase.key,
                                 stage = stageKey,
                                 difficulty = diff,
-                                players = phase.players,
                                 phase = phase -- Useful for jumping directly to the phase in practice
                             }
                             table.insert(SpellcardCollection.all, item)
@@ -401,7 +448,6 @@ function StageManager:buildSpellcardCollection()
                         phaseKey = phase.key,
                         stage = stageKey,
                         difficulties = diffToID,
-                        players = phase.players,
                     }
                     SpellcardCollection.byPhaseKeyAndDiff[phase.key] = diffToID
                     if not SpellcardCollection.byStage[stageKey] then

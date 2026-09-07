@@ -1,7 +1,7 @@
 
 local midboss=BossManager.BossSegment{
     bossName='kotoba',
-    players={REIMU=true,MARISA=true},
+    condition={players={REIMU=true,MARISA=true}},
     key='1-mid-kotoba',
     getBossSpawnPos=function(self)
         local geometry=G.runInfo.geometry
@@ -119,7 +119,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     bossName='kotoba',
     key='1-boss-kotoba',
     BGM='level1b',
-    players={REIMU=true,MARISA=true},
+    condition={players={REIMU=true,MARISA=true}},
     beforeDialogueKey=function ()
         return G.runInfo.playerType..'S1BossBefore'
     end,
