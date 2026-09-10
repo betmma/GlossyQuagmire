@@ -1,4 +1,4 @@
-VERSION="0.4.10.1"
+VERSION="0.4.10.2"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"

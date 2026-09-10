@@ -121,7 +121,7 @@ return BossManager.SpellcardPhase{
             -- end}
 
             sliceSentry.any.portal:link(outSentry.any.portal)
-            wait(DSWITCH{120,90,120,120})
+            wait(DSWITCH{150,120,150,150})
         end
     end
 }

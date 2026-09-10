@@ -97,7 +97,7 @@ return BossManager.SpellcardPhase{
         end
         local function sideAttack()
             SFX:play('enemyPowerfulShot')
-            local spawner=BulletSpawner{lifeFrame=4,period=9,firstPeriod=1,bulletNumber=DSWITCH{50,60,80,100},bulletSpeed=DSWITCH{70,80,90,100},bulletSprite=BulletSprites.bigStar.yellow,highlight=true,bulletLifeFrame=DSWITCH{450,500,550,600},bulletExtraUpdate={Action.FadeIn(20,true),Action.ZoomIn(30),Action.FadeOut(20,true),function (self)
+            local spawner=BulletSpawner{lifeFrame=4,period=9,firstPeriod=1,bulletNumber=DSWITCH{50,60,80,100},bulletSpeed=DSWITCH{70,80,90,100},bulletSprite=BulletSprites.bigStar.yellow,highlight=true,bulletLifeFrame=DSWITCH{400,450,500,550},bulletExtraUpdate={Action.FadeIn(20,true),Action.ZoomIn(30),Action.FadeOut(20,true),function (self)
                 self.spriteRotationSpeed=0.02
                 if self.frame>60 then
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,self.speed0,0.1)
@@ -117,7 +117,7 @@ return BossManager.SpellcardPhase{
             spawner:bindState(boss)
         end
         Event.LoopEvent{obj=mainSentry,period=period,firstPeriod=1,executeFunc=function (self,times)
-            local newPosb=geo:rThetaGo(boss.kinematicState.pos,math.eval(100,50),math.eval(0,99))
+            local newPosb=geo:rThetaGo(boss.kinematicState.pos,math.eval(50,50),math.eval(0,99))
             if times%3==0 then
                 sideAttack()
                 newPosb=geo:rThetaGo(newPosb,350,dir0)

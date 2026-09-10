@@ -828,12 +828,13 @@ ShotTypes.KOTOBAB=ShotType{
                 self.spriteTransparency=0.2
             end
             if self.frame==120 then
-                self.spriteTransparency=1
+                self.spriteTransparency=0.4
                 self.kinematicState.speed=1200
             end
         end
     }}, unfocused={ShootingPattern{
         sprite=Asset.playerShotSprites.paper,
+        transparency=0.4,
         frequency=6,
         damage=function(self, powerLevel) return 7.5 end,
         angle=0,

@@ -42,7 +42,7 @@ local midboss=BossManager.BossSegment{
                     end
                     local function slash(pos1,pos2,releaseFrame,color,side)
                         local dist=geo:distanceRef(pos1,pos2)
-                        local step=8
+                        local step=10
                         local remainingRatio=DSWITCH{5,4,3,2}
                         local n=math.floor(dist/step)
                         local dir0=geo:toRef(pos1,pos2)

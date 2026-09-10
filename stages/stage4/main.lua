@@ -644,7 +644,7 @@ return{
             -- wait(999999)
                 local geo=G.runInfo.geometry
                 ---@cast geo PortalGeometryBase
-                local pos=G.runInfo.player.kinematicState.pos
+                local pos=geo:init().pos
                 local pos1,dir1=geo:rThetaGo(pos,50,-math.pi/2)
                 local pos2,dir2=geo:rThetaGo(pos1,-350,dir1-math.pi/2)
                 local extraUpdate=function(self)
@@ -927,7 +927,7 @@ return{
                             summon()
                         end}
                     end}}
-                    local spawner=BulletSpawner{period=30,firstPeriod=60,bulletNumber=DSWITCH{1,3,5,7},bulletSpeed=70,angle='player',bulletSprite=BulletSprites.stick[color],bulletSize=2,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(10),Action.FadeOut(10,true)}}
+                    local spawner=BulletSpawner{period=40,firstPeriod=60,bulletNumber=DSWITCH{1,3,5,7},bulletSpeed=70,angle='player',bulletSprite=BulletSprites.stick[color],bulletSize=2,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(10),Action.FadeOut(10,true)}}
                     spawner:bindState(bigFairy)
                 end
                 summon()

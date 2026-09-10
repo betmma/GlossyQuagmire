@@ -66,9 +66,9 @@ return BossManager.SpellcardPhase{
         local groupN=15
         local compensateFrame=30
         local initPhase=math.eval(0,1)
-        local spawner=BulletSpawner{lifeFrame=9999,period=DSWITCH{4,3,2,1},bulletNumber=1,angle=smallPortalAngle,bulletSprite=BulletSprites.flame.red,bulletSpeed=300,highlight=true,bulletLifeFrame=600,bulletEvents={function (cir,args,self)
+        local spawner=BulletSpawner{lifeFrame=9999,period=DSWITCH{4,3,2,1},bulletNumber=1,angle=smallPortalAngle,bulletSprite=BulletSprites.flame.red,bulletSpeed=260,highlight=true,bulletLifeFrame=600,bulletEvents={function (cir,args,self)
             local groupIndex=self.spawnTimes%groupN
-            local phase=math.sin(initPhase+self.spawnTimes%3*math.pi*2/3+math.cos(self.spawnTimes/60))--%2-1
+            local phase=math.sin(initPhase+self.spawnTimes%3*math.pi*2/3+(self.spawnTimes/90))--%2-1
             --cir.kinematicState.speed=cir.kinematicState.speed*math.eval(1,0.05*math.min(1,self.frame/1200))
             local compensateDist=cir.kinematicState.speed*(groupIndex*self.period)/60
             cir.speedRef=cir.kinematicState.speed
