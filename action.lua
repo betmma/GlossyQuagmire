@@ -122,11 +122,7 @@ Action.ZoomIn=function(zoomFrame,targetSize,initSize)
     return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize,initSize=initSize},func=zoomIn,init=zoomInInit}
 end
 
-local appearingHint=function(self,params)
-    if self.appearingHintexecuted then
-        return
-    end
-    self.appearingHintexecuted=true
+local appearingHintInit=function(self,params)
     local size=params.size or self.size*2
     local duration=params.duration or 20
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
@@ -139,7 +135,21 @@ end
 --- @param size number|nil size of the hint, default self.size*2
 --- @param duration integer|nil number of frames for the hint animation, default 20
 Action.AppearingHint=function(size,duration)
-    return {isAction=true,params={size=size,duration=duration},func=appearingHint}
+    return {isAction=true,params={size=size,duration=duration},func=function()end,init=appearingHintInit}
+end
+
+local repeatMovement=function(self,params)
+    if self.frame<params.duration then
+        G.runInfo.geometry:update(self.kinematicState,1/60)
+    end
+end
+
+---compensate for fixing effect.larger updating shared kinematic state (v0.4.10.3). note that, to achieve the exact same behaviour, need to change fairy's extra update table to {Enemy.presetActions.fadeAndHint, a custom function, Action.RepeatMovement()}. Simply replacing Enemy.presetActions.fadeAndHint with fadeAndHintCompat has order difference.
+---@param duration integer|nil defaults to 10
+---@return Action
+Action.RepeatMovement=function(duration)
+    duration=duration or 10
+    return{isAction=true,params={duration=duration},func=repeatMovement}
 end
 
 local finale=function(self,params)

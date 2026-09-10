@@ -84,8 +84,8 @@ return {
         local versionText=base:child(
             UI.Text{
                 text=VERSION,
-                fontSize=24,color={1,1,1,1},
-                x=WINDOW_WIDTH-85,y=WINDOW_HEIGHT-30,
+                fontSize=24,color={1,1,1,1},align='right',toggleX=true,autoSize=true,
+                x=WINDOW_WIDTH,y=WINDOW_HEIGHT-30,
             }
         )
         if IS_WEB then

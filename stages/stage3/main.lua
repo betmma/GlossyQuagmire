@@ -28,7 +28,7 @@ return{
                 local geo=G.runInfo.geometry
                 local base=geo:init().pos
                 local pos1,dir1=geo:rThetaGo(base,600,-math.pi/2)
-                local fairy=Enemy{kinematicState={pos=pos1,dir=dir1+math.pi,speed=400},sprite=Asset.fairySprites.medium.white,maxhp=800,lifeFrame=300,dropItems={powerSmall=10,point=10},extraUpdate={Enemy.presetActions.fadeAndHint}}
+                local fairy=Enemy{kinematicState={pos=pos1,dir=dir1+math.pi,speed=400},sprite=Asset.fairySprites.medium.white,maxhp=800,lifeFrame=300,dropItems={powerSmall=10,point=10},extraUpdate={Enemy.presetActions.fadeAndHintCompat}}
                 fairy:addHPProtection(60,3)
                 Event.EaseEvent{obj=fairy,easeObj=fairy.kinematicState,aims={speed=0},duration=60}
                 local slowDown=function(self)
@@ -136,7 +136,7 @@ return{
                 local function spawn(mode)
                     local fairy
                     local color=mode==0 and 'white' or 'black'
-                    fairy=Enemy{kinematicState={pos=copyTable(pos1),dir=dir1+math.pi,speed=400},sprite=Asset.fairySprites.small[color],maxhp=40,lifeFrame=600,dropItems={point=1},extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                    fairy=Enemy{kinematicState={pos=copyTable(pos1),dir=dir1+math.pi,speed=400},sprite=Asset.fairySprites.small[color],maxhp=40,lifeFrame=600,dropItems={point=1},extraUpdate={Enemy.presetActions.fadeAndHintCompat,function(self)
                         if self.frame==120 then
                             self:addHPProtection(30,999)
                             local sign=math.randomSign()
@@ -209,7 +209,7 @@ return{
                     local period=DSWITCH{240,180,140,120}
                     Event{action=function ()
                         for i=1,10 do
-                            local fairy=Enemy{kinematicState={pos=copyTable(pos2),dir=dir2,speed=70},sprite=Asset.fairySprites.small[Asset.spectrum1MapFairySpectrum[color]],maxhp=80,lifeFrame=400,dropItems={powerSmall=2},extraUpdate={Enemy.presetActions.fadeAndHint,function (self)
+                            local fairy=Enemy{kinematicState={pos=copyTable(pos2),dir=dir2,speed=70},sprite=Asset.fairySprites.small[Asset.spectrum1MapFairySpectrum[color]],maxhp=80,lifeFrame=400,dropItems={powerSmall=2},extraUpdate={Enemy.presetActions.fadeAndHintCompat,function (self)
                                 if self.frame%3==0 and (self.frame-i*17+rotate*100)%period<15 then
                                     SFX:play('enemyShot',true,0.5)
                                     local dir=self.kinematicState.dir+(math.pi/2*(lr==0 and 1 or -1))*(self.mirrored and -1 or 1)
@@ -254,7 +254,7 @@ return{
                 local pos1,dir1=geo:rThetaGo(base,600,-math.pi/2)
                 dir1=dir1+math.pi
                 local function smallFairy(pos,dir,sign,color)
-                    local fairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=150},sprite=Asset.fairySprites.small[color],maxhp=50,lifeFrame=600,dropItems={powerSmall=1,point=1},extraUpdate={Enemy.presetActions.fadeAndHint}}
+                    local fairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=150},sprite=Asset.fairySprites.small[color],maxhp=50,lifeFrame=600,dropItems={powerSmall=1,point=1},extraUpdate={Enemy.presetActions.fadeAndHintCompat}}
                     fairy:addHPProtection(60,3)
                     local spawner=BulletSpawner{firstPeriod=100,period=DSWITCH{40,30,20,20},lifeFrame=9999,bulletNumber=1,range=math.pi/2,angle=dir,bulletSpeed=150,bulletSprite=BulletSprites.giant[color],highlight=true,bulletLifeFrame=300,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeIn(20,true),Action.FadeOut(10,true)}}
                     spawner:bindState(fairy)
@@ -295,7 +295,7 @@ return{
                         lifeFrame=360
                     end
                     local flag=color~='white'
-                    local fairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=400},sprite=Asset.fairySprites.large[color],maxhp=flag and 400 or 700,lifeFrame=lifeFrame,dropItems={powerSmall=flag and 5 or 10,point=flag and 5 or 10},extraUpdate={Enemy.presetActions.fadeAndHint,function (self)
+                    local fairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=400},sprite=Asset.fairySprites.large[color],maxhp=flag and 400 or 700,lifeFrame=lifeFrame,dropItems={powerSmall=flag and 5 or 10,point=flag and 5 or 10},extraUpdate={Enemy.presetActions.fadeAndHintCompat,function (self)
                         if self.frame<60 then
                             self.kinematicState.speed=self.kinematicState.speed*0.95
                         elseif self.frame==60 then
@@ -409,7 +409,7 @@ return{
                 local base=geo:init().pos
                 local pos1,dir1=geo:rThetaGo(base,350,-math.pi/2)
                 local function group(pos,dir,sign)
-                    local bigFairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=0},sprite=Asset.fairySprites.large.white,maxhp=400,lifeFrame=900,dropItems={powerSmall=10,point=10},extraUpdate={Enemy.presetActions.fadeAndHint,function (self)
+                    local bigFairy=Enemy{kinematicState={pos=copyTable(pos),dir=dir,speed=0},sprite=Asset.fairySprites.large.white,maxhp=400,lifeFrame=900,dropItems={powerSmall=10,point=10},extraUpdate={Enemy.presetActions.fadeAndHintCompat,function (self)
                         if self.frame>=self.lifeFrame-60 then
                             self.kinematicState.speed=self.kinematicState.speed+5
                         end
@@ -420,7 +420,7 @@ return{
                     local n=3
                     for i=1,n do
                         local angle=dir+math.pi*2/n*(i-1)
-                        local smallFairy=Enemy{sprite=Asset.fairySprites.small.white,maxhp=350,lifeFrame=900,dropItems={powerSmall=1,point=1},extraUpdate={Enemy.presetActions.fadeAndHint}}
+                        local smallFairy=Enemy{sprite=Asset.fairySprites.small.white,maxhp=350,lifeFrame=900,dropItems={powerSmall=1,point=1},extraUpdate={Enemy.presetActions.fadeAndHintCompat}}
                         smallFairy:addHPProtection(200,3)
                         DanmakuFuncs.orbitBind(smallFairy,bigFairy,function (self, centerObj)
                             return {r=math.min(50,self.frame),theta=self.frame/20*sign+angle}

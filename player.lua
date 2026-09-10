@@ -323,7 +323,7 @@ function Player:grazeEffect(amount)
     SFX:play('graze',false)
     G.runInfo.grazes=G.runInfo.grazes+amount
     -- non-random graze effect
-    Effect.Larger{kinematicState={pos=copyTable(self.kinematicState.pos),dir=math.pseudoRandom(G.runInfo.grazes,self.frame)*999,speed=100+60*math.pseudoRandom(G.runInfo.grazes,self.frame,2)},sprite=Asset.shards.dot,radius=1.25,growSpeed=0,animationFrame=20}
+    Effect.Larger{kinematicState={pos=copyTable(self.kinematicState.pos),dir=math.pseudoRandom(G.runInfo.grazes,self.frame)*999,speed=100+60*math.pseudoRandom(G.runInfo.grazes,self.frame,2)},sprite=Asset.shards.dot,radius=1.25,growSpeed=0,animationFrame=20,shareKinematicState=false}
 end
 EventManager.listenTo(EventManager.EVENTS.PLAYER_GRAZE,Player.grazeEffect)
 

@@ -50,6 +50,7 @@ function Enemy:new(args)
 end
 
 Enemy.presetActions={
+    fadeAndHintCompat=Action.Pack{Action.FadeIn(30,true),Action.FadeOut(30,true),Action.AppearingHint(),Action.RepeatMovement()},
     fadeAndHint=Action.Pack{Action.FadeIn(30,true),Action.FadeOut(30,true),Action.AppearingHint()},
 }
 

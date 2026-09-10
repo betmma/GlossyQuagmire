@@ -6,11 +6,19 @@ function Effect:new(args)
     Effect.super.new(self, args)
 end
 
--- something keep growing and reducing opacity
+-- something keep growing and reducing opacity. if the kinematicState has speed and is not sharing with other object, need to set shareKinematicState=false.
 ---@class Larger:Effect
 local Larger=Effect:extend()
 Effect.Larger=Larger
 function Larger:new(args)
+    -- if share kinematicState (sent fairy.kinematicState), won't call Shape.update. if not, will copy the kinematicState and call Shape.update (when the kinematicState has speed and wants it to move)
+    self.shareKinematicState=args.shareKinematicState
+    if self.shareKinematicState==nil then
+        self.shareKinematicState=true
+    end
+    if not self.shareKinematicState then
+        args.kinematicState=copyTable(args.kinematicState)
+    end
     Larger.super.new(self, args)
     ---@type Sprite
     self.sprite=args.sprite
@@ -29,7 +37,11 @@ function Larger:new(args)
 end
 
 function Larger:update(dt)
-    Larger.super.update(self,dt)
+    if self.shareKinematicState then
+        self.frame=self.frame+1 --Larger could share same kinamaticState with some fairy or bullet. do not call Shape.update or the speed is multiplied. why I find this bug only after 6 months of development
+    else
+        Larger.super.update(self,dt)
+    end
     self.size=self.size+self.growSpeed
     if self.frame==self.animationFrame then
         self:remove()

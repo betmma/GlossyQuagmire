@@ -37,7 +37,7 @@ return{
                     local sign=math.mod2Sign(i)
                     if sign==1 then
                         local kstate={pos=copyTable(pos1),speed=30*(i-15.5),dir=dir1}
-                        local fairy=Enemy{kinematicState=copyTable(kstate),maxhp=30,sprite=Asset.fairySprites.small.orange,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                        local fairy=Enemy{kinematicState=copyTable(kstate),maxhp=30,sprite=Asset.fairySprites.small.orange,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat,function(self)
                             self.kinematicState.speed=self.kinematicState.speed*0.98
                         end},dropItems={powerSmall=2}}
                         BulletSpawner{
@@ -45,7 +45,7 @@ return{
                         }:bindState(fairy)
                     else
                         local kstate={pos=copyTable(pos2),speed=200,dir=dir2-math.pi/2*(i)/15}
-                        local fairy=Enemy{kinematicState=copyTable(kstate),maxhp=50,sprite=Asset.fairySprites.small.purple,lifeFrame=700,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                        local fairy=Enemy{kinematicState=copyTable(kstate),maxhp=50,sprite=Asset.fairySprites.small.purple,lifeFrame=700,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat,function(self)
                             self.kinematicState.speed=self.kinematicState.speed*0.98
                         end},dropItems={point=1}}
                         BulletSpawner{
@@ -72,7 +72,7 @@ return{
                 local function spawnFairy(side,extra)
                     local pos2,dir2=G.runInfo.geometry:rThetaGo(pos1,200*side,dir1)
                     dir2=dir2+math.pi/2
-                    local fairy=Enemy{kinematicState={pos=copyTable(pos2),speed=20,dir=dir2+math.pi*0.6*side},maxhp=300,sprite=Asset.fairySprites.large.blue,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=10}}
+                    local fairy=Enemy{kinematicState={pos=copyTable(pos2),speed=20,dir=dir2+math.pi*0.6*side},maxhp=300,sprite=Asset.fairySprites.large.blue,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={point=10}}
                     local spawner=BulletSpawner{
                         period=DSWITCH{12,8,4,4},firstPeriod=30,lifeFrame=120,bulletNumber=DSWITCH{1,1,1,3},range=math.pi*2,bulletSpeed=300,angle=dir2,bulletSprite=BulletSprites.round.blue,bulletLifeFrame=600,visible=false,bulletExtraUpdate=function(self)
                             self.kinematicState.speed=self.kinematicState.speed*0.98
@@ -83,7 +83,7 @@ return{
                         obj=spawner,aims={angle=dir2+math.pi/2*side},duration=120
                     }
                     if extra then
-                        local fairy2=Enemy{kinematicState={pos=copyTable(pos2),speed=100,dir=dir2+math.pi*0.4*side},maxhp=100,sprite=Asset.fairySprites.medium.red,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=10}}
+                        local fairy2=Enemy{kinematicState={pos=copyTable(pos2),speed=100,dir=dir2+math.pi*0.4*side},maxhp=100,sprite=Asset.fairySprites.medium.red,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=10}}
                         local spawner2=BulletSpawner{
                             period=DSWITCH{8,8,6,4},firstPeriod=30,lifeFrame=90,bulletNumber=DSWITCH{4,6,8,10},range=0.3,bulletSpeed=150,angle=dir2+math.pi*0.4*side,bulletSprite=BulletSprites.roundDark.purple,bulletLifeFrame=300,bulletExtraUpdate={Action.FadeOut(30,true)},visible=false
                         }
@@ -117,7 +117,7 @@ return{
                         dir3=dir3-math.pi/2
                         local pos4,dir4=G.runInfo.geometry:rThetaGo(pos3,500,dir3)
                         -- dir4=dir4+math.pi
-                        local fairy=Enemy{kinematicState={pos=copyTable(pos4),speed=50,dir=G.runInfo.geometry:to(pos4,basePos)},maxhp=30,sprite=Asset.fairySprites.small.green,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1}}
+                        local fairy=Enemy{kinematicState={pos=copyTable(pos4),speed=50,dir=G.runInfo.geometry:to(pos4,basePos)},maxhp=30,sprite=Asset.fairySprites.small.green,lifeFrame=600,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=1}}
                         local spawner=BulletSpawner{
                             period=300,firstPeriod=30,lifeFrame=120,bulletNumber=DSWITCH{4,7,9,11},range=math.pi*2,bulletSpeed=100,angle=dir4+i,bulletSprite=BulletSprites.rice.green,bulletLifeFrame=600,visible=false,bulletEvents={function(cir,args,self)
                                 cir.kinematicState.speed=cir.kinematicState.speed+math.eval(0,50)
@@ -251,7 +251,7 @@ return{
                 end
                 sideWarning(-1)
                 wait(60)
-                local fairy=Enemy{kinematicState={pos=copyTable(pos0),dir=dir0,speed=0,skipZoom=true},maxhp=1500,sprite=Asset.fairySprites.large.white,lifeFrame=1200,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=5}}
+                local fairy=Enemy{kinematicState={pos=copyTable(pos0),dir=dir0,speed=0,skipZoom=true},maxhp=1500,sprite=Asset.fairySprites.large.white,lifeFrame=1200,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={point=5}}
                 local side=-1 -- -1 is left, 1 is right
                 local spawner=BulletSpawner{
                     period=60,firstPeriod=9999,lifeFrame=1200,bulletNumber=200,bulletSpeed=150,angle=dir0+math.pi,range=math.pi/15,bulletSprite=BulletSprites.rain.white,bulletLifeFrame=200,visible=false,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
@@ -295,7 +295,7 @@ return{
                     delay=delay or 10
                     local pos1,dir1=getSpawnPosDir(side,up)
                     for i=1,10 do
-                        local fairy=Enemy{kinematicState={pos=copyTable(pos1),speed=400,dir=dir1,skipZoom=true},maxhp=10,sprite=Asset.fairySprites.small[color],lifeFrame=520,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,function(self)
+                        local fairy=Enemy{kinematicState={pos=copyTable(pos1),speed=400,dir=dir1,skipZoom=true},maxhp=10,sprite=Asset.fairySprites.small[color],lifeFrame=520,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat,function(self)
                             ---@cast geo Hyperbolic
                             if geo.curvature then
                                 self.kinematicState.dir=self.kinematicState.dir-self.kinematicState.speed/geo.curvature/60*side
@@ -383,7 +383,7 @@ return{
                     dir1=dir1-math.pi/2
                     local pos2,dir2=geo:rThetaGo(pos1,spawnSide*1.5*30,dir1)
                     dir2=dir2-math.pi/2-spawnSide*math.pi*0.1
-                    local fairy=Enemy{kinematicState={pos=copyTable(pos2),speed=0,dir=dir2,skipZoom=true},maxhp=1500,sprite=Asset.fairySprites.large.black,lifeFrame=900,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=5}}
+                    local fairy=Enemy{kinematicState={pos=copyTable(pos2),speed=0,dir=dir2,skipZoom=true},maxhp=1500,sprite=Asset.fairySprites.large.black,lifeFrame=900,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={point=5}}
                     local side=-1
                     local spawner=BulletSpawner{
                         period=60,firstPeriod=9999,lifeFrame=900,bulletNumber=100,bulletSpeed=150,angle=dir2,range=math.pi/10,bulletSprite=BulletSprites.rain.black,bulletLifeFrame=100,visible=false,bulletExtraUpdate={Action.FadeOut(30,true)},bulletEvents={function(cir,args,self)
@@ -438,7 +438,7 @@ return{
                 spawnFairy(-1)
                 wait(240)
                 local posa,dira=geo:rThetaGo(basePos,300,-math.pi/2)
-                local fairy=Enemy{kinematicState={pos=copyTable(posa),dir=dira,speed=0,skipZoom=true},maxhp=1000,sprite=Asset.fairySprites.medium.white,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={point=20,powerSmall=20}}
+                local fairy=Enemy{kinematicState={pos=copyTable(posa),dir=dira,speed=0,skipZoom=true},maxhp=1000,sprite=Asset.fairySprites.medium.white,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={point=20,powerSmall=20}}
                 local p=3600/130
                 local colors={'red','blue','green','orange'}
                 local spawner=BulletSpawner{
@@ -496,7 +496,7 @@ return{
                     end
                 end
                 local spawnSmallFairy=function(color,life,largeFairy,angle0,r0,alt)
-                    local smallFairy=Enemy{maxhp=30,sprite=Asset.fairySprites.small[color],lifeFrame=life,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=1,point=DSWITCH{0,0,1,1}}}
+                    local smallFairy=Enemy{kinematicState={pos=largeFairy.kinematicState.pos,speed=0,dir=0},maxhp=30,sprite=Asset.fairySprites.small[color],lifeFrame=life,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=1,point=DSWITCH{0,0,1,1}}}
                     DanmakuFuncs.orbitBind(smallFairy,largeFairy,function(self, centerObj)
                         local rat=math.min(1,self.frame/60)
                         return {r=rat*r0,theta=angle0+centerObj.frame*0.02}
@@ -537,7 +537,7 @@ return{
                     local pos2,dir2=geo:rThetaGo(pos1,200,dir1)
                     dir2=dir2+math.pi*(1+ratio*0.3)
                     color=color or 'red'
-                    local largeFairy=Enemy{kinematicState={pos=copyTable(pos2),speed=0,dir=dir2,skipZoom=true},maxhp=80,sprite=Asset.fairySprites.large[color],lifeFrame=life,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHint,pullTowardsCenterUpdate},dropItems={point=5,powerSmall=5}}
+                    local largeFairy=Enemy{kinematicState={pos=copyTable(pos2),speed=0,dir=dir2,skipZoom=true},maxhp=80,sprite=Asset.fairySprites.large[color],lifeFrame=life,spriteTransparency=0,extraUpdate={Enemy.presetActions.fadeAndHintCompat,pullTowardsCenterUpdate},dropItems={point=5,powerSmall=5}}
                     largeFairy:addHPProtection(120,15)
                     largeFairy.dieEffect=function(self)
                         Enemy.dieEffect(self)
@@ -636,7 +636,7 @@ return{
                             if geo.curvature then
                                 self.kinematicState.dir=self.kinematicState.dir-self.kinematicState.speed/geo.curvature/60*side
                             end
-                        end},dropItems={powerSmall=1,point=(i%3==0 and DIFF()>=G.HARD) and 1 or 0}}
+                        end,Action.RepeatMovement()},dropItems={powerSmall=1,point=(i%3==0 and DIFF()>=G.HARD) and 1 or 0}}
                         fairy:addHPProtection(200,90)
                         Event{obj=fairy,action=function()
                             local waitTime=200-i*DSWITCH{3,4,5,5}
