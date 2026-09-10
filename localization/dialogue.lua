@@ -57,7 +57,8 @@ local portraitQuads=Asset.portraitQuads
 local portraitWidth,portraitHeight=Asset.portraitWidth,Asset.portraitHeight
 ---@type table<string,{x:integer,y:integer,size:number}>
 local speakerOffset={
-    tooshi={x=-50,y=-10,size=1.2} -- her drawn size is a bit smaller
+    tooshi={x=-50,y=-10,size=1.2}, -- her drawn size is a bit smaller
+    shouji={x=-50,y=-10,size=1.2},
 }
 
 ---@class DialogueControllerArgs
