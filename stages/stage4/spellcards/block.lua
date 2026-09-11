@@ -26,7 +26,8 @@ return BossManager.SpellcardPhase{
         G.runInfo.player.viewDirection=0
         local dir0=G.runInfo.player.viewDirection
         Event{obj=boss,action=function ()
-            wait(1800)
+            -- Setup has already used 60 frames. finish restoring the boss before the next gate starts.
+            wait(self.remainingFrames)
             Portal.canvasOffset.x=0
             Event.EaseEvent{obj=boss,aims={spriteTransparency=1},duration=60}
             wait(60)
