@@ -61,7 +61,7 @@ return {
             for i,stageAndScore in ipairs(stagesAndScores) do
                 local stageKey,score=stageAndScore.stageKey,stageAndScore.score
                 local stageName=Localize{'ui','SPELL_PRACTICE','stages',stageKey}
-                scoreText=scoreToString(score,8)
+                scoreText=scoreToString(score,9)
                 local option=UI.Base{width=width-gap*2,height=20,
                 events={
                     [UI.EVENTS.SELECT]=function(_)

@@ -141,6 +141,7 @@ local function gainBomb(amount)
 end
 
 local function gainScore(amount)
+    amount=math.floor(amount)*10
     local newScore=G.runInfo.score+amount
     if G.runInfo.score<G.runInfo.hiScore and G.runInfo.hiScore<newScore then -- new hiscore
         DynamicUIObjs.showNotice('hiscore')

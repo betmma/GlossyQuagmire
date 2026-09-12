@@ -4,7 +4,7 @@ local function injectGeometry()
         G.runInfo.geometry=G.geometries.EuclideanPortal
         return
     end
-    G.runInfo.geometry=copyRecursiveTable(G.runInfo.geometry)
+    G.runInfo.geometry=G.runInfo.geometry:extend()
     local geo=G.runInfo.geometry
     ---@cast geo PortalGeometryBase
     G.geometries.EuclideanPortal=geo

@@ -52,7 +52,7 @@ return {
                 local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[G.runInfo.gameType]
                 G.runInfo.lives=startResources.lives
                 G.runInfo.bombs=startResources.bombs
-                G.runInfo.score=0
+                G.runInfo.score=G.runInfo.score%10+1
                 G.runInfo.grazes=0
                 G:switchState(G.STATES.IN_GAME)
             end},

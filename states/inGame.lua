@@ -120,12 +120,8 @@ return {
                 else -- draw text
                     rightText=rightSide:child(UI.Text{
                         text='',updateText=function(self)
-                            if key=='hiScore' then
-                                return scoreToString(G.runInfo[key],8)
-                            end
-                            if key=='score' then
-                                local continue=G.CONSTANTS.DIFFICULTIES_TO_CONTINUES[G.runInfo.difficulty]-G.runInfo.remainingContinues
-                                return scoreToString(G.runInfo[key],8,continue)
+                            if key=='hiScore' or key=='score' then
+                                return scoreToString(G.runInfo[key],9)
                             end
                             if key=='power' then
                                 return string.format('%.2f/4.00',G.runInfo[key]/100)
