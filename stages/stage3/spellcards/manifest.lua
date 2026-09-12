@@ -25,6 +25,7 @@ return BossManager.SpellcardPhase{
         local hsingle=gethsingle()
         local player=G.runInfo.player
         Mirror.setHSV({h,1,1},0)
+        wait(60)
         for i=1,5 do
             local side=math.mod2Sign(i)
             local pos,dir=sidepos(side)

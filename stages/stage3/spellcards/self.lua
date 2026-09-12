@@ -17,6 +17,7 @@ return BossManager.SpellcardPhase{
             DanmakuFuncs.moveToInTime(boss,pos,60,Event.sineOProgressFunc)
         end}
         SFX:play('enemyCharge')
+        wait(60)
         Mirror.setHSV({0,0,1},0)
         local mirrorn=4
         local r0=600

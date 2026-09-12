@@ -13,6 +13,7 @@ return BossManager.SpellcardPhase{
         local basePos=geo:init().pos
         local player=G.runInfo.player
         ---@cast player Player
+        wait(60)
         local sentry=DanmakuFuncs.sentry(basePos)
         local time=120
         local followTime=60
