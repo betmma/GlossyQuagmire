@@ -21,6 +21,7 @@ return BossManager.SpellcardPhase{
         local bullets={}
         local sprites={BulletSprites.scale.black,BulletSprites.rimDark.white,BulletSprites.bigRound.black}
         local rand=math.eval(0,99)
+        local bulletMove=false
         for i=1,3 do
             local bullet=Bullet{kinematicState={pos=copyTable(pos2),speed=0,dir=0},sprite=sprites[i],lifeFrame=99999,invincible=true,extraUpdate={Action.FadeOut(20,true),function(self)
                 if self.mirrored then
@@ -29,11 +30,9 @@ return BossManager.SpellcardPhase{
                         self.spriteTransparency=0.5
                         self.lifeFrame=self.frame+600
                         self.flag=self.frame
-                    elseif self.frame>self.flag+120 then
+                    elseif bulletMove then
                         self.safe=false
-                        if self.frame==self.flag+121 then
-                           self.spriteTransparency=1 
-                        end
+                        self.spriteTransparency=1
                         self.kinematicState.speed=math.lerp(self.kinematicState.speed,90-i*10,0.01)
                     else
                         -- self.kinematicState.dir=self.kinematicState.dir+rand%0.01
@@ -71,7 +70,7 @@ return BossManager.SpellcardPhase{
                 local angle=rand*2+t*math.pi*2*(rand%1>0.5 and 1 or -1)
                 local ret={}
                 for i=-1,1 do
-                    local pos=geo:rThetaGo(pos2,r*i,angle)
+                    local pos=geo:rThetaGo(pos2,r*(i+0.01),angle)
                     table.insert(ret,pos)
                 end
                 return ret
@@ -79,7 +78,7 @@ return BossManager.SpellcardPhase{
         }
         local mirrorPointFunctions={
             function(t)
-                local r=300*(1-Event.sineOProgressFunc(t)*0.92)
+                local r=300*(1-Event.sineOProgressFunc(t)*0.86)
                 local angle=rand+t*math.pi/2*(rand%1>0.5 and 1 or -1)
                 local ret={}
                 for i=1,3 do
@@ -127,6 +126,11 @@ return BossManager.SpellcardPhase{
         }
         local t=600
         local tm=180
+        -- bullet spawn in pulses, when frame%60>=40. if mirror stops during spawning, the result would have more visible patterns
+        local function stepFunc(frame)
+            local pulse,res=math.floor(frame/60),frame%60
+            return math.min(pulse/3+math.min(res/40,1)/3,1)
+        end
         for i=1,30 do
             rand=math.eval(0,99)
             local mirrorFunction=mirrorPointFunctions[math.random(1,#mirrorPointFunctions)]
@@ -135,7 +139,7 @@ return BossManager.SpellcardPhase{
             for i=1,#pos0s do
                 local p1,p2=pos0s[i],pos0s[(i%#pos0s)+1]
                 Mirror(p1,p2,pos2, {lifeFrame=tm+20,extraUpdate={Action.FadeIn(90,false,0.5),Action.FadeOut(20,false),function(self)
-                    local poses=mirrorFunction(math.min(self.frame/tm,1))
+                    local poses=mirrorFunction(stepFunc(self.frame))
                     self.pos1,self.pos2=poses[i],poses[(i%#poses)+1]
                     if sentry.removed and not self.flag then
                         self.flag=true
@@ -156,13 +160,17 @@ return BossManager.SpellcardPhase{
                     local newPos,newDir=geo:rThetaGo(currentPos,math.min(geo:distance(currentPos,targetPos),math.min(5,index/5)),dir)
                     bullets[i].kinematicState.pos=newPos
                     bullets[i].kinematicState.dir=newDir
-                    if index>DSWITCH{150,110,100,20} and index%60>=40 and (index+1)%(i*4)==0 then
+                    if index>20 and index%60>=40 and (index-40)%(DSWITCH{20,10,6,5}*i)==0 then
                         Mirror.spawnReflections(bullets[i],39)
                         SFX:play('enemyShot')
                     end
                 end
             end}
-            wait(t)
+            wait(tm+60)
+            SFX:play('enemyPowerfulShot')
+            bulletMove=true
+            wait(t-tm-60)
+            bulletMove=false
         end
     end
 }
