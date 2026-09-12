@@ -176,8 +176,8 @@ function BossRound:new(args)
                     else
                         phase:run(boss)
                     end
+                    wait(60) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
                 end
-                wait(60) -- boss:dieEffect() will create shockwave to remove previous phase bullets and bulletSpawners. without this delay bulletSpawners created in the new phase are also removed by the shockwave.
             end
             wait(60)
         end
