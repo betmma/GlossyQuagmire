@@ -350,7 +350,7 @@ end
 function SpellcardPhase:getBonusHistoryText()
     local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
     local historyTable=G.save.spellcardHistory[self.key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
-    local bonusText=self.failedBonus and 'FAILED' or string.format('%07d', math.floor(self.currentBonus))
+    local bonusText=self.failedBonus and 'FAILED' or scoreToString(self.currentBonus,6)
     return string.format('HISTORY %d/%d  BONUS %s', historyTable.passes, historyTable.tries, bonusText)
 end
 

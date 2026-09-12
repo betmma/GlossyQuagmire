@@ -337,6 +337,7 @@ function Player:hitEffect(damage)
     local dropItems={powerSmall=20}
     if G.runInfo.lives<0 then
         dropItems={powerFull=3}
+        G.runInfo.power=0
         G:switchState(G.STATES.GAME_END)
         -- G:lose()
     end

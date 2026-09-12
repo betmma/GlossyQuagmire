@@ -579,3 +579,17 @@ function TableEqual(t1, t2)
 
     return true
 end
+
+---to make displayed scores have a 0 at last digit, and if continued it shows continue times. continued run cannot save replay so replay info is always no continue and does not need to consider this. the highscore also does not store continue data, so if a continued run achieves high score the high score will have last digit as 0 while current score is non 0. but this seems unlikely. i'll keep this bug and make it a hidden nickname later.
+---@param value integer internal score value
+---@param rjust? integer whether to add zeroes in the left to reach rjust digits, if not set add nothing
+---@param continue? integer last digit, defaults to 0
+function scoreToString(value,rjust,continue)
+    local scoreString
+    if rjust then
+        scoreString=string.format('%0'..rjust..'d', math.floor(value))
+    else
+        scoreString=tostring(math.floor(value))
+    end
+    return scoreString..(tostring(math.floor(continue or 0)))
+end
