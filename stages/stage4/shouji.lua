@@ -347,6 +347,7 @@ local boss=BossManager.BossSegment{
                         end
                     end
                     local colors={'red','orange','purple','magenta'}
+                    wait(60)
                     for i=1,8 do
                         SFX:play('enemyShot')
                         slashAtDir(dir0-math.pi/2,math.pi/2*0.8*math.mod2Sign(i),60,colors[(i-1)%4+1],math.mod2Sign(i),5)
