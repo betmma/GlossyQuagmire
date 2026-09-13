@@ -159,3 +159,22 @@
 ---@field applyForegroundShader def.Spherical.applyForegroundShader
 ---@field rThetaTo def.Spherical.rThetaTo
 ---@field zoomFactorToScreen def.Spherical.zoomFactorToScreen
+
+
+---@class Cylinder:GeometryBase
+---@field r0 number the disk radius
+---@field a number the width of the rectangle. equals r0*2pi
+---@field init def.GeometryBase.init
+---@field update def.GeometryBase.update
+---@field rThetaGo def.GeometryBase.rThetaGo
+---@field distance def.GeometryBase.distance
+---@field to def.GeometryBase.to
+---@field sideToLine def.GeometryBase.sideToLine
+---@field nearestToLine def.GeometryBase.nearestToLine
+---@field toScreen def.GeometryBase.toScreen
+---@field canSimpleDraw def.GeometryBase.canSimpleDraw
+---@field applyVertexShader def.GeometryBase.applyVertexShader
+---@field applyPixelShader def.GeometryBase.applyPixelShader
+---@field applyForegroundShader def.GeometryBase.applyForegroundShader
+---@field rThetaTo def.GeometryBase.rThetaTo
+---@field zoomFactorToScreen def.GeometryBase.zoomFactorToScreen

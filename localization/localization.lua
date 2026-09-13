@@ -934,6 +934,16 @@ return {
                         zh_cn = 'STAGE 4   另一场展览？',
                     }
                 },
+                stage5 = {
+                    main = {
+                        en_us = 'Soaring High, a Narrow Sky',
+                        zh_cn = '青云直上，用管窥天',
+                    },
+                    small = {
+                        en_us = 'STAGE 5   Rise to the Sky',
+                        zh_cn = 'STAGE 5   紧急升空',
+                    }
+                },
                 stage6 = {
                     main = {
                         en_us = 'Head in the Clouds',

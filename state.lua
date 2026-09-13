@@ -138,7 +138,7 @@ G={
         },
         ---@type table<StageKey, string>
         STAGE_TO_DEFAULT_GEOMETRY_NAME={
-            stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean',stage4='Euclidean'
+            stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean',stage4='Euclidean',stage5='Cylinder'
         }
     },
 }

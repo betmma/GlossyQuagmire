@@ -60,9 +60,10 @@ function makeDynamicUIObjs()
                 self.x,self.y=xywh[1]+xywh[3]/2,xywh[2]+xywh[4]*0.2
             end
         )}})
+    local stageTitleTextFontSize=48
     -- stage title, the main part
     local stageTitleText=centerBase:child(DynamicText{
-        text='',fontSize=48,color={1,1,1,1},autoSize=true,
+        text='',fontSize=stageTitleTextFontSize,color={1,1,1,1},autoSize=true,
         x=0,y=20,align='center',toggleX=true,transparency=0
     })
     -- the small text above main title text. like STAGE 1 Somewhere in Gensokyo
@@ -528,7 +529,13 @@ function makeDynamicUIObjs()
     local function showStageTitle(stageKey)
         local mainTitle=Localize{'ui','IN_GAME','STAGE_TITLE',stageKey,'main'}
         local smallTitle=Localize{'ui','IN_GAME','STAGE_TITLE',stageKey,'small'}
+        stageTitleText.fontSize=stageTitleTextFontSize
         stageTitleText:setText(mainTitle)
+        local width=stageTitleText.width
+        if width>550 then
+            stageTitleText.fontSize=stageTitleText.fontSize/width*550
+            UI.Text.setText(stageTitleText,mainTitle)
+        end
         stageTitleSmallText:setText(smallTitle)
         Event.Event{obj=G.runInfo.player,action=function(self)
             wait(240)

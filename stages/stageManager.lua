@@ -118,7 +118,7 @@ end
 
 ---@type table<StageKey,OneStageData>
 local StageData={}
-local currentStageKeys={'stage1','stage2','stage3','stage4'} -- currently existing stages.
+local currentStageKeys={'stage1','stage2','stage3','stage4','stage5'} -- currently existing stages.
 local function loadStageData()
     for _,stageKey in pairs(currentStageKeys) do
         StageData[stageKey]=require('stages.'..stageKey..'.main')

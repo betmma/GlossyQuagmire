@@ -153,6 +153,8 @@ local geometries={
     Hyperbolic=love.filesystem.load("geometries/hyperbolic.lua")(GeometryBase),
 ---@type Spherical
     Spherical=love.filesystem.load("geometries/spherical.lua")(GeometryBase),
+---@type Cylinder
+    Cylinder=love.filesystem.load("geometries/cylinder.lua")(GeometryBase),
 }
 ---@type MovingHyperbolic
 geometries.MovingHyperbolic=love.filesystem.load("geometries/movingHyperbolic.lua")(geometries.Hyperbolic)
