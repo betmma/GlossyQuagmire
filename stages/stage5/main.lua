@@ -1,6 +1,7 @@
 ---@type OneStageDataRaw
 return{
     init=function()
+        G:replaceBackgroundPatternIfNot(BackgroundPattern.Stage5S2R)
         if G.runInfo.geometry==G.geometries.Cylinder then
             local border=Border.XYBorder{minx=-20,maxx=2500,miny=-G.geometries.Cylinder.r0+20,maxy=G.geometries.Cylinder.r0-20}
             G.runInfo.player.border=border
@@ -27,7 +28,7 @@ return{
                 end
                 DynamicUIObjs.showStageTitle('stage5')
                 wait(360)
-                wait(240)
+                wait(24000)
             end
         }
     }
