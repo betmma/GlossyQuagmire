@@ -4,7 +4,7 @@ local normalStageOrder={'stage1','stage2','stage3','stage4','stage5','stage6'}
 G={
     ---@class G.CONSTANTS
     ---@field DRAW fun(self, uiToDrawBatch?: STATE)
-    ---@field FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader}
+    ---@field FOREGROUND_SHADERS {RECTANGLE: love.Shader, CIRCLE: love.Shader, TWO_CIRCLES: love.Shader, RING: love.Shader}
     ---@field USE_FOREGROUND_SHADER fun(key: string, args: table)
     ---@field DIFFICULTIES DIFFICULTY[]
     ---@field DIFFICULTIES_DATA table<DIFFICULTY, {value: string, shortForm: string, color: rgbaColor}>
@@ -35,10 +35,6 @@ G={
             Asset:drawBatches()
             love.graphics.setShader()
         end,
-        --- from previous game vvv
-        ---@enum VIEW_MODE
-        VIEW_MODES={NORMAL='NORMAL',FOLLOW='FOLLOW'},
-        --- from previous game ^^^
         FOREGROUND_SHADERS={
             -- xywh: vec4
             RECTANGLE=love.graphics.newShader('shaders/foreground/rectangle.glsl'),
@@ -46,6 +42,8 @@ G={
             CIRCLE=love.graphics.newShader('shaders/foreground/circle.glsl'),
             -- centerXY: vec2, radius: number, centerXY2: vec2, radius2: number
             TWO_CIRCLES=love.graphics.newShader('shaders/foreground/twoCircles.glsl'),
+            -- centerXY: vec2, radius: number, innerRadius: number
+            RING=love.graphics.newShader('shaders/foreground/ring.glsl'),
         },
         USE_FOREGROUND_SHADER=function(key,args)
             G.foregroundShaderData={shader=G.CONSTANTS.FOREGROUND_SHADERS[key],args=args}

@@ -82,7 +82,7 @@ end
 
 function Cylinder:applyForegroundShader()
     local radius=self.r0
-    G.CONSTANTS.USE_FOREGROUND_SHADER('CIRCLE',{centerXY={self.viewConfig.screenCenter.x,self.viewConfig.screenCenter.y},radius=radius})
+    G.CONSTANTS.USE_FOREGROUND_SHADER('RING',{centerXY={self.viewConfig.screenCenter.x,self.viewConfig.screenCenter.y},radius=radius,innerRadius=self.r0*math.exp(-2)})
 end
 
 return Cylinder

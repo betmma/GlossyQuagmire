@@ -2,10 +2,13 @@
 
 ---@alias circleForegroundStrategy fun(self:UIText, centerXY:number[], radius:number):nil
 ---@alias rectangleForegroundStrategy fun(self:UIText, xywh:number[]):nil
+---@alias ringForegroundStrategy fun(self:UIText, centerXY:number[], radius:number, innerRadius:number):nil
 
 ---@param circleStrategy circleForegroundStrategy
 ---@param rectangleStrategy rectangleForegroundStrategy
-local function strategy(circleStrategy, rectangleStrategy)
+---@param ringStrategy? ringForegroundStrategy
+local function strategy(circleStrategy, rectangleStrategy, ringStrategy)
+    ringStrategy=ringStrategy or circleStrategy
     return function(self)
         local shader=G.foregroundShaderData.shader
         if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
@@ -14,6 +17,10 @@ local function strategy(circleStrategy, rectangleStrategy)
         elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
             local xywh=G.foregroundShaderData.args.xywh
             return rectangleStrategy(self, xywh)
+        elseif shader==G.CONSTANTS.FOREGROUND_SHADERS.RING then
+            local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
+            local innerRadius=G.foregroundShaderData.args.innerRadius
+            return ringStrategy(self, centerXY, radius, innerRadius)
         end
     end
 end
@@ -426,6 +433,9 @@ function makeDynamicUIObjs()
         end,
         function(self, xywh)
             self.x,self.y=xywh[1]+baseWidth+5,xywh[2]+xywh[4]-30
+        end,
+        function (self, centerXY, radius, innerRadius)
+            self.x,self.y=centerXY[1],centerXY[2]
         end
     ),function(self)
         self.transparency=math.lerpCondition(self.transparency,itemComboData.active,1,0,0.1)

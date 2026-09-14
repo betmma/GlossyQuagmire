@@ -937,7 +937,7 @@ return {
                 stage5 = {
                     main = {
                         en_us = 'Soaring High, a Narrow Sky',
-                        zh_cn = '青云直上，用管窥天',
+                        zh_cn = '青云直上，以管窥天',
                     },
                     small = {
                         en_us = 'STAGE 5   Rise to the Sky',

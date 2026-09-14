@@ -25,7 +25,7 @@ return {
         })
         local getForegroundBaseX=function(y)
             local shader=G.foregroundShaderData.shader
-            if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
+            if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES or shader==G.CONSTANTS.FOREGROUND_SHADERS.RING then
                 local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
                 local dy=y-centerXY[2]
                 if math.abs(dy)>=radius then
