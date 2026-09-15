@@ -13,22 +13,104 @@ return{
         {
             key='5-1',
             type='midStage',
-            func=function() -- 10s
+            func=function() -- 11s. mid boss needs to appear at 51s
                 local geo=G.runInfo.geometry
                 ---@cast geo Cylinder
                 local pos0=geo:init().pos
                 local pos1=geo:rThetaGo(pos0,300,-math.pi/2)
                 local pos2=geo:rThetaGo(pos1,geo.a/2,0)
                 for i=1,20 do
-                    fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=math.pi*(i%2),speed=180},maxhp=50,sprite=Asset.fairySprites.small.purple,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=2}}
+                    local fairy=Enemy{kinematicState=copyTable{pos=pos2,dir=math.pi*(i%2),speed=180},maxhp=50,sprite=Asset.fairySprites.small.purple,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=2}}
                     BulletSpawner{
-                        period=DSWITCH{90,70,50,30},firstPeriod=i*3+30,lifeFrame=570,bulletNumber=DSWITCH{1,3,3,3},bulletSpeed=150+i*10,bulletSize=1,angle='player',range=math.pi/2,bulletSprite=BulletSprites.round.purple,bulletLifeFrame=600,visible=false,bulletExtraUpdate={Action.FadeOut(20,true)}
+                        period=DSWITCH{90,90,45,45},firstPeriod=60-(i%3)*15,lifeFrame=470,bulletNumber=DSWITCH{1,3,3,5},bulletSpeed=150+i*10,bulletSize=1,angle='player',range=math.pi/2,bulletSprite=BulletSprites.round.purple,bulletLifeFrame=540,visible=false,bulletExtraUpdate={Action.FadeOut(20,true)}
                     }:bindState(fairy)
-                    wait(12)
+                    wait(15)
                 end
                 DynamicUIObjs.showStageTitle('stage5')
                 wait(360)
-                wait(24000)
+                -- wait(24000)
+            end
+        },
+        {
+            key='5-2',
+            type='midStage',
+            func=function() -- 25s
+                -- bgm is 160, so a beat is 22.5 frames. 630 frames would be 28 beats
+                local geo=G.runInfo.geometry
+                ---@cast geo Cylinder
+                local pos0=geo:init().pos
+                pos0.x=G.runInfo.player.kinematicState.pos.x -- same angle
+                local radius=geo.r0*0.8
+                local pos1=geo:rThetaGo(pos0,250+radius-geo.r0,-math.pi/2)
+                local posh=geo:rThetaGo(pos0,600,-math.pi/2)
+                local rotateSpeedRatio=DSWITCH{1,1.2,0.6,-1.2}
+                local bindFunc=function (self, centerObj)
+                    local t=centerObj.frame
+                    return {r=self.any.r*math.min(1,t/60),theta=self.any.angle+t*(centerObj.kinematicState.speed/geo.r0/60)*rotateSpeedRatio*-math.mod2Sign(self.any.index)*math.min(1,t/60)}
+                end
+                local slow=function(self)
+                    self.kinematicState.speed=math.lerp(self.kinematicState.speed,150,0.03)
+                end
+                local sentry=DanmakuFuncs.sentry()
+                local refreshGraze=function(self)
+                    if self.frame%4==0 and sentry.frame<1260 then
+                        self.grazed=false
+                    end
+                end
+                local afterCenterRemove=function(self)
+                    self.extraUpdate[#self.extraUpdate+1] = slow
+                end
+                local colors={'red','yellow','teal','blue','purple'}
+                for i=1,2 do
+                    local pos2=geo:rThetaGo(pos1,geo.a/4*math.mod2Sign(i),0)
+                    local bigFairy=Enemy{kinematicState=copyTable{pos=pos2,dir=math.pi*(i%2),speed=0},maxhp=500,sprite=Asset.fairySprites.large.red,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=5,point=5}}
+                    BulletSpawner{
+                        period=240,firstPeriod=60,lifeFrame=90,bulletNumber=2,bulletSpeed=geo.a/2*60/315,bulletSize=1,angle=math.pi/2,bulletSprite=BulletSprites.round.red,bulletLifeFrame=1260,bulletExtraUpdate={Action.FadeOut(20,true)},bulletEvents={function (cir,args,self)
+                            SFX:play('enemyPowerfulShot')
+                            cir.lifeFrame=cir.lifeFrame-(i-1)*630
+                            -- flower shape
+                            local n=5
+                            local colorIndex=math.random(1,5)
+                            for j=1,n do
+                                local color=colors[(j+colorIndex)%5+1]
+                                local angleBase=j/n*math.pi*2
+                                local n2=21
+                                for k=1,n2 do
+                                    local ratio=((k-0.5)/n2-0.5)*2
+                                    local angle=math.sign(ratio)*math.abs(ratio)^2*math.pi/2
+                                    local r0=math.max(math.log(math.tan(math.pi/2-0.03-math.abs(angle))*2+1),0) -- maps angle from -pi/2 to pi/2 to a petal shape
+                                    local rmax=math.log(math.tan(math.pi/2-0.03)*2+1)
+                                    local r=radius/rmax*r0
+                                    local bullet=Bullet{lifeFrame=cir.lifeFrame+300,sprite=BulletSprites.bigStar[color],extraUpdate={Action.FadeIn(20,true),Action.FadeOut(20,true),refreshGraze},size=1}
+                                    bullet.any={r=r,angle=angleBase+angle,index=args.index}
+                                    DanmakuFuncs.orbitBind(bullet,cir,bindFunc,afterCenterRemove)
+                                end
+                                -- decorative laser. currently due to "side to line" undefined in cylinder, laser cannot calculate checkHitPlayer normally so set it to safe
+                                local laser=GeoLaser{sprite=BulletSprites.laser[color],size=9*radius/geo.r0,rayAngle=-0.1,spriteTransparency=1,safe=true,invincible=true,lifeFrame=cir.lifeFrame,meshBudget={capNum=3,step=30,num=math.floor(9*radius/geo.r0)},extraUpdate={GeoLaser.presetActions.laserZoomIn(20),GeoLaser.presetActions.laserZoomOut(20),function(self)
+                                end}}
+                                laser.any={r=0,angle=angleBase,index=args.index}
+                                DanmakuFuncs.orbitBind(laser,cir,bindFunc,function (self)
+                                    self.lifeFrame=self.frame+30
+                                end)
+                            end
+                        end}
+                    }:bindState(bigFairy)
+                    Event{action=function ()
+                        wait(120)
+                        for j=1,20 do
+                            local posh2=geo:rThetaGo(posh,geo.a/4/20*j*math.mod2Sign(i),0)
+                            local fairy=Enemy{kinematicState=copyTable{pos=posh2,dir=math.pi/2,speed=120},maxhp=50,sprite=Asset.fairySprites.small.white,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHintCompat},dropItems={powerSmall=1,point=1}}
+                            BulletSpawner{
+                                period=DSWITCH{90,70,50,40},firstPeriod=120,lifeFrame=300,bulletNumber=DSWITCH{1,3,3,5},bulletSpeed=300,bulletSize=1,angle='player',range=math.pi/9,bulletSprite=BulletSprites.round.white,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeOut(20,true),slow}
+                            }:bindState(fairy)
+                            wait(12)
+                        end
+                    end}
+                    wait(630)
+                end
+                wait(60)
+                SFX:play('enemyPowerfulShot')
+                wait(180)
             end
         }
     }
