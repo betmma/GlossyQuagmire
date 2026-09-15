@@ -24,7 +24,7 @@ local Asset=...
 
 ---@alias AssetBulletSpritesCollection { \
 ---laser: spectrum, round: spectrum, rim: spectrum, rice: spectrum, bill: spectrum, kunai: spectrum, scale: spectrum, bullet: spectrum, bulletFog: spectrum, crystal: spectrum, star: spectrum, rain: spectrum, diamond: spectrum, coin: spectrum, cross: spectrum, crossDark: spectrum, crossRim: spectrum, crossDarkRim: spectrum, \
----laserDark: spectrum, roundDark: spectrum, rimDark: spectrum, blackrice: spectrum, billDark: spectrum, kunaiDark: spectrum, scaleDark: spectrum, bulletDark: spectrum, bulletFogDark: spectrum, crystalDark: spectrum, starDark: spectrum, rainDark: spectrum, \
+---laserDark: spectrum, roundDark: spectrum, rimDark: spectrum, blackrice: spectrum, billDark: spectrum, kunaiDark: spectrum, scaleDark: spectrum, bulletDark: spectrum, bulletFogDark: spectrum, crystalDark: spectrum, starDark: spectrum, rainDark: spectrum, turret: spectrum, \
 ---ellipse: spectrum, knife: spectrum, arrow: spectrum, \
 ---dot: spectrum, darkdot: spectrum, \
 ---bigRound: spectrum, bigStar: spectrum, heart: spectrum, flower: spectrum, magatama: spectrum, haniwa: spectrum, orb: spectrum, \
@@ -55,7 +55,7 @@ matrix{
     colorOffsetFunc=simpleOffsetFunc(16,0),
     baseX=0,baseY=0,
 }:addToAsset()
-local names16x16_2={'laserDark','roundDark','rimDark','blackrice','billDark','kunaiDark','scaleDark','bulletDark','bulletFogDark','crystalDark','starDark','rainDark'}
+local names16x16_2={'laserDark','roundDark','rimDark','blackrice','billDark','kunaiDark','scaleDark','bulletDark','bulletFogDark','crystalDark','starDark','rainDark','turret'}
 matrix{
     unit=single{sizeX=16,sizeY=16},
     names=names16x16_2,colors=colors,
