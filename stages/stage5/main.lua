@@ -157,7 +157,7 @@ return{
             type='midStage',
             func=function() -- 42s
             -- second half add some fairies. finale shoot aimed bullets. need to make them vertical as possible to prevent lingering on the board
-                BGM.data[BGM.currentAudio]:seek(51,'seconds')
+                -- BGM.data[BGM.currentAudio]:seek(51,'seconds')
                 local geo=G.runInfo.geometry
                 ---@cast geo Cylinder
                 local pos0=geo:init().pos
@@ -208,7 +208,7 @@ return{
                 local function explosion(core,r,g,b)
                     local noiseF=getNoiseF()
                     local cycles=4
-                    BulletSpawner{bulletNumber=300,period=10,firstPeriod=1,lifeFrame=3,angle='0+99',range=math.pi*2*cycles,bulletSprite=BulletSprites.ellipse.white,highlight=true,bulletSpeed=150,bulletLifeFrame=1260,bulletEvents={function (cir,args,self)
+                    BulletSpawner{bulletNumber=DSWITCH{160,200,240,300},period=10,firstPeriod=1,lifeFrame=3,angle='0+99',range=math.pi*2*cycles,bulletSprite=BulletSprites.ellipse.white,highlight=true,bulletSpeed=150,bulletLifeFrame=1260,bulletEvents={function (cir,args,self)
                         local cycle=math.ceil(args.index/(self.bulletNumber/cycles))-1
                         local angle=math.modClamp(cir.kinematicState.dir)
                         cir.lifeFrame=math.abs(1/math.clamp(math.tan(angle),0.2,10))*200+200
@@ -219,7 +219,7 @@ return{
                 local function explosion2(core,r,g,b)
                     local noiseF=getNoiseF()
                     local cycles=2
-                    BulletSpawner{bulletNumber=100,period=10,firstPeriod=1,lifeFrame=3,angle='0+99',range=math.pi*2*cycles,bulletSprite=BulletSprites.giant.white,highlight=true,bulletSpeed=150,bulletLifeFrame=1260,bulletEvents={function (cir,args,self)
+                    BulletSpawner{bulletNumber=DSWITCH{40,60,80,100},period=10,firstPeriod=1,lifeFrame=3,angle='0+99',range=math.pi*2*cycles,bulletSprite=BulletSprites.giant.white,highlight=true,bulletSpeed=150,bulletLifeFrame=1260,bulletEvents={function (cir,args,self)
                         cir.forceQuad=true
                         local cycle=math.ceil(args.index/(self.bulletNumber/cycles))-1
                         local angle=math.modClamp(cir.kinematicState.dir)
@@ -236,7 +236,7 @@ return{
                             cir.kinematicState.dir=geo:to(cir.kinematicState.pos,G.runInfo.player.kinematicState.pos)
                             cir.kinematicState.speed=cir.kinematicState.speed-math.abs(mid)*20
                             local angle=math.modClamp(cir.kinematicState.dir)
-                            cir.lifeFrame=math.abs(1/math.clamp(math.tan(angle),0.2,10))*200+200
+                            cir.lifeFrame=math.abs(1/math.clamp(math.tan(angle),0.2,10))*DSWITCH{100,120,150,200}+200
                         end},bulletExtraUpdate={Action.ZoomIn(20,1,3),Action.FadeOut(20,true),easeSpeed},fogEffect=true,fogTime=10}
                     end
                     for i=1,5 do
@@ -245,6 +245,8 @@ return{
                         local posi=geo:rThetaGo(core.kinematicState.pos,r1,angle)
                         local dir=math.sign(math.modClamp(geo:to(posi,G.runInfo.player.kinematicState.pos)-math.pi/2))*math.pi/2+math.pi/2
                         local fairy=Enemy{kinematicState={pos=posi,dir=dir,speed=math.eval(200,50)},maxhp=50,sprite=Asset.fairySprites.medium.white,lifeFrame=time,extraUpdate={Enemy.presetActions.fadeAndHint,Action.Finale(3)},dropItems={powerSmall=4,point=4},extraDieEffects={fairyDieEffect}}
+                        local warningBullet=Bullet{invincible=true,lifeFrame=fairy.lifeFrame,sprite=BulletSprites.lightRound.red,spriteColor={1,0,0,1},safe=true,forceQuad=true,highlight=true,size=1,extraUpdate={Action.FadeOut(20,false)}}
+                        warningBullet:bindState(fairy)
                         -- DanmakuFuncs.orbitBind(fairy,core,{r=r1,theta=angle})
                     end
                 end
@@ -315,7 +317,98 @@ return{
                     bigbang(nil,true)
                     wait(math.ceil((criticals[index+1][1]-criticals[index][1])*60*60/160-0.5))
                 end
-                wait(900)
+            end
+        },
+        {
+            key='5-5',
+            type='midStage',
+            func=function() -- 25.5s
+                BGM.data[BGM.currentAudio]:seek(93,'seconds')
+                local geo=G.runInfo.geometry
+                ---@cast geo Cylinder
+                local pos0=geo:init().pos
+                local player=G.runInfo.player
+                wait(22) -- a beat before 16 3-3-2s
+                local function getNoiseF()
+                    local rands={math.eval(0,1),math.eval(0,0.7),math.eval(0,0.5)}
+                    local freq=math.random(2,4)
+                    local noiseF=function(angle)
+                        local ans=0
+                        local freqi=freq
+                        for i=1,3 do
+                            ans=ans+math.sin(angle*freqi+rands[i]*9)*rands[i]
+                            freqi=freqi*2
+                        end
+                        return ans
+                    end
+                    return noiseF
+                end
+                local sentry=DanmakuFuncs.sentry()
+                local counts={0,0,0,0}
+                local countN=#counts
+                local function rand()
+                    local min=math.min(unpack(counts))
+                    local pool={}
+                    for i=1,countN do
+                        if counts[i]==min then
+                            pool[#pool+1]=i
+                        end
+                    end
+                    local index=pool[math.random(1,#pool)]
+                    counts[index]=counts[index]+1
+                    return index
+                end
+                local function spawnFairy(angle)
+                    local pos={x=angle*geo.r0+player.kinematicState.pos.x,y=0}
+                    local level=rand()
+                    local fairy=Enemy{kinematicState={pos=pos,dir=math.pi/2,speed=(level-0.5-countN/2)*180},maxhp=150,sprite=Asset.fairySprites.medium.blue,lifeFrame=600,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3}}
+                    local warningBullet=Bullet{invincible=true,lifeFrame=fairy.lifeFrame,sprite=BulletSprites.lightRound.red,spriteColor={1,0.2,0.7,1},safe=true,forceQuad=true,highlight=true,size=1.5,extraUpdate={Action.FadeOut(20,false)}}
+                    warningBullet:bindState(fairy)
+                    fairy:addHPProtection(60,3)
+                    SFX:play('enemyShot')
+                    Event{obj=fairy,action=function()
+                        Event.EaseEvent{obj=fairy,easeObj=fairy.kinematicState,aims={speed=0},duration=90}
+                        wait(90)
+                        SFX:play('enemyShot')
+                        local period=6
+                        local lifeFrame=60
+                        local num=lifeFrame/period
+                        local noiseF=getNoiseF()
+                        local oscillatePeriod=180
+                        BulletSpawner{period=period,lifeFrame=lifeFrame,bulletNumber=DSWITCH{2,2,4,4},angle=0,range=0,bulletLifeFrame=600,bulletSpeed=DSWITCH{150,200,150,200},bulletSprite=BulletSprites.giant.blue,highlight=true,bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20),function(self)
+                            local phase=self.any.deltaPhase+sentry.frame/oscillatePeriod*math.pi
+                            self.kinematicState.pos.y=self.any.y0+70*math.sin(phase)*math.min(1,self.frame/30)*self.any.ratio
+                        end},bulletEvents={function(cir,args,self)
+                            cir.forceQuad=true
+                            local index=args.index
+                            local deltaPhase=(index%2)*math.pi
+                            if index>2 then
+                                cir.kinematicState.dir=cir.kinematicState.dir+math.pi
+                                deltaPhase=deltaPhase+math.pi/2
+                            end
+                            local ratio0=(self.spawnTimes-1)/(num-1)
+                            local ratio=(noiseF(ratio0*math.pi/2)*0.4+1)*(1-(ratio0*2-1)^2)^0.5
+                            cir.any={index=self.spawnTimes*period,deltaPhase=deltaPhase,y0=cir.kinematicState.pos.y,ratio=ratio}
+                        end}}:bindState(fairy)
+                        Event.EaseEvent{obj=warningBullet,aims={size=1},duration=20,progressFunc=Event.sineOProgressFunc}
+                        Event.EaseEvent{obj=warningBullet,easeObj=warningBullet.spriteColor,aims={[2]=0,[3]=0},duration=20,progressFunc=Event.sineOProgressFunc}
+                        wait(90)
+                        local dirp=math.sign(math.modClamp(geo:to(fairy.kinematicState.pos,player.kinematicState.pos)-math.pi/2))*math.pi/2+math.pi/2
+                        fairy.kinematicState.dir=dirp
+                        Event.EaseEvent{obj=fairy,easeObj=fairy.kinematicState,aims={speed=150},duration=90}
+                    end}
+                end
+                for i=1,8 do
+                    local angle0=math.mod2Sign(i)*math.pi/3
+                    spawnFairy(angle0+math.mod2Sign(i)*math.pi*4/3)
+                    wait(34)
+                    spawnFairy(angle0+math.mod2Sign(i)*math.pi*2/3)
+                    wait(34)
+                    spawnFairy(angle0)
+                    wait(22)
+                    wait(90)
+                end
+                wait(78) -- 3 more beats after 16 3-3-2s, overall 17 bars = 25.5s
             end
         }
     }
