@@ -59,11 +59,6 @@ float axialOffset(float z, float center) {
     return mod(z-center+WORLD_PERIOD*0.5, WORLD_PERIOD)-WORLD_PERIOD*0.5;
 }
 
-// Conservative empty-space bound for the two repeated cloud layers.
-float layerDistance(float z) {
-    return min(abs(axialOffset(z, 6.0))-1.35, abs(axialOffset(z, 10.0))-1.0);
-}
-
 float cloudDensity(vec3 q, float z) {
     float heightA = axialOffset(z, 6.0)/1.35;
     float heightB = axialOffset(z, 10.0);
@@ -112,9 +107,21 @@ vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
     float offsetLength = length(translation.xy);
     float sinc = offsetLength < 0.00001 ? 1.0 : sin(offsetLength)/offsetLength;
     vec3 q0 = vec3(translation.xy*sinc, cos(offsetLength));
-    float denominator = max(1.0+q0.z, 0.000001);
-    vec3 east = vec3(1.0-q0.x*q0.x/denominator, -q0.x*q0.y/denominator, -q0.x);
-    vec3 south = vec3(-q0.x*q0.y/denominator, 1.0-q0.y*q0.y/denominator, -q0.y);
+    float denominator = 1.0+q0.z;
+    vec3 east;
+    vec3 south;
+    if(denominator > 0.0001) {
+        east = vec3(1.0-q0.x*q0.x/denominator, -q0.x*q0.y/denominator, -q0.x);
+        south = vec3(-q0.x*q0.y/denominator, 1.0-q0.y*q0.y/denominator, -q0.y);
+    }else{
+        // The north-pole projection is singular at the antipode. Continue
+        // with the meridian selected by the approach direction instead of
+        // clamping 1+z, which causes a visible camera-position pop.
+        vec2 meridian = normalize(translation.xy);
+        vec2 azimuth = vec2(-meridian.y, meridian.x);
+        east = vec3(azimuth, 0.0);
+        south = vec3(-meridian*cos(offsetLength), -sin(offsetLength));
+    }
     float sphericalSpeed = length(d.xy);
     vec3 tangent = east;
     if(sphericalSpeed > 0.000001) tangent = (east*d.x+south*d.y)/sphericalSpeed;
@@ -126,33 +133,29 @@ vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
     // Fixed spatial jitter breaks concentric sampling bands without flickering.
     float sampleOffset = 0.15+0.70*hash31(vec3(screenCoords, 0.37));
     for(int stepIndex=0; stepIndex<64; stepIndex++) {
-        float z = translation.z+d.z*travel;
-        float emptyDistance = layerDistance(z);
-        if(emptyDistance > 0.02) {
-            // S2 motion cannot reach a layer sooner along its R coordinate.
-            travel += max(0.03, emptyDistance/max(abs(d.z), 0.0001));
-        }else{
-            float stepLength = 0.055+travel*0.003;
-            float sampleTravel = travel+stepLength*sampleOffset;
-            // Exact product geodesic. Integrate density with finite steps;
-            // cloud noise is not a distance bound suitable for sphere tracing.
-            float angle = sampleTravel*sphericalSpeed/sphere_radius;
-            vec3 q = q0*cos(angle)+tangent*sin(angle);
-            float sampleZ = translation.z+d.z*sampleTravel;
-            float density = cloudDensity(q, sampleZ);
-            if(density > 0.001) {
-                // One probe between the old near/far shadow samples.
-                float above = cloudDensity(q, sampleZ+0.38);
-                float sunlight = exp(-2.0*above);
-                vec3 cloudColor = mix(vec3(0.36, 0.48, 0.65), vec3(1.0, 0.97, 0.88), sunlight);
-                cloudColor += vec3(0.10, 0.13, 0.17)*(1.0-density);
-                cloudColor = mix(cloudColor, sky, 1.0-exp(-sampleTravel*0.025));
-                float opacity = 1.0-exp(-density*stepLength*3.8);
-                accumulated += transmission*opacity*cloudColor;
-                transmission *= 1.0-opacity;
-            }
-            travel += stepLength;
+        // Keep the sample lattice continuous as the camera moves. The former
+        // layerDistance jump changed the number and phase of samples whenever
+        // a ray crossed its 0.02 guard, producing visible popping.
+        float stepLength = 0.105+travel*0.004;
+        float sampleTravel = travel+stepLength*sampleOffset;
+        // Exact product geodesic. Integrate density with finite steps;
+        // cloud noise is not a distance bound suitable for sphere tracing.
+        float angle = sampleTravel*sphericalSpeed/sphere_radius;
+        vec3 q = q0*cos(angle)+tangent*sin(angle);
+        float sampleZ = translation.z+d.z*sampleTravel;
+        float density = cloudDensity(q, sampleZ);
+        if(density > 0.001) {
+            // One probe between the old near/far shadow samples.
+            float above = cloudDensity(q, sampleZ+0.38);
+            float sunlight = exp(-2.0*above);
+            vec3 cloudColor = mix(vec3(0.36, 0.48, 0.65), vec3(1.0, 0.97, 0.88), sunlight);
+            cloudColor += vec3(0.10, 0.13, 0.17)*(1.0-density);
+            cloudColor = mix(cloudColor, sky, 1.0-exp(-sampleTravel*0.025));
+            float opacity = 1.0-exp(-density*stepLength*3.8);
+            accumulated += transmission*opacity*cloudColor;
+            transmission *= 1.0-opacity;
         }
+        travel += stepLength;
         if(travel > MAX_TRAVEL || transmission < 0.015) break;
     }
     return vec4(clamp(accumulated+transmission*sky, 0.0, 1.0), 1.0)*color;
