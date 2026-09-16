@@ -152,5 +152,171 @@ return{
                 wait(450)
             end
         },
+        {
+            key='5-4',
+            type='midStage',
+            func=function() -- 42s
+            -- second half add some fairies. finale shoot aimed bullets. need to make them vertical as possible to prevent lingering on the board
+                BGM.data[BGM.currentAudio]:seek(51,'seconds')
+                local geo=G.runInfo.geometry
+                ---@cast geo Cylinder
+                local pos0=geo:init().pos
+                pos0.x=G.runInfo.player.kinematicState.pos.x -- same angle as player
+                local pos1=geo:rThetaGo(pos0,250,-math.pi/2)
+                local function cloudPartOnCoreRemove(self)
+                    self.kinematicState.speed=200
+                end
+                local function easeSpeed(self)
+                    self.kinematicState.speed=math.lerp(self.kinematicState.speed,150,0.03)
+                end
+                local count=0
+                local current=1
+                local criticals={{0,8+3/4},{15+1/4,22+1/4},{28,36+3/4},{43+1/4,50+1/4},{56,56}}
+                local function cloud(core)
+                    -- several random giant bullets
+                    local n=6
+                    local r,g,b=math.hsvToRgb(math.eval(0,1),math.eval(0.8,0.2),math.eval(0.35,0.05))
+                    for i=1,n do
+                        local ra=math.eval(40,20)
+                        local theta=math.pi*2/n*i+math.eval(0,0.4)
+                        local x,y=math.rTheta2xy(ra,theta)
+                        y=y/2 -- oval shape
+                        local r2,theta2=math.xy2rTheta(x,y)
+                        local size=math.eval(2,0.5)
+                        local giant=Bullet{lifeFrame=1260,sprite=BulletSprites.lightRound.white,size=size,extraUpdate={Action.FadeIn(20,true),Action.FadeOut(20,true)},highlight=true,spriteTransparency=1,spriteColor={r,g,b,1},forceQuad=true}
+                        DanmakuFuncs.orbitBind(giant,core,{r=r2,theta=theta2},cloudPartOnCoreRemove)
+                        -- Event.LoopEvent{obj=giant,period=180,firstPeriod=120,times=6,executeFunc=function (self, index, total)
+                        -- end}
+                    end
+                    count=count+1
+                    return r,g,b
+                end
+                local function getNoiseF()
+                    local rands={math.eval(0,1),math.eval(0,0.7),math.eval(0,0.5)}
+                    local freq=math.random(2,4)
+                    local noiseF=function(angle)
+                        local ans=0
+                        local freqi=freq
+                        for i=1,3 do
+                            ans=ans+math.sin(angle*freqi+rands[i]*9)*rands[i]
+                            freqi=freqi*2
+                        end
+                        return ans
+                    end
+                    return noiseF
+                end
+                local function explosion(core,r,g,b)
+                    local noiseF=getNoiseF()
+                    local cycles=4
+                    BulletSpawner{bulletNumber=300,period=10,firstPeriod=1,lifeFrame=3,angle='0+99',range=math.pi*2*cycles,bulletSprite=BulletSprites.ellipse.white,highlight=true,bulletSpeed=150,bulletLifeFrame=1260,bulletEvents={function (cir,args,self)
+                        local cycle=math.ceil(args.index/(self.bulletNumber/cycles))-1
+                        local angle=math.modClamp(cir.kinematicState.dir)
+                        cir.lifeFrame=math.abs(1/math.clamp(math.tan(angle),0.2,10))*200+200
+                        cir.kinematicState.speed=cir.kinematicState.speed+50*noiseF(angle)+80*cycle
+                        cir.spriteColor=math.lerpTable({r,g,b,1},{1,1,1,1},cycle/10)
+                    end},bulletExtraUpdate={Action.FadeOut(20,true),easeSpeed}}:bindState(core)
+                end
+                local function explosion2(core,r,g,b)
+                    local noiseF=getNoiseF()
+                    local cycles=2
+                    BulletSpawner{bulletNumber=100,period=10,firstPeriod=1,lifeFrame=3,angle='0+99',range=math.pi*2*cycles,bulletSprite=BulletSprites.giant.white,highlight=true,bulletSpeed=150,bulletLifeFrame=1260,bulletEvents={function (cir,args,self)
+                        cir.forceQuad=true
+                        local cycle=math.ceil(args.index/(self.bulletNumber/cycles))-1
+                        local angle=math.modClamp(cir.kinematicState.dir)
+                        cir.lifeFrame=math.abs(1/math.clamp(math.tan(angle),0.2,10))*200+200
+                        cir.kinematicState.speed=cir.kinematicState.speed+50*noiseF(angle)+50*cycle
+                        cir.spriteColor=math.lerpTable({r,g,b,1},{1,1,1,1},cycle/10)
+                    end},bulletExtraUpdate={Action.FadeOut(20,true),easeSpeed}}:bindState(core)
+                    local data=criticals[current]
+                    local time=math.floor((criticals[current+1][1]-data[1])*60*60/160)-60
+                    local fairyDieEffect=function(self)
+                        BulletSpawner{kinematicState={pos=self.kinematicState.pos,speed=0,dir=0},lifeFrame=5,firstPeriod=3,period=10,bulletSprite=BulletSprites.bullet.white,range=0,bulletNumber=10,highlight=true,bulletSpeed=300,bulletLifeFrame=600,angle=geo:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos),bulletEvents={function(cir,args,self)
+                            local mid=args.index-0.5-self.bulletNumber/2
+                            cir.kinematicState.pos=geo:rThetaGo(cir.kinematicState.pos,mid*10,cir.kinematicState.dir+math.pi/2)
+                            cir.kinematicState.dir=geo:to(cir.kinematicState.pos,G.runInfo.player.kinematicState.pos)
+                            cir.kinematicState.speed=cir.kinematicState.speed-math.abs(mid)*20
+                            local angle=math.modClamp(cir.kinematicState.dir)
+                            cir.lifeFrame=math.abs(1/math.clamp(math.tan(angle),0.2,10))*200+200
+                        end},bulletExtraUpdate={Action.ZoomIn(20,1,3),Action.FadeOut(20,true),easeSpeed},fogEffect=true,fogTime=10}
+                    end
+                    for i=1,5 do
+                        local r1=math.eval(50,30)
+                        local angle=math.eval(0,math.pi)
+                        local posi=geo:rThetaGo(core.kinematicState.pos,r1,angle)
+                        local dir=math.sign(math.modClamp(geo:to(posi,G.runInfo.player.kinematicState.pos)-math.pi/2))*math.pi/2+math.pi/2
+                        local fairy=Enemy{kinematicState={pos=posi,dir=dir,speed=math.eval(200,50)},maxhp=50,sprite=Asset.fairySprites.medium.white,lifeFrame=time,extraUpdate={Enemy.presetActions.fadeAndHint,Action.Finale(3)},dropItems={powerSmall=4,point=4},extraDieEffects={fairyDieEffect}}
+                        -- DanmakuFuncs.orbitBind(fairy,core,{r=r1,theta=angle})
+                    end
+                end
+                local function laser(core,r,g,b)
+                    local data=criticals[current]
+                    local time=math.floor((data[2]-data[1])*60*60/160)-60
+                    local side=count%4<2 and 1 or -1
+                    local laserDir=side*math.pi/2
+                    -- directly move core towards laserDir to reduce chance of undodgable wall
+                    core.kinematicState.pos=geo:rThetaGo(core.kinematicState.pos,DSWITCH{100,90,80,70},laserDir)
+                    GeoLaser{kinematicState=copyTable(core.kinematicState),sprite=BulletSprites.laser.white,size=3,rayAngle=0,spriteTransparency=0.3,safe=true,invincible=true,lifeFrame=1250,meshBudget={capNum=2,step=80,num=10},spriteColor={r*1.5,g*1.5,b*1.5,1},extraUpdate={GeoLaser.presetActions.laserZoomIn(time),GeoLaser.presetActions.laserZoomOut(20),function(self)
+                        self.kinematicState.pos=copyTable(core.kinematicState.pos)
+                        self.kinematicState.dir=laserDir
+                        if core.removed and not self.removeFlag then
+                            self.removeFlag=true
+                            self.lifeFrame=self.frame+20
+                        end
+                        if self.frame==time+50 then
+                            Event.EaseEvent{obj=self,duration=20,aims={size=0.1},progressFunc=Event.sineBackProgressFunc}
+                        end
+                        if self.frame==time+60 then
+                            SFX:play('enemyPowerfulShot',nil,0.3)
+                            self.safe=false
+                        end
+                        if time+60<=self.frame and self.frame<time+70 then
+                            self.spriteTransparency=self.spriteTransparency+(1-0.3)/10
+                        end
+                    end}}
+                    return side
+                end
+                local function getPos()
+                    return{x=G.runInfo.player.kinematicState.pos.x+geo.a*math.eval(0.5,0.25),y=0}
+                end
+                local function bigbang(pos,round2)
+                    pos=pos or getPos()
+                    SFX:play('enemyPowerfulShot')
+                    for side=0,1 do
+                        local angle0=math.pi*side
+                        local offset=math.eval(0,0.2)
+                        local n=1
+                        local period=math.eval(120,30)
+                        for i=1,n do
+                            local mid=i-0.5-n/2
+                            local extraAngle=mid*math.pi/9+offset
+                            local angle=angle0+extraAngle
+                            local core=Bullet{kinematicState={pos=copyTable(pos),dir=angle,speed=math.eval(100,30)},sprite=BulletSprites.round.red,spriteTransparency=0,lifeFrame=1260,safe=true,extraUpdate={function(self)
+                                self.kinematicState.dir=math.cos(self.frame/period)*self.any.extraAngle+self.any.angle0
+                            end}}
+                            core.any={angle0=angle0,extraAngle=extraAngle}
+                            local r,g,b=cloud(core)
+                            if not round2 and count%2==0 then
+                                explosion(core,r,g,b)
+                            end
+                            local laserDir=laser(core,r,g,b)
+                            if laserDir==-1 and round2 then
+                                explosion2(core,r,g,b)
+                            end
+                        end
+                    end
+                end
+                for index=1,#criticals-1 do
+                    current=index
+                    bigbang()
+                    wait(math.ceil((criticals[index+1][1]-criticals[index][1])*60*60/160-0.5))
+                end
+                for index=1,#criticals-1 do
+                    current=index
+                    bigbang(nil,true)
+                    wait(math.ceil((criticals[index+1][1]-criticals[index][1])*60*60/160-0.5))
+                end
+                wait(900)
+            end
+        }
     }
 }
