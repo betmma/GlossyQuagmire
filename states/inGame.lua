@@ -175,7 +175,7 @@ return {
         base:updateHierarchy()
         StageManager:update()
         GameObject:updateAll(dt)
-        if isPressed('d') then
+        if DEV_MODE and isPressed('d') then
             local index=1
             local geometries={}
             for key,geometry in pairs(G.geometries) do
