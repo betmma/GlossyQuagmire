@@ -9,6 +9,7 @@ local function injectGeometry()
     ---@cast geo PortalGeometryBase
     G.geometries.EuclideanPortal=geo
     geo.portal=true
+    geo.viewConfig=copyTable(geo.viewConfig)
     geo.viewConfig.following=true
     local applyVertexShaderRef=geo.applyVertexShader
     geo.applyVertexShader=function(self,viewer)
