@@ -43,7 +43,7 @@ return{
                 local radius=geo.r0*0.8
                 local pos1=geo:rThetaGo(pos0,250+radius-geo.r0,-math.pi/2)
                 local posh=geo:rThetaGo(pos0,600,-math.pi/2)
-                local rotateSpeedRatio=DSWITCH{1,1.2,0.6,-1.2}
+                local rotateSpeedRatio=DSWITCH{1,1.2,1.2,-1.2}
                 local bindFunc=function (self, centerObj)
                     local t=centerObj.frame
                     return {r=self.any.r*math.min(1,t/60),theta=self.any.angle+t*(centerObj.kinematicState.speed/geo.r0/60)*rotateSpeedRatio*-math.mod2Sign(self.any.index)*math.min(1,t/60)}
@@ -133,6 +133,7 @@ return{
                     fairy:addHPProtection(180,5)
                     BulletSpawner{
                         period=DSWITCH{27,18,18,9},firstPeriod=60,lifeFrame=900-sentry.frame,bulletNumber=DSWITCH{2,2,4,4},bulletSpeed=300,bulletSize=1,angle=math.pi,range=math.pi/3,bulletSprite=BulletSprites.turret.blue,bulletLifeFrame=500,bulletExtraUpdate={Action.FadeOut(20,true)},bulletEvents={function (cir,args,self)
+                            cir.lifeFrame=math.min(500,900-sentry.frame)
                             cir.spriteRotationSpeed=math.mod2Sign(args.index)*0.1
                             cir.spriteExtraDirection=math.eval(0,99)
                             local mid=math.ceil(math.abs(args.index-self.bulletNumber/2-0.5))
@@ -164,11 +165,13 @@ return{
                 pos0.x=G.runInfo.player.kinematicState.pos.x -- same angle as player
                 local pos1=geo:rThetaGo(pos0,250,-math.pi/2)
                 local function cloudPartOnCoreRemove(self)
+                    self.lifeFrame=self.frame+30
                     self.kinematicState.speed=200
                 end
                 local function easeSpeed(self)
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,150,0.03)
                 end
+                local sentry=DanmakuFuncs.sentry()
                 local count=0
                 local current=1
                 local criticals={{0,8+3/4},{15+1/4,22+1/4},{28,36+3/4},{43+1/4,50+1/4},{56,56}}
@@ -288,11 +291,12 @@ return{
                         local offset=math.eval(0,0.2)
                         local n=1
                         local period=math.eval(120,30)
+                        local remainingFrame=42*60-sentry.frame -- 42 seconds - passed time
                         for i=1,n do
                             local mid=i-0.5-n/2
                             local extraAngle=mid*math.pi/9+offset
                             local angle=angle0+extraAngle
-                            local core=Bullet{kinematicState={pos=copyTable(pos),dir=angle,speed=math.eval(100,30)},sprite=BulletSprites.round.red,spriteTransparency=0,lifeFrame=1260,safe=true,extraUpdate={function(self)
+                            local core=Bullet{kinematicState={pos=copyTable(pos),dir=angle,speed=math.eval(100,30)},sprite=BulletSprites.round.red,spriteTransparency=0,lifeFrame=math.min(remainingFrame,1260),safe=true,extraUpdate={function(self)
                                 self.kinematicState.dir=math.cos(self.frame/period)*self.any.extraAngle+self.any.angle0
                             end}}
                             core.any={angle0=angle0,extraAngle=extraAngle}
@@ -322,8 +326,8 @@ return{
         {
             key='5-5',
             type='midStage',
-            func=function() -- 25.5s
-                BGM.data[BGM.currentAudio]:seek(93,'seconds')
+            func=function() -- 25.125s
+                -- BGM.data[BGM.currentAudio]:seek(93,'seconds')
                 local geo=G.runInfo.geometry
                 ---@cast geo Cylinder
                 local pos0=geo:init().pos
@@ -375,7 +379,8 @@ return{
                         local num=lifeFrame/period
                         local noiseF=getNoiseF()
                         local oscillatePeriod=180
-                        BulletSpawner{period=period,lifeFrame=lifeFrame,bulletNumber=DSWITCH{2,2,4,4},angle=0,range=0,bulletLifeFrame=600,bulletSpeed=DSWITCH{150,200,150,200},bulletSprite=BulletSprites.giant.blue,highlight=true,bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20),function(self)
+                        local remainingFrame=math.ceil(25.125*60)-sentry.frame
+                        BulletSpawner{period=period,lifeFrame=lifeFrame,bulletNumber=DSWITCH{2,2,4,4},angle=0,range=0,bulletLifeFrame=math.min(remainingFrame,600),bulletSpeed=DSWITCH{150,200,150,200},bulletSprite=BulletSprites.giant.blue,highlight=true,bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20),function(self)
                             local phase=self.any.deltaPhase+sentry.frame/oscillatePeriod*math.pi
                             self.kinematicState.pos.y=self.any.y0+70*math.sin(phase)*math.min(1,self.frame/30)*self.any.ratio
                         end},bulletEvents={function(cir,args,self)
@@ -408,8 +413,224 @@ return{
                     wait(22)
                     wait(90)
                 end
-                wait(78) -- 3 more beats after 16 3-3-2s, overall 17 bars = 25.5s
+                wait(46) -- 2 more beats after 16 3-3-2s, overall 16+3/4 bars = 25.125s
             end
-        }
+        },
+        {
+            key='5-6',
+            type='midStage',
+            func=function() -- 57+4s, 57s is till end of the music
+                -- BGM.data[BGM.currentAudio]:seek(118.125--[[+21+15]],'seconds')
+                local geo=G.runInfo.geometry
+                ---@cast geo Cylinder
+                local pos0=geo:init().pos
+                local player=G.runInfo.player
+                local sentry=DanmakuFuncs.sentry()
+                local fairyAngle={val=0}
+                local function fairyPos(angle)
+                    return {x=geo.r0*angle,y=-250}
+                end
+                local function sentryiExtraUpdate(self)
+                    self.kinematicState.pos=fairyPos(fairyAngle.val+self.any.anglei)
+                end
+                -- spawn 12 fairies rotating based on fairyAngle. when beaten generate a new fairy after a while
+                local fairyN=12
+                local sentries={}
+                for i=1,fairyN do
+                    local anglei=math.pi*2/fairyN*i
+                    local sentryi=DanmakuFuncs.sentry(fairyPos(anglei))
+                    sentries[i]=sentryi
+                    sentryi.extraUpdate={sentryiExtraUpdate}
+                    sentryi.any={anglei=anglei}
+                    local spawnFairy
+                    spawnFairy=function()
+                        local fairyDieEffect=function()
+                            Event{obj=sentryi,action=function ()
+                                wait(120)
+                                if not sentryi.removed then
+                                    spawnFairy()
+                                end
+                            end}
+                        end
+                        local fairy=Enemy{kinematicState={pos=fairyPos(anglei),dir=0,speed=0},lifeFrame=57*60,maxhp=250,sprite=Asset.fairySprites.large.purple,extraUpdate={Enemy.presetActions.fadeAndHint},dropItems={powerSmall=3,point=3},extraDieEffects={fairyDieEffect}}
+                        fairy:bindState(sentryi)
+                        sentryi.any.fairy=fairy
+                        return fairy
+                    end
+                    local fairy=spawnFairy()
+                end
+                local function batchCall(func,...)
+                    for i=1,#sentries do
+                        local sentryi=sentries[i]
+                        if sentryi.any.fairy.removed then
+                            goto continue
+                        end
+                        local data={pos=sentryi.kinematicState.pos,angle=sentryi.any.anglei+fairyAngle.val,sentry=sentryi}
+                        func(data,...)
+                        ::continue::
+                    end
+                end
+                local function lines(data,color,aimDistance,speed,offset)
+                    SFX:play('enemyPowerfulShot')
+                    local groupSize=5
+                    local groups=4
+                    BulletSpawner{kinematicState={pos=data.pos,dir=0,speed=0},period=10,firstPeriod=1,lifeFrame=3,angle=math.pi/2,bulletNumber=groupSize*groups,bulletSprite=BulletSprites.bigStar[color],range=0,bulletLifeFrame=700*60/speed,bulletSpeed=speed,bulletEvents={function(cir,args,self)
+                        local index=args.index
+                        local groupI,groupCount=(index-1)%groupSize,math.ceil(index/groupSize)-1
+                        groupCount=groupCount-groups/2+0.5
+                        local mid=groupI+0.5-groupSize/2+offset
+                        local dx=geo.a/fairyN*mid
+                        local angle=math.atan2(dx,aimDistance)
+                        cir.kinematicState.dir=cir.kinematicState.dir+angle
+                        cir.kinematicState.speed=cir.kinematicState.speed/math.cos(angle)*(1+groupCount*DSWITCH{0.05,0.08,0.11,0.15}+mid*0.02*math.sign(offset))
+                    end},bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20)}}
+                end
+                local function giantSpawn(color,pos,angle)
+                    local sprite='giant'
+                    if DIFF()<=G.NORMAL then
+                        sprite='bigRound'
+                    end
+                    BulletSpawner{kinematicState={pos=pos,dir=0,speed=0},period=10,firstPeriod=1,lifeFrame=3,angle=angle,bulletNumber=4,bulletSprite=BulletSprites[sprite][color],highlight=true,range=0,bulletLifeFrame=300,bulletSpeed=250,bulletEvents={function(cir,args,self)
+                        cir.forceQuad=true
+                        local index=args.index
+                        local mid=index-0.5-self.bulletNumber/2
+                        cir.kinematicState.speed=cir.kinematicState.speed*(1+mid*DSWITCH{0.05,0.1,0.15,0.2})
+                    end},bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20)}}
+                end
+                local function giants(data,color,angle)
+                    SFX:play('enemyPowerfulShot')
+                    local function spawn()
+                        giantSpawn(color,data.sentry.kinematicState.pos,angle+math.pi/2)
+                    end
+                    Event{obj=sentry,action=function ()
+                        spawn()
+                        wait(22)
+                        spawn()
+                        wait(23)
+                        spawn()
+                        wait(11)
+                        spawn()
+                    end}
+                end
+                local function rotate(angle,duration)
+                    SFX:play('enemyPowerfulShot')
+                    Event.EaseEvent{obj=sentry,easeObj=fairyAngle,aims={val=fairyAngle.val+angle},duration=duration,progressFunc=Event.sineOProgressFunc}
+                end
+                local criticals={{0,8+3/4},{15+1/4,22+1/4},{28,36+3/4},{43+1/4,50+1/4},{56,56}}
+                -- 16 bars climax
+                for index=1,#criticals-1 do
+                    local midFrame=math.ceil((criticals[index][2]-criticals[index][1])*60*60/160)
+                    Event{obj=sentry,action=function()
+                        if index==1 or index==3 then
+                            batchCall(lines,'blue',400,120,math.eval(0,0.5*index))
+                            wait(midFrame)
+                            batchCall(lines,'red',500,180,math.eval(0,0.5*index))
+                        elseif index==2 or index==4 then
+                            local angle=math.pi/2*0.5
+                            rotate(math.pi/14,79)
+                            batchCall(giants,'purple',angle)
+                            wait(79)
+                            rotate(-math.pi/14,79)
+                            batchCall(giants,'purple',-angle)
+                            wait(79)
+                            -- batchCall(lines,'blue',400,120,math.eval(0,0.5))
+                            wait(78)
+                            batchCall(lines,'blue',400,120,math.eval(0,0.5))
+                        end
+                    end}
+                    wait(math.ceil((criticals[index+1][1]-criticals[index][1])*60*60/160-0.5))
+                end
+                local function laser(data,time,life)
+                    time=time or 78
+                    life=life or 112
+                    local lase=GeoLaser{kinematicState={pos=copyTable(data.pos),dir=0,speed=0},sprite=BulletSprites.laser.purple,size=3,rayAngle=0.04,spriteTransparency=0.3,safe=true,invincible=true,lifeFrame=life,meshBudget={capNum=2,step=80,num=10},spriteColor={0.7,0.7,1,1},extraUpdate={GeoLaser.presetActions.laserZoomIn(22),GeoLaser.presetActions.laserZoomOut(20),function(self)
+                        self.kinematicState.pos=copyTable(data.sentry.kinematicState.pos)
+                        self.kinematicState.dir=math.pi/2
+                        if self.frame==time-10 then
+                            Event.EaseEvent{obj=self,duration=20,aims={size=0.1},progressFunc=Event.sineBackProgressFunc}
+                        end
+                        if self.frame==time then
+                            SFX:play('enemyPowerfulShot',nil,0.3)
+                            self.safe=false
+                        end
+                        if time<=self.frame and self.frame<time+10 then
+                            self.spriteTransparency=self.spriteTransparency+(1-0.3)/10
+                        end
+                    end}}
+                end
+                local function rotateUpdate(self)
+                    self.kinematicState.dir=self.kinematicState.dir+self.any.sign*0.004
+                end
+                local function circle(data,color,speed,i)
+                    local sprite='giant'
+                    if DIFF()<=G.NORMAL then
+                        sprite='bigRound'
+                    end
+                    local number=DSWITCH{4,8,8,8}
+                    -- if i<=8 then
+                    --     number=4
+                    -- end
+                    BulletSpawner{kinematicState={pos=data.pos,dir=0,speed=0},period=10,firstPeriod=1,lifeFrame=3,angle=math.pi/2,range=math.pi,bulletNumber=number,bulletSprite=BulletSprites[sprite][color],highlight=true,bulletLifeFrame=300,bulletSpeed=speed,bulletEvents={function(cir,args,self)
+                        cir.forceQuad=true
+                        cir.any={sign=math.mod2Sign(args.index)}
+                    end},bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20),DIFF()<=G.HARD and rotateUpdate or nil}}
+                    -- with rotateUpdate it's easier
+                end
+                -- 10 bars bridge
+                for i=1,16 do
+                    Event{obj=sentry,action=function()
+                        if i%2==1 then
+                            batchCall(laser)
+                            rotate(math.randomSign()*math.eval(0.5,0.2),56)
+                        end
+                        if i%2==0 and i>2 then
+                            if i%4<2 or DIFF()<=G.EASY then
+                                batchCall(circle,'blue',240,i)
+                            else
+                                batchCall(circle,'red',280,i)
+                            end
+                            -- batchCall(circle,'blue',180)
+                        end
+                        wait(22)
+                        wait(17)
+                        -- if i%2==1 then
+                        -- end
+                    end}
+                    wait(56+(i%4==3 and 1 or 0))
+                end
+                -- 16 bars climax
+                for index=1,#criticals-1 do
+                    local midFrame=math.ceil((criticals[index][2]-criticals[index][1])*60*60/160)
+                    Event{obj=sentry,action=function()
+                        if index==1 or index==3 then
+                            batchCall(laser,midFrame,630)
+                            batchCall(lines,'blue',400,120,math.eval(0,2))
+                            wait(midFrame)
+                            batchCall(lines,'red',500,180,math.random(-2,2)-math.eval(0.2,0.2))
+                            wait()
+                            SFX:play('enemyPowerfulShot')
+                        elseif index==2 or index==4 then
+                            local angle=math.pi/2*0.5
+                            rotate(math.pi/16,79)
+                            batchCall(giants,'purple',angle)
+                            wait(79)
+                            rotate(-math.pi/16,79)
+                            batchCall(giants,'purple',-angle)
+                            wait(79)
+                            wait(78)
+                            if index==4 then
+                                batchCall(lines,'purple',400,120,math.eval(0,2))
+                                batchCall(lines,'purple',450,150,math.eval(0,2))
+                                sentry:remove()
+                            else
+                                batchCall(lines,'red',500,160,math.eval(0,2))
+                            end
+                        end
+                    end}
+                    wait(math.ceil((criticals[index+1][1]-criticals[index][1])*60*60/160-0.5))
+                end
+                wait(120)
+            end
+        },
     }
 }
