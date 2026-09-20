@@ -1,5 +1,8 @@
 uniform vec2 screenCenter;
-uniform vec3 translation;
+uniform float axial_position;
+uniform vec3 sphere_position;
+uniform vec3 sphere_right;
+uniform vec3 sphere_down;
 uniform float pitch;
 uniform float yaw;
 uniform float roll;
@@ -104,27 +107,12 @@ vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
     vec2 uv = (screenCoords-screenCenter)/love_ScreenSize.y;
     vec3 d = orientRay(normalize(vec3(uv, FOCAL_LENGTH)));
 
-    float offsetLength = length(translation.xy);
-    float sinc = offsetLength < 0.00001 ? 1.0 : sin(offsetLength)/offsetLength;
-    vec3 q0 = vec3(translation.xy*sinc, cos(offsetLength));
-    float denominator = 1.0+q0.z;
-    vec3 east;
-    vec3 south;
-    if(denominator > 0.0001) {
-        east = vec3(1.0-q0.x*q0.x/denominator, -q0.x*q0.y/denominator, -q0.x);
-        south = vec3(-q0.x*q0.y/denominator, 1.0-q0.y*q0.y/denominator, -q0.y);
-    }else{
-        // The north-pole projection is singular at the antipode. Continue
-        // with the meridian selected by the approach direction instead of
-        // clamping 1+z, which causes a visible camera-position pop.
-        vec2 meridian = normalize(translation.xy);
-        vec2 azimuth = vec2(-meridian.y, meridian.x);
-        east = vec3(azimuth, 0.0);
-        south = vec3(-meridian*cos(offsetLength), -sin(offsetLength));
-    }
+    // Lua maintains this orthonormal frame by actual rotations on S2.
+    // No reconstruction from planar offsets or pole-dependent denominator.
+    vec3 q0 = sphere_position;
     float sphericalSpeed = length(d.xy);
-    vec3 tangent = east;
-    if(sphericalSpeed > 0.000001) tangent = (east*d.x+south*d.y)/sphericalSpeed;
+    vec3 tangent = sphere_right;
+    if(sphericalSpeed > 0.000001) tangent = (sphere_right*d.x+sphere_down*d.y)/sphericalSpeed;
 
     vec3 sky = skyColor(d);
     vec3 accumulated = vec3(0.0);
@@ -142,9 +130,9 @@ vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
         // cloud noise is not a distance bound suitable for sphere tracing.
         float angle = sampleTravel*sphericalSpeed/sphere_radius;
         vec3 q = q0*cos(angle)+tangent*sin(angle);
-        float sampleZ = translation.z+d.z*sampleTravel;
+        float sampleZ = axial_position+d.z*sampleTravel;
         float density = cloudDensity(q, sampleZ);
-        if(density > 0.001) {
+        if(density > 0.0) {
             // One probe between the old near/far shadow samples.
             float above = cloudDensity(q, sampleZ+0.38);
             float sunlight = exp(-2.0*above);
@@ -156,7 +144,7 @@ vec4 effect(vec4 color, Image texture, vec2 textureCoords, vec2 screenCoords) {
             transmission *= 1.0-opacity;
         }
         travel += stepLength;
-        if(travel > MAX_TRAVEL || transmission < 0.015) break;
+        if(travel > MAX_TRAVEL) break;
     }
     return vec4(clamp(accumulated+transmission*sky, 0.0, 1.0), 1.0)*color;
 }
