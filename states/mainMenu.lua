@@ -43,7 +43,8 @@ return {
                 {value='REPLAY',state='LOAD_REPLAY'},
                 {value='PLAYER_DATA',disabled=true},
                 {value='MUSIC_ROOM'},
-                {value='NICKNAMES',disabled=true},
+                -- {value='NICKNAMES',disabled=true}, -- decided to put inside player data
+                {value='CREDITS'},
                 {value='OPTIONS'},
                 {value='MANUAL',disabled=true},
                 {value='EXIT'},

@@ -478,6 +478,10 @@ return {
                 en_us = 'Nicknames',
                 zh_cn = '称号',
             },
+            CREDITS = {
+                en_us = 'Credits',
+                zh_cn = '鸣谢'
+            },
             OPTIONS = {
                 en_us = 'Options',
                 zh_cn = '设置',
@@ -490,6 +494,24 @@ return {
                 en_us = 'Exit',
                 zh_cn = '退出',
             },
+        },
+        CREDITS = {
+            page = {
+                en_us = 'Page {current} of {total}',
+                zh_cn = '第{current}页，共{total}页'
+            },
+            [1] = {
+                en_us = 'Audio\n\nMusic:\nBetmma\n\nSFX:\nTouhou-SFX (not official assets)\nCK GAME FACTORY\nOld-school Shonen SFX\nfreesound_community',
+                zh_cn = '音频\n\n音乐：\nBetmma\n\n音效：\nTouhou-SFX（非原作音效）\nCK GAME FACTORY\nOld-school Shonen SFX\nfreesound_community'
+            },
+            [2] = {
+                en_us = 'Graphics\n\nBullet, Fairy and Reimu Player Sprites:\nSeija.Real/TyrantSatanachia (Shared on Discord)\n\nPortraits and Other Player Sprites:\nBetmma',
+                zh_cn = '美术\n\n子弹、妖精、灵梦自机图像：\nSeija.Real/TyrantSatanachia（在Discord上共享）\n\n立绘和其他自机图像：\nBetmma'
+            },
+            [3] = {
+                en_us = 'Writing\n\nDialogue:\nヤブサメ, Betmma',
+                zh_cn = '文案\n\n对话：\nヤブサメ、Betmma'
+            }
         },
         OPTIONS={
             master_volume = {

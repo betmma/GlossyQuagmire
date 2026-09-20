@@ -259,6 +259,7 @@ G={
         PRACTICE='PRACTICE',
         SPELL_PRACTICE='SPELL_PRACTICE',
         MUSIC_ROOM='MUSIC_ROOM',
+        CREDITS='CREDITS',
         -- NICKNAMES='NICKNAMES',
         OPTIONS='OPTIONS',
         IN_GAME='IN_GAME',
@@ -285,6 +286,9 @@ G={
             LOAD_REPLAY={
                 slideDirection='left'
             },
+            CREDITS={
+                slideDirection='right',
+            },
             OPTIONS={
                 slideDirection='right'
             },
@@ -294,6 +298,11 @@ G={
             NICKNAMES={
                 slideDirection='up'
             },
+        },
+        CREDITS={
+            MAIN_MENU={
+                slideDirection='left',
+            }
         },
         OPTIONS={
             MAIN_MENU={

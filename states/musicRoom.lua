@@ -90,8 +90,6 @@ return {
                 x=optionBaseX,y=400,
                 width=600,height=170,
                 fillColor={0,0,0,0.3},
-                borderColor={1,1,1,1},
-                borderWidth=2,
             }
         )
         local descriptionText=infoPanel:child(
