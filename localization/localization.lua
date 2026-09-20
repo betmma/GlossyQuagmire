@@ -1469,164 +1469,164 @@ return {
     dialogues = {
         REIMUS1BossBefore = {
             hiKotoba = {
-                en_us = 'Hi Kotoba!',
+                en_us = 'Hey, Kotoba.',
                 zh_cn = '嗨，言波！',
             },
             howsYourWorkHere = {
-                en_us = 'How\'s your work here?',
-                zh_cn = '你在这工作，感觉怎么样呀？',
+                en_us = 'Actually, you seem oddly carefree here—how exactly is your work here?',
+                zh_cn = '你怎么看上去无忧无虑的，工作情况怎么样呀？',
             },
             workIsFine = {
-                en_us = 'Work is fine.',
-                zh_cn = '工作还行。',
+                en_us = 'Er, everything is under control here..',
+                zh_cn = '呃，一切尽在掌握之中……',
             },
             haveYouHeardThatMysteriousPlace = {
-                en_us = 'Have you heard about that mysterious place that can be accessed from this travel hub?',
-                zh_cn = '你听说过那个可以从这里进入的神秘地方吗？',
+                en_us = 'Well, I didn\'t come here for small talk. Anyways, do you know anything about that weird, hidden place accessed from this travel hub?',
+                zh_cn = '我不是来聊闲天的。有个奇怪隐秘的地方，能从这个旅行枢纽进入，这你知道吗？',
             },
             ughNo = {
-                en_us = 'Ugh, no. (She knows I\'ll leave work early to check that place?)',
-                zh_cn = '呃，没有。(她知道我会早退去那个地方？)',
+                en_us = '...Uhh, no. (Crap, she knows I\'ll leave work early to check that place!?)',
+                zh_cn = '呃，没有。(不好，她知道我会早退去那里？)',
             },
             howCanYouNotKnow = {
-                en_us = 'How can you not know about it? That would be a safety issue if you, the manager of here, don\'t know about it.',
-                zh_cn = '你怎么能不知道？如果你身为管理员都不知道的话，那可就是安全问题了。',
+                en_us = 'How can you not know about it?? You\'re the manager of this entire travel hub, it\'d be an issue if you don\'t know about it! And frankly you\'re wasting my time.',
+                zh_cn = '你怎么能不知道？？如果你身为管理员都不知道的话，那可就是严肃的问题了。我看你在浪费我的时间吧。',
             },
             ahhhIMeanIKnowBut = {
-                en_us = 'Ahhh! I mean, I have heard about it but don\'t quite remember...',
-                zh_cn = '啊啊！我是说，我听说过，但不太记得了……',
+                en_us = 'Ahhh, fine! I mean, I\'ve heard rumors about it but I don\'t quite remember...',
+                zh_cn = '啊啊！我是说，我听说过相关的流言，但不太记得了……',
             },
             aDanmakuBattleWouldHelpYouRemember = {
-                en_us = 'A danmaku battle would help you remember, right?',
-                zh_cn = '打一场弹幕战会帮助你回忆起来的，对吧？',
+                en_us = '...Hmph, a danmaku battle would surely help clear up your head and fix that memory of yours, wouldn\'t it?',
+                zh_cn = '……哼哼，打一场弹幕战会帮助你回忆起来的，对吧？',
             }
         },
         REIMUS1BossAfter = {
             yeahIRememberNow = {
-                en_us = 'Yeah, I remember now.',
-                zh_cn = '嗯，我现在记起来了。',
+                en_us = 'Alright, alright! It\'s all coming back to me now! Just stop shooting! It\'s probably over there!',
+                zh_cn = '好啦，我全都记起来了！别打了！应该就是那边！',
             },
             soItsThisWay = {
-                en_us = 'So it\'s this way. Bye.',
-                zh_cn = '所以是这条路。拜拜。',
+                en_us = 'Ah, alright. So it\'s this way from here, thanks.',
+                zh_cn = '那好。所以是这条路，谢了。',
             }
         },
         MARISAS1BossBefore = {
             wowThisPlaceSoCool = {
-                en_us = 'Wow, this place is sick!',
-                zh_cn = '哇，这个地方太棒了！',
+                en_us = 'Whoa, the deeper I go, the more this place splitting apart into smaller areas! This place is sick!',
+                zh_cn = '哇，越往深处走，这个地方就越分裂成小块！太神奇了！',
             },
             welcomeToHyperbolicDomain = {
                 en_us = 'Welcome to the Hyperbolic Domain, the travel hub of Gensokyo!',
                 zh_cn = '欢迎来到双曲域，幻想乡的交通枢纽！',
             },
             ohHi = {
-                en_us = 'Oh hi...',
-                zh_cn = '哦嗨……',
+                en_us = 'Oh, neat, a resident! Hey there!',
+                zh_cn = '哦，不错，有个人在！你好啊！',
             },
             wheresThatPlace = {
-                en_us = 'Where\'s that place? Squinting my eyes...',
-                zh_cn = '那个地方在哪里？眯着眼睛找找……',
+                en_us = 'Y\'know where\'s that rare, rumored place someone can access from this hub? \'Cause I\'m keeping my eyes squinting looking for it…',
+                zh_cn = '你知道的，这交通枢纽通向那个罕见的地方，它在哪里？我一直在眯着眼睛找呢……',
             },
             waitThatThievishLook = {
-                en_us = 'Wait, that thievish look... What are you planning?',
-                zh_cn = '等等，这贼眉鼠眼的表情……你在打什么主意？',
+                en_us = 'Wait, hold it right there… I think I know that shifty, thievish look from somewhere... What exactly are you planning?',
+                zh_cn = '等等，我认识这贼眉鼠眼的表情……你在打什么主意？',
             },
             iMustStopYouNow = {
-                en_us = 'I must stop you now!',
-                zh_cn = '我必须阻止你了！',
+                en_us = 'Because if you\'re plotting to steal anything from this hub, I\'m not letting you!',
+                zh_cn = '如果你想从这里偷东西，我才不会允许！',
             }
         },
         MARISAS1BossAfter = {
             youreStrong = {
-                en_us = 'You\'re strong...',
-                zh_cn = '好强……',
+                en_us = 'Ouch... you\'re pretty strong...',
+                zh_cn = '啊呜，好强……',
             },
             ofCourseIAm = {
-                en_us = 'Of course I am. Ha!',
-                zh_cn = '那当然了。哈哈！',
+                en_us = 'Heh! That\'s just the power of daily hard work and curiosity I tell ya!',
+                zh_cn = '哈哈！这是每日辛勤劳作和好奇心的力量，我跟你讲！',
             },
             whatAreYouLookingForHere = {
-                en_us = 'So what are you looking for here?',
-                zh_cn = '所以你在这里找什么？',
+                en_us = '...So, what exactly are you looking for here?',
+                zh_cn = '……所以你在这里找什么？',
             },
             thatPlace = {
-                en_us = 'That place that can be accessed from this travel hub. I heard it\'s really cool!',
-                zh_cn = '那个可以从双曲域进入的地方。我听说那里很棒！',
+                en_us = 'That hidden place accessible from this travel hub, obviously! I heard the space over there bends and warps crazily, it\'s like a magician\'s dream y\'know!',
+                zh_cn = '显然是那个可以从双曲域进入的地方。我听说那里的空间疯狂地弯曲折叠，就和魔法使梦到的一样！',
             },
             thisWay = {
-                en_us = 'It\'s this way. See the sign on the wall?',
+                en_us = 'Well, it\'s down this way. See the sign on the wall?',
                 zh_cn = '就在这条路上。看到墙上的标志了吗？',
             },
             shouldTellMeInTheBeginning = {
-                en_us = 'You should tell me in the beginning, you know?',
-                zh_cn = '你应该一开始就告诉我的，知道吧？',
+                en_us = 'You could\'ve just told me from the beginning y\'know. But thanks for the heads up anyways!',
+                zh_cn = '你应该一开始就告诉我的，知道吧。总之，多谢提醒！',
             }
         },
         KOTOBAS1BossBefore = {
             wheresThatPlace = {
-                en_us = 'Where\'s that place? Squinting my eyes...',
-                zh_cn = '那个地方在哪里？眯着眼睛找找……',
+                en_us = '...Where\'s that rare, rumored place someone can access from this hub? Hm…',
+                zh_cn = '流言所说的罕见地方在哪里？嗯……',
             },
             waitThatThievishLook = {
-                en_us = 'Wait, that thievish look... What is she planning?',
-                zh_cn = '等等，这贼眉鼠眼的表情……她在打什么主意？',
+                en_us = 'Wait, hold it right there… I think I know that shifty, thievish look from somewhere... What on earth is she planning?',
+                zh_cn = '等等，我认识这贼眉鼠眼的表情……她在打什么主意？',
             },
             whoYouAre = {
-                en_us = 'Who are you? What are you doing now?',
-                zh_cn = '你是谁？你在做什么？',
+                en_us = 'Stop right there! Who are you, and what do you think are you doing?',
+                zh_cn = '别动！你是谁，你在做什么？',
             },
             imReimu = {
-                en_us = 'I\'m Reimu Hakurei. The shrine maiden.',
-                zh_cn = '我是博丽灵梦。那个巫女。',
+                en_us = 'How rude! I\'m Reimu Hakurei obviously, y\'know, the red-white shrine maiden.',
+                zh_cn = '这么没礼貌！我显然是博丽灵梦。你知道的，神社的红白巫女。',
             },
             iJustMetHerYouKnow = {
-                en_us = 'I just met her one minute ago. She dresses in red, you know?',
-                zh_cn = '我一分钟前刚见过她。她穿红色的，知道吧？',
+                en_us = 'Nice try, but I just met her—the real Reimu—a minute ago! And she dresses in red and definitely doesn\'t wear black, y\'know?',
+                zh_cn = '少来这套，我一分钟前刚见过她！她穿红色的，不是黑色，知道吧？',
             },
             herDressCanChangeColorYouKnow = {
-                en_us = 'Her dress can change color, you know? That infrared fabric...',
-                zh_cn = '她的裙子会变色的，知道吧？红外线编出来的！',
+                en_us = 'Pfft, her dress can change color whenever she wants, you know! Made of high-tech infrared threads!',
+                zh_cn = '噗，她的裙子可以随意变色的，知道吧？高科技红外线编出来的！',
             },
             thatsLame = {
-                en_us = 'Infrared fabric? No, that\'s entirely fabricated!',
+                en_us = 'Infrared "fabric?!" No, that\'s entirely "fabricated!" Stop bluffing!',
                 zh_cn = '红外线编的？不会编就别编了！',
             },
             okthenImMarisa = {
-                en_us = 'Ok then, I\'m Marisa Kirisame!',
-                zh_cn = '那好吧，我是雾雨魔理沙！',
+                en_us = 'Tch, fine, you caught me, I\'m Marisa Kirisame!',
+                zh_cn = '嘁，好吧，我是雾雨魔理沙！',
             },
             andIllPunishYou = {
-                en_us = 'And I\'ll punish you right now!',
-                zh_cn = '我现在就惩罚你！',
+                en_us = 'And you\'ll pay to be punished for ruining my disguise right now for sure!',
+                zh_cn = '竟敢揭穿我的伪装，接受惩罚吧！',
             }
         },
         KOTOBAS1BossAfter = {
             impossible = {
-                en_us = 'Impossible... How could you defeat me?',
-                zh_cn = '不可能……你怎么能打败我？',
+                en_us = 'No way… I lost after my fake Reimu setup?! Man, you really don\'t hold back at all dude… Man, whatever, I\'m leaving anyways.',
+                zh_cn = '不可能……自称灵梦怎么会输呢？！你怎么都不放水？不管了，我溜了。',
             },
             whatStrangePerson = {
-                en_us = 'What a strange person...',
-                zh_cn = '真是个奇怪的人……',
+                en_us = 'What a strange girl… She didn\'t even care her lasers were curved…',
+                zh_cn = '真是个奇怪的人……她都不在意自己的激光变弯了……',
             }
         },
         S2Branch1 = {
             hiThere = {
-                en_us = 'Hi there.',
-                zh_cn = '嗨，你好呀。',
+                en_us = 'Hi there, traveler!',
+                zh_cn = '嗨，旅行者你好呀。',
             },
             areYouGoingForward = {
-                en_us = 'Are you going forward? I can lead you.',
-                zh_cn = '你要往前走吗？我可以带路哦。',
+                en_us = 'Planning on heading deeper inside? I can guide you~.',
+                zh_cn = '要往前深入吗？我可以带路哦～',
             },
             thereAreTwoPaths = {
-                en_us = 'There are two paths ahead. The left one is safer, while the right one has more rewards.',
-                zh_cn = '前面有两条路。左边的路更安全，右边的路奖励更多。',
+                en_us = 'Watch out though, there are two paths ahead... the left one is safer, but the right one has far more rewards.',
+                zh_cn = '注意了，前面有两条路……左边的路更安全，右边的路奖励更多。',
             },
             stayAtLeftOrRightSide = {
-                en_us = 'Stay at the left or right side of the screen to choose.',
-                zh_cn = '待在屏幕左侧或右侧来选择。',
+                en_us = 'Go and quickly make your choice! Drift over to left or right side of the clearing.',
+                zh_cn = '做出你的选择吧！待在屏幕左侧或右侧。',
             },
             three = {
                 en_us = 'Three...',
@@ -1637,608 +1637,612 @@ return {
                 zh_cn = '二……',
             },
             one = {
-                en_us = 'One...',
-                zh_cn = '一……',
+                en_us = 'One...!',
+                zh_cn = '一……！',
             }
         },
         S2BranchLeft = {
             youChoseLeft = {
-                en_us = 'The safer path? Ok, follow me!',
-                zh_cn = '安全的道路？好的，跟我来！',
+                en_us = 'Hm, playing it safe aren\'t we? Alright, follow me!',
+                zh_cn = '嗯，安全优先吗？好的，跟我来！',
             },
         },
         S2BranchRight = {
             youChoseRight = {
-                en_us = 'The more rewarding path? Ok, Follow me!',
-                zh_cn = '奖励更多的道路？好的，跟我来！',
+                en_us = 'Ah, chasing after the rewards? Hm, I like your spirit! Follow me!',
+                zh_cn = '啊哈，追逐奖励吗？好的，跟我来！',
             },
         },
         REIMUS2BossBefore = {
             stop = {
-                en_us = 'Stop! You are going too fast!',
-                zh_cn = '等等！你跑得太快了！',
+                en_us = 'Stand still, I\'m sick of chasing you around! ',
+                zh_cn = '停下，我受不了继续追着你跑了！',
             },
             ohYouAreStillFollowing = {
-                en_us = 'Oh, you are still following?',
+                en_us = 'Oh, still at my tail?',
                 zh_cn = '哦，你还跟着呢？',
             },
             youAreReallyGood = {
-                en_us = 'You are really good at hiking!',
-                zh_cn = '你真的很擅长徒步啊！',
+                en_us = 'You\'re quite resilient at walking these trails~',
+                zh_cn = '你真的很擅长徒步啊～',
             },
             huhWhat = {
-                en_us = 'Huh, no. I can fly.',
-                zh_cn = '啊，不，我会飞哦。',
+                en_us = 'Huhh? Of course not, I can literally fly anyways.',
+                zh_cn = '啊？当然不是，我可是会飞的哦。',
             },
             youAreMaliciousYoukai = {
-                en_us = 'Anyway, you are a malicious youkai, right?',
-                zh_cn = '不管怎样，你并非善类吧？',
+                en_us = 'Either way, you\'re just another malicious youkai causing trouble, aren\'t you?',
+                zh_cn = '不管怎样，你又是个惹是生非的妖怪吧？',
             },
             whyYouSayThat = {
-                en_us = 'Why do you say that? I\'m leading the way for you.',
-                zh_cn = '为什么这么说？我可是带路的哦。',
+                en_us = 'Meee? Troublesome? Why do you say that? I\'m just nicely leading the way for you~.',
+                zh_cn = '我——？惹事？为什么这么说？我可是很好心地为你带路哦～',
             },
             yourLantern = {
-                en_us = 'Your lantern is not normal.',
-                zh_cn = '你的灯笼不正常。',
+                en_us = 'That annoying lantern of yours is not normal. It\'s totally messing with my eyes.',
+                zh_cn = '你那烦人的灯笼不正常，它看得我眼都花了。',
             },
             itCanAffectOthersMinds = {
-                en_us = 'It can affect others\' minds.',
-                zh_cn = '它可以影响别人的心智。',
+                en_us = 'From it\'s aura, you\'re just messing with my head here, and things from afar and up-close seems way too much for my eyes. I don\'t have time for your mind games!',
+                zh_cn = '它的气场让我头昏脑胀，这忽近忽远的地形也让我受不了。我没时间和你玩这种把戏！',
             },
             ohIDontKnowWhyYouGuessThat = {
-                en_us = 'Oh, I don\'t know why you guess that.',
-                zh_cn = '哦，我不知道你为什么会这么猜。',
+                en_us = 'Oh my, I don\'t know why\'d you guess that~.',
+                zh_cn = '哦我的天，我不知道你为什么会这么猜～',
             },
             butDie = {
-                en_us = 'But die!',
-                zh_cn = '但是去死吧！',
+                en_us = 'But rules are rules~, prepare to crash down to the bottom of the warped world!',
+                zh_cn = '但是规矩就是规矩～准备好跌入这世界的最底端吧！',
             }
         },
         REIMUS2BossAfter = {
             wahISurrender = {
-                en_us = 'Wah! I surrender!',
-                zh_cn = '哇！我投降！',
+                en_us = 'Waaah! Okay, okay, I surrender!',
+                zh_cn = '哇！好吧，好吧，我投降！',
             },
             whatWereYouTryingToDo = {
-                en_us = 'What were you trying to do?',
-                zh_cn = '你到底想干什么？',
+                en_us = 'Start talking. What exactly were you trying to do?',
+                zh_cn = '老实交代，你到底想干什么？',
             },
             iJustLikePranking = {
-                en_us = 'I just like pranking people.',
-                zh_cn = '我只是喜欢恶作剧而已。',
+                en_us = 'I just wanted to pull off a harmless little prank! ',
+                zh_cn = '我只是想搞个无害的小恶作剧而已。',
             },
             leadPeopleDeepAndAbandonThem = {
-                en_us = 'Lead people deep into such place and abandon them.',
-                zh_cn = '把人带到这种地方深处然后抛下他们。',
+                en_us = '...You know, leading people deep into this deep perspective warp and completely ditching them.',
+                zh_cn = '……也就是，把人带到这种地方深处然后抛下他们。',
             },
             soIsThatPlaceReallyHere = {
-                en_us = 'So is that beautiful place really here?',
-                zh_cn = '所以那个美丽的地方真的在这里吗？',
+                en_us = 'How incredibly annoying... So is that "obscure beautiful place" really past here?',
+                zh_cn = '真是烦人啊……所以那个“美丽的地方”真的在前面吗？',
             },
             yeahYouSeeItFromHere = {
-                en_us = 'Yeah. It\'s called Pavilion of Visual Splendor. You can see it from here.',
-                zh_cn = '是呀。它叫“观艳馆”。这里已经可以看到它了。',
+                en_us = 'Alright, fine! It\'s called Pavilion of Visual Splendor. Look—you can even see it from here.',
+                zh_cn = '是呀！它叫“观艳馆”，你看，从这里能直接看到它了。',
             },
             huhSoTheTrick = {
-                en_us = 'Oh? Ah, to make the prank more convincing, you lead the correct way...',
-                zh_cn = '嗯？哦，为了让恶作剧更可信，其实走的是正确的路吗……',
+                en_us = 'Oh? Hmph, so to make the prank more convincing, you actually had to lead me the correct way...',
+                zh_cn = '哦？哼，为了让恶作剧更可信，其实带的是正确的路吗……',
             },
             okBye = {
-                en_us = 'Ok, bye.',
-                zh_cn = '好吧，拜拜。',
+                en_us = 'Whatever, I\'m going there.',
+                zh_cn = '好吧，我去那边了。',
             }
         },
         MARISAS2BossBefore = {
             whyGoingSoFast = {
-                en_us = 'Why are you going so fast? Wait for me!',
-                zh_cn = '你为什么跑那么快？等等我！',
+                en_us = 'Hey hey wait up! Why are you going so fast when the geometry here\'s all messed up!? Wait for me!',
+                zh_cn = '嗨，等一下！这里的空间都这么乱了，你为什么还跑那么快？等等我！',
             },
             ohYouAreStillFollowing = {
-                en_us = 'Oh, you are still following?',
+                en_us = 'Oh, still at my tail?',
                 zh_cn = '哦，你还跟着呢？',
             },
             youAreReallyGood = {
-                en_us = 'You are really good at hiking!',
-                zh_cn = '你真的很擅长徒步啊！',
+                en_us = 'You\'re quite resilient at walking these trails~',
+                zh_cn = '你真的很擅长徒步啊～',
             },
             huhWhat = {
-                en_us = 'Ah, of course! (Actually I was flying with my broom)',
-                zh_cn = '啊，当然了！(其实我是骑扫帚飞)',
+                en_us = 'Eh? You\'re probably right about that.. (Actually, I was just cruising along with with my broom.)',
+                zh_cn = '啊？那，那当然了……（其实，我是骑着扫帚行驶）',
             },
             youDidWantToAbandonMe = {
-                en_us = 'Wait, you did want to abandon me, right?',
-                zh_cn = '不对，你就是想抛下我吧？',
+                en_us = 'But hold on for a sec, you seemed like you were gonna abandon me here. Especially with that weird lantern bending my line of perception here for real.',
+                zh_cn = '但是等一下，你这是想抛下我吧。尤其是那个奇怪的灯笼，扭曲我的视线。',
             },
             calmDownPlease = {
-                en_us = 'Calm down, please!',
-                zh_cn = '冷静一下！',
+                en_us = '"Bending the line of perception?" Nonsense, why not just calm down for a moment, please?',
+                zh_cn = '“扭曲视线？”胡说，为什么不先冷静一下呢？',
             },
             lookAtMyLantern = {
-                en_us = 'Look at my lantern! Why I bring it with me, if not for leading people?',
-                zh_cn = '看我的灯笼！如果不是为了带路，我为什么要带着它？',
+                en_us = 'Now, why don\'t you just look at my lantern? Why would I bring it with me, if not for leading people in this mind-bending area?',
+                zh_cn = '现在，你再仔细看看我的灯笼！如果不是为了在这扭曲的地方带路，我为什么要带着它？',
             },
             whyWouldIKnowThat = {
-                en_us = 'Why would I look at that? Maybe it\'s magical as my broom?',
-                zh_cn = '为什么我要看？也许它像我的扫帚一样有魔力？',
+                en_us = 'Eh? Why would I look at that? Maybe it\'s magical as my broom? It\'s got that certain value to it enough to mess with the heads of people.',
+                zh_cn = '呃，为什么我要看？也许它像我的扫帚一样有魔力？它是足以让人头晕目眩。',
             },
             die = {
-                en_us = 'How did you know that? Die!',
-                zh_cn = '你怎么知道的？去死吧！',
+                en_us = '...What? How did you know that? Whatever, if you\'ll bypass my rules, then prepare to crash down to the bottom of my warped world!',
+                zh_cn = '……什么？你怎么知道的？哼哼，竟敢坏了规矩，准备好跌入这世界的最底端吧！',
             }
         },
         MARISAS2BossAfter = {
             wahISurrender = {
-                en_us = 'Wah! I surrender!',
-                zh_cn = '哇！我投降！',
+                en_us = 'Waaah! Okay, okay, I surrender!',
+                zh_cn = '哇！好吧，好吧，我投降！',
             },
             badFox = {
-                en_us = 'Bad fox! How dare you fight me!',
-                zh_cn = '坏狐狸！你怎么敢和我斗！',
+                en_us = 'Hmph, you\'re pretty annoying for a kitsune. Whatever you were doing with that lantern was definitely no good.',
+                zh_cn = '烦人的狐狸，你这灯笼果然不干好事。',
             },
             iSeeTheresABuilding = {
-                en_us = 'I see there\'s a building in the distance. You know its name?',
+                en_us = 'I see there\'s a building in the distance. Y\'know its name?',
                 zh_cn = '我看到远处有一栋建筑。你知道它的名字吗？',
             },
             itsName = {
-                en_us = 'Its name is Pavilion of Visual Splendor.',
-                zh_cn = '它的名字叫“观艳馆”。',
+                en_us = '...Its name is Pavilion of Visual Splendor.',
+                zh_cn = '……它的名字叫“观艳馆”。',
             },
             strangeName = {
-                en_us = 'Strange name. But it sounds like my target.',
-                zh_cn = '好奇怪的名字。但听起来就是我的目标地点。',
+                en_us = 'Pretty strange name! But it sounds like my target. Thanks!',
+                zh_cn = '好奇怪的名字！但听起来就是我的目的地。谢啦！',
             }
         },
         KOTOBAS2BossBefore = {
             areWeAlmostThere = {
-                en_us = 'Are we almost there?',
-                zh_cn = '我们快到了吗？',
+                en_us = 'Eh... Are we almost there?',
+                zh_cn = '呃……我们快到了吗？',
             },
             ohYouAreStillFollowing = {
-                en_us = 'Oh, you are still following?',
+                en_us = 'Oh, still at my tail?',
                 zh_cn = '哦，你还跟着呢？',
             },
             youAreReallyGood = {
-                en_us = 'You are really good at hiking!',
-                zh_cn = '你真的很擅长徒步啊！',
+                en_us = 'You\'re quite resilient at walking these trails~',
+                zh_cn = '你真的很擅长徒步啊～',
             },
             whyAmIFast = {
-                en_us = 'Why am I so fast? Cuz I began a fast today!',
+                en_us = 'Heh, I guess so! I\'ve been getting weirdly faster than earlier though...',
                 zh_cn = '只要心情愉快，速度就能变快了！',
             },
             lookAtMyLantern = {
-                en_us = 'Cool. Now look at my lantern.',
-                zh_cn = '好。现在看我的灯笼。',
+                en_us = 'Now, how about you take a look at my lantern~?',
+                zh_cn = '好。现在看看我的灯笼，怎么样～？',
             },
             yeah = {
-                en_us = 'Yeah...',
-                zh_cn = '嗯……',
+                en_us = 'Err... Yeah...',
+                zh_cn = '嗯……好的……',
             },
             iFeelStrange = {
-                en_us = 'I start to feel strange?',
-                zh_cn = '我感觉有点奇怪？',
+                en_us = '...Heh... I feeel.. a little "strange and funny" around it...',
+                zh_cn = '……哈哈……我感觉……有点奇怪又好玩？',
             },
             enjoyTheDance = {
-                en_us = 'Dance with me!',
-                zh_cn = '和我一起跳舞吧！',
+                en_us = 'Under my lantern... Now, dance with me!',
+                zh_cn = '在灯笼光芒下……现在，和我一起跳舞吧！',
             }
         },
         KOTOBAS2BossAfter = {
             wahISurrender = {
-                en_us = 'Wah! I surrender!',
-                zh_cn = '哇！我投降！',
+                en_us = 'Waaah! I surrender!! You\'re more resilient than I thought!',
+                zh_cn = '哇！我投降！你比我预期的要坚强！',
             },
             whatWasIDoing = {
-                en_us = 'What was I doing?',
-                zh_cn = '我在做什么来着？',
+                en_us = '...Huh. What on Oxford\'s Dictionary was I doing?',
+                zh_cn = '……什么奇怪押韵。我在做什么来着？',
             },
             soDoYouReallyKnowThatPlace = {
-                en_us = 'Oh right. So do you really know that place?',
-                zh_cn = '哦哦。所以你真的知道那个地方吗？',
+                en_us = '...Oh right! So do you really know that place? Y\'know, that pavilion?',
+                zh_cn = '……哦对！所以你真的知道那个地方吗？那个什么馆？',
             },
             itsCloseYouCanSeeItFromHere = {
-                en_us = 'It\'s close. You can see it from here.',
-                zh_cn = '很近了。你从这里就能看到它。',
+                en_us = 'Ehh? You mean the "Pavilion of Visual Splendor"? It\'s close, look you can even see it from here!',
+                zh_cn = '你是说“观艳馆”？很近了，你从这里就能看到它！',
             },
             ohSoThisIsntAScam = {
-                en_us = 'Oh, so this isn\'t a scam? I\'m still confused...',
-                zh_cn = '哦，所以这不是骗局？我还是没明白……',
+                en_us = 'Oh, so this isn\'t a scam like any other lousy youkai would usually do? I\'m still confused...',
+                zh_cn = '哦，所以这不是那种讨厌妖怪的骗局？我还是没明白……',
             },
             ofCourse = {
-                en_us = 'Of course not. As long as you keep the speed, you do reach your destination.',
-                zh_cn = '当然不是。只要速度跟得上，就的确能到达目的地。',
+                en_us = '...Of course not! As long as you keep up your speed, you can reach your destination.',
+                zh_cn = '……当然不是。只要速度跟得上，就的确能到达目的地。',
             },
             overThere = {
-                en_us = 'The Pavilion of Visual Splendor is over there.',
-                zh_cn = '观艳馆就在那边了。',
+                en_us = 'See? The pavilion\'s just up ahead you see? (This girl is bothersome already!)',
+                zh_cn = '看到了吗？观艳馆就在那边了！（你赶紧走开吧！）',
             },
             whateverImHeadingThere = {
-                en_us = 'Whatever. I\'m heading there.',
-                zh_cn = '随便啦，我是要去那里。',
+                en_us = 'Oh. Whatever. I\'m heading there; peace out, girl-fox!',
+                zh_cn = '哦，随便啦，我是要去那里。再见，狐狸！',
             }
         },
         REIMUS3BossBefore={
             thePavilionIsSoBeautiful = {
-                en_us = 'The pavilion is so beautiful!',
-                zh_cn = '观艳馆好漂亮呀！',
+                en_us = 'Gosh, this pavilion is actually pretty stunning.',
+                zh_cn = '哇哦，观艳馆真是震撼。',
             },
             whoWouldBeTheOwner = {
-                en_us = 'Who would be the owner of this pavilion?',
-                zh_cn = '观艳馆的主人会是谁呢？',
+                en_us = 'Now, if I\'m probably right by intuition.. could that weird mirror girl from earlier own this place?',
+                zh_cn = '如果我的直觉没错，之前那个奇怪的镜女人是这里的主人吧？',
             },
             aVisitor = {
-                en_us = 'A visitor!',
-                zh_cn = '有访客来了！',
+                en_us = 'Ah, a shrine maiden visiting! Yes, that "mirror girl" is me.',
+                zh_cn = '啊，巫女来拜访了！是的，那个“镜女人”是我。',
             },
             thisCorridorIsMyPlace = {
-                en_us = 'This corridor is my place.',
-                zh_cn = '这条走廊是我的地盘。',
+                en_us = 'This corridor is my place. Say, Miss Shrine Maiden, is the view of my corridor not magnificent?',
+                zh_cn = '这条走廊是我的地盘。你说，巫女小姐，我的走廊是不是很壮丽？',
             },
             iNeverSeenSuchModernPlaceInGensokyo = {
-                en_us = 'I never seen such a modern place in Gensokyo.',
-                zh_cn = '我在幻想乡还从没见过这么摩登的地方。',
+                en_us = 'Hmm... I haven\'t seen such a place like this in Gensokyo other than the Eientei estate\'s hallway corridors.',
+                zh_cn = '嗯……和永远亭的走廊比起来，这地方过于摩登了……全幻想乡都没见过。',
             },
             youKnowInteractiveArt = {
-                en_us = 'There\'s more! You know interactive art?',
-                zh_cn = '还有更多好东西呢！你知道互动艺术吗？',
+                en_us = 'Ah, but this is more than just a hallway! Do you know interactive art Miss Shrine Maiden?',
+                zh_cn = '除了走廊，还有更多好东西呢！你知道互动艺术吗，巫女小姐？',
             },
             what = {
-                en_us = 'What is that?',
-                zh_cn = '那是什么？',
+                en_us = 'No idea whatever that is. Is it some outside-dialect way of saying "danmaku"? Or are you asking to be beat up?',
+                zh_cn = '那是什么东西，是“弹幕”的非主流方言吗？还是你想被揍一顿？',
             },
             letsHaveFun = {
-                en_us = 'Let\'s have fun!',
-                zh_cn = '我们来玩吧！',
+                en_us = 'Perhaps I can show you, Miss Shrine Maiden. Let us play within the reflection!',
+                zh_cn = '我来展示给你看，巫女小姐。我们在镜像中游玩吧！',
             }
         },
         REIMUS3BossAfter = {
             notGoodForMyEyes = {
-                en_us = 'I\'m afraid this is not good for my eyes...',
-                zh_cn = '这怕是对我的眼睛不好……',
+                en_us = 'Ack, your so-called "interactive art" is straining my eyes! Stop that!',
+                zh_cn = '啊，你所谓的“互动艺术”怕是对我的眼睛不好！停下！',
             },
             theNextExhibition = {
-                en_us = 'The next exhibition is in this way.',
-                zh_cn = '下一场展览在这边。',
+                en_us = 'Ah, alas... if my art was not beautiful for you, there is another "exhibition" up next, becareful with the looping spaces up ahead Miss shrine maiden.',
+                zh_cn = '啊，唉唉……如果我的艺术不够美，那里还有下一场展览等着你。小心那里循环的空间，巫女小姐。',
             },
             bye = {
-                en_us = 'Bye!',
-                zh_cn = '拜拜！',
+                en_us = 'So it was that easy for you to say? Agh, whatever, my eyes are still straining a little. I\'m leaving to find the cause of this, bye.',
+                zh_cn = '你早说下一场展览在哪啊，我的眼睛还酸痛着呢。我先走了，拜拜。',
             }
         },
         MARISAS3BossBefore = {
             soManyMirrors = {
-                en_us = 'So many mirrors!',
-                zh_cn = '这么多镜子！',
+                en_us = 'Woah, there\'s tons of reflections and portraits around here!',
+                zh_cn = '哇，这么多画和镜子！',
             },
             infinityMirrorAtCertainAngle = {
-                en_us = 'Infinity mirror at certain angle!',
-                zh_cn = '在某个角度可以看到无穷镜像！',
+                en_us = 'If I point my non-directional lasers at certain angles, I could see infinite lasers through these mirrors for sure!',
+                zh_cn = '如果我发射非定向激光，在某个角度就能看到无穷多的激光吧！',
             },
             enjoying = {
                 en_us = 'Enjoying the exhibition?',
                 zh_cn = '在欣赏展览吗？',
             },
             thisCorridorIsMyPlace = {
-                en_us = 'This corridor is my place.',
-                zh_cn = '这条走廊是我的地盘。',
+                en_us = 'This corridor is my place, Miss Magician. Do you like the kaleidoscopic art of the fairies here?',
+                zh_cn = '这条走廊是我的地盘，魔法使小姐。你喜欢这里妖精组成的万花筒艺术吗？',
             },
             whyYouHaveYourBackToMe = {
-                en_us = 'Why do you have your back to me? That\'s strange.',
-                zh_cn = '你为什么背对着我啊？好奇怪。',
+                en_us = 'Eh? Why do you have your back at me? That\'s not everyday I see a boss-type do that, \'cause usually only a certain miko or dollmaker would be facing away when being mad at me.',
+                zh_cn = '嗯？你为什么背对着我啊？我平时见到的boss可不这样。只有某个巫女和人偶师，在对我发火时才会背对着我。',
             },
             imNot = {
-                en_us = 'I\'m not.',
-                zh_cn = '并非如此。',
+                en_us = 'I reassure you, I am not.',
+                zh_cn = '并非如此，我没发火。',
             },
             myReflectionIsFacingYou = {
-                en_us = 'Isn\'t my reflection facing you?',
-                zh_cn = '我在镜中的像难道不是面向你的吗？',
+                en_us = 'Is my reflection not facing you, Miss Magician?',
+                zh_cn = '我在镜中的像难道不是面向你的吗，魔法使小姐？',
             },
             ughhYeah = {
-                en_us = 'Ughh, yeah. Still weird to me.',
-                zh_cn = '呃，是啊。我还是觉得奇怪。',
+                en_us = 'Uhh, yeah, sorta. Still a wack to me. You sure you ain\'t mad at me for barging in here?',
+                zh_cn = '呃，行吧，还是挺奇怪的。我闯进来你真的不生气？',
             },
             youKnowInteractiveArt = {
-                en_us = 'There\'s weirder thing. You know interactive art?',
-                zh_cn = '还有更奇怪的呢。你知道互动艺术吗？',
+                en_us = 'There is a far more perplexing idea you mayhaps approve of. Do you happen to know interactive art?',
+                zh_cn = '你或许会喜欢这个更复杂的想法。你知道互动艺术吗？',
             },
             likeBodyPaintingThing = {
-                en_us = 'Like smearing pigment on your body thing?',
-                zh_cn = '像是在身上涂抹颜料这种东西？',
+                en_us = 'Like "smearing pigments onto your body" sorta thing like your reflection? Yeah, probably.',
+                zh_cn = '像是在身上涂抹颜料这种东西，就和你镜子里一样？',
             },
             notQuiteThat = {
-                en_us = 'Not quite that, but similar.',
+                en_us = 'Not quite that, but perhaps it\'s similar to your description.',
                 zh_cn = '不完全是那样，但有点类似。',
             },
             butYoullSeeNow = {
-                en_us = 'But you\'ll see now!',
-                zh_cn = '不过你现在就会看到的！',
+                en_us = 'But here, you will see now, Miss Magician!',
+                zh_cn = '不过你现在就会看到的，魔法使小姐！',
             }
         },
         MARISAS3BossAfter = {
             iHaveToLearnSuchMagic = {
-                en_us = 'I have to learn such magic!',
-                zh_cn = '我必须学会这种魔法！',
+                en_us = 'Man, I gotta learn what type of magic you\'re doing to do all these wacky and pretty stuff!',
+                zh_cn = '我说，我必须学会你这种炫酷魔法！',
             },
             iCanPlayWithItAllDay = {
-                en_us = 'I can play with it all day.',
-                zh_cn = '我可以玩一整天。',
+                en_us = 'I\'d be playing with it all day if I could do it way earlier y\'know!',
+                zh_cn = '我要是学会了，我可以玩一整天啊！',
             },
             yeahYouCanTry = {
-                en_us = 'Yeah, you can try it.',
-                zh_cn = '嗯，你可以试试。',
+                en_us = 'Thank you for your approval of my reflective art, Miss Magician. They\'re entirely also free for you to try; just be careful up ahead with the next "exhibition."',
+                zh_cn = '感谢你的认可，魔法使小姐。你当然可以试试，试试又不花钱。不过，你可要当心下一场“展览”啊。',
             },
             imHeadingToTheNextExhibition = {
-                en_us = 'I\'m heading to the next exhibition.',
-                zh_cn = '我去下一场展览了。',
+                en_us = 'Alright, I\'m heading at that next exhibition, thanks mirror girl.',
+                zh_cn = '好的，我去下一场展览了，谢谢镜女人。',
             }
         },
         KOTOBAS3BossBefore = {
             paintingsOnTheWall = {
-                en_us = 'Paintings on the wall...',
+                en_us = '...Paintings on the walls...',
                 zh_cn = '墙上的画……',
             },
             theirContentIsOnlyVisibleFromMirrors = {
-                en_us = 'Their content is only visible from mirrors.',
-                zh_cn = '它们的内容只能从镜子里看到。',
+                en_us = 'Hm, it looks like the contents are only visible from these reflective mirrors.',
+                zh_cn = '嗯，它们的内容只能从镜子里看到。',
             },
             yeahItsFunny = {
-                en_us = 'Yeah, it\'s funny.',
-                zh_cn = '是呀，很有趣。',
+                en_us = 'You are not entirely wrong, miss. It is quite a droll, is it not?',
+                zh_cn = '你说的不错，小姐。这很滑稽，对不对？',
             },
             thisCorridorIsMyPlace = {
-                en_us = 'This corridor is my place.',
-                zh_cn = '这条走廊是我的地盘。',
+                en_us = 'Because, this corridor is my place.',
+                zh_cn = '因为，这条走廊是我的地盘。',
             },
             ohThatsTrueReflectionOfYourSkills = {
-                en_us = 'Oh, that\'s true reflection of your skills.',
-                zh_cn = '哦，那的确“反映”了你的技艺。',
+                en_us = 'Ohhh, so that\'s true "reflection" of your skills! Must be fun seeing doubles on the hubble.',
+                zh_cn = '哦，那的确“反映”了你的技艺！',
             },
             haha = {
-                en_us = 'Haha, I see what you mean.',
-                zh_cn = '哈哈，我明白你的意思了。',
+                en_us = 'Hehe, I see what you mean there, miss.',
+                zh_cn = '哈哈，我明白你的意思了，小姐。',
             },
             youKnowInteractiveArt = {
-                en_us = 'There\'s more! You know interactive art?',
-                zh_cn = '还有更多好东西呢！你知道互动艺术吗？',
+                en_us = 'But there\'s more to this corridor! Do you happen to know interactive art?',
+                zh_cn = '不过这里还有更多好东西呢！你知道互动艺术吗？',
             },
             iGuessThatWouldBeCool = {
-                en_us = 'I guess that would be cool.',
-                zh_cn = '我猜那会很酷。',
+                en_us = 'Probably! Maybe. But, I guess that would be cool!',
+                zh_cn = '应该吧！呃，可能吧。不过，我猜那会很酷！',
             },
             ofCourse = {
-                en_us = 'Of course! Enjoy with me.',
-                zh_cn = '当然啦！和我一起享受吧。',
+                en_us = 'Of course! Let us have joy within the reflections!',
+                zh_cn = '当然啦！和我一起享受镜面倒影吧。',
             }
         },
         KOTOBAS3BossAfter = {
             ughhIFeelDizzy = {
-                en_us = 'Ughh, I feel dizzy...',
-                zh_cn = '呃，我有点头晕……',
+                en_us = 'Ughh, man, I feel dizzy...',
+                zh_cn = '呃，我说，我有点头晕……',
             },
             butItsTrulyInteresting = {
-                en_us = 'But it\'s truly interesting.',
-                zh_cn = '不过这确实很有趣。',
+                en_us = 'But wait, your "art" is throwing dart and duplicating it into a rampart... You\'re pretty interesting, y\'know?',
+                zh_cn = '不过，你的“艺术”把“一”支箭复制成无“数”支箭……这确实很有趣。',
             },
+			thanksForLikingArt = {
+				en_us = 'Perhaps you can say that, miss. Thank you for approval. You may be more interested in the other "exhibition" up ahead.',
+				zh_cn = '感谢您喜欢我的作品，小姐。前面还有一个“展览”，您可能会更喜欢。',
+			},
             imConsideringAddingMirrorsToHyperbolicDomain = {
-                en_us = 'I\'m considering adding mirrors to Hyperbolic Domain.',
-                zh_cn = '我要考虑在双曲域里加上镜子。',
+                en_us = 'Hmmm, I might be considering to add mirrors to the Hyperbolic Domain! But true, I want to see the next exhibition, see ya mirror girl!',
+                zh_cn = '我要考虑在双曲域里加上镜子！不过的确，我想去看下一个展览。拜拜，镜女人！',
             },
         },
         REIMUS4BossBefore = {
             theSpaceIsMoreAndMoreAbnormal = {
-                en_us = 'The space is more and more abnormal.',
-                zh_cn = '空间越来越奇怪了。',
+                en_us = 'Hold on, the space here is more abnormal. When was the last time I move "freely" like this?',
+                zh_cn = '怎么回事，空间越来越奇怪了。上次这样“自由”地移动是什么时候？',
             },
             isThisAPotentialIncident = {
-                en_us = 'Is this a potential incident?',
-                zh_cn = '难道是潜在的异变？',
+                en_us = 'Ugh, could this be another potential incident during this time of solving THIS incident?',
+                zh_cn = '唉，难道是潜在的异变？',
             },
             aNewRoomInCageShape = {
-                en_us = 'A new room, in cage shape...',
-                zh_cn = '笼子形状的新房间……',
+                en_us = 'Another new room in the shape of a cage... it seems this space "sometimes" loops around onto itself, no wonder.',
+                zh_cn = '又一个新房间，还是笼子形状的……',
             },
             yeahItsForYou = {
-                en_us = 'Yeah, it\'s for you!',
-                zh_cn = '是啊，是给你准备的！'
+                en_us = 'Exactly, built just for you to be trapped within.',
+                zh_cn = '正确，是给你准备的。'
             },
             ninjaInGensokyo = {
-                en_us = 'Ninja in Gensokyo?!',
+                en_us = '!?  A ninja? In a warped space of all places??',
                 zh_cn = '幻想乡里出现了忍者？！'
             },
             thisIsSurelyAnIncident = {
-                en_us = 'This is surely an incident!',
+                en_us = 'Now I\'m more convinced there is something up than just some space-warping incident.',
                 zh_cn = '这的确是异变啊！'
             },
             stopTalkingToYourself = {
-                en_us = 'Stop talking to yourself.',
-                zh_cn = '别自言自语了。'
+                en_us = 'Stop talking to yourself, Hakurei shrine maiden.',
+                zh_cn = '别自言自语了，博丽的巫女。'
             },
             youAreThePerfectTarget = {
-                en_us = 'You are the perfect target...',
-                zh_cn = '你是完美的目标……'
+                en_us = 'You are the target perfect for assassination since the majority of Gensokyo knows who you are... Now,',
+                zh_cn = '你是完美的刺杀目标，因为幻想乡人人都认识你……现在，'
             },
             tryNotGetLostInPortals = {
-                en_us = 'Try not to break your gohei in half when crossing the portals!',
-                zh_cn = '可别在穿过传送门时把御币折断了！'
+                en_us = 'I\'d like to see you to trying to keep your gohei rod intact when trying to escape my portals! Kuukan-no-jutsu!',
+                zh_cn = '可别在穿过传送门时把御币折断了！空间之术！'
             }
         },
         REIMUS4BossAfter = {
             iWin = {
-                en_us = 'I win!',
-                zh_cn = '我赢了！',
+                en_us = '...And I won anyways. Do you have a sort of grudge against me that you decided to be a stalker? Talk about weird.',
+                zh_cn = '……我还是赢了。你是对我有什么不满吗，为什么要跟踪我？奇怪。',
             },
             yeahIllWalkYouOutside = {
-                en_us = 'Yeah, I\'ll walk you outside.',
-                zh_cn = '嗯，我送你出去吧。',
+                en_us = 'Ugh, of course I lost to the Shrine Maiden of Paradise... Fine, I\'ll escort you outside.',
+                zh_cn = '唉，当然我会输给乐园的巫女……好吧，我送你出去吧。',
             },
             wait = {
-                en_us = 'Wait, there\'s something off...',
+                en_us = 'Wait wait, there\'s something off here...',
                 zh_cn = '等等，有点不对劲……',
             },
             aboutThisSpatialAbility = {
-                en_us = 'About this spatial ability, it feels too strong.',
+                en_us = 'Something about this spatial warping... It feels too strong.',
                 zh_cn = '这种空间能力，感觉太强大了。',
             },
             itCouldntBeFromYou = {
-                en_us = 'It couldn\'t be yours, right?',
-                zh_cn = '不可能是你的能力吧？',
+                en_us = 'It couldn\'t be yours, right? Seems the aura is different than yours.',
+                zh_cn = '不可能是你的能力吧？这气场和你的不一样。',
             },
-            ohNo = {
-                en_us = 'Oh no...',
-                zh_cn = '不好……',
+            leave = {
+                en_us = '...What? Asking me such things after our battle? Because if you\'re planning to go through that hole from above, you\'re free to go up there anyways. Leave.',
+                zh_cn = '……嗯？问我这种事情吗？如果你想从上面那个洞出去，那也随便。快走。',
             },
             isntTheHoleInTheCeilingStrange = {
-                en_us = 'Isn\'t the hole in the ceiling strange?',
-                zh_cn = '天花板上的洞不是很奇怪吗？',
+                en_us = 'Wow, rude. Anyways—hold on, the hole up there is pretty strange.',
+                zh_cn = '好没礼貌。这么一说，天花板上的洞是很奇怪。',
             },
             illGoThere = {
-                en_us = 'I\'ll go there and check it out.',
-                zh_cn = '我去看看。',
+                en_us = '...I\'ll go there and check it out.',
+                zh_cn = '……我去看看。',
             }
         },
         MARISAS4BossBefore = {
             iveSeenEnoughWhereIsExit = {
-                en_us = 'I\'ve seen enough. Where is the exit?',
-                zh_cn = '我已经看够了。出口在哪里？',
+                en_us = 'Gah, I\'ve seen enough. Where is the exit here? The space here is practically looping!',
+                zh_cn = '哎呀，我已经看够了。出口在哪里？这里的空间一直在循环！',
             },
             aStrangeRoomWhoIsIt = {
-                en_us = 'A bigger room. Who is it?',
-                zh_cn = '更大些的房间。那是谁？',
+                en_us = 'Now another huge space. Is anyone other than those fairies here?',
+                zh_cn = '更大些的房间。除了妖精还有别人在吗？',
             },
             mustBeAnotherVisitor = {
-                en_us = 'Just another visitor.',
+                en_us = 'Or is it just gonna be another random visitor?',
                 zh_cn = '只是另一个游客啊。',
             },
             thatsABigMistake = {
-                en_us = 'That\'s a big mistake.',
+                en_us = 'That would be a big mistake.',
                 zh_cn = '那可是个大错误。',
             },
             noYouDontHaveMagicCircle = {
-                en_us = 'It\'s not. You don\'t have a magic circle, so you are not a threat.',
-                zh_cn = '才不是。你没有魔法阵，所以你不是个威胁。',
+                en_us = 'Naah it ain\'t. I\'m not seeing any magic sigil anywhere from you, so you aren\'t a threat man.',
+                zh_cn = '才不是。你身下没有魔法阵，所以你不是个威胁。',
             },
             haGuessWhyIDontCastIt = {
-                en_us = 'Ha! Guess why I don\'t cast one?',
+                en_us = 'Ha, try guessing why I don\'t cast one.',
                 zh_cn = '哈哈！猜猜我为什么不施放魔法阵？',
             },
             cuzYouDontHaveMagicPowerNotLikeMe = {
-                en_us = 'Cuz you don\'t have magic power! It\'s a privilege to meet a great magician like me.',
-                zh_cn = '因为你没有魔力啊！你能遇到像我这样的大魔法使应该感到很荣幸呢。',
+                en_us = 'Because I bet\'cha don\'t have any sorta magic power! It\'s a privilege to meet a great magician like me, y\'know.',
+                zh_cn = '因为我敢打赌，你没有一丁点魔力啊！你能遇到像我这样的大魔法使应该感到很荣幸呢。',
             },
             wrongItsForStealth = {
-                en_us = 'Wrong! It\'s for stealth.',
+                en_us = 'Wrong, it\'s for stealth.',
                 zh_cn = '错了！是为了潜行。',
             },
             arentYouAlreadyInFrontOfMe = {
-                en_us = 'Aren\'t you already in front of me?',
+                en_us = 'Aren\'t you already in front of me? You probably didn\'t even bother or are you a show-off?',
                 zh_cn = '你不就在我面前吗？',
             },
             iWasWatchingYouWhenYouWereWanderingAround = {
-                en_us = 'I was watching you when you were wandering around.',
+                en_us = 'I was watching you when you were wandering around—just dodging in a looping space. A clueless magician you are.',
                 zh_cn = '我在你四处游荡的时候就一直在观察你。',
             },
             andIvePreparedPersonalizedAttacks = {
-                en_us = 'I\'ve prepared personalized attacks for you.',
-                zh_cn = '我为你准备了个性化的攻击。',
+                en_us = '...And while you were lost, I\'ve prepared personalized attacks for you. Kuukan-no-Jutsu!',
+                zh_cn = '……在你迷路的时候，我已经准备好了针对你的攻击。空间之术！',
             },
         },
         MARISAS4BossAfter = {
             stillBetterThanTheWorstMushroomIHad = {
                 en_us = 'Still better than the worst magic mushroom I had.',
-                zh_cn = '还是比我吃过的最难吃的魔法蘑菇好。',
+                zh_cn = '还是比我吃过的最离谱的魔法蘑菇好。',
             },
             imGenuinelyCuriousAboutIt = {
-                en_us = 'Well, I\'m genuinely curious about it.',
-                zh_cn = '我真的很好奇。',
+                en_us = 'Ehh, I\'m now genuinely curious about that mushroom.',
+                zh_cn = '呃，我现在真心好奇那蘑菇是怎么回事。',
             },
             whateverYouCanLeave = {
-                en_us = 'Ahem. You can leave now.',
-                zh_cn = '呃，你可以走了。',
+                en_us = '...Ahem. You can leave now.',
+                zh_cn = '……总之，你可以走了。',
             },
             theClosestExitIs80RoomsAway = {
                 en_us = 'The closest exit is 80 rooms away. I\'ll walk you there.',
                 zh_cn = '最近的出口在80个房间之外。我送你过去吧。',
             },
             really = {
-                en_us = 'Really?',
-                zh_cn = '真的吗？',
+                en_us = 'Really? You\'re being oddly nice about it... What, trying to act like you didn\'t just lose?',
+                zh_cn = '真的吗？现在怎么这么好心了……难道是在装作没输？',
             },
             aHoleInTheCeiling = {
-                en_us = 'But there is a hole in the ceiling.',
-                zh_cn = '但天花板上有个洞。',
+                en_us = 'Buut there is a hole in the ceiling, weird.',
+                zh_cn = '但天花板上有个洞，奇怪。',
             },
             takeThisFasterWay = {
-                en_us = 'I rather take this faster way.',
-                zh_cn = '我走这条更快的路。',
+                en_us = 'I\'d rather take this the faster way! Bye ninja-stalker!',
+                zh_cn = '我还是走这条更快的路吧！再见了跟踪狂忍者！',
             },
             thatsNotTheExit = {
-                en_us = 'That\'s not an exit—',
-                zh_cn = '那不是出口——',
+                en_us = 'Hold on, that\'s not the exit—',
+                zh_cn = '停下，那不是出口——',
             },
         },
         KOTOBAS4BossBefore = {
             theRoomsDynamicallyChangeStructure = {
-                en_us = 'The rooms dynamically change structure?',
-                zh_cn = '房间的结构在动态变化？',
+                en_us = 'The rooms dynamically change structure? Huh, cool.',
+                zh_cn = '房间的结构在动态变化？有点意思。',
             },
             finallyADifferentRoom = {
-                en_us = 'Finally, a different room.',
-                zh_cn = '终于，一个不同的房间。',
+                en_us = 'Oh, finally, a different room!',
+                zh_cn = '终于，一个不同的房间！',
             },
             isntItTheTravelHubManager = {
-                en_us = 'Isn\'t it the travel hub manager?',
-                zh_cn = '那不是交通枢纽的管理员吗？',
+                en_us = 'Ah, hold on a second. Aren\'t you the travel hub manager of the Hyperbolic Domain?',
+                zh_cn = '啊，等等，那不是交通枢纽“双曲域”的管理员吗？',
             },
             yeahWhoAreYou = {
-                en_us = 'Yeah, who are you?',
-                zh_cn = '是啊，你是哪位？',
+                en_us = 'Yeah, and who are you? Weren\'t you that silhouette attacking me earlier?',
+                zh_cn = '是啊，你是哪位？你就是之前袭击我的人？',
             },
             shouji = {
-                en_us = 'I\'m Shouji Yaeme. The maze is set up by me.',
-                zh_cn = '我是八重目障子。迷宫就是我设置的。',
+                en_us = 'Yess yes, I\'m Shouji Yaeme, pleasure meeting you. The maze was set up by me.',
+                zh_cn = '是，我是八重目障子，很高兴见到你。迷宫就是我设置的。',
             },
             thisPavillionGetsManyVisitors = {
-                en_us = 'After the appearance of Hyperbolic Domain, this pavilion gets many visitors.',
-                zh_cn = '双曲域出现后，观艳馆有了很多访客呢。',
+                en_us = 'Because ever since the appearance of Hyperbolic Domain, this pavilion gets many visitors with your help, manager. Would a pay back not be appropriate?',
+                zh_cn = '双曲域出现后，观艳馆有了很多访客呢。是时候报答了。',
             },
             toPayBackLetsBattle = {
-                en_us = 'To pay back, let\'s battle!',
-                zh_cn = '为了报答，我来和你战斗吧！',
+                en_us = 'Because if so, I shall pay you back with a duel! Kuukan-no-Jutsu!',
+                zh_cn = '作为报答，我来和你决斗吧！空间之术！',
             },
         },
         KOTOBAS4BossAfter = {
             imExhausted = {
-                en_us = 'I\'m exhausted...',
-                zh_cn = '我累坏了……',
+                en_us = '...Maaan, I\'m exhausted...',
+                zh_cn = '……我说，我累坏了……',
             },
             theBattleIsntEnding = {
-                en_us = 'The battle isn\'t ending?',
-                zh_cn = '战斗还没结束吗？',
+                en_us = 'And the battle isn\'t ending? Aw shucks.',
+                zh_cn = '战斗还没结束吗？差不多得了！',
             },
             iStillHaveNineStars = {
-                en_us = 'I still have nine star spellcards—',
-                zh_cn = '我还有九张星符——',
+                en_us = 'Not now! I still have nine flying star spellcards—',
+                zh_cn = '还没结束！我还有九张星符——',
             },
             ahhWhatToDo = {
-                en_us = 'Ahh, what to do?',
+                en_us = 'Agghh!!! What to do?!',
                 zh_cn = '啊啊，我该怎么办？',
             },
             andEightGods = {
-                en_us = '—And eight god spellcards.',
-                zh_cn = '——以及八张神符。',
+                en_us = '—and eight divine spellcards left!',
+                zh_cn = '——以及八张神符！',
             },
             hmm = {
-                en_us = 'Hmm, I have to think!',
-                zh_cn = '嗯，我得好好想想！',
+                en_us = 'Hmmmm, darn, I have to think!!',
+                zh_cn = '嗯，该死，我得好好想想！',
             },
             theresAHoleInTheCeiling = {
-                en_us = 'There\'s a hole in the ceiling!',
-                zh_cn = '天花板上有个洞！',
+                en_us = 'Oh! Wow! There\'s a hole in the ceiling!',
+                zh_cn = '哦，天花板上有个洞！',
             },
             takeOffNow = {
-                en_us = 'Take off now!',
-                zh_cn = '我要远走高飞！',
+                en_us = 'I\'ll be taking off now Miss Shouji! Bye now!',
+                zh_cn = '我要远走高飞，障子小姐！再见啦！',
             }
         }
     },

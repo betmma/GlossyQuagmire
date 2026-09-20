@@ -607,6 +607,7 @@ local KOTOBAS3BossAfter={
     lines={
         line('kotoba','frustrated','ughhIFeelDizzy'),
         line('kotoba','frustrated','butItsTrulyInteresting'),
+		line('cora', 'happy', 'thanksForLikingArt'),
         line('kotoba','normal','imConsideringAddingMirrorsToHyperbolicDomain')
     }
 }
@@ -648,7 +649,7 @@ local REIMUS4BossAfter={
         line('reimu','normal','wait'),
         line('reimu','normal','aboutThisSpatialAbility'),
         line('reimu','cunning','itCouldntBeFromYou'),
-        line('shouji','surprised','ohNo'),
+        line('shouji','surprised','leave'),
         line('reimu','normal','isntTheHoleInTheCeilingStrange',{callback=triggerStage4BackgroundFlyingIntoHole}),
         line('reimu','happy','illGoThere'),
     }
