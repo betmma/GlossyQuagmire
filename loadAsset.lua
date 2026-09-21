@@ -169,6 +169,8 @@ function MovingSprite:countDown(movingLeft, movingRight)
     end
 end
 
+local AltImagesManager=require('assetCode.altImagesManager')
+
 local playerImage = love.graphics.newImage( "assets/player.png" )
 Asset.playerImage=playerImage
 
@@ -185,7 +187,7 @@ Asset.fairyImage=fairyImage
 local itemImage = love.graphics.newImage( "assets/item.png" )
 Asset.itemImage=itemImage
 
-love.filesystem.load('loadBulletSprites.lua')(Asset)
+love.filesystem.load('assetCode/loadBulletSprites.lua')(Asset)
 ---@type AssetPlayerShotSpritesCollection
 Asset.playerShotSprites=Asset.playerShotSprites
 ---@type AssetFairySpritesCollection
@@ -201,12 +203,13 @@ Asset.spectrum1MapSpectrum2={white='gray',gray='gray',red='red',orange='red',yel
 ---@type table<spectrum,fairySpectrum>
 Asset.spectrum1MapFairySpectrum={white='white',gray='black',red='red',orange='orange',yellow='orange',green='green',teal='green',cyan='blue',blue='blue',purple='purple',magenta='purple',black='black'}
 
-local bgImage = love.graphics.newImage( "assets/bg.png" )
-Asset.backgroundImage=bgImage
+Asset.backgroundImage=AltImagesManager{fileName='bg.png'}
+local bgImage = Asset.backgroundImage.current
 Asset.backgroundQuad=love.graphics.newQuad(0,0,bgImage:getWidth(),bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
 -- Asset.backgroundLeft=love.graphics.newQuad(0,0,150,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
 Asset.backgroundRight=love.graphics.newQuad(500,0,300,bgImage:getHeight(),bgImage:getWidth(),bgImage:getHeight())
-local titleImage = love.graphics.newImage( "assets/title.png" )
+Asset.titleImage=AltImagesManager{fileName='title.png'}
+local titleImage = Asset.titleImage.current
 Asset.title=love.graphics.newQuad(0,0,1280,720,titleImage:getWidth(),titleImage:getHeight())
 
 local bossImage = love.graphics.newImage( "assets/placeholderBossSprite.png" )
@@ -241,24 +244,6 @@ for i,speaker in ipairs(speakerList) do
     end
 end
 
---[[
-Batches are used to seperate different draw layers. Generally, order should be:
-
-Background (backgroundPattern class)
-Enemy with HP bar (boss)
-Player bullets
-Player
-Enemy without HP bar
-Items (niy)
-Enemy bullets highlighted (add blend mode)
-Enemy bullets
-Effects
-Player spell (niy)
-Player focus 
-UI (left half and right half foreground)
-Dialogue 
-Dialogue Characters 
-]]
 ---@class SpecialBatch:Object
 ---@field type string 'mesh' or 'function' or other types if needed
 ---@field contents table
@@ -379,7 +364,26 @@ function FunctionBatch:draw()
     end
 end
 
+--[[
+Batches are used to seperate different draw layers. Generally, order should be:
+
+Background (backgroundPattern class)
+Enemy with HP bar (boss)
+Player bullets
+Player
+Enemy without HP bar
+Items
+Enemy bullets highlighted (add blend mode)
+Enemy bullets
+Effects
+Player spell (niy)
+Player focus 
+UI (left half and right half foreground)
+Dialogue 
+Dialogue Characters 
+]]
 Asset.titleBatch=love.graphics.newSpriteBatch(titleImage,1,'stream') -- title screen
+Asset.titleImage:addSpriteBatch(Asset.titleBatch)
 -- for boss effects like hexagon and hp bar
 Asset.bossEffectMeshes=MeshBatch(Asset.bulletImage,500)
 Asset.bossMeshes=MeshBatch(Asset.bossImage,5)
@@ -397,6 +401,7 @@ Asset.playerFocusMeshes=MeshBatch(Asset.bulletImage,5)
 -- deprecated, use meshes for higher quality. maybe useful if a level has thousands of focus points and lags for meshes
 Asset.playerFocusBatch=love.graphics.newSpriteBatch(bulletImage, 5,'stream')
 Asset.foregroundBatch=love.graphics.newSpriteBatch(bgImage,5,'stream')
+Asset.backgroundImage:addSpriteBatch(Asset.foregroundBatch)
 -- for hp bar (could be curly in circle foreground)
 Asset.itemUIMeshes=MeshBatch(Asset.itemImage,100)
 -- for lives and bombs icons on UI

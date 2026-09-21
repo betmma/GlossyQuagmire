@@ -2,7 +2,7 @@ return {
     TRANSITION=true,
     enter=function(self,transitionArgs)
         transitionArgs.startFrame=self.frame
-        transitionArgs.image=transitionArgs.image or Asset.backgroundImage
+        transitionArgs.image=transitionArgs.image or Asset.backgroundImage.current
         transitionArgs.shader=transitionArgs.shader or love.graphics.newShader("shaders/transitionImage.glsl")
         transitionArgs.thershold=transitionArgs.thershold or 0.3
         self.currentUI.transitionArgs=transitionArgs
