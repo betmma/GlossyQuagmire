@@ -1,13 +1,12 @@
 ---@type OneStageDataRaw
 return{
-    init=function()
+    init=function(stageKey)
         G:replaceBackgroundPatternIfNot(BackgroundPattern.Stage5S2R)
         if G.runInfo.geometry==G.geometries.Cylinder then
             local border=Border.XYBorder{minx=-20,maxx=2500,miny=-G.geometries.Cylinder.r0+20,maxy=G.geometries.Cylinder.r0-20}
             G.runInfo.player.border=border
         end
-        BGM:play('level5',true)
-        DynamicUIObjs.showSoundtrack()
+        StageManager.commonStageInit(stageKey)
     end,
     segments={
         {

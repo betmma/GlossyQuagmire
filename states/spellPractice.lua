@@ -253,6 +253,7 @@ return {
     end,
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
+        Asset.backgroundImage:set()
         base.frame=0
         if updateOptions then updateOptions() end -- to refresh the options when entering the state, in case there are changes in spellcard history after playing a stage or practice
     end,

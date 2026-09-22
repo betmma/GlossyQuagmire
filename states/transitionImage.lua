@@ -1,3 +1,29 @@
+local canvas1x1=love.graphics.newCanvas(1,1)
+---@type table<love.Image,number>
+local averageGrayscaleCache={}
+function getAverageGrayscaleFromImage(image)
+    if averageGrayscaleCache[image] then
+        return averageGrayscaleCache[image]
+    end
+    local w,h=image:getDimensions()
+
+    -- Render the image squeezed into the 1x1 canvas
+    love.graphics.setCanvas(canvas1x1)
+    love.graphics.clear()
+    -- Scale down
+    love.graphics.draw(image,0,0,0,1/w,1/h)
+    love.graphics.setCanvas()
+
+    local singlePixelData = canvas1x1:newImageData()
+    local r, g, b = singlePixelData:getPixel(0, 0)
+
+    singlePixelData:release()
+
+    local ret=(0.2126 * r) + (0.7152 * g) + (0.0722 * b)
+    averageGrayscaleCache[image]=ret
+    return ret
+end
+
 return {
     TRANSITION=true,
     enter=function(self,transitionArgs)
@@ -73,6 +99,7 @@ return {
         local image=args.image
         local shader=args.shader
         shader:send("progress",progress)
+        shader:send("averageGrayscale",getAverageGrayscaleFromImage(image))
         love.graphics.setShader(shader)
         love.graphics.draw(image,0,0,0,1,1)
         love.graphics.setShader()

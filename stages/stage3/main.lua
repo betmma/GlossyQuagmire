@@ -10,14 +10,13 @@ local kora=require"stages.stage3.kora"
 
 ---@type OneStageDataRaw
 return{
-    init=function()
+    init=function(stageKey)
         if G.runInfo.geometry==G.geometries.Euclidean then
             local border=Border.XYBorder{minx=20,maxx=500,miny=30,maxy=560}
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Corridor)
         end
-        BGM:play('level3',true)
-        DynamicUIObjs.showSoundtrack()
+        StageManager.commonStageInit(stageKey)
     end,
     segments={
         {

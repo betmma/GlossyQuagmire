@@ -36,7 +36,7 @@ spell practice: jump to specific boss segment, and only run the spellcard phase 
 ---@field condition PhaseCondition
 
 ---@class OneStageDataRaw the raw data in stages/stageX/main.lua. after loading, StageManager will add other fields and do some processing
----@field init fun() to initialize the stage, like setting player border.
+---@field init fun(stageKey:StageKey) to initialize the stage, like setting player border, playing music, showing music title.
 ---@field segments (SegmentRawNoNext|SegmentRawWithNext|BossSegment)[]
 
 ---@class OneStageData:OneStageDataRaw
@@ -114,6 +114,16 @@ function StageManager.checkCondition(Condition,difficulty,player)
         end
     end
     return false
+end
+
+---common things to do in stage init function. like play corresponding bgm, show bgm text. set ui background and logo variation needs to be done at the middle of transition so it's put at inGame.lua's enter function
+---@param stageKey StageKey
+function StageManager.commonStageInit(stageKey)
+    ---@type table<StageKey,string>
+    local stageKey2BGM={stage1='level1',stage2='level2',stage3='level3',stage4='level4',stage5='level5',stage6='level6',stageEX='level7'}
+    local BGMKey=stageKey2BGM[stageKey]
+    BGM:play(BGMKey,true)
+    DynamicUIObjs.showSoundtrack()
 end
 
 ---@type table<StageKey,OneStageData>
@@ -214,7 +224,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
         segmentFuncArgs=segmentFuncArgs
     }
     local func=function()
-        self.currentStageData.init()
+        self.currentStageData.init(stageKey)
         local PC=1
         local reachedSkipSegment=false
         local pathToSkipSegment=self.currentStageData.findPathToSegment(skipToSegmentKey)

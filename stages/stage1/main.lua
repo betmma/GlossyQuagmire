@@ -21,14 +21,13 @@ end
 local kotobaBosses=require('stages.stage1.kotoba')
 ---@type OneStageDataRaw
 return{
-    init=function()
+    init=function(stageKey)
         if G.runInfo.geometry~=G.geometries.Spherical then
             local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
             G.runInfo.player.border=border
             G:replaceBackgroundPatternIfNot(BackgroundPattern.Honeycomb)
         end
-        BGM:play('level1',true)
-        DynamicUIObjs.showSoundtrack()
+        StageManager.commonStageInit(stageKey)
     end,
     segments={
         {

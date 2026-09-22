@@ -163,6 +163,7 @@ return {
     end,
     enter=function(self,fromState)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
+        Asset.backgroundImage:set()
         BGM:play('title')
         base.frame=0
         if stageSwitcher then -- reached state and shotType may have changed, so must remake

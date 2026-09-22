@@ -161,6 +161,11 @@ return {
     end,
     enter=function(self,lastState)
         if lastState~=G.STATES.PAUSE and lastState~=G.STATES.GAME_END then
+            local stageKey=StageManager.args.stageKey
+            if stageKey then
+                Asset.backgroundImage:set(stageKey)
+                Asset.titleImage:set(stageKey)
+            end
             self:replaceBackgroundPatternIfNot(BackgroundPattern.Empty)
             for i,mainEffect in pairs(Asset.mainEffects) do
                 if mainEffect.reset then

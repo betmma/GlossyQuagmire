@@ -2,7 +2,7 @@ local setZoomSpeed=require('stages.stage2.setZoomSpeed')
 local deltaYaw=0.5
 ---@type OneStageDataRaw
 return{
-    init=function()
+    init=function(stageKey)
         if G.runInfo.geometry==G.geometries.Hyperbolic then
             local border=Border.CircleBorder{center=G.runInfo.geometry:init().pos,radius=400}
             G.runInfo.player.border=border
@@ -14,8 +14,7 @@ return{
         else
             G:replaceBackgroundPatternIfNot(BackgroundPattern.SphericalGrid)
         end
-        BGM:play('level2',true)
-        DynamicUIObjs.showSoundtrack()
+        StageManager.commonStageInit(stageKey)
         G.runInfo.player.kinematicState.skipZoom=true
         setZoomSpeed(0,0)
     end,

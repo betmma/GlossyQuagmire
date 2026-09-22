@@ -171,7 +171,7 @@ local shouji=require"stages.stage4.shouji"
 
 ---@type OneStageDataRaw
 return{
-    init=function()
+    init=function(stageKey)
         outerPortals={}
         G:replaceBackgroundPatternIfNot(BackgroundPattern.Stage4Rooms)
         G.backgroundPattern:setRoomChanges(0,1)
@@ -184,8 +184,7 @@ return{
             -- G.runInfo.player.border=border
             -- G:replaceBackgroundPatternIfNot(BackgroundPattern.Corridor)
         end
-        BGM:play('level4',true)
-        DynamicUIObjs.showSoundtrack()
+        StageManager.commonStageInit(stageKey)
     end,
     segments={
         {

@@ -140,6 +140,7 @@ return {
     end,
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
+        Asset.backgroundImage:set()
         BGM:play('title')
     end,
     chosen=1,
