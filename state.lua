@@ -136,7 +136,7 @@ G={
         },
         ---@type table<StageKey, string>
         STAGE_TO_DEFAULT_GEOMETRY_NAME={
-            stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean',stage4='Euclidean',stage5='Cylinder'
+            stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean',stage4='Euclidean',stage5='Cylinder',stage6='Spherical'
         }
     },
 }
@@ -718,9 +718,8 @@ G.drawText=function(self)
     NoticeManager:drawText()
 end
 G._drawBatches=function(self)
-    if not self.backgroundPattern.noZoom then
-        self.backgroundPattern:draw()
-    end
+    self.backgroundPattern:draw()
+    BossManager.drawSpellBackground()
     self.currentUI.draw(self)
 end
 -- remove all objects in the scene

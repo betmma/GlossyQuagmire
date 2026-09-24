@@ -3,6 +3,7 @@ local BackgroundPattern=...
 -- love2d draws a white rectangle then shader draws pattern.
 local Shader=BackgroundPattern:extend()
 ---@class ShaderBackground:BackgroundPattern
+---@field transparency number
 ---@class love.Shader
 ---@class ShaderBackgroundArgs
 ---@field shader love.Shader the shader to use for drawing the background
@@ -18,6 +19,7 @@ function Shader:new(args)
     self.color={1,1,1}
     self.lightColor={1,1,1}
     self.darkColor={0.5,0.5,0.5}
+    self.transparency=1
     self.autoDark=true -- if true, color will be lerped to darkColor when self.darking=true (managed by bossManager, during spellcard) (for very bright shaders)
 end
 function Shader:update(dt)
@@ -36,7 +38,7 @@ function Shader:draw()
         return
     end
     local colorref={love.graphics.getColor()}
-    love.graphics.setColor(self.color[1],self.color[2],self.color[3])
+    love.graphics.setColor(self.color[1],self.color[2],self.color[3],self.transparency)
     -- love.graphics.rectangle('fill',0,0,800,600)
     love.graphics.setShader(self.shader)
     self:paramSendFunction(self.shader) -- send parameters to shader

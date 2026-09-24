@@ -4,6 +4,7 @@
 ---@field key string like "1-mid"
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field BGM? string key for BGM:play(). will be sent to dialogue if has beforeDialogueKey and not in spell practice. otherwise directly played when func is called.
+---@field spellBackground? ShaderBackground
 ---@field getBossSpawnPos fun(self):Position
 ---@field bossSpawnCallback? fun(self,boss:Boss):nil
 ---@field rounds BossRound[]
@@ -16,6 +17,7 @@
 ---@field type 'boss'
 ---@field bossName string a key to be sent to Localize and to get sprite
 ---@field BGM? string key for BGM:play(). will be sent to dialogue if has beforeDialogueKey and not in spell practice. otherwise directly played when func is called.
+---@field spellBackground? ShaderBackground only called in spellPhase
 ---@field getBossSpawnPos fun(self):Position
 ---@field bossSpawnCallback? fun(self,boss:Boss):nil
 ---@field rounds BossRound[]
@@ -32,6 +34,7 @@ function BossSegment:new(args)
     self.type='boss'
     self.bossName=args.bossName
     self.BGM=args.BGM
+    self.spellBackground=args.spellBackground
     self.getBossSpawnPos=args.getBossSpawnPos
     self.bossSpawnCallback=args.bossSpawnCallback
     self.rounds=args.rounds
@@ -96,6 +99,7 @@ function BossSegment:func(args)
     end
 
     for i, round in ipairs(roundsToRun) do
+        round.bossSegment=self
         if DEV_MODE and SKIP_MODE then -- skip to the last round for testing
             if i==#roundsToRun or round.SKIP_INCLUDE then
                 round:func(boss)
@@ -128,6 +132,7 @@ end
 ---@field func fun(self)
 
 ---@class BossRound:Object a round typically contains one nonspell and one spellcard. this layer is used to calculate remaining stars besides boss name and calculate HP bar (all phases in the same round compose one multi part HP bar)
+---@field bossSegment BossSegment reference to the upper layer. it's dynamically assigned in the upper layer's func before calling this object's func
 ---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this round. for testing middle rounds.
 ---@field ignorePlayerCondition boolean|nil for spell practice to skip check on playerType
 ---@field phaseCount fun(self):table<BossPhaseType, integer> how many phases of each type in the round. can differ based on difficulties.
@@ -168,6 +173,7 @@ function BossRound:new(args)
                 playerType=G.runInfo.playerType
             end
             for i, phase in ipairs(self.phases) do
+                phase.bossRound=self
                 if StageManager.checkCondition(phase.condition,G.runInfo.difficulty,playerType) then
                     if DEV_MODE and SKIP_MODE then -- skip to the last phase for testing. note that the hp bar will be wrong as it is based on all phases but it's for dev testing so doesnt matter
                         if i==#self.phases or phase.SKIP_INCLUDE then
@@ -223,6 +229,7 @@ end
 ---@alias BossPhaseType 'nonspell'|'spellcard'
 
 ---@class BossPhase:Object should not create a BossPhase directly; only use NonSpellPhase and SpellcardPhase.
+---@field bossRound BossRound reference to the upper layer. it's dynamically assigned in the upper layer's func before calling this object's func
 ---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this phase. for testing middle phases.
 ---@field type BossPhaseType
 ---@field time integer frames of the phase
@@ -336,6 +343,7 @@ end
 ---@field bonusScore integer score player gets after clearing the spellcard.
 ---@field currentBonus integer current bonus score, which counts down every frame.
 ---@field failedBonus boolean whether the player has failed the spellcard and lost the bonus score. failed means getting hit or using bomb or time runs out.
+---@field spellBackgroundObj ShaderBackground created in run
 ---@overload fun(args:SpellcardPhaseArgs):SpellcardPhase
 local SpellcardPhase=BossPhase:extend()
 
@@ -371,11 +379,28 @@ end
 EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
 EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
 
+local currentSpellBackgroundObj
+
+local function drawSpellBackground()
+    if currentSpellBackgroundObj and not currentSpellBackgroundObj.removed then
+        currentSpellBackgroundObj:draw()
+    end
+end
+
 function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
     self.failedBonus=false
     currentSpellcardPhase=self
-    G.backgroundPattern.darking=true
+    local spellBackground=self.bossRound.bossSegment.spellBackground
+    local spellBackgroundEaseEvent
+    if not spellBackground then
+        G.backgroundPattern.darking=true
+    else
+        self.spellBackgroundObj=spellBackground()
+        currentSpellBackgroundObj=self.spellBackgroundObj
+        self.spellBackgroundObj.transparency=0
+        spellBackgroundEaseEvent=Event.EaseEvent{obj=self.spellBackgroundObj,aims={transparency=1},duration=60}
+    end
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
@@ -389,6 +414,7 @@ function SpellcardPhase:run(boss)
         historyTable.tries=historyTable.tries+1
     end
     BossPhase.run(self, boss)
+    -- add draw call to spell background. where?
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
     if self.remainingFrames==0 and not self.isTimeout then
         self.failedBonus=true
@@ -404,7 +430,14 @@ function SpellcardPhase:run(boss)
         -- show bonus failed text
         DynamicUIObjs.showNotice('spellCardBonusFailed')
     end
-    G.backgroundPattern.darking=false
+    if not spellBackground then
+        G.backgroundPattern.darking=false
+    else
+        spellBackgroundEaseEvent:remove()
+        Event.EaseEvent{obj=self.spellBackgroundObj,aims={transparency=0},duration=60,afterFunc=function()
+            self.spellBackgroundObj:remove()
+        end}
+    end
     DynamicUIObjs.spellcardNameText:setText('')
     DynamicUIObjs.spellcardBonusHistoryText:setText('')
 end
@@ -429,4 +462,5 @@ BossManager={
     BossPhase=BossPhase,
     NonSpellPhase=NonSpellPhase,
     SpellcardPhase=SpellcardPhase,
+    drawSpellBackground=drawSpellBackground
 }

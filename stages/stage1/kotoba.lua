@@ -1,6 +1,7 @@
 
 local midboss=BossManager.BossSegment{
     bossName='kotoba',
+    spellBackground=BackgroundPattern.KotobaSpell,
     condition={players={REIMU=true,MARISA=true}},
     key='1-mid-kotoba',
     getBossSpawnPos=function(self)
@@ -117,6 +118,7 @@ local addFollow=function(boss)
 end
 local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
     bossName='kotoba',
+    spellBackground=BackgroundPattern.KotobaSpell,
     key='1-boss-kotoba',
     BGM='level1b',
     condition={players={REIMU=true,MARISA=true}},

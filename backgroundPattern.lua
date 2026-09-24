@@ -268,6 +268,8 @@ BackgroundPattern.MainMenuTesselation=MainMenuTesselation
 BackgroundPattern.Shader=love.filesystem.load('backgrounds/shaderBackground.lua')(BackgroundPattern)
 local Shader=BackgroundPattern.Shader
 
+BackgroundPattern.KotobaSpell=love.filesystem.load('backgrounds/kotobaSpell.lua')(Shader)
+
 BackgroundPattern.SphericalGrid=love.filesystem.load("backgrounds/sphericalGrid.lua")(BackgroundPattern)
 
 local WalkerShader=love.filesystem.load("backgrounds/walkerShader.lua")(Shader)
