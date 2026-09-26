@@ -276,7 +276,7 @@ function makeDynamicUIObjs()
     ---@return ScreenPosition
     function hpBar:ratioToPos(ratio,upOrDown)
         local shader=G.foregroundShaderData.shader
-        if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
+        if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES or shader==G.CONSTANTS.FOREGROUND_SHADERS.RING then
             local centerXY, radius=G.foregroundShaderData.args.centerXY,G.foregroundShaderData.args.radius
             local startAngle,endAngle=-math.pi*3/4,-math.pi/4
             local angle=math.lerp(startAngle,endAngle,ratio)

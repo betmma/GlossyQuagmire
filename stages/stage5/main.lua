@@ -631,5 +631,6 @@ return{
                 wait(120)
             end
         },
+        require('stages.stage5.tatsu')
     }
 }
