@@ -355,6 +355,36 @@ return {
                     zh_cn = '开门「连环八重天光」'
                 }
             }
+        },
+        ['tatsu-ball'] = {
+            EASY = {
+                name = {
+                    en_us = 'Bounce Sign "Pinball In the Sky"',
+                    zh_cn = '弹符「空中弹珠台」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Superball "Pachinko In Thunderclouds"',
+                    zh_cn = '超球「雷云间的柏青哥」'
+                }
+            }
+        },
+        ['tatsu-dragon'] = {
+            EASY = {
+                name = {
+                    en_us = 'Coiling Dragon "Ascending Spiral"',
+                    zh_cn = '蟠龙「升天螺旋」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Green Dragon "Dragon Coiled upon the Heavenly Pillar"',
+                    zh_cn = '青龙「环绕天柱之龙」'
+                }
+            }
         }
     },
     levelData = {
@@ -432,7 +462,18 @@ return {
                 zh_cn = '八重目障子'
             },
             nickname = {
-                en_us = ''
+                en_us = '',
+                zh_cn = ''
+            }
+        },
+        tatsu = {
+            name = {
+                en_us = 'Tatsu Zuiun',
+                zh_cn = '瑞云辰'
+            },
+            nickname = {
+                en_us = '',
+                zh_cn = ''
             }
         }
     },

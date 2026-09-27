@@ -1,6 +1,8 @@
 local function getBall(boss)
-    local ball=Bullet{kinematicState={pos=boss.kinematicState.pos,dir=0,speed=0},lifeFrame=9999,sprite=BulletSprites.lotus.red,invincible=true,extraUpdate={Action.ZoomIn(20)},size=1.5}
+    local ball=Bullet{kinematicState={pos=boss.kinematicState.pos,dir=0,speed=0},lifeFrame=9999,sprite=BulletSprites.lotus.red,invincible=true,extraUpdate={Action.ZoomIn(20)},size=1.5,spriteTransparency=0.4}
     ball.spriteRotationSpeed=0.05
+    local center=Bullet{kinematicState={pos=boss.kinematicState.pos,dir=0,speed=0},lifeFrame=9999,sprite=BulletSprites.lightRound.red,invincible=true,extraUpdate={Action.ZoomIn(20)},size=3,highlight=true,safe=true}
+    center:bindState(ball)
     local fairy=Enemy{sprite=Asset.fairySprites.small.red,lifeFrame=9999,spriteTransparency=0,maxhp=9999}
     fairy.size=8
     fairy.safe=true
@@ -59,6 +61,9 @@ local boss=BossManager.BossSegment{
         local pos,dir=geo:rThetaGo(playerPos,280*math.pi,0)
         return {x=pos.x,y=200}
     end,
+    bossSpawnCallback=function (self, boss)
+        boss.any={getBall=getBall}
+    end,
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
@@ -108,6 +113,9 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage5.spellcards.ball')
+        }},
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
                 key='5-boss-tatsu-non-2',
                 time=1800,
@@ -129,8 +137,8 @@ local boss=BossManager.BossSegment{
                         local angle=DSWITCH{0.1,0.09,0.09,0.075}*math.eval(1,0.1)
                         SFX:play('enemyPowerfulShot')
                         local num=DSWITCH{120,120,150,150}
-                        local bulletLifeFrame=1200
-                        local accDiv=DSWITCH{300,300,200,200}
+                        local bulletLifeFrame=1000
+                        local accDiv=DSWITCH{300,300,240,220}
                         lightOrbSpawner(ball,sign,i,num,geo,sentry,angle,bulletLifeFrame,accDiv,2)
                         sentry.any.flag=false
                         wait(60)
@@ -155,6 +163,9 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage5.spellcards.dragon')
+        }},
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
                 key='5-boss-tatsu-non-3',
                 time=1800,

@@ -155,7 +155,7 @@ return {
                     diffOptions:clearOptions()
                     item=horizontalOptions.spellcards[horizontalOptions.spellcardSwitcher.currentOptionIndex]
                     if not item then return end
-                    for i,diff in ipairs(G.CONSTANTS.STAGE_TO_DIFFICULTIES[stageKey]) do
+                    for i,diff in ipairs(G.CONSTANTS.STAGE_TO_DIFFICULTIES[item.stage]) do
                         if item.difficulties[diff] then
                             local status=2 -- 1, 2, 3 means locked, unlocked, cleared respectively
                             local historyTable=G.save.spellcardHistory[item.phaseKey][diff][shotType]
