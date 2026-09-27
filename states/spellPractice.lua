@@ -221,7 +221,7 @@ return {
                 horizontalOptions:addOption(difficultyOptions)
                 horizontalOptions.difficultyOptions=difficultyOptions
                 -- updateOptions()
-                local exit=UI.Base{x=-100,y=0,width=0,height=0,events={
+                local exit=UI.Base{x=-200,y=0,width=0,height=0,events={
                     [UI.EVENTS.FOCUS]=function(self,args)
                         self.parent.parent:switchOption(stageText,true,false)
                         G:switchState(G.STATES.MAIN_MENU)
