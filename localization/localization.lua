@@ -385,6 +385,21 @@ return {
                     zh_cn = '青龙「环绕天柱之龙」'
                 }
             }
+        },
+        ['tatsu-cloud'] = {
+            EASY = {
+                name = {
+                    en_us = 'Cloud Sign "Secret in the Clouds"',
+                    zh_cn = '云符「云中的秘密」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Cloud Play "Guess What I Made!"',
+                    zh_cn = '云游「猜猜我画了什么！」'
+                }
+            }
         }
     },
     levelData = {

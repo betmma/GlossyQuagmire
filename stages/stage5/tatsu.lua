@@ -212,6 +212,7 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage5.spellcards.cloud')
         }},
     }
 }

@@ -66,7 +66,12 @@ function Cylinder:toScreen(position)
 end
 
 function Cylinder:canSimpleDraw(position,radius)
-    local ratio=radius/self.r0
+    local zoom=math.exp(position.y/self.r0-1)
+    local drawnCenterRadius=zoom*self.r0
+    if drawnCenterRadius-radius>self.r0*1.2 then -- outside of visible area
+        return true,4
+    end
+    local ratio=radius/self.r0*zoom
     if ratio<0.1 then
         return true,8
     end
