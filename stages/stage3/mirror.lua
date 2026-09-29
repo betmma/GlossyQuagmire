@@ -89,7 +89,7 @@ end
 ---@return table<string,any> setAttributes
 local function getSpawnPresets(obj)
     if obj:is(Bullet) then
-        return {size=obj.size,sprite=obj.sprite,batch=obj.batch,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=obj.frame,extraUpdate=obj.extraUpdate}, {}
+        return {size=obj.size,sprite=obj.sprite,batch=obj.batch,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=obj.frame,extraUpdate=obj.extraUpdate}, {fadeInTransparency=obj.fadeInTransparency}
     elseif obj:is(Enemy) then
         return {maxhp=obj.maxhp,hp=obj.hp,sprite=obj.sprite,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=obj.frame,extraUpdate=obj.extraUpdate,dropItems=obj.dropItems}, {dieEffect=obj.dieEffect}
     elseif obj:is(Item) then

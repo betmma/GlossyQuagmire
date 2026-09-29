@@ -279,7 +279,7 @@ function ShootingPattern:shoot(shooter, powerLevel, optionIndex)
     if self.sprite.data.key=='amuletHuge' then
         bullet.spriteRotationSpeed=math.pi/10
         bullet.spriteExtraDirection=math.eval(0,999)
-        bullet.extraUpdate[2].params.fadeTransparency=0.5
+        bullet.fadeInTransparency=0.5
     end
     if self.extraUpdate then
         bullet.extraUpdate[#bullet.extraUpdate+1] = self.extraUpdate

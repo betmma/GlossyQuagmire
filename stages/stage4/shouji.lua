@@ -220,7 +220,7 @@ local boss=BossManager.BossSegment{
                             local size=Event.sineBackProgressFunc(progress)*1+0.5
                             local deltadir=progress*0.8-(progress*64)%1*0.3+0.5
                             dir=dir+side*deltadir
-                            local bullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.round[color],size=size,lifeFrame=540,extraUpdate={Action.ZoomIn(math.ceil(i/n*10)),Action.FadeIn(20,false),Action.FadeOut(20,true),releaseUpdate},highlight=true,safe=true,spriteTransparency=0.3}
+                            local bullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.round[color],size=size,lifeFrame=540,extraUpdate={Action.ZoomIn(math.ceil(i/n*10)),Action.FadeIn(20,false),Action.FadeOut(20,true),releaseUpdate},highlight=true,safe=true,spriteTransparency=0.5}
                             if i%remainingRatio~=0 then
                                 bullet.lifeFrame=120
                             end

@@ -59,7 +59,7 @@ local fadeIn=function(self,params)
         if params.setSafe then
             self.safe=true
         end
-        self.spriteTransparency=(params.fadeTransparency or 1) * frame/fadeFrame
+        self.spriteTransparency=self.fadeInTransparency * frame/fadeFrame
     elseif frame==fadeFrame+1 then
         if params.setSafe then
             self.safe=false
@@ -69,6 +69,10 @@ end
 
 local fadeInInit=function(self,params)
     self.fadeInBaseFrame=self.frame -- to deal with mirror reflection: if not copying bullet's frame, would need extra logic on lifeFrame and extraUpdate that uses frame. if copying, fadeIn won't work since initial frames have passed. so use this to effectively let fadeIn use its own frame count. 
+    self.fadeInTransparency=params.fadeTransparency or self.spriteTransparency
+    if self.fadeInTransparency==0 then
+        self.fadeInTransparency=1
+    end
     self.spriteTransparency=0
     if params.setSafe then
        self.safe=true

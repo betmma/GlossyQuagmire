@@ -114,7 +114,7 @@ local function signCore(cir,boss,r0,dangle)
     Event.Event{obj=cir,action=function()
         while 1 do
             if r>spawnedChains*gap then
-                local chain=Bullet{sprite=BulletSprites.rimDark.gray,size=1,invincible=true,safe=true,spriteTransparency=0.3,lifeFrame=life-cir.frame,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
+                local chain=Bullet{sprite=BulletSprites.rimDark.gray,size=1,invincible=true,safe=true,spriteTransparency=0.7,lifeFrame=life-cir.frame,extraUpdate={Action.FadeIn(30,false),Action.FadeOut(20,false)}}
                 local num=spawnedChains
                 DanmakuFuncs.orbitBind(chain,boss,function()
                     local rChain=gap*num
