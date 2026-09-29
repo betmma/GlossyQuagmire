@@ -33,7 +33,7 @@ return BossManager.SpellcardPhase{
             local r=270
             local angle0=math.eval(math.pi/2,2)
             for i=1,2 do
-                local n=DSWITCH{60,90,90,120}
+                local n=DSWITCH{60,90,90,110}
                 for j=1,n do
                     local angle=math.pi*2/n*j+math.pi/3*i
                     local r2,angle2=math.polygonize(3,angle,r,math.pi/3*i)
@@ -70,7 +70,7 @@ return BossManager.SpellcardPhase{
             posv.x=posv.x-screenCenter.x
             posv.y=posv.y-screenCenter.y
             for i=1,n do
-                local n2=DSWITCH{8,12,16,20}
+                local n2=DSWITCH{8,10,12,16}
                 for j=1,n2 do
                     local ratio=j/n2
                     local posix,posiy=math.rTheta2xy(geo.r0,(i-0.5)/n*math.pi*2)
@@ -87,7 +87,7 @@ return BossManager.SpellcardPhase{
         end
         local function nine()
             local angle0=math.eval(0,99)
-            local n=DSWITCH{12,18,24,30}
+            local n=DSWITCH{9,12,18,24}
             local span=280
             for row=1,9 do
                 local yv=(row-5.5)*40
@@ -111,7 +111,7 @@ return BossManager.SpellcardPhase{
             local anglei=math.pi/12*math.randomSign()
             local ratio=math.cos(math.pi/4)/math.cos(math.pi/4-math.abs(anglei))
             local n0=40
-            for i=1,DSWITCH{3,5,7,9} do
+            for i=1,DSWITCH{5,9,'<','<'} do
                 local n=math.ceil(n0)
                 for j=1,n do
                     local angle=math.pi*2/n*j+anglei*i

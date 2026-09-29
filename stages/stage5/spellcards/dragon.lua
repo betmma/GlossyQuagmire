@@ -56,12 +56,12 @@ return BossManager.SpellcardPhase{
             sentry.lifeFrame=time-1
             ball.safe=true
             local lastXratio=0
-            local multi=math.eval(7.37,0.2)
+            local multi=math.eval(7.37,0.05)
             sentry.extraUpdate={function(self)
                 ball.kinematicState.speed=speedF(self.frame)
                 local xratio=ball.kinematicState.pos.x/geo.a*multi
                 if math.ceil(xratio)~=math.ceil(lastXratio) and sentry.frame>60 then
-                    BulletSpawner{kinematicState={pos=copyTable(ball.kinematicState.pos),dir=0,speed=0},firstPeriod=1,period=5,lifeFrame=2,bulletNumber=5,angle=-math.pi/2,range=math.pi/2,bulletSprite=BulletSprites.giant.green,bulletSpeed=500-sentry.frame,highlight=true,bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20),dropUpdate},bulletLifeFrame=500,bulletEvents={function(cir)
+                    BulletSpawner{kinematicState={pos=copyTable(ball.kinematicState.pos),dir=0,speed=0},firstPeriod=1,period=5,lifeFrame=2,bulletNumber=4,angle=-math.pi/2,range=math.pi/2,bulletSprite=BulletSprites.giant.green,bulletSpeed=500-sentry.frame,highlight=true,bulletExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(20),dropUpdate},bulletLifeFrame=500,bulletEvents={function(cir)
                         cir.forceQuad=true
                     end}}
                 end

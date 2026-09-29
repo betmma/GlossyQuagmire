@@ -359,14 +359,14 @@ return {
         ['tatsu-ball'] = {
             EASY = {
                 name = {
-                    en_us = 'Bounce Sign "Pinball In the Sky"',
+                    en_us = 'Bounce Sign "Pinball in the Sky"',
                     zh_cn = '弹符「空中弹珠台」'
                 }
             },
             NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
-                    en_us = 'Superball "Pachinko In Thunderclouds"',
+                    en_us = 'Superball "Pachinko in Thunderclouds"',
                     zh_cn = '超球「雷云间的柏青哥」'
                 }
             }
@@ -400,7 +400,15 @@ return {
                     zh_cn = '云游「猜猜我画了什么！」'
                 }
             }
-        }
+        },
+        ['tatsu-dance'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Dragon Dance "Auspicious Clouds in Procession"',
+                    zh_cn = '龙舞「瑞云巡游」'
+                }
+            }
+        },
     },
     levelData = {
     },
@@ -1539,6 +1547,16 @@ return {
             description = {
                 en_us = 'Stage 5\'s theme.\nThe intro is repeated call and response, like sending and receiving radio signals. The title seems not related to the story? Just regard the flying protagonist as a radio signal (^^;',
                 zh_cn = '第五面的主题曲。\n前奏是重复的对唱，就像发送和接收无线电信号一样。这个曲名似乎与故事无关？就把飞行的主角当作无线电信号吧(^^;',
+            }
+        },
+        level5b = {
+            name = {
+                en_us = '',
+                zh_cn = '',
+            },
+            description = {
+                en_us = '',
+                zh_cn = '',
             }
         }
     },

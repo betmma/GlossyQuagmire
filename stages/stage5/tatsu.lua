@@ -54,7 +54,7 @@ end
 local boss=BossManager.BossSegment{
     bossName='tatsu',
     key='5-boss',
-    -- BGM='level5b',
+    BGM='level5b',
     getBossSpawnPos=function(self)
         local geo=G.runInfo.geometry
         local playerPos=G.runInfo.player.kinematicState.pos
@@ -186,7 +186,7 @@ local boss=BossManager.BossSegment{
                         wait(120)
                         local angle=0.075*math.eval(1,0.1)
                         SFX:play('enemyPowerfulShot')
-                        local num=DSWITCH{120,130,140,145}
+                        local num=DSWITCH{120,130,135,140}
                         local bulletLifeFrame=600
                         local accDiv=DSWITCH{300,300,200,200}
                         lightOrbSpawner(ball,sign,i,num,geo,sentry,angle,bulletLifeFrame,accDiv,3)
@@ -213,6 +213,9 @@ local boss=BossManager.BossSegment{
                 end
             },
             require('stages.stage5.spellcards.cloud')
+        }},
+        BossManager.BossRound{phases={
+            require('stages.stage5.spellcards.dance')
         }},
     }
 }
