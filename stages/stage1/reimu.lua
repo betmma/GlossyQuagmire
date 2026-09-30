@@ -1,5 +1,6 @@
 local midboss=BossManager.BossSegment{
     bossName='reimu',
+    spellBackground=BackgroundPattern.ReimuSpell,
     condition={players={KOTOBA=true}},
     key='1-mid-reimu',
     getBossSpawnPos=function(self)

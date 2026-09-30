@@ -619,13 +619,7 @@ Asset.drawBatches=function(self)
             love.graphics.setShader()
             -- add shoveEffects before ending main layer
             shove.clearEffects('main')
-            local activate=G.STATE==G.STATES.IN_GAME or G.STATE==G.STATES.PAUSE
-            if G.STATE==G.STATES.TRANSITION_FADE then
-                local args=G.UIDEF.TRANSITION_FADE.transitionArgs
-                if args.lastState==G.STATES.IN_GAME or args.lastState==G.STATES.PAUSE then
-                    activate=true
-                end
-            end
+            local activate=G.inGameLike()
             if activate then
                 for i, effect in pairs(self.mainEffects) do
                     if effect:active() then

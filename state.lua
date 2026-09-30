@@ -635,6 +635,25 @@ end
 
 G:switchState(G.STATES.MAIN_MENU)
 
+--- it's common to ask if current state is IN_GAME or related to it like PAUSE where IN_GAME's content is also drawn. so have a function for the single source of truth. Asset.mainEffects (like die effect) uses includeGameEnd=false and spell background uses includeGameEnd=true
+---@param includeGameEnd boolean
+G.inGameLike=function(includeGameEnd)
+    local state=G.STATE
+    local activate=state==G.STATES.IN_GAME or state==G.STATES.PAUSE
+    if state==G.STATES.TRANSITION_FADE then
+        local args=G.UIDEF.TRANSITION_FADE.transitionArgs
+        local lastState=args.lastState
+        if lastState==G.STATES.IN_GAME or lastState==G.STATES.PAUSE or (includeGameEnd and lastState==G.STATES.GAME_END) then
+            activate=true
+        end
+    end
+    if includeGameEnd then
+        if state==G.STATES.GAME_END or state==G.STATES.SAVE_REPLAY_ENTER_NAME or state==G.STATES.SAVE_REPLAY or state==G.STATES.TRANSITION_FADE then
+            activate=true
+        end
+    end
+    return activate
+end
 
 G.update=function(self,dt)
     self.runInfo.geometry:enterPhase('update')

@@ -41,6 +41,7 @@ local function starTweak(cir,num)
 end
 local marisaBoss=BossManager.BossSegment{
     bossName='marisa',
+    spellBackground=BackgroundPattern.MarisaSpell,
     condition={players={KOTOBA=true}},
     key='1-boss-marisa',
     BGM='level1c',

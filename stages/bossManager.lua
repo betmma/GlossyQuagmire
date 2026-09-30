@@ -382,7 +382,11 @@ EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
 local currentSpellBackgroundObj
 
 local function drawSpellBackground()
-    if currentSpellBackgroundObj and not currentSpellBackgroundObj.removed then
+    local ingame=G.inGameLike(true)
+    if not ingame and currentSpellBackgroundObj then
+        currentSpellBackgroundObj:remove()
+    end
+    if ingame and currentSpellBackgroundObj and not currentSpellBackgroundObj.removed then
         currentSpellBackgroundObj:draw()
     end
 end
