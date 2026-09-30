@@ -54,8 +54,10 @@ function Cylinder:nearestToLine(position,linePoint1,linePoint2)
     }
 end
 
+-- as requested by youtube comments, could zoom in when player is near the center. zoom ratio is rmult=math.exp(-math.min(G.runInfo.player.kinematicState.pos.y/self.r0,0)), that is 1 at r0 and e at -r0. for performance this ratio is inlined and only the part inside math.exp() is added to toScreen, canSimpleDraw, zoomFactorToScreen and applyForegroundShader. if wants to change, search and replace.
+
 function Cylinder:toScreen(position)
-    local r=self.r0*math.exp(position.y/self.r0-1)
+    local r=self.r0*math.exp(position.y/self.r0-1-math.min(G.runInfo.player.kinematicState.pos.y/self.r0,0))
     local theta=-position.x/self.r0
     if self.viewConfig.following then
         theta=theta+G.runInfo.player.kinematicState.pos.x/self.r0+math.pi/2
@@ -66,7 +68,7 @@ function Cylinder:toScreen(position)
 end
 
 function Cylinder:canSimpleDraw(position,radius)
-    local zoom=math.exp(position.y/self.r0-1)
+    local zoom=math.exp(position.y/self.r0-1-math.min(G.runInfo.player.kinematicState.pos.y/self.r0,0))
     local drawnCenterRadius=zoom*self.r0
     if drawnCenterRadius-radius>self.r0*1.2 then -- outside of visible area
         return true,4
@@ -82,12 +84,12 @@ function Cylinder:applyVertexShader(viewer)
 end
 
 function Cylinder:zoomFactorToScreen(position)
-    return {math.exp(position.y/self.r0-1)}
+    return {math.exp(position.y/self.r0-1-math.min(G.runInfo.player.kinematicState.pos.y/self.r0,0))}
 end
 
 function Cylinder:applyForegroundShader()
     local radius=self.r0
-    G.CONSTANTS.USE_FOREGROUND_SHADER('RING',{centerXY={self.viewConfig.screenCenter.x,self.viewConfig.screenCenter.y},radius=radius,innerRadius=self.r0*math.exp(-2)})
+    G.CONSTANTS.USE_FOREGROUND_SHADER('RING',{centerXY={self.viewConfig.screenCenter.x,self.viewConfig.screenCenter.y},radius=radius,innerRadius=self.r0*math.exp(-2-math.min(G.runInfo.player.kinematicState.pos.y/self.r0,0))})
 end
 
 return Cylinder
