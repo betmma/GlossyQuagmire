@@ -52,7 +52,7 @@ return {
                         return ''..index..'. '..Localize{'musicData',musicName,'name'}
                     end,
                     fontSize=24,color={1,1,1,1},
-                    width=500,
+                    width=600,
                     align='left',
                 }
             end,

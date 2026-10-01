@@ -1551,12 +1551,12 @@ return {
         },
         level5b = {
             name = {
-                en_us = '',
-                zh_cn = '',
+                en_us = 'Red Ball Dropped from Kunlun Hanging Garden',
+                zh_cn = '昆仑悬圃坠红球',
             },
             description = {
-                en_us = '',
-                zh_cn = '',
+                en_us = 'Tatsu Zuiun\'s theme.\nShe is a playful cloud youkai imitating a dragon, so I added many funny parts into the theme. Stage 5 title and spellcards already repeated "sky" "cloud" and "dragon" many times, so the theme\'s title uses other elements. The title is too long to add a secondary part.',
+                zh_cn = '瑞云辰的主题曲。\n她是贪玩的云妖怪，扮成龙的样子，所以我在曲子中加了很多滑稽的片段。因为五面标题和她的符卡名重复太多次“天”“云”“龙”，此曲的标题就只能用其它元素了。考虑到翻译过去的英文名已经很长，没有加副标题。',
             }
         }
     },
