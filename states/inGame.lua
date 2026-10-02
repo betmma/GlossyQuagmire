@@ -13,16 +13,6 @@ return {
             fontSize=36,color=G.CONSTANTS.DIFFICULTIES_DATA[G.runInfo.difficulty].color,boldColor={0,0,0,1},
             x=0,y=0,width=300,align='center',toggleX=false,
         })
-        local gameIconText=rightSide:child(UI.Text{
-            text=GAME_NAME,
-            fontSize=28,color={55/255,65/255,81/255,1},
-            x=0,y=520,width=300,
-            align='center',toggleX=false,
-            extraUpdates={function(self)
-                local shader=G.foregroundShaderData.shader
-                self.transparency=math.lerpCondition(self.transparency,shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES,0,1,0.1)
-            end}
-        })
         local getForegroundBaseX=function(y)
             local shader=G.foregroundShaderData.shader
             if shader==G.CONSTANTS.FOREGROUND_SHADERS.CIRCLE or shader==G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES or shader==G.CONSTANTS.FOREGROUND_SHADERS.RING then
@@ -194,7 +184,7 @@ return {
             end
             G.runInfo.geometry=geometries[(index%#geometries)+1]
         end
-        if isPressed('r') then
+        if DEV_MODE and isPressed('r') then
             GameObject:removeAll()
             G:reloadUI()
         end
