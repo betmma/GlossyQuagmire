@@ -2,6 +2,9 @@
 local base=UI.Base()
 local playingReplay
 local remakeOptions
+--- when entering gameEnd state, will play Player's Score music. if player continues, need to resume the current stage's music
+local previousBGM
+local previousBGMTime
 return {
     base=base,
     init=function(self)
@@ -55,6 +58,8 @@ return {
                 G.runInfo.score=G.runInfo.score%10+1
                 G.runInfo.grazes=0
                 G:switchState(G.STATES.IN_GAME)
+                BGM:play(previousBGM)
+                BGM.data[BGM.currentAudio]:seek(previousBGMTime,'seconds')
             end},
             {key='saveReplay',func=function()
                 if playingReplay or G.runInfo.continued then
@@ -115,6 +120,9 @@ return {
         remakeOptions()
     end,
     enter=function(self,lastState)
+        previousBGM=BGM.currentAudio
+        previousBGMTime=BGM.data[previousBGM]:tell("seconds")
+        BGM:play('score')
         base.frame=0
         playingReplay=G.runInfo.replay~=nil
         -- remakeOptions needs to know most recent playingReplay so cannot swap order

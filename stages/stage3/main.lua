@@ -424,7 +424,7 @@ return{
                         DanmakuFuncs.orbitBind(smallFairy,bigFairy,function (self, centerObj)
                             return {r=math.min(50,self.frame),theta=self.frame/20*sign+angle}
                         end)
-                        local spawner=BulletSpawner{lifeFrame=9999,period=4,bulletNumber=3,range=math.pi/15,angle=0,bulletSpeed=60,bulletSprite=BulletSprites.rice.white,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(10,true),Action.FadeOut(10,true)}}
+                        local spawner=BulletSpawner{lifeFrame=9999,period=6,bulletNumber=3,range=math.pi/15,angle=0,bulletSpeed=60,bulletSprite=BulletSprites.rice.white,bulletLifeFrame=600,bulletExtraUpdate={Action.FadeIn(10,true),Action.FadeOut(10,true)}}
                         spawner:bindState(smallFairy)
                         Event.LoopEvent{obj=spawner,period=1,executeFunc=function ()
                             spawner.angle=geo:to(spawner.kinematicState.pos,bigFairy.kinematicState.pos)+math.pi/6*sign

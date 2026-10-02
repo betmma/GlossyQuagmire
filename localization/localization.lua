@@ -565,8 +565,8 @@ return {
                 zh_cn = '第{current}页，共{total}页'
             },
             [1] = {
-                en_us = 'Audio\n\nMusic:\nBetmma\n\nSFX:\nTouhou-SFX (not official assets)\nCK GAME FACTORY\nOld-school Shonen SFX\nfreesound_community',
-                zh_cn = '音频\n\n音乐：\nBetmma\n\n音效：\nTouhou-SFX（非原作音效）\nCK GAME FACTORY\nOld-school Shonen SFX\nfreesound_community'
+                en_us = 'Audio\n\nMusic:\nBetmma, Bloccy\n\nSFX:\nTouhou-SFX (not official assets)\nCK GAME FACTORY\nOld-school Shonen SFX\nfreesound_community',
+                zh_cn = '音频\n\n音乐：\nBetmma, Bloccy\n\n音效：\nTouhou-SFX（非原作音效）\nCK GAME FACTORY\nOld-school Shonen SFX\nfreesound_community'
             },
             [2] = {
                 en_us = 'Graphics\n\nBullet, Fairy and Reimu Player Sprites:\nSeija.Real/TyrantSatanachia (Shared on Discord)\n\nPortraits and Other Player Sprites:\nBetmma',
@@ -1557,6 +1557,16 @@ return {
             description = {
                 en_us = 'Tatsu Zuiun\'s theme.\nShe is a playful cloud youkai imitating a dragon, so I added many funny parts into the theme. Stage 5 title and spellcards already repeated "sky" "cloud" and "dragon" many times, so the theme\'s title uses other elements. The title is too long to add a secondary part.',
                 zh_cn = '瑞云辰的主题曲。\n她是贪玩的云妖怪，扮成龙的样子，所以我在曲子中加了很多滑稽的片段。因为五面标题和她的符卡名重复太多次“天”“云”“龙”，此曲的标题就只能用其它元素了。考虑到翻译过去的英文名已经很长，没有加副标题。',
+            }
+        },
+        score = {
+            name = {
+                en_us = 'Player\'s Score (GQ Mix)',
+                zh_cn = '玩家得分（勘艳陷混音版）'
+            },
+            description = {
+                en_us = 'By Bloccy.\nI got inspired by stage 3\'s theme and got this futuristic theming since non-euclidean is often talked about in sci-fi and such.. though many people tend to forget non-euclidean "fantastical," don\'t you think?',
+                zh_cn = 'Bloccy所作。\n我从三面的曲子得到灵感，写了这首有未来感的曲子，毕竟非欧几何在科幻作品中常常提到……虽然，很多人往往会忘记非欧几何的“奇幻”之处，你不觉得吗？'
             }
         }
     },
