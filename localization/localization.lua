@@ -2350,6 +2350,178 @@ return {
                 en_us = 'I\'ll be taking off now Miss Shouji! Bye now!',
                 zh_cn = '我要远走高飞，障子小姐！再见啦！',
             }
+        },
+        REIMUS5BossBefore = {
+            myGuessIsRight = {
+                en_us = 'My guess is right. I\'m in an invisible vertical tube connected to that hole in the ceiling.',
+                zh_cn = '我的猜测是对的。我在一个隐形的竖直管道里，这管道连接着天花板上的那个洞。',
+            },
+            iFeelThePowerBeStronger = {
+                en_us = 'I feel the spatial power be stronger as I fly upwards. Above me is a giant cloud.',
+                zh_cn = '随着我向上飞行，空间的力量变得更强大。我的上方是一团巨大的云。',
+            },
+            whatsThatFallingObject = {
+                en_us = 'What\'s that falling object?',
+                zh_cn = '那掉下来的东西是什么？',
+            },
+            ohReimu = {
+                en_us = 'Oh, Reimu!',
+                zh_cn = '哦，灵梦！',
+            },
+            whatAreYouDoing = {
+                en_us = 'The ball in your hand... It doesn\'t seem to be powerful? What are you doing with it?',
+                zh_cn = '你手里的球……也没什么特别的，你在干什么？',
+            },
+            tossingTheBallForFun = {
+                en_us = 'I\'m tossing the ball for fun, obviously.',
+                zh_cn = '我当然是在抛球玩啦。',
+            },
+            ahISeeWhatYouAreHereFor = {
+                en_us = 'Ah, I see what you are here for.',
+                zh_cn = '啊，我明白你在这是干什么的了。',
+            },
+            aLaidbackDoorkeeper = {
+                en_us = 'You\'re a laid-back doorkeeper, aren\'t you?',
+                zh_cn = '你是个悠闲的守门人吧？',
+            },
+            soYouWantToGoInside = {
+                en_us = 'So you want to go inside the cloud?',
+                zh_cn = '所以你想进入云中？',
+            },
+            fineLetsSeeYourStrength = {
+                en_us = 'Fine, let\'s see your strength then.',
+                zh_cn = '好吧，那就让我看看你的实力吧。',
+            },
+        },
+        REIMUS5BossAfter = {
+            youCanGoInside = {
+                en_us = 'You can go inside now.',
+                zh_cn = '你进去吧。',
+            },
+            shouldntYouOpenAPath = {
+                en_us = 'Shouldn\'t you open a path for me to go inside? That\'s too lazy of a doorkeeper.',
+                zh_cn = '你不应该为我开一条路吗？你这个守门人也太懒了吧。',
+            },
+            imNotADoorkeeper = {
+                en_us = 'I\'m not a doorkeeper, from the beginning.',
+                zh_cn = '我从一开始就不是守门人啊。',
+            },
+            iCannotControlThisGiantCloud = {
+                en_us = 'I can ride clouds, but strangely I cannot budge this giant cloud.',
+                zh_cn = '我虽然能腾云驾雾，但却动不了这团巨大的云。',
+            },
+            okIllExorciseIt = {
+                en_us = 'Okay, I\'ll exorcise it.',
+                zh_cn = '好吧，我来驱散它。',
+            }
+        },
+        MARISAS5BossBefore = {
+            thisReallyIsntTheExit = {
+                en_us = 'Surprisingly, this really isn\'t the exit.',
+                zh_cn = '奇怪，这真的不是出口。',
+            },
+            itLooksLikeNothingsHereBut = {
+                en_us = 'There are only some twisted clouds, but I cannot move away from them.',
+                zh_cn = '这里只有几团扭曲的云，但我怎么飞都无法远离它们。',
+            },
+            okLemmeCastMasterSpark = {
+                en_us = 'Okay, let me cast Master Spark—',
+                zh_cn = '好吧，我放个魔炮看看——',
+            },
+            wahStop = {
+                en_us = 'Wah! Stop!',
+                zh_cn = '哇！住手！',
+            },
+            who = {
+                en_us = 'Who is that?',
+                zh_cn = '那是谁？',
+            },
+            iAlmostMissedMyBall = {
+                en_us = 'I almost missed my ball!',
+                zh_cn = '我差点就没接住我的球！',
+            },
+            canIHaveALook = {
+                en_us = 'Ball? Is it magical? Can I have a look at it?',
+                zh_cn = '球？它有魔力吗？我能看看吗？',
+            },
+            noWay = {
+                en_us = 'No way!',
+                zh_cn = '不行！',
+            }
+        },
+        MARISAS5BossAfter = {
+            itsReallyANormalBouncyBall = {
+                en_us = 'It\'s really a normal bouncy ball...',
+                zh_cn = '这真的是普通的弹力球……',
+            },
+            wellIThoughtItsOccultBall = {
+                en_us = 'Well, I thought it was an occult ball or something similar.',
+                zh_cn = '我还以为它是灵异珠什么的呢。',
+            },
+            illLeaveNowYouCanBlastTheCloud = {
+                en_us = 'I\'ll leave now, you can blast the cloud above as you want.',
+                zh_cn = '我先走了，你可以随意轰击上面那团云。',
+            },
+            movingForward = {
+                en_us = 'Moving forward!',
+                zh_cn = '继续前进！',
+            }
+        },
+        KOTOBAS5BossBefore = {
+            iveNeverBeenAnywhereThisHigh = {
+                en_us = 'I\'ve never been anywhere this high before!',
+                zh_cn = '我从来没有到过这么高的地方！',
+            },
+            hiImTatsu = {
+                en_us = 'Hi, it\'s uncommon to see others here! I\'m Tatsu Zuiun.',
+                zh_cn = '嗨，在这里见到别人真是不寻常呢！我是瑞云辰。',
+            },
+            youAreSittingOnTheClouds = {
+                en_us = 'You are sitting on the clouds! That\'s cozy.',
+                zh_cn = '你坐在云上！一定很舒服吧。',
+            },
+            yeahSometimesI = {
+                en_us = 'Yeah, sometimes I move lower and watch people on the ground.',
+                zh_cn = '是啊，我有时会降到低处，看看地面上的人。',
+            },
+            doYouKnowThatBigCloudAbove = {
+                en_us = 'Do you know that oversized cloud above?',
+                zh_cn = '你知道上面那团大云吗？',
+            },
+            iHaveNoIdea = {
+                en_us = 'I can control clouds but not that one. I have no idea what it is.',
+                zh_cn = '我能控制云，但不能控制那团云。我不知道它是什么。',
+            },
+            itHasBeenFloatingThereForAges = {
+                en_us = 'It has been floating there for ages, and I\'ve never seen it move.',
+                zh_cn = '它已经漂浮在那里很久了，我从没见过它动过。',
+            },
+            aboutMyBall = {
+                en_us = 'You see, I have a bouncy ball. That cloud is a good target to hit with it.',
+                zh_cn = '你看，我有一个弹力球。那团云是用来击打的好目标。',
+            },
+            iCanShowYouHowToPlayIt = {
+                en_us = 'I can show you how to play with it!',
+                zh_cn = '我可以教你怎么玩！',
+            }
+        },
+        KOTOBAS5BossAfter = {
+            soTheSpaceBelowTheBigCloud = {
+                en_us = 'So the space below the big cloud is warped?',
+                zh_cn = '所以大云下面的空间是扭曲的？',
+            },
+            yeahItLoopsHorizontallySo = {
+                en_us = 'Yeah, it loops horizontally so I can throw my ball at highest speed and it will come back to me.',
+                zh_cn = '是啊，它在水平方向上循环，所以我以最高速度扔出我的球，它也会回到我手里。',
+            },
+            andImReallyCurious = {
+                en_us = 'And I\'m really curious about what\'s inside that cloud.',
+                zh_cn = '我也很好奇那团云里面有什么。',
+            },
+            imIn = {
+                en_us = 'I\'m in! I\'ll tell you what\'s inside later!',
+                zh_cn = '我进去了！之后会告诉你里面有什么！',
+            }
         }
     },
 }

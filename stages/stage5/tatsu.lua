@@ -64,6 +64,12 @@ local boss=BossManager.BossSegment{
     bossSpawnCallback=function (self, boss)
         boss.any={getBall=getBall}
     end,
+    beforeDialogueKey=function ()
+        return G.runInfo.playerType..'S5BossBefore'
+    end,
+    afterDialogueKey=function ()
+        return G.runInfo.playerType..'S5BossAfter'
+    end,
     rounds={
         BossManager.BossRound{phases={
             BossManager.NonSpellPhase{

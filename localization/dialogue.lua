@@ -729,6 +729,106 @@ local KOTOBAS4BossAfter={
     }
 }
 
+local REIMUS5BossBefore={
+    name='REIMUS5BossBefore',
+    defaultSpeakerPosition={
+        reimu='left',
+        tatsu='right',
+    },
+    lines={
+        line('reimu','normal','myGuessIsRight'),
+        line('reimu','normal','iFeelThePowerBeStronger'),
+        line('reimu','surprised','whatsThatFallingObject'),
+        line('tatsu','happy','ohReimu'),
+        line('reimu','surprised','whatAreYouDoing'),
+        line('tatsu','happy','tossingTheBallForFun'),
+        line('reimu','cunning','ahISeeWhatYouAreHereFor'),
+        line('reimu','happy','aLaidbackDoorkeeper'),
+        line('tatsu','cunning','soYouWantToGoInside'),
+        line('tatsu','normal','fineLetsSeeYourStrength',{playBGM=true}),
+    }
+}
+
+local REIMUS5BossAfter={
+    name='REIMUS5BossAfter',
+    defaultSpeakerPosition={
+        reimu='left',
+        tatsu='right',
+    },
+    lines={
+        line('tatsu','sad','youCanGoInside'),
+        line('reimu','angry','shouldntYouOpenAPath'),
+        line('tatsu','frustrated','imNotADoorkeeper'),
+        line('tatsu','frustrated','iCannotControlThisGiantCloud'),
+        line('reimu','normal','okIllExorciseIt'),
+    }
+}
+
+local MARISAS5BossBefore={
+    name='MARISAS5BossBefore',
+    defaultSpeakerPosition={
+        marisa='left',
+        tatsu='right',
+    },
+    lines={
+        line('marisa','frustrated','thisReallyIsntTheExit'),
+        line('marisa','frustrated','itLooksLikeNothingsHereBut'),
+        line('marisa','happy','okLemmeCastMasterSpark'),
+        line('tatsu','angry','wahStop'),
+        line('marisa','surprised','who'),
+        line('tatsu','angry','iAlmostMissedMyBall'),
+        line('marisa','cunning','canIHaveALook'),
+        line('tatsu','angry','noWay',{playBGM=true}),
+    }
+}
+
+local MARISAS5BossAfter={
+    name='MARISAS5BossAfter',
+    defaultSpeakerPosition={
+        marisa='left',
+        tatsu='right',
+    },
+    lines={
+        line('tatsu','sad','itsReallyANormalBouncyBall'),
+        line('marisa','normal','wellIThoughtItsOccultBall'),
+        line('tatsu','sad','illLeaveNowYouCanBlastTheCloud'),
+        line('marisa','happy','movingForward'),
+    }
+}
+
+local KOTOBAS5BossBefore={
+    name='KOTOBAS5BossBefore',
+    defaultSpeakerPosition={
+        kotoba='left',
+        tatsu='right',
+    },
+    lines={
+        line('kotoba','happy','iveNeverBeenAnywhereThisHigh'),
+        line('tatsu','happy','hiImTatsu'),
+        line('kotoba','surprised','youAreSittingOnTheCloud'),
+        line('tatsu','happy','yeahSometimesI'),
+        line('kotoba','normal','doYouKnowThatBigCloudAbove'),
+        line('tatsu','normal','iHaveNoIdea'),
+        line('tatsu','normal','itHasBeenFloatingThereForAges'),
+        line('tatsu','happy','aboutMyBall'),
+        line('tatsu','happy','iCanShowYouHowToPlayIt',{playBGM=true}),
+    }
+}
+
+local KOTOBAS5BossAfter={
+    name='KOTOBAS5BossAfter',
+    defaultSpeakerPosition={
+        kotoba='left',
+        tatsu='right',
+    },
+    lines={
+        line('kotoba','normal','soTheSpaceBelowTheBigCloud'),
+        line('tatsu','happy','yeahItLoopsHorizontallySo'),
+        line('tatsu','normal','andImReallyCurious'),
+        line('kotoba','normal','imIn'),
+    }
+}
+
 ---@type table<string,Dialogue>
 Dialogue.data={
     REIMUS1BossBefore=REIMUS1BossBefore,
@@ -757,7 +857,13 @@ Dialogue.data={
     MARISAS4BossBefore=MARISAS4BossBefore,
     MARISAS4BossAfter=MARISAS4BossAfter,
     KOTOBAS4BossBefore=KOTOBAS4BossBefore,
-    KOTOBAS4BossAfter=KOTOBAS4BossAfter
+    KOTOBAS4BossAfter=KOTOBAS4BossAfter,
+    REIMUS5BossBefore=REIMUS5BossBefore,
+    REIMUS5BossAfter=REIMUS5BossAfter,
+    MARISAS5BossBefore=MARISAS5BossBefore,
+    MARISAS5BossAfter=MARISAS5BossAfter,
+    KOTOBAS5BossBefore=KOTOBAS5BossBefore,
+    KOTOBAS5BossAfter=KOTOBAS5BossAfter,
 }
 
 
