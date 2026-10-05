@@ -230,12 +230,12 @@ end
 
 
 local portraitsImage=love.graphics.newImage('assets/portraits.png')
-local portraitWidth=2000
-local portraitHeight=2000
+local portraitWidth=1000
+local portraitHeight=1000
 Asset.portraitWidth,Asset.portraitHeight=portraitWidth,portraitHeight
 ---@type table<string,table<string,love.Quad>> speaker -> expression -> quad
 Asset.portraitQuads={}
-local speakerList={'cora','kotoba','marisa','reimu','shouji','tooshi'}
+local speakerList={'cora','kotoba','marisa','reimu','shouji','tatsu','tooshi'}
 local speakerExpressionList={'angry','cunning','frustrated','happy','normal','sad','surprised'}
 for i,speaker in ipairs(speakerList) do
     Asset.portraitQuads[speaker]={}

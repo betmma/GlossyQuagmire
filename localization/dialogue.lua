@@ -205,8 +205,8 @@ function DialogueController:draw()
         if not quad then
             goto continue
         end
-        local portraitSize=0.25
-        local x=character.position=='left' and -100+portraitWidth*portraitSize or WINDOW_WIDTH-100-portraitWidth*portraitSize -- width and height are 2000px. /4 -> 500px
+        local portraitSize=0.5
+        local x=character.position=='left' and -100+portraitWidth*portraitSize or WINDOW_WIDTH-100-portraitWidth*portraitSize -- width and height are 1000px. *portraitSize -> 500px
         if G.foregroundShaderData.shader==G.CONSTANTS.FOREGROUND_SHADERS.RECTANGLE then
             local xywh=G.foregroundShaderData.args.xywh
             if character.position=='right' then
@@ -215,7 +215,7 @@ function DialogueController:draw()
                 x=x-50
             end
         end
-        local y=WINDOW_HEIGHT-portraitHeight/4
+        local y=WINDOW_HEIGHT-portraitHeight*portraitSize
         if speakerOffset[speaker] then
             x=x+speakerOffset[speaker].x
             y=y+speakerOffset[speaker].y

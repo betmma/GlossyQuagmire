@@ -257,10 +257,28 @@ return {
             },
         },
         ['shouji-trick'] = {
-            __default__ = {
+            EASY = {
                 name = {
                     en_us = 'Trick "Through the Revolving Trapdoor"',
                     zh_cn = '技法「机关门的背后」',
+                }
+            },
+            NORMAL = {
+                name = {
+                    en_us = 'Trick "Behind the Seven-Colored Wall"',
+                    zh_cn = '技法「七色壁的背后」',
+                }
+            },
+            HARD = {
+                name = {
+                    en_us = 'Ninja Art "The Ceiling-Reversal Technique"',
+                    zh_cn = '忍法「天井返之术」',
+                }
+            },
+            __default__ = {
+                name = {
+                    en_us = 'Ninja Art "Kinkaku-ji\'s Single-Piece Trapdoor"',
+                    zh_cn = '忍法「金阁寺的一枚活板门」',
                 }
             },
         },
@@ -2476,13 +2494,13 @@ return {
                 en_us = 'Hi, it\'s uncommon to see others here! I\'m Tatsu Zuiun.',
                 zh_cn = '嗨，在这里见到别人真是不寻常呢！我是瑞云辰。',
             },
-            youAreSittingOnTheClouds = {
+            youAreSittingOnTheCloud = {
                 en_us = 'You are sitting on the clouds! That\'s cozy.',
                 zh_cn = '你坐在云上！一定很舒服吧。',
             },
             yeahSometimesI = {
-                en_us = 'Yeah, sometimes I move lower and watch people on the ground.',
-                zh_cn = '是啊，我有时会降到低处，看看地面上的人。',
+                en_us = 'Yeah. Sometimes I even move lower and watch people on the ground.',
+                zh_cn = '是啊。我有时还会降到低处，看看地面上的人。',
             },
             doYouKnowThatBigCloudAbove = {
                 en_us = 'Do you know that oversized cloud above?',

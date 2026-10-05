@@ -24,7 +24,7 @@ G={
             Asset.foregroundBatch:add(Asset.backgroundQuad,0,0,0,1,1,0,0)
             if G.foregroundShaderData.shader~=G.CONSTANTS.FOREGROUND_SHADERS.TWO_CIRCLES then
                 Asset.titleBatch:setColor(1,1,1,1)
-                Asset.titleBatch:add(Asset.title,500,350,0,0.375,0.375,0,0)
+                Asset.titleBatch:add(Asset.title,500,375,0,0.375,0.375,0,0)
             end
             GameObject:drawAll() -- adding sprite into corresponding batch.
             local ui=uiToDrawBatch and self.UIDEF[uiToDrawBatch] or self.currentUI
