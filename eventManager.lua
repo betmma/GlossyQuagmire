@@ -9,6 +9,7 @@ EventManager.EVENTS={
     RELOAD_UI='reloadUI',
     PLAYER_PRESS_C='playerPressC',
     PLAYER_PRESS_Z='playerPressZ',
+    PLAYER_HOLD_DIALOGUE_SKIP='playerHoldDialogueSkip',
     SPELLCARD_BONUS='spellcardBonus',
     FINISH_BOSS_PHASE='finishBossPhase',
     -- when player uses bomb

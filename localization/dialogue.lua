@@ -100,6 +100,13 @@ function DialogueController:new(args)
         end
     end
     EventManager.listenTo(EventManager.EVENTS.PLAYER_PRESS_Z,self.playerZCallback,EventManager.EVENTS.LEAVE_GAME)
+    -- Read skip input in Player:update, just like Z, to use the correct replay frame.
+    self.playerSkipCallback=function()
+        if self.timeSinceLastAdvance>=0.05 and not self.data.lines[self.currentLineIndex].extra.autoForwardTime then
+            self:advanceDialogue()
+        end
+    end
+    EventManager.listenTo(EventManager.EVENTS.PLAYER_HOLD_DIALOGUE_SKIP,self.playerSkipCallback,EventManager.EVENTS.LEAVE_GAME)
 end
 
 function DialogueController:block()
@@ -113,6 +120,7 @@ function DialogueController:update(dt)
         self.transparency=math.max(self.transparency-1/30,0)
         if self.transparency==0 then
             EventManager.removeListener(EventManager.EVENTS.PLAYER_PRESS_Z,self.playerZCallback)
+            EventManager.removeListener(EventManager.EVENTS.PLAYER_HOLD_DIALOGUE_SKIP,self.playerSkipCallback)
             self:remove()
         end
     else
@@ -124,7 +132,7 @@ function DialogueController:update(dt)
     local player=G.runInfo.player
     if player then
         local advanceTime=self.data.lines[self.currentLineIndex].extra.autoForwardTime or self.autoAdvanceTime
-        if self.timeSinceLastAdvance>=advanceTime then -- or love.keyboard.isDown('lctrl') then -- press z or hold left ctrl to advance. lctrl isn't in player's replay record keys so cannot add now. and adding lctrl would exceed 8 keys and also need to change replayManager's serialize (currently 8 keys -> 2 hex chars) ughh
+        if self.timeSinceLastAdvance>=advanceTime then
             self:advanceDialogue(true)
         end
     end
@@ -156,6 +164,9 @@ function DialogueController:update(dt)
 end
 
 function DialogueController:advanceDialogue(isAuto)
+    if self.removing or self.removed then
+        return
+    end
     SFX:play('select',false)
     if isAuto then
         self.timeSinceLastAutoAdvance=0

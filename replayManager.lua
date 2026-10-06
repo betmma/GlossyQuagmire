@@ -70,21 +70,40 @@ local function intTableToHexString(t)
     return table.concat(hexParts)
 end
 
----@param hex string
----@return integer[]
-local function hexStringToIntTable(hex)
+-- Two radix-64 digits per frame. Keep hex digits first so old replay strings
+-- retain their meaning when bits 4..7 are remapped to bits 6..9 in Player.
+-- Hash bytes still use the hexadecimal encoder above.
+local keyAlphabet='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/'
+local keyDigits={}
+for i=1,#keyAlphabet do
+    keyDigits[keyAlphabet:sub(i,i)]=i-1
+end
+
+---@param t integer[]
+---@return string
+local function encodeKeyRecord(t)
+    local parts={}
+    for i,value in ipairs(t) do
+        local high,low=math.floor(value/64),value%64
+        parts[i]=keyAlphabet:sub(high+1,high+1)..keyAlphabet:sub(low+1,low+1)
+    end
+    return table.concat(parts)
+end
+
+---@param encoded string
+---@return integer[]|nil
+local function decodeKeyRecord(encoded)
+    if #encoded%2~=0 then
+        return nil
+    end
     local t = {}
-    local count = 1
-    for i = 1, #hex, 2 do
-        -- Extract two characters
-        local byteString = string.sub(hex, i, i + 1)
-        -- Convert from hex (base 16) to integer
-        local num = tonumber(byteString, 16)
-        
-        if num then
-            t[count] = num
-            count = count + 1
+    for i = 1, #encoded, 2 do
+        local high=keyDigits[encoded:sub(i,i)]
+        local low=keyDigits[encoded:sub(i+1,i+1)]
+        if high==nil or low==nil then
+            return nil
         end
+        t[#t+1]=high*64+low
     end
     return t
 end
@@ -104,7 +123,7 @@ end
 ---@field protected getBasicReplayDataFromCurrentGame fun(self:replayBase): {difficulty: DIFFICULTY, shotType: SHOT_TYPE, time: string, version: string, type: GAME_TYPE} helper function for subclasses
 ---@field protected getBaseHashString fun(self:replayBase, data:replayDataBase): string include common fields in replayData for hash
 ---@field protected getExtraHashString fun(self:replayBase, data:replayDataBase): string subclasses need to override it to include additional fields in the hash
----@field toSaveFormat fun(self: replayBase):table transform to save format, mainly: replace keyRecord with more compact hex strings and add hash value. replayBase.toSaveFormat is only for subclasses with keyRecord in self.data and should not be used on replayBase
+---@field toSaveFormat fun(self: replayBase):table transform to save format, mainly: replace keyRecord with compact radix-64 strings and add hash value. replayBase.toSaveFormat is only for subclasses with keyRecord in self.data and should not be used on replayBase
 ---@field fromSaveFormat fun(self: replayBase, data: table): replayBase|nil takes save format and tries to load. if hash doesnt match returns nil, otherwise returns an instance like new()
 ---@overload fun(data: replayDataBase): replayBase
 local replayBase=Object:extend(true)
@@ -153,20 +172,21 @@ end
 ---@param hashPrefix string
 ---@return string
 function replayBase:transformKeyRecord(keyRecord,hashPrefix)
-    local hexKeyRecord=intTableToHexString(keyRecord)
-    local hashResult=Hash64(hashPrefix..hexKeyRecord)
+    local encodedKeyRecord=encodeKeyRecord(keyRecord)
+    local hashResult=Hash64(hashPrefix..encodedKeyRecord)
     local hashResultString=intTableToHexString(hashResult)
-    return hexKeyRecord..hashResultString
+    return encodedKeyRecord..hashResultString
 end
 
----@param hexKeyRecordWithHash string
+---@param encodedKeyRecordWithHash string
 ---@param hashPrefix string
 ---@return boolean, integer[]
-function replayBase:testSavedKeyRecord(hexKeyRecordWithHash, hashPrefix)
-    local hexKeyRecord,hash=string.sub(hexKeyRecordWithHash,1,-HASH_LENGTH-1),string.sub(hexKeyRecordWithHash,-HASH_LENGTH)
-    local calculatedHash=Hash64(hashPrefix..hexKeyRecord)
+function replayBase:testSavedKeyRecord(encodedKeyRecordWithHash, hashPrefix)
+    local encodedKeyRecord,hash=string.sub(encodedKeyRecordWithHash,1,-HASH_LENGTH-1),string.sub(encodedKeyRecordWithHash,-HASH_LENGTH)
+    local calculatedHash=Hash64(hashPrefix..encodedKeyRecord)
     local calculatedHashString=intTableToHexString(calculatedHash)
-    return calculatedHashString==hash, hexStringToIntTable(hexKeyRecord)
+    local keyRecord=decodeKeyRecord(encodedKeyRecord)
+    return calculatedHashString==hash and keyRecord~=nil, keyRecord or {}
 end
 
 function replayBase:toSaveFormat()

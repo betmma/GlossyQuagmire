@@ -5,6 +5,7 @@ KEYS={
     SELECT='z',
     CANCEL='x',
     SPECIAL='c',
+    SKIP_DIALOGUE='lctrl',
     DIRECTIONS={
         UP='up',
         DOWN='down',

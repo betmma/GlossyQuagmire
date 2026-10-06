@@ -64,7 +64,7 @@ function Player:new(args)
     if self.replaying then
         self:setReplaying()
     end
-    self.key2Value={up=1,right=2,down=4,left=8,lshift=16,z=32,x=64,c=128}
+    self.key2Value={up=1,right=2,down=4,left=8,lctrl=16,lshift=64,z=128,x=256,c=512}
     self.keyIsDown=function(key,deltaFrame)
        return love.keyboard.isDown(key) 
     end
@@ -112,6 +112,10 @@ function Player:update(dt)
 
     if self.keyIsPressed(KEYS.SELECT) then
         EventManager.post(EventManager.EVENTS.PLAYER_PRESS_Z)
+    end
+
+    if self.keyIsDown(KEYS.SKIP_DIALOGUE) then
+        EventManager.post(EventManager.EVENTS.PLAYER_HOLD_DIALOGUE_SKIP)
     end
 
     self.immobileFrame=math.max(0,self.immobileFrame-1)
