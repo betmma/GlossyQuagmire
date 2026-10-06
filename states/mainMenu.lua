@@ -99,7 +99,7 @@ return {
         base.frame=0
     end,
     update=function(self,dt)
-        if isPressed('f3') then
+        if DEV_MODE and isPressed('f3') then
             SFX:play('cancel')
             self.backgroundPattern:randomize()
         end
@@ -111,7 +111,7 @@ return {
         base:drawHierarchy()
     end,
     drawText=function(self)
-        if love.keyboard.isDown('f2') then
+        if DEV_MODE and love.keyboard.isDown('f2') then
             return
         end
         base:drawTextHierarchy()

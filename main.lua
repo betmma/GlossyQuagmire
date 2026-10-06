@@ -1,8 +1,8 @@
-VERSION="0.5.10.2"
+VERSION="0.5.10.3"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
-DEV_MODE=true
+DEV_MODE=not love.filesystem.isFused()
 if arg[2] == "debug" then
     require("lldebugger").start()
 end
@@ -69,7 +69,7 @@ end
 -- return true if current frame is the first frame that key be pressed down
 isPressed=Input.isKeyJustPressed
 
-local profiExists=pcall(require,"profi") -- lib that log functions call and time spent to optimize code
+local profiExists=DEV_MODE and pcall(require,"profi") -- lib that log functions call and time spent to optimize code
 local profi
 if profiExists then
     profi=require"profi"

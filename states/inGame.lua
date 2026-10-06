@@ -196,7 +196,7 @@ return {
     draw=G.CONSTANTS.DRAW,
     drawText=function(self)
         GameObject:drawTextAll()
-        if love.keyboard.isDown('f2') then
+        if DEV_MODE and love.keyboard.isDown('f2') then
             return
         end
         -- if isPressed('escape') then

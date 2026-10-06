@@ -31,6 +31,7 @@ local midboss=BossManager.BossSegment{
                             self.kinematicState.speed=100
                             self:changeSprite(BulletSprites.kunai[self.sprite.data.color])
                             self.safe=false
+                            self.batch=BulletBatch
                         elseif t>0 and t<30 then
                             self.size=self.size*0.97
                         elseif t>100 and t<180 then
@@ -199,6 +200,7 @@ local boss=BossManager.BossSegment{
                             self:changeSprite(BulletSprites.kunai[self.sprite.data.color])
                             self.safe=false
                             self.spriteTransparency=1
+                            self.batch=BulletBatch
                         elseif t>0 and t<30 then
                             self.size=self.size*0.97
                         elseif t>30 and t<100 then
@@ -289,6 +291,7 @@ local boss=BossManager.BossSegment{
                             self:changeSprite(BulletSprites.kunai[self.sprite.data.color])
                             self.safe=false
                             self.spriteTransparency=1
+                            self.batch=BulletBatch
                         elseif t>0 and t<30 then
                             self.size=self.size*0.97
                         elseif t>30 and t<100 then

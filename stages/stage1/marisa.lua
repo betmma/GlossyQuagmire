@@ -81,7 +81,7 @@ local marisaBoss=BossManager.BossSegment{
                             local pos,dir=G.runInfo.geometry:rThetaGo(boss.kinematicState.pos,r1,angle1)
                             bulletSpawner.kinematicState.pos=pos
                             bulletSpawner.angle=dir
-                            if bulletSpawner.frame%120>12 then
+                            if bulletSpawner.frame%150>12 then
                                 bulletSpawner.bulletNumber=0
                             else
                                 bulletSpawner.bulletNumber=3

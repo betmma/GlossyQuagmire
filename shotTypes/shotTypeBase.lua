@@ -721,10 +721,7 @@ local function kotobaSpellcardFunc(playerState, isFocused)
                 local playerShot=PlayerShot{kinematicState={pos=copyTable(bullet.kinematicState.pos), speed=800, dir=dir},sprite=bullet.sprite,size=bullet.size,damage=4,lifeFrame=120,batch=bullet.batch,meshBatch=bullet.meshBatch,extraUpdate={Action.FadeOut(5,false)},forceQuad=bullet.forceQuad,forceMesh=bullet.forceMesh,fromPlayer=true,invincible=true}
                 bullet:remove()
             else
-                local dirTouch=G.runInfo.geometry:to(bullet.kinematicState.pos, self.kinematicState.pos)+math.pi
-                local bulletDir=math.modClamp(bullet.kinematicState.dir,dirTouch)
-                dir=dirTouch*2-bulletDir
-                bullet.kinematicState.dir=dir
+                bullet:remove()
             end
         end}
         reflectShockwave:bindState(G.runInfo.player)
@@ -825,7 +822,7 @@ ShotTypes.KOTOBAB=ShotType{
         fadeIn=false,
         size=1,extraUpdate=function (self)
             if self.frame==0 then
-                self.spriteTransparency=0.2
+                self.spriteTransparency=0.1
             end
             if self.frame==120 then
                 self.spriteTransparency=0.4
@@ -841,6 +838,7 @@ ShotTypes.KOTOBAB=ShotType{
         lifeFrame=600,
         size=1,extraUpdate=function (self)
             if self.frame==30 then
+                self.spriteTransparency=0.1
                 self.kinematicState.speed=0
             end
         end

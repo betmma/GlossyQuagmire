@@ -51,16 +51,17 @@ local function lightOrbSpawner(ball,sign,i,num,geo,sentry,angle,bulletLifeFrame,
     end}}
 end
 
+local function getBossSpawnPos(self)
+    local geo=G.runInfo.geometry
+    local playerPos=G.runInfo.player.kinematicState.pos
+    local pos,dir=geo:rThetaGo(playerPos,280*math.pi,0)
+    return {x=pos.x,y=200}
+end
 local boss=BossManager.BossSegment{
     bossName='tatsu',
     key='5-boss',
     BGM='level5b',
-    getBossSpawnPos=function(self)
-        local geo=G.runInfo.geometry
-        local playerPos=G.runInfo.player.kinematicState.pos
-        local pos,dir=geo:rThetaGo(playerPos,280*math.pi,0)
-        return {x=pos.x,y=200}
-    end,
+    getBossSpawnPos=getBossSpawnPos,
     bossSpawnCallback=function (self, boss)
         boss.any={getBall=getBall}
     end,
@@ -114,6 +115,7 @@ local boss=BossManager.BossSegment{
                                 sentry.any.flag=true
                             end
                         end}
+                        DanmakuFuncs.moveToInTime(boss,getBossSpawnPos(),120,Event.sineOProgressFunc)
                         wait(360)
                         sentry.any.flag=false
                     end
@@ -164,6 +166,7 @@ local boss=BossManager.BossSegment{
                                 sentry.any.flag=true
                             end
                         end}
+                        DanmakuFuncs.moveToInTime(boss,getBossSpawnPos(),120,Event.sineOProgressFunc)
                         wait(360)
                         sentry.any.flag=false
                     end
@@ -213,6 +216,7 @@ local boss=BossManager.BossSegment{
                                 sentry.any.flag=true
                             end
                         end}
+                        DanmakuFuncs.moveToInTime(boss,getBossSpawnPos(),120,Event.sineOProgressFunc)
                         wait(300)
                         sentry.any.flag=false
                     end
