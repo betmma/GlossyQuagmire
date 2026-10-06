@@ -139,6 +139,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
                 key='1-boss-kotoba-non-1',
                 time=1500,
                 hp=2000,
+                --- hyperbolic geometry's update changes estimation / precise at speed=300. this non's bullet speed increases from below 300 to above it, so there's discontinuity. i don't know how to fix it 
                 func=function(self, boss)
                     addFollow(boss)
                     for j=1,6 do

@@ -62,6 +62,7 @@ G={
             'NORMAL',
             'HARD',
             'LUNATIC',
+            -- 'OVERDRIVE', -- this is just for fun, not an official difficulty. DSWITCH can guess the value for overdrive, though spells with difficulty condition (like shouji's gate spells) will be skipped. it's quite good, few impossible or broken danmaku and palpable difficulty increase.
             'EXTRA',
         },
         ---@type {DIFFICULTY: {value: string, shortForm: string, color:rgbaColor}}
@@ -70,6 +71,7 @@ G={
             NORMAL={value='NORMAL',shortForm='N',color={0.5,0.5,1,1}},
             HARD={value='HARD',shortForm='H',color={0.25,0.25,1,1}},
             LUNATIC={value='LUNATIC',shortForm='L',color={0.9,0,0.9,1}},
+            OVERDRIVE={value='OVERDRIVE',shortForm='Od',color={0.9,0,0,1}},
             EXTRA={value='EXTRA',shortForm='Ex',color={1,0.1,0.1,1}},
         },
         REGULAR_DIFFICULTIES={ -- shown in game start menu
@@ -77,6 +79,7 @@ G={
             'NORMAL',
             'HARD',
             'LUNATIC',
+            -- 'OVERDRIVE'
         },
         EXTRA_DIFFICULTIES={
             'EXTRA',
@@ -144,12 +147,17 @@ G={
 G.CONSTANTS.STAGE_TO_DIFFICULTIES={}
 for i, difficulty in ipairs(G.CONSTANTS.DIFFICULTIES) do
     local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[difficulty]
+    if not stages then
+        G.CONSTANTS.DIFFICULTIES_TO_STAGES[difficulty]=normalStageOrder
+        stages=normalStageOrder
+    end
     for _, stage in ipairs(stages) do
         if not G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage] then
             G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage] = {}
         end
         table.insert(G.CONSTANTS.STAGE_TO_DIFFICULTIES[stage], difficulty)
     end
+    G.CONSTANTS.DIFFICULTIES_TO_CONTINUES[difficulty]=G.CONSTANTS.DIFFICULTIES_TO_CONTINUES[difficulty] or G.CONSTANTS.DIFFICULTIES_TO_CONTINUES.EASY
 end
 ---@type table<PLAYER, SHOT_TYPE[]>
 G.CONSTANTS.PLAYER_TO_SHOT_TYPES={}
@@ -534,7 +542,11 @@ G={
     }
 }
 
-for i,difficulty in ipairs(G.CONSTANTS.DIFFICULTIES) do
+for i,difficulty in ipairs(G.CONSTANTS.REGULAR_DIFFICULTIES) do
+    G[difficulty]=i
+end
+
+for i,difficulty in ipairs(G.CONSTANTS.EXTRA_DIFFICULTIES) do
     G[difficulty]=i
 end
 

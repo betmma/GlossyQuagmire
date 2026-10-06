@@ -485,10 +485,19 @@ end
 ---@alias ENHLValue number|'<'|'>'
 ---@param ENHLValues {[1]:ENHLValue, [2]:ENHLValue, [3]:ENHLValue, [4]:ENHLValue} normal use: 4 elements mapping to easy normal hard lunatic. '<' means refering to the value of the previous difficulty, and '>' means refering to the next difficulty. 
 ---@return number
-DSWITCH=function(ENHLValues)
-    local diff=DIFF()
+DSWITCH=function(ENHLValues,diff)
+    diff=diff or DIFF()
     local count=0
     local value=ENHLValues[diff]
+    if not value then -- guess the value
+        local v1=DSWITCH(ENHLValues,G.HARD)
+        local v2=DSWITCH(ENHLValues,G.LUNATIC)
+        local guess=math.interpolate(v1,v2,(diff-G.HARD)/(G.LUNATIC-G.HARD))
+        if math.sign(guess)==math.sign(v2) then
+            return guess
+        end
+        return v2
+    end
     while value=='<' or value=='>' do
         count=count+1
         if count>#ENHLValues then

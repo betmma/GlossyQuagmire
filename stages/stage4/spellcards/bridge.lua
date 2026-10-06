@@ -18,7 +18,7 @@ return BossManager.SpellcardPhase{
         local posr,dirr=geo:rThetaGoRef(posp,width,dir0)
         local posl,dirl=geo:rThetaGoRef(posp,-width,dir0)
         local colors={'blue','orange','red','purple'}
-        local color=colors[DSWITCH{1,2,3,4}]
+        local color=colors[DSWITCH{1,2,3,4}] or 'black'
         -- flame walls and portals
         local offsets={{y=0,size=0},{y=0,size=0}}
         local function getSeg(side)

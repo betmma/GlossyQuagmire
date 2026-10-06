@@ -697,6 +697,20 @@ return {
                         zh_cn = '蝃蝀在东，莫之敢指',
                     },
                 },
+                OVERDRIVE = {
+                    title = {
+                        en_us = 'Glitch Level',
+                        zh_cn = '故障级'
+                    },
+                    plainName = {
+                        en_us = 'OVERDRIVE MODE',
+                        zh_cn = 'OVERDRIVE MODE',
+                    },
+                    description = {
+                        en_us = 'For test.',
+                        zh_cn = '测试用'
+                    }
+                },
                 EXTRA = {
                     title = {
                         en_us = 'Pearl Level',
@@ -1212,6 +1226,12 @@ return {
                     name = {
                         en_us = '4-Boss',
                         zh_cn = '4-Boss',
+                    }
+                },
+                ['5-boss'] = {
+                    name = {
+                        en_us = '5-Boss',
+                        zh_cn = '5-Boss',
                     }
                 },
             }
