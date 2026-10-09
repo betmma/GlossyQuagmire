@@ -96,6 +96,7 @@ return {
     enter=function(self)
         self:replaceBackgroundPatternIfNot(BackgroundPattern.MainMenuTesselation)
         BGM:play('title')
+        Asset.titleImage:set()
         base.frame=0
     end,
     update=function(self,dt)

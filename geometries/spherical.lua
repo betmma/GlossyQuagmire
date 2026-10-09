@@ -456,6 +456,10 @@ function Spherical:canSimpleDraw(position, radius)
     return false, sides
 end
 
+function Spherical:applyVertexShader()
+    -- do nothing. the geometry base performs a flat translation that is not needed
+end
+
 Spherical.sphericalShader = ShaderScan:load_shader("shaders/sphericalDual.glsl")
 
 Spherical.hasPixelShader = true
