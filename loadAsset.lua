@@ -464,7 +464,7 @@ for i,batch in pairs(Asset.BatchesList) do
 end
 local isHighlightBatch={}
 isHighlightBatch[Asset.playerBulletMeshes]=true
-isHighlightBatch[Asset.playerBulletBatch]=true
+-- isHighlightBatch[Asset.playerBulletBatch]=true
 isHighlightBatch[Asset.bigBulletMeshes]=true
 isHighlightBatch[Asset.bulletHighlightBatch]=true
 isHighlightBatch[Asset.laserMeshes]=true

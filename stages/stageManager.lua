@@ -493,7 +493,7 @@ DSWITCH=function(ENHLValues,diff)
         local v1=DSWITCH(ENHLValues,G.HARD)
         local v2=DSWITCH(ENHLValues,G.LUNATIC)
         local guess=math.interpolate(v1,v2,(diff-G.HARD)/(G.LUNATIC-G.HARD))
-        if math.sign(guess)==math.sign(v2) then
+        if math.sign(guess)==math.sign(v2) then -- prevent being 0 or flipped sign
             return guess
         end
         return v2

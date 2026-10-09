@@ -1,8 +1,8 @@
-VERSION="0.5.11"
+VERSION="0.6.0"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
-DEV_MODE=not love.filesystem.isFused()
+-- DEV_MODE=not love.filesystem.isFused()
 if arg[2] == "debug" then
     require("lldebugger").start()
 end

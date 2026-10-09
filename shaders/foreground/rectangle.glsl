@@ -28,7 +28,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
     dist=min(dist,distance(screen_coords,xywh.xy+vec2(0.0,xywh.w)));
     dist=min(dist,distance(screen_coords,xywh.xy+vec2(xywh.z,xywh.w)));
     if(dist <= edge) {
-        white=1.0-smoothstep(0,edge,dist);
+        white=1.0-smoothstep(0.0,edge,dist);
         white=white*0.5;
     }
 

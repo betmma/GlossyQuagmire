@@ -17,7 +17,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
         alpha = 0.0; // Fully transparent inside the circle and outside innerRadius
     }
     if(dist <= radius+edge){
-        white=1.0-smoothstep(0,edge,dist-radius);
+        white=1.0-smoothstep(0.0,edge,dist-radius);
         white=white*0.5;
     }
 

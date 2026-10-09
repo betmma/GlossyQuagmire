@@ -16,14 +16,14 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
     if(dist <= radius) {
         alpha = 0.0; // Fully transparent inside the circle
     }else if(dist <= radius+edge){
-        white=1.0-smoothstep(0,edge,dist-radius);
+        white=1.0-smoothstep(0.0,edge,dist-radius);
     }
 
     float dist2 = distance(screen_coords, centerXY2);
     if(dist2 <= radius2) {
         alpha = 0.0; // Fully transparent inside the second circle
     }else if(dist2 <= radius2+edge){
-        white=1.0-smoothstep(0,edge,dist2-radius2);
+        white=1.0-smoothstep(0.0,edge,dist2-radius2);
     }
     white=white*0.5;
     
