@@ -82,7 +82,7 @@ function Bullet:new(args)
     self.forceMesh=args.forceMesh or false
     self.spriteTransparency=args.spriteTransparency or 1
 
-    self.spriteExtraDirection=0
+    self.spriteExtraDirection=args.spriteExtraDirection or 0
     self.spriteRotationSpeed=0 -- used for nuke bullet
 
     if not self.sprite then

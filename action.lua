@@ -189,8 +189,9 @@ local trail=function(self,params)
     local lifeFrame=params.lifeFrame or 30
     local period=params.period or 2
     local minimumSpeed=params.minimumSpeed or 0
+    local transparency=params.transparency or self.spriteTransparency
     if self.frame%period==0 and self.kinematicState.speed >= minimumSpeed then
-        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=self.spriteTransparency,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,invincible=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
+        Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=self.kinematicState.dir,speed=0},sprite=self.sprite,size=self.size,batch=self.batch,spriteTransparency=transparency,spriteExtraDirection=self.spriteExtraDirection,forceQuad=self.forceQuad,lifeFrame=lifeFrame,spriteColor=self.spriteColor,safe=true,invincible=true,extraUpdate={Action.FadeOut(lifeFrame,false),Action.ZoomOut(lifeFrame)}}
     end
 end
 
@@ -198,8 +199,9 @@ end
 --- @param lifeFrame integer|nil number of frames for the trail bullets to fade out and shrink, default 30
 --- @param period integer|nil how many frames between each trail bullet, default 2
 --- @param minimumSpeed number|nil minimum speed for the trail bullets, default 0. if bullet speed is below this, no trail bullet will be created.
-Action.Trail=function(lifeFrame,period,minimumSpeed)
-    return {isAction=true,params={lifeFrame=lifeFrame,period=period,minimumSpeed=minimumSpeed},func=trail}
+--- @param transparency number|nil the initial transparency of trail bullets
+Action.Trail=function(lifeFrame,period,minimumSpeed,transparency)
+    return {isAction=true,params={lifeFrame=lifeFrame,period=period,minimumSpeed=minimumSpeed,transparency=transparency},func=trail}
 end
 
 local aimAt=function(self,params)

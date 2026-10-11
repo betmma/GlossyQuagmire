@@ -33,6 +33,7 @@ function BulletSpawner:new(args)
     -- when spawning bullets, spawn a fog that turns into bullet sometime later
     self.fogEffect=args.fogEffect or false
     self.fogTime=args.fogTime or 60
+    self.spawnSFX=args.spawnSFX or 'enemyShot'
     self.spawnSFXVolume=args.spawnSFXVolume -- nil means default volume set in audio.lua (50%)
     self.spawnTimes=0
     self.spawnBulletFunc=args.spawnBulletFunc or function(self,_args)
@@ -72,7 +73,7 @@ function BulletSpawner:new(args)
     end
     self.spawnBatchFunc=args.spawnBatchFunc or function(self)
         ---@cast self BulletSpawner
-        SFX:play('enemyShot',true,self.spawnSFXVolume)
+        SFX:play(self.spawnSFX,true,self.spawnSFXVolume)
         local num=math.eval(self.bulletNumber)
         local range=math.eval(self.range)
         local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos) or (math.eval(self.angle)+(self.useRelativeAngle and self.kinematicState.dir or 0))

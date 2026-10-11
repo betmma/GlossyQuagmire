@@ -142,9 +142,13 @@ function SmoothAudioSystem:update()
 end
 
 ---@type AudioSystem
-local sfx=AudioSystem{folder='sfx',fileSuffix='.wav',fileNames={'select','graze','damage','playerHit','kill','cancel','timeout','enemyShot','enemyCharge','enemyPowerfulShot','start.mp3','stop.mp3','hit','hit2','koto.mp3','sticky.mp3','notice.mp3','extend.mp3'},volumeCoeff=0.35,defaultRestart=true}
+local sfx=AudioSystem{folder='sfx',fileSuffix='.wav',fileNames={'select','graze','damage','playerHit','kill','cancel','timeout','enemyShot','enemyShot2','enemyShot3','enemyShot4','sparkleShot','enemyCharge','enemyPowerfulShot','start.mp3','stop.mp3','hit','hit2','koto.mp3','sticky.mp3','notice.mp3','extend.mp3'},volumeCoeff=0.35,defaultRestart=true}
 --[[ start and stop are used for izayoi's time stop effects. start should be played 30 frames before time stop starts, and stop should be played 20 frames before time stop ends. ]]
 sfx:setAudioVolume('enemyShot',3)
+sfx:setAudioVolume('enemyShot2',3)
+sfx:setAudioVolume('enemyShot3',3)
+sfx:setAudioVolume('enemyShot4',3)
+sfx:setAudioVolume('sparkleShot',3)
 sfx:setAudioVolume('enemyCharge',0.6)
 sfx:setAudioVolume('enemyPowerfulShot',0.6)
 sfx:setAudioVolume('start',3)
@@ -153,7 +157,7 @@ sfx:setAudioVolume('notice',3)
 sfx:setAudioVolume('cancel',2)
 sfx:setAudioVolume('extend',2)
 ---@type SmoothAudioSystem
-local bgm=SmoothAudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level1b','level1c','level2','level2b','level3','level3b','level4','level4b','level5','level5b','score'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level2b',loadType='stream',defaultRestart=false}
+local bgm=SmoothAudioSystem{folder='bgm',fileSuffix='.mp3',fileNames={'title','level1','level1b','level1c','level2','level2b','level3','level3b','level4','level4b','level5','level5b','score'},volumeCoeff=1,looping=true,unique=true,defaultAudio='level5',loadType='stream',defaultRestart=false}
 --- @type {sfx:AudioSystem,bgm:SmoothAudioSystem}
 local Audio={
     sfx=sfx,

@@ -427,6 +427,21 @@ return {
                 }
             }
         },
+        ['enri-wind'] = {
+            EASY = {
+                name = {
+                    en_us = 'Heaven Wind "Eye of the Wandering Typhoon"',
+                    zh_cn = '天风「彷徨飓风之眼」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Heaven Wind "Circulating Gale of the Nine Skies"',
+                    zh_cn = '天风「九天周流之烈风」'
+                }
+            }
+        }
     },
     levelData = {
     },
@@ -511,6 +526,16 @@ return {
             name = {
                 en_us = 'Tatsu Zuiun',
                 zh_cn = '瑞云辰'
+            },
+            nickname = {
+                en_us = '',
+                zh_cn = ''
+            }
+        },
+        enri = {
+            name = {
+                en_us = 'Enri Tengai',
+                zh_cn = '天盖艳离'
             },
             nickname = {
                 en_us = '',
@@ -1058,7 +1083,7 @@ return {
                         zh_cn = '青云直上，以管窥天',
                     },
                     small = {
-                        en_us = 'STAGE 5   Rise to the Sky',
+                        en_us = 'STAGE 5   Invisible Tube',
                         zh_cn = 'STAGE 5   紧急升空',
                     }
                 },
@@ -1595,6 +1620,16 @@ return {
             description = {
                 en_us = 'Tatsu Zuiun\'s theme.\nShe is a playful cloud youkai imitating a dragon, so I added many funny parts into the theme. Stage 5 title and spellcards already repeated "sky" "cloud" and "dragon" many times, so the theme\'s title uses other elements. The title is too long to add a secondary part.',
                 zh_cn = '瑞云辰的主题曲。\n她是贪玩的云妖怪，扮成龙的样子，所以我在曲子中加了很多滑稽的片段。因为五面标题和她的符卡名重复太多次“天”“云”“龙”，此曲的标题就只能用其它元素了。考虑到翻译过去的英文名已经很长，没有加副标题。',
+            }
+        },
+        level6 = {
+            name = {
+                en_us = 'Lunatic Cosmic Ray',
+                zh_cn = '疯狂宇宙射线'
+            },
+            description = {
+                en_us = 'Stage 6\'s theme.\nSomeone says the OST isn\'t uncanny enough, so varying tempo here. A segment that accelerates infinitely, and a segment that both accelerates and decelerates. How many touhou fangames have set the final stage in space?',
+                zh_cn = '第六面的主题曲。\n还有人说OST不够奇异，那就上变化的节奏。无限加速，以及同时加速和减速。有多少东方同人游戏把最终面设计成宇宙背景？'
             }
         },
         score = {
