@@ -450,9 +450,9 @@ end
 function Spherical:canSimpleDraw(position, radius)
     local ratio = radius / Spherical.radius
     if ratio < 0.08 then
-        return true, 8
+        return true, 6
     end
-    local sides = math.clamp(math.ceil(ratio * GeometryBase.MESH_MAX_SIDES), 8, GeometryBase.MESH_MAX_SIDES)
+    local sides = math.clamp(math.ceil(ratio * GeometryBase.MESH_MAX_SIDES/3), 6, GeometryBase.MESH_MAX_SIDES)
     return false, sides
 end
 

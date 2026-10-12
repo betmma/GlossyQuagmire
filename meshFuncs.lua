@@ -276,7 +276,7 @@ function MeshFuncs.twoRaysMesh(rays,quad,color,meshBatch,budget)
         return step*i
     end
     local geometry=G.runInfo.geometry
-    if geometry==G.geometries.Spherical then
+    if geometry==G.geometries.Spherical and step==0 then
         ---@cast geometry Spherical
         local perimeter=math.pi*2*geometry.radius
         step=perimeter/num

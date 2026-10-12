@@ -430,8 +430,8 @@ return {
         ['enri-wind'] = {
             EASY = {
                 name = {
-                    en_us = 'Heaven Wind "Eye of the Wandering Typhoon"',
-                    zh_cn = '天风「彷徨飓风之眼」'
+                    en_us = 'Heaven Wind "Wandering Typhoon"',
+                    zh_cn = '天风「彷徨飓风」'
                 }
             },
             NORMAL = '@ref:EASY',
@@ -439,6 +439,21 @@ return {
                 name = {
                     en_us = 'Heaven Wind "Circulating Gale of the Nine Skies"',
                     zh_cn = '天风「九天周流之烈风」'
+                }
+            }
+        },
+        ['enri-galaxy'] = {
+            EASY = {
+                name = {
+                    en_us = 'Celestial Phenomena "The Ring Nebula"',
+                    zh_cn = '天象「环状星云」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Celestial Phenomena "Eye of the Cold Cosmos"',
+                    zh_cn = '天象「冷酷宇宙之眼」'
                 }
             }
         }

@@ -21,12 +21,13 @@ local boss=BossManager.BossSegment{
             BossManager.NonSpellPhase{
                 key='6-boss-enri-non-1',
                 time=1800,
-                hp=2000,
+                hp=4000,
                 func=function(self, boss)
-                    local geo=G.runInfo.geometry
+                    
                 end
             },
-            require('stages.stage6.spellcards.wind')
+            require('stages.stage6.spellcards.wind'),
+            require('stages.stage6.spellcards.galaxy'),
         }},
     }
 }
