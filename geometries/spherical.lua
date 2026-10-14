@@ -6,9 +6,7 @@ local GeometryBase = ...
 ---@field radius number
 
 ---@class SphericalViewConfig:ViewConfig
----@field sourceCircleRadius number projection radius used by toScreen, independent from final display circles.
----@field sourceCutoffZ number cutoff for toScreen/source projection generation.
----@field shaderCutoffZ number cutoff passed to shader for final keep/remap. 0 means each circle contains a hemisphere. larger value means more overlap.
+---@field sourceCutoffZ number overlap for drawing sprites whose centers are beyond the hemisphere rim.
 ---@field sourcePrimaryCenter ScreenPosition
 ---@field sourceSecondaryCenter ScreenPosition
 ---@field primaryCircle SphericalCircleConfig
@@ -20,36 +18,40 @@ local Spherical = GeometryBase:extend()
 
 Spherical.radius = 220
 Spherical.EPS = 1e-8
-Spherical.CANVAS_WIDTH, Spherical.CANVAS_HEIGHT = 3000, 1500
+local mainRadius = WINDOW_HEIGHT * 7/15
+local miniRadius = WINDOW_HEIGHT * 0.16
+Spherical.CANVAS_WIDTH = math.ceil(4 * (mainRadius + miniRadius))
+Spherical.CANVAS_HEIGHT = WINDOW_HEIGHT
 local CANVAS_WIDTH, CANVAS_HEIGHT = Spherical.CANVAS_WIDTH, Spherical.CANVAS_HEIGHT
 Spherical.canvas=love.graphics.newCanvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 local CUTOFF_Z = math.sqrt(0.5) -- 45 deg latitude on a unit sphere.
-local sourceR=CANVAS_WIDTH/4
 ---@type SphericalViewConfig
 Spherical.viewConfig = {
     following = true,
     screenCenter = { x = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 40, y = WINDOW_HEIGHT / 2 },
-    sourceCircleRadius = sourceR,
     sourceCutoffZ = CUTOFF_Z,
-    shaderCutoffZ = 0,
-    sourcePrimaryCenter = { x = sourceR, y = sourceR },
-    sourceSecondaryCenter = { x = sourceR * 3, y = sourceR },
+    sourcePrimaryCenter = { x = mainRadius, y = CANVAS_HEIGHT / 2 },
+    sourceSecondaryCenter = { x = CANVAS_WIDTH - miniRadius, y = CANVAS_HEIGHT / 2 },
     primaryCircle = {
         center = { x = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 40, y = WINDOW_HEIGHT / 2 },
-        radius = WINDOW_HEIGHT * 7/15,
+        radius = mainRadius,
     },
     secondaryCircle = {
         center = { x = WINDOW_WIDTH * 0.8, y = WINDOW_HEIGHT * 0.8 },
-        radius = WINDOW_HEIGHT * 0.16,
+        radius = miniRadius,
     },
     rotateSpeed=0,
 }
 
-local function source_hemisphere_radius_pixels()
-    local c = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
-    local sourceLimit = (2 * Spherical.radius * math.sqrt(1 - c * c)) / (1 - c)
-    local hemisphereLimit = 2 * Spherical.radius
-    return Spherical.viewConfig.sourceCircleRadius * hemisphereLimit / sourceLimit
+-- Rows of the world-to-camera rotation. This default matches the old shader
+-- with latitude, longitude, and view direction all zero (following disabled).
+local camera = { 0, 1, 0, 0, 0, 1, 1, 0, 0 }
+
+local function world_to_camera(x, y, z)
+    return
+        camera[1] * x + camera[2] * y + camera[3] * z,
+        camera[4] * x + camera[5] * y + camera[6] * z,
+        camera[7] * x + camera[8] * y + camera[9] * z
 end
 
 local function tangent_basis(ux, uy, uz)
@@ -57,15 +59,9 @@ local function tangent_basis(ux, uy, uz)
     local eastY = ux
     local eastZ = 0
     local eastLen = math.sqrt(eastX * eastX + eastY * eastY + eastZ * eastZ)
-    if eastLen < Spherical.EPS then
-        eastX = 1
-        eastY = 0
-        eastZ = 0
-    else
-        eastX = eastX / eastLen
-        eastY = eastY / eastLen
-        eastZ = eastZ / eastLen
-    end
+    eastX = eastX / eastLen
+    eastY = eastY / eastLen
+    eastZ = eastZ / eastLen
 
     local northX = uy * eastZ - uz * eastY
     local northY = uz * eastX - ux * eastZ
@@ -76,6 +72,30 @@ local function tangent_basis(ux, uy, uz)
     northZ = northZ / northLen
 
     return eastX, eastY, eastZ, northX, northY, northZ
+end
+
+function Spherical:enterPhase(phase)
+    if phase ~= 'draw' then
+        return
+    end
+
+    -- Called by G.draw before objects add their vertices to the batches.
+    local fx, fy, fz, direction = 1, 0, 0, 0
+    local viewer = G.runInfo.player
+    if self.viewConfig.following and viewer then
+        local pos = viewer.kinematicState.pos
+        local invLen = 1 / math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
+        fx, fy, fz = pos.x * invLen, pos.y * invLen, pos.z * invLen
+        direction = viewer.viewDirection
+    end
+
+    local ex, ey, ez, nx, ny, nz = tangent_basis(fx, fy, fz)
+    local c, s = math.cos(direction), math.sin(direction)
+    ex, ey, ez = ex * c + nx * s, ey * c + ny * s, ez * c + nz * s
+    nx, ny, nz = fy * ez - fz * ey, fz * ex - fx * ez, fx * ey - fy * ex
+    camera[1], camera[2], camera[3] = ex, ey, ez
+    camera[4], camera[5], camera[6] = nx, ny, nz
+    camera[7], camera[8], camera[9] = fx, fy, fz
 end
 
 local function direction_to_tangent(ux, uy, uz, direction)
@@ -410,37 +430,41 @@ function Spherical:toScreen(position)
     local ux = position.x / posLen
     local uy = position.y / posLen
     local uz = position.z / posLen
+    -- Rotate world east along with the center to preserve the sprite's heading.
+    -- Its length does not matter when finding the projected angle.
+    local tx, ty, tz = -uy, ux, 0
+    tx, ty, tz = world_to_camera(tx, ty, tz)
+    ux, uy, uz = world_to_camera(ux, uy, uz)
     ---@type (Dummy|ScreenPosition)[]
     local ret = { GeometryBase.Dummy, GeometryBase.Dummy }
-    local sourceCutoff = math.clamp(Spherical.viewConfig.sourceCutoffZ, 0, 0.999999)
-    -- Scale stereographic coordinates so the cutoff latitude lands on the source circle.
-    local sourceLimitR = (2 * Spherical.radius * math.sqrt(1 - sourceCutoff * sourceCutoff)) / (1 - sourceCutoff)
-    local sourceScale = Spherical.viewConfig.sourceCircleRadius / sourceLimitR
+    local sourceCutoff = Spherical.viewConfig.sourceCutoffZ
 
-    -- Primary map: project from viewer (north pole), cover 45N to 90S.
-    if uz <= sourceCutoff then
-        local k = (2 * Spherical.radius) / (1 - uz)
-        local px = k * ux
-        local py = k * uy
+    -- Main circle: forward hemisphere, projected from the camera's south pole.
+    -- The hemisphere rim has exactly the foreground circle's pixel radius.
+    if uz >= -sourceCutoff then
+        local denom = 1 + uz
+        local px, py = ux / denom, uy / denom
+        local radius = Spherical.viewConfig.primaryCircle.radius
         local center = Spherical.viewConfig.sourcePrimaryCenter
         ret[1] = {
-            x = center.x + px * sourceScale,
-            y = center.y + py * sourceScale,
-            rotation = -math.atan2(py, px) + math.pi / 2,
-            flip = true,
+            x = center.x + px * radius,
+            y = center.y + py * radius,
+            rotation = math.atan2(ty - py * tz, tx - px * tz),
         }
     end
 
-    -- Secondary map: project from south pole, cover 90N to 45S.
-    if uz >= -sourceCutoff then
-        local k = (2 * Spherical.radius) / (1 + uz)
-        local px = k * ux
-        local py = k * uy
+    -- Mini circle: opposite hemisphere, projected from the camera's north pole.
+    if uz <= sourceCutoff then
+        local denom = 1 - uz
+        local px, py = ux / denom, uy / denom
+        local radius = Spherical.viewConfig.secondaryCircle.radius
         local center = Spherical.viewConfig.sourceSecondaryCenter
         ret[2] = {
-            x = center.x + px * sourceScale,
-            y = center.y + py * sourceScale,
-            rotation = math.atan2(py, px) + math.pi / 2,
+            x = center.x + px * radius,
+            y = center.y + py * radius,
+            -- Shape.drawQuad negates both rotation and X scale for a flip.
+            rotation = math.pi - math.atan2(ty + py * tz, tx + px * tz),
+            flip = true,
         }
     end
 
@@ -449,7 +473,7 @@ end
 
 function Spherical:canSimpleDraw(position, radius)
     local ratio = radius / Spherical.radius
-    if ratio < 0.08 then
+    if ratio < 0.2 then
         return true, 6
     end
     local sides = math.clamp(math.ceil(ratio * GeometryBase.MESH_MAX_SIDES/3), 6, GeometryBase.MESH_MAX_SIDES)
@@ -476,7 +500,6 @@ function Spherical:applyPixelShader(viewer)
         Spherical.viewConfig.sourceSecondaryCenter.x,
         Spherical.viewConfig.sourceSecondaryCenter.y,
     })
-    shader:send("source_hemisphere_radius", source_hemisphere_radius_pixels())
 
     shader:send("main_center", {
         Spherical.viewConfig.primaryCircle.center.x,
@@ -488,20 +511,7 @@ function Spherical:applyPixelShader(viewer)
         Spherical.viewConfig.secondaryCircle.center.y,
     })
     shader:send("mini_radius", Spherical.viewConfig.secondaryCircle.radius)
-    shader:send("cutoff_z", math.clamp(Spherical.viewConfig.shaderCutoffZ, 0, 0.999999))
     shader:send("canvas_size",{CANVAS_WIDTH,CANVAS_HEIGHT})
-
-    local viewerLat, viewerLon = 0.0, 0.0
-    local viewDirection = 0.0
-    if Spherical.viewConfig.following then
-        local pos = viewer.kinematicState.pos
-        local posLen = math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
-        viewerLat = math.asin(math.clamp(pos.z / posLen, -1, 1))
-        viewerLon = math.atan2(pos.y / posLen, pos.x / posLen)
-        viewDirection = viewer.viewDirection
-    end
-    shader:send("viewer_view_direction", viewDirection)
-    shader:send("viewer_lat_lon", { viewerLat, viewerLon })
 end
 
 function Spherical:applyForegroundShader()
@@ -510,23 +520,16 @@ end
 
 function Spherical:zoomFactorToScreen(position)
     local posLen = math.sqrt(position.x * position.x + position.y * position.y + position.z * position.z)
-    local uz = position.z / posLen
+    local uz = (camera[7] * position.x + camera[8] * position.y + camera[9] * position.z) / posLen
     local factors = { 0, 0 }
     local sourceCutoff = Spherical.viewConfig.sourceCutoffZ
-    -- Match toScreen's source-circle scaling, then apply the local stereographic derivative.
-    local c = math.clamp(sourceCutoff, 0, 0.999999)
-    local sourceLimitR = (2 * Spherical.radius * math.sqrt(1 - c * c)) / (1 - c)
-
-    if uz <= sourceCutoff then
-        local denom = 1 - uz
-        local stereoScale = (2 * Spherical.radius) / denom
-        factors[1] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.sourceCircleRadius / sourceLimitR)
-    end
 
     if uz >= -sourceCutoff then
-        local denom = 1 + uz
-        local stereoScale = (2 * Spherical.radius) / denom
-        factors[2] = (stereoScale / Spherical.radius) * (Spherical.viewConfig.sourceCircleRadius / sourceLimitR)
+        factors[1] = Spherical.viewConfig.primaryCircle.radius / (Spherical.radius * (1 + uz))
+    end
+
+    if uz <= sourceCutoff then
+        factors[2] = Spherical.viewConfig.secondaryCircle.radius / (Spherical.radius * (1 - uz))
     end
 
     return factors

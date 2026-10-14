@@ -1274,6 +1274,12 @@ return {
                         zh_cn = '5-Boss',
                     }
                 },
+                ['6-boss'] = {
+                    name = {
+                        en_us = '6-Boss',
+                        zh_cn = '6-Boss',
+                    }
+                },
             }
         },
         SPELL_PRACTICE = {

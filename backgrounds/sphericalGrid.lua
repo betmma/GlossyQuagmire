@@ -1,4 +1,5 @@
 -- a crude spherical grid background pattern for spherical geometry.
+-- it's deprecated as stage 6 will have a real background. after spherical geometry rendering is rewritten and this is not updated it would be inaccurate. previously toScreen simply draws northern and southern hemisphere at two source circles, so this background can draw static pattern that gets rotated later by the pixel shader. now toScreen already considers following view the pixel shader only transforms two circles to foreground position.
 
 local BackgroundPattern=...
 

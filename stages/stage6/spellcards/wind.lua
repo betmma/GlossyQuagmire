@@ -46,7 +46,7 @@ return BossManager.SpellcardPhase{
                 local pos=self.kinematicState.pos
                 local distance=geo:distance(pos,G.runInfo.player.kinematicState.pos)
                 distance=math.min(distance,geo:distance(pos,boss.kinematicState.pos))
-                self.spriteTransparency=math.clamp(distance/100*0.1-0.1,0,0.3)
+                self.spriteTransparency=math.clamp(distance/100*0.5-0.5,0,0.7)
             end
             for i=1,n do
                 local angle=(i*goldenAngle*sign)%math.pi*2
@@ -59,7 +59,7 @@ return BossManager.SpellcardPhase{
                 local finalSpeed=(radius*math.pi-distance)*60/stopTime*2 -- remaining distance
                 local bullet=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),dir=angle,speed=initSpeed},lifeFrame=life,sprite=sprite,extraUpdate=extraUpdate,highlight=true,size=1.5,forceQuad=true}
                 bullet.any={speed=finalSpeed,initStopTime=initStopTime}
-                local fog=Bullet{safe=true,highlight=true,spriteTransparency=0.1,sprite=BulletSprites.explosion.gray,lifeFrame=life,extraUpdate=fogUpdate,forceQuad=true,size=1}:bindState(bullet)
+                local fog=Bullet{safe=true,highlight=true,spriteTransparency=0,sprite=BulletSprites.darkLotus.gray,lifeFrame=life,extraUpdate=fogUpdate,forceQuad=true,size=2.5}:bindState(bullet)
             end
             Event{obj=pole,action=function()
                 wait(stopTime)
