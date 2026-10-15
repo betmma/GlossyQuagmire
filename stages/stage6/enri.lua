@@ -8,7 +8,7 @@ end
 local boss=BossManager.BossSegment{
     bossName='enri',
     key='6-boss',
-    -- BGM='level6b',
+    BGM='level6b',
     getBossSpawnPos=getBossSpawnPos,
     -- beforeDialogueKey=function ()
     --     return G.runInfo.playerType..'S6BossBefore'
@@ -81,6 +81,7 @@ local boss=BossManager.BossSegment{
                         end
                     end}
                     local function flower(pos,dir,speed)
+                        SFX:play('enemyShot')
                         local core=Bullet{kinematicState={pos=copyTable(pos),dir=dir,speed=speed},sprite=BulletSprites.round.yellow,lifeFrame=600,extraUpdate=coreExtraUpdate,highlight=true}
                         local n=DSWITCH{4,4,4,5}
                         for i=1,n do
@@ -131,6 +132,7 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage6.spellcards.dipper'),
             require('stages.stage6.spellcards.wind'),
             require('stages.stage6.spellcards.galaxy'),
         }},

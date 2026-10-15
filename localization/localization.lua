@@ -442,6 +442,21 @@ return {
                 }
             }
         },
+        ['enri-dipper'] = {
+            EASY = {
+                name = {
+                    en_us = 'Big Dipper "Treading the Seven Stars"',
+                    zh_cn = '天罡「步罡踏斗」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Big Dipper "Treading the Dipper With the Yu Steps"',
+                    zh_cn = '天罡「蹑罡履斗之禹步」'
+                }
+            }
+        },
         ['enri-galaxy'] = {
             EASY = {
                 name = {
@@ -456,7 +471,7 @@ return {
                     zh_cn = '天象「冷酷宇宙之眼」'
                 }
             }
-        }
+        },
     },
     levelData = {
     },
@@ -1651,6 +1666,16 @@ return {
             description = {
                 en_us = 'Stage 6\'s theme.\nSomeone says the OST isn\'t uncanny enough, so varying tempo here. A segment that accelerates infinitely, and a segment that both accelerates and decelerates. How many touhou fangames have set the final stage in space?',
                 zh_cn = '第六面的主题曲。\n还有人说OST不够奇异，那就上变化的节奏。无限加速，以及同时加速和减速。有多少东方同人游戏把最终面设计成宇宙背景？'
+            }
+        },
+        level6b = {
+            name = {
+                en_us = '',
+                zh_cn = ''
+            },
+            description = {
+                en_us = '',
+                zh_cn = '',
             }
         },
         score = {

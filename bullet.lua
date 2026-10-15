@@ -42,6 +42,7 @@ local Bullet = Shape:extend()
 ---@field forceQuad boolean|nil If true, forces simple quad drawing even if geometry suggests mesh. Default is false.
 ---@field forceMesh boolean|nil If true, forces mesh drawing. Default is false.
 ---@field spriteTransparency number|nil Alpha multiplier (0-1). Default is 1.
+---@field spriteExtraDirection number|nil
 ---@field extraUpdate ExtraUpdate|function|nil Additional update functions or actions to execute each frame.
 ---@field events fun(self:Bullet, args:BulletArgs)[]|nil List of event functions to call on initialization, with signature fun(self:Bullet, args:BulletArgs).
 function Bullet:new(args)

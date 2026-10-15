@@ -171,6 +171,35 @@ local function LaserZoomIn(zoomFrame,targetSize,targetRayAngle)
     return {isAction=true,params={zoomFrame=zoomFrame,targetSize=targetSize,targetRayAngle=targetRayAngle},func=lazerZoomIn,init=lazerZoomInInit}
 end
 
+local laserPrep=function(self,params)
+    local prepTime=params.prepTime
+    local window=params.window
+    local minSize=params.minSize
+    if self.frame==prepTime-window then
+        Event.EaseEvent{obj=self,duration=window*2,aims={size=minSize,rayAngle=0},progressFunc=Event.sineBackProgressFunc}
+    end
+    if self.frame==prepTime then
+        SFX:play('enemyPowerfulShot',nil,0.3)
+        self.safe=false
+        Event.EaseEvent{obj=self,duration=window,aims={spriteTransparency=1}}
+    end
+end
+
+local laserPrepInit=function(self,params)
+    self.spriteTransparency=params.initTransparency or self.spriteTransparency
+    self.safe=true
+end
+
+--- shrinks and expands and become unsafe
+--- @param prepTime integer frame when the laser become unsafe
+---@param initTransparency? number init transparency. can set transparency in GeoLaser's init, this param is to hint you to set a <1 value.
+---@param window? integer duration of shrink and expand. default to 10
+---@param minSize? number size at prepTime. default to 0.1
+--- @return Action
+local function LaserPrep(prepTime,initTransparency,window,minSize)
+    return {isAction=true,params={prepTime=prepTime,initTransparency=initTransparency,window=window or 10,minSize=minSize or 0.1},func=laserPrep,init=laserPrepInit}
+end
+
 local laserZoomOut=function(self,params)
     local zoomFrame=params.zoomFrame or 30
     local initialSize=self.sizeReference or self.size
@@ -192,7 +221,8 @@ end
 
 GeoLaser.presetActions={
     laserZoomIn=LaserZoomIn,
-    laserZoomOut=LaserZoomOut
+    laserPrep=LaserPrep,
+    laserZoomOut=LaserZoomOut,
 }
 
 

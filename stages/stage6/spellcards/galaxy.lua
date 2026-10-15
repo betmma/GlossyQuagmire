@@ -21,14 +21,15 @@ return BossManager.SpellcardPhase{
             if self.frame>=self.any.stopTime then
                 return
             end
-            local angle=self.any.angle+self.any.omega*self.frame
-            local ovalAngle=self.any.ovalAngle-self.any.omega*self.frame*0.3
+            local slowDown=math.clamp(-(self.frame-self.any.stopTime)/20,0,1)
+            self.any.angle=self.any.angle+self.any.omega*slowDown
+            self.any.ovalAngle=self.any.ovalAngle-self.any.omega*0.3
             local r=self.any.r
-            local x,y=math.rTheta2xy(r,angle-ovalAngle)
+            local x,y=math.rTheta2xy(r,self.any.angle-self.any.ovalAngle)
             x=x*0.7
             local r2,theta2=math.xy2rTheta(x,y)
             self.any.r2=r2
-            theta2=theta2+ovalAngle
+            theta2=theta2+self.any.ovalAngle
             self.kinematicState.pos,self.kinematicState.dir=geo:rThetaGo(self.any.center,r2,theta2)
         end}
         local outwardBulletsExtraUpdate={Action.ZoomIn(20),Action.ZoomOut(10),function(self)
