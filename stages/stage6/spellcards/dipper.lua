@@ -10,7 +10,7 @@
 return BossManager.SpellcardPhase{
     key='enri-dipper',
     bonusScore=50000,
-    time=2700,
+    time=2770,
     hp=2000,
     dropItems={powerSmall=30,point=15},
     func=function(self, boss)
@@ -274,7 +274,7 @@ return BossManager.SpellcardPhase{
                 for i=1,7 do
                     local lightOrb=sevenLightOrbs[i]
                     if lightOrb then
-                        BulletSpawner{lifeFrame=999,firstPeriod=8*i,period=56,bulletNumber=8,angle='0+999',bulletSprite=BulletSprites.round.red,bulletLifeFrame=240,bulletSpeed=50,bulletExtraUpdate={Action.ZoomIn(20,1,3),Action.FadeIn(25,true),Action.FadeOut(15,true)}}:bindState(lightOrb)
+                        BulletSpawner{lifeFrame=999,firstPeriod=8*(8-i),period=56,bulletNumber=DSWITCH{4,5,6,8},angle='0+999',bulletSprite=BulletSprites.round.red,bulletLifeFrame=240,bulletSpeed=DSWITCH{50,70,80,90},bulletExtraUpdate={Action.ZoomIn(20,1,3),Action.FadeIn(25,true),Action.FadeOut(15,true)}}:bindState(lightOrb)
                     end
                 end
                 Event{obj=sentry,action=function ()
@@ -310,7 +310,7 @@ return BossManager.SpellcardPhase{
                 local aim=geo:rThetaGo(boss.kinematicState.pos,step[2]*radius,boss.kinematicState.dir)
                 Event{obj=sentry,action=function ()
                     wait(stepFrame-60)
-                    DanmakuFuncs.moveToInTime(boss,aim,60,nil,true)
+                    DanmakuFuncs.moveToInTime(boss,aim,60,Event.sineIProgressFunc,true)
                 end}
             end
         end}

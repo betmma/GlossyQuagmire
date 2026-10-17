@@ -112,12 +112,11 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
         end
     end
 
-    if damageSum==0 then
-        return
+    if damageSum~=0 then
+        SFX:play('damage',false)
     end
-    SFX:play('damage',false)
     objToReduceHp.hp=objToReduceHp.hp-damageSum*damageFactor/(objToReduceHp.damageResistance or 1)
-    if objToReduceHp.hp<0 and not objToReduceHp.removed then
+    if objToReduceHp.hp<=0 and not objToReduceHp.removed then
         objToReduceHp:die()
     end
 end

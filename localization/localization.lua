@@ -427,6 +427,21 @@ return {
                 }
             }
         },
+        ['enri-military'] = {
+            EASY = {
+                name = {
+                    en_us = 'Heaven Scripture "Precious is the Severed Path"',
+                    zh_cn = '天书「兵贵绝道」' -- see《六韬·虎韬·绝道》. resembles how player kills fairies in controlled paths
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Heaven Scripture "Surrounding Defence at High Place"',
+                    zh_cn = '天书「背高环龟之防卫」' -- see《司马法·用众》
+                }
+            }
+        },
         ['enri-wind'] = {
             EASY = {
                 name = {
@@ -1190,6 +1205,10 @@ return {
                     en_us = 'Extend!!',
                     zh_cn = '获得残机！！',
                 },
+                enriMilitarySpellHint = {
+                    en_us = 'Press Buttons Around You\nto Defend Yourself!',
+                    zh_cn = '用周围的按钮来防御！'
+                }
             }
         },
         PRACTICE = {
@@ -1670,8 +1689,8 @@ return {
         },
         level6b = {
             name = {
-                en_us = '',
-                zh_cn = ''
+                en_us = 'Mystical Arts of the Nine Heavens ~ Glossy Concealment',
+                zh_cn = '璇枢妙术　～ Glossy Concealment'
             },
             description = {
                 en_us = '',

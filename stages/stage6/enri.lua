@@ -132,8 +132,9 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
-            require('stages.stage6.spellcards.dipper'),
+            require('stages.stage6.spellcards.military'),
             require('stages.stage6.spellcards.wind'),
+            require('stages.stage6.spellcards.dipper'),
             require('stages.stage6.spellcards.galaxy'),
         }},
     }
