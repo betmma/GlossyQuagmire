@@ -437,7 +437,7 @@ return {
             NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
-                    en_us = 'Heaven Scripture "Surrounding Defence at High Place"',
+                    en_us = 'Heaven Scripture "Tortoise Defense Backed by the Heights"',
                     zh_cn = '天书「背高环龟之防卫」' -- see《司马法·用众》
                 }
             }
@@ -483,7 +483,7 @@ return {
             __default__ = {
                 name = {
                     en_us = 'Celestial Phenomena "Eye of the Cold Cosmos"',
-                    zh_cn = '天象「冷酷宇宙之眼」'
+                    zh_cn = '天象「冷酷宇宙之眼目」'
                 }
             }
         },
