@@ -9,7 +9,6 @@ return{
             key='6-1',
             type='midStage',
             func=function() -- 20s
-                wait(9999)
                 local geo=G.runInfo.geometry
                 local player=G.runInfo.player
                 local sign=math.randomSign()

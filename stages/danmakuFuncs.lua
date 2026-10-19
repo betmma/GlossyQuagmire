@@ -34,6 +34,7 @@ end
 ---@field ref boolean|nil whether to use rThetaGoRef or rThetaGo. default false (use rThetaGo)
 
 ---add an extraUpdate function to [shape] to make it orbit around [centerObj] with radius and angle determined by [rtheta]. it will not set position if centerObj is removed.
+---WARNING: EVERY SHAPE SENT TO orbitBind MUST NOT SHARE THE SAME extraUpdate TABLE, OR MULTIPLE FUNCTIONS WILL BE ADDED TO IT
 ---@param shape Shape
 ---@param centerObj Shape
 ---@param rtheta rThetaRet|fun(self:Shape, centerObj:Shape): rThetaRet

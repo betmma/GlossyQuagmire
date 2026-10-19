@@ -237,6 +237,129 @@ local boss=BossManager.BossSegment{
                 end
             },
             require('stages.stage6.spellcards.wind'),
+        }},
+        BossManager.BossRound{phases={
+            BossManager.NonSpellPhase{
+                key='6-boss-enri-non-3',
+                time=1800,
+                hp=4000,
+                func=function (self, boss)
+                    local geo=G.runInfo.geometry
+                    ---@cast geo Spherical
+                    local radius=geo.radius
+                    ---@cast geo GeometryBase
+                    local fogData={}
+                    wait(60)
+                    local potShapeExtraUpdate={Action.FadeIn(20,true),Action.FadeOut(20,true),function (self)
+                        local t=self.frame
+                        if not self.flag and self.frame>=150 then
+                            if self.frame%30==0 then
+                                self:changeSpriteColor('magenta')
+                            elseif self.frame%30==10 then
+                                self:changeSpriteColor('yellow')
+                            end
+                            if self.frame%30>=10 then
+                                self.spriteColor={1,(self.frame%30-10)/19,1,1}
+                            end
+                        end
+                        if self.any.sentry.flag and not self.flag then
+                            self:changeSpriteColor('white')
+                            self.spriteColor={1,1,1,1}
+                            self.flag=true
+                            if DIFF()<=G.EASY then
+                                self.lifeFrame=self.frame+20
+                            else
+                                self.kinematicState.speed=200
+                            end
+                        end
+                    end}
+                    local function pot(dir,i)
+                        SFX:play('enemyPowerfulShot')
+                        local sentry=DanmakuFuncs.sentry(boss.kinematicState.pos)
+                        sentry.kinematicState.dir=dir
+                        sentry.extraUpdate={function (self)
+                            local t=self.frame
+                            if fogData.signal and not self.flag and t%5==0 and math.abs(fogData.fogRadius-geo:distance(fogData.fogCenter,self.kinematicState.pos))<25 then
+                                self.flag=true
+                                self.any=true
+                                self.lifeFrame=self.frame+20
+                            end
+                        end}
+                        Event{obj=sentry,action=function ()
+                            Event.EaseEvent{obj=sentry,easeObj=sentry.kinematicState,aims={speed=100},duration=120}
+                            wait(120)
+                            local group,num=5,DSWITCH{5,10,10,15}
+                            local spawner=BulletSpawner{lifeFrame=600,period=30,bulletNumber=num,range=math.pi*2*num/group,bulletSprite=BulletSprites.flame.magenta,highlight=true,bulletSpeed=i==1 and 180 or 230,bulletLifeFrame=480,bulletExtraUpdate={Action.ZoomIn(20,1,3,true),Action.FadeOut(20,true),function(self)
+                                if not self.flag then
+                                    self.kinematicState.speed=math.clamp(self.kinematicState.speed,380,0.01)
+                                end
+                                local t=self.frame
+                                if fogData.signal and not self.flag and t%3==0 and math.abs(fogData.fogRadius-geo:distance(fogData.fogCenter,self.kinematicState.pos))<25 then
+                                    self:changeSpriteColor('white')
+                                    self.flag=true
+                                    self.kinematicState.speed=0
+                                end
+                            end},angle='player'--[[math.eval(0,math.pi)]],bulletEvents={function (cir,args,self)
+                                cir.forceQuad=true
+                                if num==10 then
+                                    cir.kinematicState.dir=cir.kinematicState.dir+math.pi/5
+                                end
+                                local groupIndex=math.ceil((args.index-group)/group)
+                                cir.kinematicState.speed=cir.kinematicState.speed+40*groupIndex
+                                cir.zoomInTargetSize=1+(num/group-1-groupIndex)*0.4
+                                cir.size=cir.size*cir.zoomInTargetSize
+                                cir.zoomInInitialSize=cir.size
+                            end}}
+                            spawner:bindState(sentry)
+                            Event.LoopEvent{obj=spawner,period=1,executeFunc=function ()
+                                if sentry.any then
+                                    spawner:remove()
+                                end
+                            end}
+                        end}
+                        -- yellow circle
+                        local r1=50
+                        for i=1,18 do
+                            local angle=math.pi*2/18*i
+                            local bullet=Bullet{lifeFrame=600,sprite=BulletSprites.lightRound.yellow,extraUpdate=copyTable(potShapeExtraUpdate),highlight=true,invincible=true,size=i%2==0 and 1 or 0.8}
+                            bullet.any={angle=angle,sentry=sentry}
+                            DanmakuFuncs.orbitBind(bullet,sentry,function (self, centerObj)
+                                local t=self.frame
+                                return {r=r1*math.min(1,t/60),theta=self.any.angle+t/10}
+                            end)
+                            -- 3 foot
+                            if i%6==0 then
+                                for j=-1,1,2 do
+                                    local r=r1+j*20
+                                    local bullet=Bullet{lifeFrame=600,sprite=BulletSprites.lightRound.yellow,extraUpdate=copyTable(potShapeExtraUpdate),highlight=true,invincible=true}
+                                    bullet.any={angle=angle,sentry=sentry}
+                                    DanmakuFuncs.orbitBind(bullet,sentry,function (self, centerObj)
+                                        local t=self.frame
+                                        return {r=r*math.min(1,t/60),theta=self.any.angle+t/10}
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                    for i=1,8 do
+                        local sign=math.mod2Sign(i)
+                        local to=geo:to(boss.kinematicState.pos,G.runInfo.player.kinematicState.pos)
+                        if DIFF()>=G.HARD and i>1 then
+                            pot(to-math.pi/3*sign,i)
+                            wait(60)
+                            pot(to+math.pi/3*sign,i)
+                        else
+                            pot(to,i)
+                        end
+                        wait(180)
+                        SFX:play('enemyCharge')
+                        wait(60)
+                        SFX:play('enemyPowerfulShot')
+                        spawnFog(fogData,boss.kinematicState.pos,300)
+                        wait(60)
+                    end
+                end
+            },
             require('stages.stage6.spellcards.dipper'),
             require('stages.stage6.spellcards.galaxy'),
         }},

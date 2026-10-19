@@ -280,9 +280,9 @@ return BossManager.SpellcardPhase{
                 controllablePathsOn[index]=on
                 self.on=on
             end}
-            local buttonBullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.giant[controllablePathSprites[index].data.color],lifeFrame=9999,extraUpdate={buttonBindExtraUpdate},safe=true,size=0.7,highlight=true}
+            local buttonBullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.giant[controllablePathSprites[index].data.color],lifeFrame=9999,extraUpdate={buttonBindExtraUpdate},invincible=true,safe=true,size=0.7,highlight=true}
             buttonBullet.any={buttonSentry=buttonSentry}
-            local symbolBullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=controllablePathSprites[index],lifeFrame=9999,extraUpdate={buttonBindExtraUpdate},safe=true}
+            local symbolBullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=controllablePathSprites[index],lifeFrame=9999,extraUpdate={buttonBindExtraUpdate},invincible=true,safe=true}
             symbolBullet.any={buttonSentry=buttonSentry}
             return buttonSentry
         end
