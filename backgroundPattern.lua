@@ -287,4 +287,6 @@ BackgroundPattern.Stage4Rooms=love.filesystem.load("backgrounds/stage4Rooms.lua"
 
 BackgroundPattern.Stage5S2R=love.filesystem.load("backgrounds/stage5S2R.lua")(WalkerShader)
 
+BackgroundPattern.Stage6S3=love.filesystem.load("backgrounds/stage6S3.lua")(WalkerShader)
+
 return BackgroundPattern

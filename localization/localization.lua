@@ -1683,8 +1683,8 @@ return {
                 zh_cn = '疯狂宇宙射线'
             },
             description = {
-                en_us = 'Stage 6\'s theme.\nSomeone says the OST isn\'t uncanny enough, so varying tempo here. A segment that accelerates infinitely, and a segment that both accelerates and decelerates. How many touhou fangames have set the final stage in space?',
-                zh_cn = '第六面的主题曲。\n还有人说OST不够奇异，那就上变化的节奏。无限加速，以及同时加速和减速。有多少东方同人游戏把最终面设计成宇宙背景？'
+                en_us = 'Stage 6\'s theme.\nSomeone says the OST isn\'t uncanny enough, so varying tempo here. A segment that both accelerates and decelerates, and a segment that accelerates infinitely.\nHow many touhou fangames have set the final stage in space?',
+                zh_cn = '第六面的主题曲。\n还有人说OST不够奇异，那就上变化的节奏。同时加速和减速的片段，和无限加速的片段。\n有多少东方同人游戏把最终面设计成宇宙背景？'
             }
         },
         level6b = {
@@ -1693,8 +1693,8 @@ return {
                 zh_cn = '璇枢妙术　～ Glossy Concealment'
             },
             description = {
-                en_us = '',
-                zh_cn = '',
+                en_us = 'Enri Tengai\'s theme.\nThe intro feels like waking up from a dream. The overall vibe feels unexpectedly hot-blood and warm for a character staying in such place.\n',
+                zh_cn = '天盖艳离的主题曲。\n开头有从梦中醒来的感觉。对于一直待在这种地方的角色来讲，曲子整体的氛围有些意想不到的热血和温暖。\n',
             }
         },
         score = {

@@ -152,14 +152,14 @@ local boss=BossManager.BossSegment{
                     local radius=geo.radius
                     ---@cast geo GeometryBase
                     local fogData={}
-                    wait(60)
+                    wait(120)
                     local function webUpdate(self)
                         if self.frame<80 then
                             self.kinematicState.speed=self.kinematicState.speed*0.98
                             self.kinematicState.dir=self.kinematicState.dir+self.any.sign*0.01
                             return
                         elseif self.frame==80 then
-                            self:changeSprite(BulletSprites.note.yellow)
+                            self:changeSprite(BulletSprites.note[self.sprite.data.color])
                             self.size=1
                             self.kinematicState.dir=self.kinematicState.dir+self.any.sign*(math.pi/2-self.any.index*0.02)+(self.any.index2)*math.pi*0.7
                         elseif self.frame<140 and not self.flag then
@@ -195,6 +195,7 @@ local boss=BossManager.BossSegment{
                             end
                         end
                     end
+                    local colors={'green','purple','red','yellow'}
                     local function web(dir,sign)
                         local n=5
                         local gap=50
@@ -202,7 +203,7 @@ local boss=BossManager.BossSegment{
                             local d1=gap*(i-0.5-n/2)
                             local pos1,dir1=geo:rThetaGo(boss.kinematicState.pos,d1,dir-math.pi/2)
                             dir1=dir1+math.pi/2
-                            BulletSpawner{kinematicState={pos=pos1,dir=0,speed=0},angle=dir1,bulletNumber=1,lifeFrame=240,period=DSWITCH{8,4,4,4},highlight=true,bulletSprite=BulletSprites.stick.yellow,bulletSize=2,bulletLifeFrame=600,bulletSpeed=400,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeOut(20,true),webUpdate},bulletEvents={function (cir,args,self)
+                            BulletSpawner{kinematicState={pos=pos1,dir=0,speed=0},angle=dir1,bulletNumber=1,lifeFrame=240,period=DSWITCH{8,4,4,4},highlight=true,bulletSprite=BulletSprites.stick[colors[(DIFF()-1)%#colors+1]],bulletSize=2,bulletLifeFrame=600,bulletSpeed=400,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeOut(20,true),webUpdate},bulletEvents={function (cir,args,self)
                                 cir.any={sign=sign,index=self.spawnTimes,index2=(i-0.5-n/2)/n}
                                 cir.forceQuad=true
                             end}}

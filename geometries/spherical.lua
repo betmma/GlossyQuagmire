@@ -487,6 +487,9 @@ end
 Spherical.sphericalShader = ShaderScan:load_shader("shaders/sphericalDual.glsl")
 
 Spherical.hasPixelShader = true
+-- Sprites are composited over the stage background by Asset.drawBatches.
+-- Empty parts of both projected hemispheres must leave that background visible.
+Spherical.pixelShaderCanvasClearColor = {0,0,0,0}
 
 function Spherical:applyPixelShader(viewer)
     local shader = Spherical.sphericalShader

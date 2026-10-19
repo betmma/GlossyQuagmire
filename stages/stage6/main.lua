@@ -1,7 +1,7 @@
 ---@type OneStageDataRaw
 return{
     init=function(stageKey)
-        -- G:replaceBackgroundPatternIfNot(BackgroundPattern.SphericalGrid)
+        G:replaceBackgroundPatternIfNot(BackgroundPattern.Stage6S3)
         StageManager.commonStageInit(stageKey)
     end,
     segments={
@@ -9,6 +9,7 @@ return{
             key='6-1',
             type='midStage',
             func=function() -- 20s
+                wait(9999)
                 local geo=G.runInfo.geometry
                 local player=G.runInfo.player
                 local sign=math.randomSign()
