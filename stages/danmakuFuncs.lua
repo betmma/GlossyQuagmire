@@ -8,8 +8,9 @@ DanmakuFuncs={}
 ---@param duration integer
 ---@param progressFunc nil|fun(x:number):number
 ---@param updateDir boolean|nil whether to update kinematicState.dir to align with geometry
-function DanmakuFuncs.moveToInTime(shape, targetPos, duration, progressFunc, updateDir)
-    Event{obj=shape, action=function()
+---@param eventObj? Shape replace Event.obj. useful for moving boss and it's possible to be interrupted (isn't in the beginning and this boss phase could end)
+function DanmakuFuncs.moveToInTime(shape, targetPos, duration, progressFunc, updateDir, eventObj)
+    Event{obj=eventObj or shape, action=function()
         local startPos=copyTable(shape.kinematicState.pos)
         local shapeDir=shape.kinematicState.dir
         local startDir=G.runInfo.geometry:to(startPos,targetPos)

@@ -139,6 +139,7 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
+            require('stages.stage6.spellcards.yinyang'),
             require('stages.stage6.spellcards.military'),
         }},
         BossManager.BossRound{phases={

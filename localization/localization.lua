@@ -487,6 +487,21 @@ return {
                 }
             }
         },
+        ['enri-yinyang'] = {
+            EASY = {
+                name = {
+                    en_us = 'Natural Law "Mutual Inversion and Induction"',
+                    zh_cn = '天式「阴阳交感」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = 'Natural Law "Knowing the White and Guarding the Black"',
+                    zh_cn = '天式「知白守黑之无极」'
+                }
+            }
+        }
     },
     levelData = {
     },
