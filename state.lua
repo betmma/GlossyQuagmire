@@ -130,7 +130,7 @@ G={
         ---@type table<GAME_TYPE,{lives:integer,bombs:integer}>
         START_LIVES_AND_BOMBS={
             FULL_GAME={lives=2,bombs=3},
-            STAGE_PRACTICE={lives=8,bombs=8},
+            STAGE_PRACTICE={lives=0,bombs=8},
             SPELL_PRACTICE={lives=0,bombs=0}
         },
         ---@type table<StageKey,integer>

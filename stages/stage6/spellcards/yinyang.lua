@@ -30,7 +30,7 @@ return BossManager.SpellcardPhase{
         local r0=radius*math.pi/2
         local gap=60
         local n=math.ceil(r0*1.5/gap)
-        local bulletExtraUpdate={Action.ZoomIn(30),Action.ZoomOut(20),function (self)
+        local bulletExtraUpdate={Action.FadeIn(30,true),Action.ZoomOut(20),function (self)
             local r,theta=self.any.r,self.any.theta
             self.kinematicState.pos,self.kinematicState.dir=geo:rThetaGo(boss.kinematicState.pos,r,theta+boss.kinematicState.dir)
         end}
@@ -41,7 +41,7 @@ return BossManager.SpellcardPhase{
             else
                 r,theta=geo:rThetaTo(boss.kinematicState.pos,pos)
             end
-            local bullet=Bullet{kinematicState={pos=pos,dir=0,speed=0},lifeFrame=9999,sprite=BulletSprites.lightRound.white,highlight=true,extraUpdate=bulletExtraUpdate,size=size,forceQuad=true}
+            local bullet=Bullet{kinematicState={pos=pos,dir=0,speed=0},lifeFrame=9999,sprite=BulletSprites.lightRound.white,highlight=true,extraUpdate=bulletExtraUpdate,size=size,forceQuad=true,invincible=true}
             bullet.any={r=r,theta=theta-boss.kinematicState.dir}
             return bullet
         end
@@ -182,9 +182,9 @@ return BossManager.SpellcardPhase{
             bullet.any.accumulatedMovement=0
             bullet.extraUpdate=spawnerExtraUpdate
         end
-        -- directly draw edge of 4 semicircles to make edge more smooth, also will spawn bullets
+        -- directly draw edge of 4 semicircles to make edge more smooth, also will spawn trail (doppler effect to hint how boundary moves)
         local trailExtraUpdate=copyTable(bulletExtraUpdate)
-        local period=1
+        local period=2
         table.insert(trailExtraUpdate,function (self)
             if G.save.options.reduceVisualQuality then
                 return
@@ -196,7 +196,7 @@ return BossManager.SpellcardPhase{
                 local diff=math.angleDiff(dir,towardsWhite)
                 local transparency=math.abs(math.cos(diff))*math.clamp(distance/3,0,1)
                 local color=diff<math.pi/2 and {1,0,0,1} or {0,0,1,1}
-                Bullet{kinematicState={pos=self.kinematicState.pos,dir=self.kinematicState.dir,speed=0},lifeFrame=2,sprite=BulletSprites.lightRound.white,safe=true,highlight=true,forceQuad=true,spriteTransparency=transparency,size=self.size,spriteColor=color}
+                Bullet{kinematicState={pos=self.kinematicState.pos,dir=self.kinematicState.dir,speed=0},lifeFrame=2,sprite=BulletSprites.lightRound.white,safe=true,highlight=true,forceQuad=true,invincible=true,spriteTransparency=transparency,size=self.size,spriteColor=color}
             end
             self.posRef=copyTable(self.kinematicState.pos)
         end)
@@ -227,6 +227,9 @@ return BossManager.SpellcardPhase{
             end
         end
         local sentry=DanmakuFuncs.sentry()
+        sentry.removeEffect=function ()
+            boss.showHexagram=true -- restore hexagram
+        end
         local multi=DSWITCH{1,1.2,1.5,2}
         local movements={
             -- boss directly rotate. black area rotates around boss (along long direction), cannot be too fast

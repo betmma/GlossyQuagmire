@@ -25,7 +25,7 @@ local Asset=...
 ---@alias AssetBulletSpritesCollection { \
 ---laser: spectrum, round: spectrum, rim: spectrum, rice: spectrum, bill: spectrum, kunai: spectrum, scale: spectrum, bullet: spectrum, bulletFog: spectrum, crystal: spectrum, star: spectrum, rain: spectrum, diamond: spectrum, coin: spectrum, cross: spectrum, crossDark: spectrum, crossRim: spectrum, crossDarkRim: spectrum, \
 ---laserDark: spectrum, roundDark: spectrum, rimDark: spectrum, blackrice: spectrum, billDark: spectrum, kunaiDark: spectrum, scaleDark: spectrum, bulletDark: spectrum, bulletFogDark: spectrum, crystalDark: spectrum, starDark: spectrum, rainDark: spectrum, turret: spectrum, \
----ellipse: spectrum, knife: spectrum, arrow: spectrum, \
+---ellipse: spectrum, knife: spectrum, arrow: spectrum, ellipseDark: spectrum, \
 ---dot: spectrum, darkdot: spectrum, \
 ---bigRound: spectrum, bigStar: spectrum, heart: spectrum, flower: spectrum, magatama: spectrum, haniwa: spectrum, orb: spectrum, \
 ---giant: spectrum, lightRound: spectrum, largeOrb: spectrum, largeMagatama: spectrum, \
@@ -72,6 +72,12 @@ matrix{
     baseX=0,baseY=16*17,
 }:addToAsset()
 setCenterPosition('arrow',8,6)
+spectrum{
+    unit=single{sizeX=16,sizeY=32,name='ellipseDark'},
+    colors=colors,
+    offsetFunc=simpleOffsetFunc(16,0),
+    baseX=16*12,baseY=16*17,
+}:addToAsset()
 local names8x8={'dot','darkdot'}
 matrix{
     unit=single{sizeX=8,sizeY=8},

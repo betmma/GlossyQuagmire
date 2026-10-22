@@ -76,8 +76,9 @@ function BulletSpawner:new(args)
         SFX:play(self.spawnSFX,true,self.spawnSFXVolume)
         local num=math.eval(self.bulletNumber)
         local range=math.eval(self.range)
-        local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos) or (math.eval(self.angle)+(self.useRelativeAngle and self.kinematicState.dir or 0))
-        local spawnCircleAngle=math.eval(self.spawnCircleAngle)
+        local relativeAngle=(self.useRelativeAngle and self.kinematicState.dir or 0)
+        local angle=self.angle=='player' and G.runInfo.geometry:to(self.kinematicState.pos,G.runInfo.player.kinematicState.pos) or (math.eval(self.angle)+relativeAngle)
+        local spawnCircleAngle=math.eval(self.spawnCircleAngle)+relativeAngle
         local spawnCircleRange=math.eval(self.spawnCircleRange)
         local spawnCircleRadius=math.eval(self.spawnCircleRadius)
         local size=math.eval(self.bulletSize)
@@ -86,7 +87,7 @@ function BulletSpawner:new(args)
             local direction=range*(i-0.5-num/2)/num+angle
             local pos=G.runInfo.geometry:rThetaGo(self.kinematicState.pos,spawnCircleRadius,spawnCircleRange*(i-0.5-num/2)/num+spawnCircleAngle)
             if spawnCircleRadius~=0 then
-                direction=G.runInfo.geometry:to(pos,self.kinematicState.pos)+math.pi+angle
+                direction=G.runInfo.geometry:to(pos,self.kinematicState.pos)+math.pi+angle-relativeAngle -- deduct relativeAngle or it's added twice
             end
             local kinematicState={pos=pos,dir=direction,speed=speed}
             self:spawnBulletFunc{kinematicState=kinematicState,size=size,index=i,batch=self.bulletBatch,fogTime=self.fogTime,sprite=self.bulletSprite}

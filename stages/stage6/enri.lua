@@ -139,7 +139,6 @@ local boss=BossManager.BossSegment{
                     end
                 end
             },
-            require('stages.stage6.spellcards.yinyang'),
             require('stages.stage6.spellcards.military'),
         }},
         BossManager.BossRound{phases={
@@ -362,7 +361,177 @@ local boss=BossManager.BossSegment{
                 end
             },
             require('stages.stage6.spellcards.dipper'),
+        }},
+        BossManager.BossRound{phases={
+            BossManager.NonSpellPhase{
+                key='6-boss-enri-non-4',
+                time=1800,
+                hp=4000,
+                func=function (self,boss)
+                    boss:addHPProtection(180,9)
+                    local geo=G.runInfo.geometry
+                    ---@cast geo Spherical
+                    local radius=geo.radius
+                    ---@cast geo GeometryBase
+                    local fogData={}
+                    wait(60)
+                    local sentry=DanmakuFuncs.sentry()
+                    local bulletSpawner=BulletSpawner{lifeFrame=9999,bulletNumber=1,spawnCircleRadius=0,spawnCircleAngle=math.eval(0,1),period=6,bulletSprite=BulletSprites.flame.blue,bulletSpeed=150,bulletLifeFrame=300,highlight=true,useRelativeAngle=true,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeOut(20,true),function (self)
+                        local t=self.frame
+                        if fogData.signal and not self.flag and t%5==0 and math.abs(fogData.fogRadius-geo:distance(fogData.fogCenter,self.kinematicState.pos))<25 then
+                            self.flag=true
+                            self.any=true
+                            self:changeSpriteColor('white')
+                            self.kinematicState.speed=100
+                            if DIFF()<=G.NORMAL then
+                                self.lifeFrame=math.min(self.lifeFrame,self.frame+60)
+                            end
+                        end
+                    end}}
+                    bulletSpawner:bindState(boss)
+                    Event.LoopEvent{obj=bulletSpawner,period=30,executeFunc=function ()
+                        bulletSpawner.spawnCircleRadius=math.min(80,bulletSpawner.spawnCircleRadius+10)
+                        bulletSpawner.bulletNumber=math.min(DSWITCH{4,5,7,9},bulletSpawner.bulletNumber+1)
+                        bulletSpawner.spawnCircleAngle=bulletSpawner.spawnCircleAngle+math.pi/(bulletSpawner.bulletNumber-1)
+                        bulletSpawner.angle=bulletSpawner.angle+math.pi*2/(bulletSpawner.bulletNumber+3)
+                        bulletSpawner.bulletSpeed=math.min(300,bulletSpawner.bulletSpeed+10)
+                    end}
+                    Event.LoopEvent{obj=sentry,period=240,executeFunc=function ()
+                        local pos=geo:rThetaGo(boss.kinematicState.pos,math.eval(30,20),math.eval(0,math.pi))
+                        DanmakuFuncs.moveToInTime(boss,pos,60,Event.sineOProgressFunc,true)
+                        local fogCenter=geo:rThetaGo(G.runInfo.player.kinematicState.pos,math.eval(radius*math.pi/2,100),math.eval(0,math.pi))
+                        SFX:play('enemyPowerfulShot')
+                        spawnFog(fogData,fogCenter,300,40)
+                    end}
+                end
+            },
             require('stages.stage6.spellcards.galaxy'),
+        }},
+        BossManager.BossRound{phases={
+            BossManager.NonSpellPhase{
+                key='6-boss-enri-non-5',
+                time=1800,
+                hp=4000,
+                func=function (self,boss)
+                    boss:addHPProtection(180,9)
+                    local geo=G.runInfo.geometry
+                    ---@cast geo Spherical
+                    local radius=geo.radius
+                    ---@cast geo GeometryBase
+                    local fogData={}
+                    local player=G.runInfo.player
+                    wait(60)
+                    local sentry=DanmakuFuncs.sentry()
+                    local colors={'red','yellow','blue'}
+                    local silkExtraUpdate={Action.FadeIn(50,true),Action.ZoomOut(10),function (self)
+                        local t=self.frame
+                        if fogData.signal and not self.flag and t%5==0 and self.frame<self.lifeFrame-10 and math.abs(fogData.fogRadius-geo:distance(fogData.fogCenter,self.kinematicState.pos))<25 then
+                            self.flag=true
+                            self.size=1
+                            self.batch=BulletBatch
+                            local type,mod2Sign=self.any.type,self.any.mod2Sign
+                            if type==1 then
+                                if DIFF()<=G.EASY and mod2Sign<0 then
+                                    self:remove()
+                                end
+                                self.kinematicState.dir=self.kinematicState.dir+math.pi/2
+                                self:changeSprite(BulletSprites.ellipse.white)
+                            elseif type==2 then
+                                if DIFF()<=G.NORMAL and mod2Sign<0 then
+                                    self:remove()
+                                end
+                                self.kinematicState.dir=self.kinematicState.dir-math.pi/2
+                                self:changeSprite(BulletSprites.ellipse.white)
+                            elseif type==3 then
+                                if DIFF()<=G.HARD then
+                                    self:remove()
+                                end
+                                self.kinematicState.dir=geo:to(self.kinematicState.pos,player.kinematicState.pos)
+                                self:changeSprite(BulletSprites.ellipse.black)
+                                self.spriteColor={0.6,0.6,0.6,1}
+                                self.kinematicState.speed=-20
+                            end
+                            self.lifeFrame=self.lifeFrame+250
+                        end
+                        if self.flag then
+                            self.kinematicState.speed=math.lerp(self.kinematicState.speed,DSWITCH{170,180,190,200},0.02)
+                        end
+                    end}
+                    local function silk(pos,dir,typeMap)
+                        local rows=5
+                        local gap=25
+                        local n=40
+                        local dirOffset=0
+                        local posFunc=function(i)
+                            return geo:rThetaGo(pos,(i/n*900)%(radius*math.pi*2)+100,dir+i/n*math.pi*.2+math.sin(i/100)*2+dirOffset)
+                        end
+                        Event.Event{obj=sentry,action=function ()
+                            for index=1,n*999 do
+                                -- local distance=gap*index
+                                local pos1=posFunc(index)
+                                local dir1=geo:to(pos1,posFunc(index+1))
+                                for i=1,rows do
+                                    local i2=i-0.5-rows/2
+                                    local pos2,dir2=geo:rThetaGo(pos1,gap*i2,dir1-math.pi/2)
+                                    dir2=dir2+math.pi/2
+                                    local type=typeMap(index,i)
+                                    local color=colors[type]
+                                    if geo:distance(pos2,player.kinematicState.pos)>80 then
+                                        local bullet=Bullet{kinematicState={pos=pos2,dir=dir2,speed=0},sprite=BulletSprites.roundDark[color],lifeFrame=120,extraUpdate=silkExtraUpdate,highlight=true,size=1.5}
+                                        bullet.any={type=type,mod2Sign=math.mod2Sign(index+i)}
+                                    end
+                                end
+                                local distance,to=geo:rThetaTo(pos,player.kinematicState.pos)
+                                local posn,dirn=geo:rThetaGo(pos,math.clamp(distance-30,0,5),to)
+                                pos=posn
+                                dirOffset=dirOffset+dirn-to
+                                -- if index%2==0 then
+                                    wait(2)
+                                -- end
+                            end
+                        end}
+                    end
+                    local pos=geo:rThetaGo(player.kinematicState.pos,1,math.eval(0,math.pi))
+                    local squareSpiral={
+                        {1,1,1,1,3,1,1,1,1,1},
+                        {2,2,2,2,3,2,2,2,2,2},
+                        {1,1,1,2,3,2,1,1,1,2},
+                        {1,2,2,2,3,2,2,2,1,2},
+                        {1,1,1,1,3,1,1,1,1,2},
+                    }
+                    -- need to prevent any color appearing in all columns
+                    silk(pos,math.eval(0,math.pi),function (index,i)
+                        local variationCount=4
+                        local variation=math.ceil(index/150-1)%variationCount+1
+                        local step=index-1
+                        local column=step
+                        local x=column%5+1
+                        if variation==4 then
+                            return squareSpiral[i][column%10+1]
+                        elseif variation==2 then
+                            -- Alternating square rings around the center of each tile.
+                            if x==3 and i==3 then return 3 end
+                            return math.max(math.abs(x-3),math.abs(i-3))%2+1
+                        elseif variation==3 then
+                            -- Diagonal bands fold back every four columns.
+                            local zigzag=4-math.abs(column%6-3)
+                            -- Mark the alternating outer tips
+                            if (zigzag==1 or zigzag==4) and (i==1 or i==5) then
+                                return 3
+                            end
+                            return math.floor((i-1+zigzag)/2)%2+1
+                        end
+                        -- bands
+                        return math.ceil(column/4)%3+1
+                    end)
+                    Event.LoopEvent{obj=sentry,period=300,firstPeriod=120,executeFunc=function (self, index, total)
+                        local fogCenter=geo:rThetaGo(G.runInfo.player.kinematicState.pos,math.eval(radius*math.pi/2,100),math.eval(0,math.pi))
+                        SFX:play('enemyPowerfulShot')
+                        spawnFog(fogData,fogCenter,300,40)
+                    end}
+                end
+            },
+            require('stages.stage6.spellcards.yinyang'),
         }},
     }
 }
