@@ -376,7 +376,9 @@ local boss=BossManager.BossSegment{
                     local fogData={}
                     wait(60)
                     local sentry=DanmakuFuncs.sentry()
-                    local bulletSpawner=BulletSpawner{lifeFrame=9999,bulletNumber=1,spawnCircleRadius=0,spawnCircleAngle=math.eval(0,1),period=6,bulletSprite=BulletSprites.flame.blue,bulletSpeed=150,bulletLifeFrame=300,highlight=true,useRelativeAngle=true,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeOut(20,true),function (self)
+                    local group=5
+                    local bulletSpawner
+                    bulletSpawner=BulletSpawner{lifeFrame=9999,bulletNumber=1,spawnCircleRadius=0,spawnCircleAngle=math.eval(0,1),period=6,bulletSprite=BulletSprites.flame.blue,bulletSpeed=150,bulletLifeFrame=300,highlight=true,useRelativeAngle=true,bulletExtraUpdate={Action.ZoomIn(20),Action.FadeOut(20,true),function (self)
                         local t=self.frame
                         if fogData.signal and not self.flag and t%5==0 and math.abs(fogData.fogRadius-geo:distance(fogData.fogCenter,self.kinematicState.pos))<25 then
                             self.flag=true
@@ -387,14 +389,25 @@ local boss=BossManager.BossSegment{
                                 self.lifeFrame=math.min(self.lifeFrame,self.frame+60)
                             end
                         end
+                        if not self.flag then
+                            local speed=self.kinematicState.speed
+                            self.kinematicState.speed=math.lerp(speed,bulletSpawner.bulletSpeed,0.05)
+                        end
+                    end},bulletEvents={function (cir,args,self)
+                        local index=self.spawnTimes
+                        index=(index-0.5)/group-0.5
+                        cir.kinematicState.speed=cir.kinematicState.speed+index*300
+                        cir.kinematicState.dir=cir.kinematicState.dir+index*DSWITCH{0.1,0.15,0.2,0.3}*(self.sign or 1)
                     end}}
                     bulletSpawner:bindState(boss)
-                    Event.LoopEvent{obj=bulletSpawner,period=30,executeFunc=function ()
+                    Event.LoopEvent{obj=bulletSpawner,period=30,executeFunc=function (_,times)
                         bulletSpawner.spawnCircleRadius=math.min(80,bulletSpawner.spawnCircleRadius+10)
                         bulletSpawner.bulletNumber=math.min(DSWITCH{4,5,7,9},bulletSpawner.bulletNumber+1)
                         bulletSpawner.spawnCircleAngle=bulletSpawner.spawnCircleAngle+math.pi/(bulletSpawner.bulletNumber-1)
                         bulletSpawner.angle=bulletSpawner.angle+math.pi*2/(bulletSpawner.bulletNumber+3)
-                        bulletSpawner.bulletSpeed=math.min(300,bulletSpawner.bulletSpeed+10)
+                        bulletSpawner.bulletSpeed=math.min(260,bulletSpawner.bulletSpeed+10)
+                        bulletSpawner.spawnTimes=0
+                        bulletSpawner.sign=math.mod2Sign(times)
                     end}
                     Event.LoopEvent{obj=sentry,period=240,executeFunc=function ()
                         local pos=geo:rThetaGo(boss.kinematicState.pos,math.eval(30,20),math.eval(0,math.pi))
