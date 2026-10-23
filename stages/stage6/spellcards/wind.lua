@@ -57,9 +57,9 @@ return BossManager.SpellcardPhase{
                 local initSpeed=radius*math.pi*60/stopTime
                 local initStopTime=math.ceil(distance*60/initSpeed)
                 local finalSpeed=(radius*math.pi-distance)*60/stopTime*2 -- remaining distance
-                local bullet=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),dir=angle,speed=initSpeed},lifeFrame=life,sprite=sprite,extraUpdate=extraUpdate,highlight=true,size=1.5,forceQuad=true}
+                local bullet=Bullet{kinematicState={pos=copyTable(boss.kinematicState.pos),dir=angle,speed=initSpeed},lifeFrame=life,sprite=sprite,extraUpdate=extraUpdate,highlight=true,size=1.5,forceQuad=true,invincible=i%2==0}
                 bullet.any={speed=finalSpeed,initStopTime=initStopTime}
-                local fog=Bullet{safe=true,highlight=true,spriteTransparency=0,sprite=BulletSprites.darkLotus.gray,lifeFrame=life,extraUpdate=fogUpdate,forceQuad=true,size=2.5}:bindState(bullet)
+                local fog=Bullet{safe=true,highlight=true,spriteTransparency=0,sprite=BulletSprites.darkLotus.gray,lifeFrame=life,extraUpdate=fogUpdate,forceQuad=true,size=2.5,invincible=i%2==0}:bindState(bullet)
             end
             Event{obj=pole,action=function()
                 wait(stopTime)

@@ -173,6 +173,9 @@ return BossManager.SpellcardPhase{
                     local lase=GeoLaser{kinematicState={pos=copyTable(posb),dir=angle,speed=0},sprite=BulletSprites.laser.black,spriteColor={1,0.7,0.3,1},lifeFrame=prepTime+60,extraUpdate={GeoLaser.presetActions.laserZoomIn(20),GeoLaser.presetActions.laserPrep(prepTime,0.3),GeoLaser.presetActions.laserZoomOut(20),},meshBudget={capNum=1,step=0,num=20},size=0.01,rayAngle=rayAngle}
                     Event{obj=lase,action=function ()
                         wait(prepTime)
+                        if sentry.removed then
+                            return
+                        end
                         SFX:play('enemyShot2')
                         local batch=DSWITCH{1,1,3,3}
                         BulletSpawner{kinematicState={pos=copyTable(posb),dir=0,speed=0},lifeFrame=DSWITCH{4,5,5,6},period=1,angle=lase.kinematicState.dir,bulletNumber=batch*2,bulletSprite=BulletSprites.scale.yellow,highlight=true,bulletLifeFrame=1200,range=0,bulletSpeed=0,bulletExtraUpdate=extraUpdate,bulletEvents={function(cir,args,self)
@@ -298,7 +301,7 @@ return BossManager.SpellcardPhase{
                     local mids,dirs=DanmakuFuncs.midPoints(previous.kinematicState.pos,this.kinematicState.pos,30,20)
                     for i=2,#mids-1 do
                         local mid,dir=mids[i],dirs[i]
-                        Bullet{kinematicState={pos=mid,dir=dir,speed=0},lifeFrame=this.lifeFrame,highlight=true,sprite=BulletSprites.stick.yellow,size=3,extraUpdate={Action.FadeIn(i+10,true),Action.FadeOut(20,true)}}
+                        Bullet{kinematicState={pos=mid,dir=dir,speed=0},lifeFrame=this.lifeFrame,highlight=true,invincible=true,sprite=BulletSprites.stick.yellow,size=3,extraUpdate={Action.FadeIn(i+10,true),Action.FadeOut(20,true)}}
                     end
                 end
             end

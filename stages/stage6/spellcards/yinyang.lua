@@ -30,7 +30,7 @@ return BossManager.SpellcardPhase{
         local r0=radius*math.pi/2
         local gap=60
         local n=math.ceil(r0*1.5/gap)
-        local bulletExtraUpdate={Action.FadeIn(30,true),Action.ZoomOut(20),function (self)
+        local bulletExtraUpdate={Action.FadeIn(90,true),Action.ZoomOut(20),function (self)
             local r,theta=self.any.r,self.any.theta
             self.kinematicState.pos,self.kinematicState.dir=geo:rThetaGo(boss.kinematicState.pos,r,theta+boss.kinematicState.dir)
         end}
@@ -99,7 +99,6 @@ return BossManager.SpellcardPhase{
         end
         local t=240
         -- bullet spawner. spawns when moved certain distance
-        local spawnerExtraUpdate=copyTable(bulletExtraUpdate)
         local switchExtraUpdate={Action.ZoomIn(20,1,2),Action.FadeIn(20,true),Action.ZoomOut(20),function (self)
             -- it means whether the bullet is in white area. its sprite color is opposite to the area color it's in
             local currentWhite=self.any.currentWhite
@@ -149,6 +148,7 @@ return BossManager.SpellcardPhase{
         end}
         local round=0
         local resetSignal=false
+        local spawnerExtraUpdate=copyTable(bulletExtraUpdate)
         table.insert(spawnerExtraUpdate,function (self)
             local pos=self.kinematicState.pos
             if resetSignal then
@@ -208,11 +208,11 @@ return BossManager.SpellcardPhase{
             for j=1,nj do
                 local anglej=(j-0.5-nj/2)/nj*math.pi*(sign==1 and 2 or 1) -- white part draws whole circle instead, due to the inner half circle is difficult to be covered by central part
                 local angle=dir+sign*math.pi/2+anglej
-                local pos=geo:rThetaGo(smallCircle,r,angle)
+                local pos,newAngle=geo:rThetaGo(smallCircle,r,angle)
                 local bullet=spawnBullet(pos,nil,nil,2)
                 if math.abs(anglej)<math.pi/2 then
                     bullet.extraUpdate=trailExtraUpdate
-                    bullet.any.towardsWhite=angle+(sign==1 and math.pi or 0)-geo:to(pos,boss.kinematicState.pos)
+                    bullet.any.towardsWhite=newAngle+(sign==1 and math.pi or 0)-geo:to(pos,boss.kinematicState.pos)
                 end
             end
         end

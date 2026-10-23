@@ -34,6 +34,10 @@ local boss=BossManager.BossSegment{
     key='6-boss',
     BGM='level6b',
     getBossSpawnPos=getBossSpawnPos,
+    bossSpawnCallback=function (self, boss)
+        -- easier to hit. surprisingly, it's more difficult to hit the stage 6 boss though the space converges
+        boss.extraHitRadius=64
+    end,
     -- beforeDialogueKey=function ()
     --     return G.runInfo.playerType..'S6BossBefore'
     -- end,
@@ -163,7 +167,7 @@ local boss=BossManager.BossSegment{
                             self.size=1
                             self.kinematicState.dir=self.kinematicState.dir+self.any.sign*(math.pi/2-self.any.index*0.02)+(self.any.index2)*math.pi*0.7
                         elseif self.frame<140 and not self.flag then
-                            self.kinematicState.speed=self.kinematicState.speed+4+DSWITCH{-0.3,-0.2,-0.1,0.05}
+                            self.kinematicState.speed=self.kinematicState.speed+4+DSWITCH{-0.3,-0.2,-0.1,0}
                             self.kinematicState.dir=self.kinematicState.dir+math.eval(0,DSWITCH{0,0.02,0.02,0.02})
                         end
                         local t=self.frame
@@ -217,7 +221,7 @@ local boss=BossManager.BossSegment{
                         SFX:play('enemyCharge')
                         wait(60)
                         SFX:play('enemyPowerfulShot')
-                        spawnFog(fogData,boss.kinematicState.pos)
+                        spawnFog(fogData,boss.kinematicState.pos,nil,40)
                         if i==1 and DIFF()>=G.HARD then
                             local n=DSWITCH{5,5,5,10}
                             Event.LoopEvent{obj=sentry,period=120,firstPeriod=1,executeFunc=function (self,times)
@@ -421,7 +425,7 @@ local boss=BossManager.BossSegment{
             require('stages.stage6.spellcards.galaxy'),
         }},
         BossManager.BossRound{phases={
-            BossManager.NonSpellPhase{
+            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='6-boss-enri-non-5',
                 time=1800,
                 hp=4000,
@@ -461,19 +465,19 @@ local boss=BossManager.BossSegment{
                                 end
                                 self.kinematicState.dir=geo:to(self.kinematicState.pos,player.kinematicState.pos)
                                 self:changeSprite(BulletSprites.ellipse.black)
-                                self.spriteColor={0.6,0.6,0.6,1}
+                                self.spriteColor={0.7,0.7,0.7,1}
                                 self.kinematicState.speed=-20
                             end
                             self.lifeFrame=self.lifeFrame+250
                         end
                         if self.flag then
-                            self.kinematicState.speed=math.lerp(self.kinematicState.speed,DSWITCH{170,180,190,200},0.02)
+                            self.kinematicState.speed=math.lerp(self.kinematicState.speed,DSWITCH{170,175,180,190},0.02)
                         end
                     end}
                     local function silk(pos,dir,typeMap)
                         local rows=5
                         local gap=25
-                        local n=40
+                        local n=36
                         local dirOffset=0
                         local posFunc=function(i)
                             return geo:rThetaGo(pos,(i/n*900)%(radius*math.pi*2)+100,dir+i/n*math.pi*.2+math.sin(i/100)*2+dirOffset)
@@ -490,7 +494,7 @@ local boss=BossManager.BossSegment{
                                     local type=typeMap(index,i)
                                     local color=colors[type]
                                     if geo:distance(pos2,player.kinematicState.pos)>80 then
-                                        local bullet=Bullet{kinematicState={pos=pos2,dir=dir2,speed=0},sprite=BulletSprites.roundDark[color],lifeFrame=120,extraUpdate=silkExtraUpdate,highlight=true,size=1.5}
+                                        local bullet=Bullet{kinematicState={pos=pos2,dir=dir2,speed=0},sprite=BulletSprites.roundDark[color],lifeFrame=100,extraUpdate=silkExtraUpdate,highlight=true,size=1.5}
                                         bullet.any={type=type,mod2Sign=math.mod2Sign(index+i)}
                                     end
                                 end
@@ -498,6 +502,7 @@ local boss=BossManager.BossSegment{
                                 local posn,dirn=geo:rThetaGo(pos,math.clamp(distance-30,0,5),to)
                                 pos=posn
                                 dirOffset=dirOffset+dirn-to
+                                SFX:play('enemyShot')
                                 -- if index%2==0 then
                                     wait(2)
                                 -- end

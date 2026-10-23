@@ -6,6 +6,7 @@
 ---@field dropItems DropItems
 ---@field extraDieEffects function[]
 ---@field extraOrientation number?
+---@field extraHitRadius number extra hit radius added to hitboxRadius. default 32
 ---@overload fun(args:EnemyArgs):Enemy
 local Enemy=Shape:extend()
 
@@ -29,6 +30,7 @@ function Enemy:new(args)
     self.invincible=args.invincible
     self.size=1
     self.hitboxRadius=16
+    self.extraHitRadius=32
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
     self.sprite=args.sprite
@@ -91,7 +93,7 @@ function Enemy:checkHitByPlayer(objToReduceHp,damageFactor)
     objToReduceHp=objToReduceHp or self
     damageFactor=damageFactor or 1
     local damageSum=0
-    local selfRadius=self:getHitboxRadius()+32 -- easier to hit. doesn't directly increase hitbox so player can stand above enemy to hit without being hit.
+    local selfRadius=self:getHitboxRadius()+self.extraHitRadius -- easier to hit. doesn't directly increase hitbox so player can stand above enemy to hit without being hit.
     for _, circ in ipairs(PlayerShot.objects) do
         ---@cast circ PlayerShot
         local radius=selfRadius+circ:getHitboxRadius()
