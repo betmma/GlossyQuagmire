@@ -43,6 +43,7 @@ local Bullet = Shape:extend()
 ---@field forceMesh boolean|nil If true, forces mesh drawing. Default is false.
 ---@field spriteTransparency number|nil Alpha multiplier (0-1). Default is 1.
 ---@field spriteExtraDirection number|nil
+---@field spriteRotationSpeed number|nil How fast the sprite rotates over time.
 ---@field extraUpdate ExtraUpdate|function|nil Additional update functions or actions to execute each frame.
 ---@field events fun(self:Bullet, args:BulletArgs)[]|nil List of event functions to call on initialization, with signature fun(self:Bullet, args:BulletArgs).
 function Bullet:new(args)
@@ -84,7 +85,7 @@ function Bullet:new(args)
     self.spriteTransparency=args.spriteTransparency or 1
 
     self.spriteExtraDirection=args.spriteExtraDirection or 0
-    self.spriteRotationSpeed=0 -- used for nuke bullet
+    self.spriteRotationSpeed=args.spriteRotationSpeed or 0 -- used for nuke bullet
 
     if not self.sprite then
         error('Bullet:new: args.sprite is nil')

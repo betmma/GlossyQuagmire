@@ -501,6 +501,21 @@ return {
                     zh_cn = '天式「知白守黑之无极」'
                 }
             }
+        },
+        ['enri-kill'] = {
+            EASY = {
+                name = {
+                    en_us = '"Lethal Power from Heaven"',
+                    zh_cn = '「天发杀机」'
+                }
+            },
+            NORMAL = '@ref:EASY',
+            __default__ = {
+                name = {
+                    en_us = '"Conserted Lethal Power from Heaven and Human"',
+                    zh_cn = '「天人合发之杀机」'
+                }
+            }
         }
     },
     levelData = {
