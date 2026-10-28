@@ -34,18 +34,27 @@ return BossManager.SpellcardPhase{
                 local angle0=angle+parent.kinematicState.dir
                 local pos,dir=geo:rThetaGo(parent.kinematicState.pos,r,angle0)
                 self.kinematicState.pos,self.kinematicState.dir=pos,dir-angle0
-                -- if self.any.i then
-                --     self.kinematicState.dir=dir
-                -- end
+                if self.any.index==1 then -- let star angle same as small bullets
+                    parent.spriteExtraDirection=angle
+                end
             end
             return ret
         end
         local r1=math.pi/2*radius
-        -- local colors={'red','green','blue'}
         local period=900
         local phase=math.pi/2-0.25
-        local layerUpdates={getLayerUpdate(400,r1,period,phase,math.pi/450,DIFF()>=G.HARD)}
-        local bulletUpdate={Action.FadeIn(60,true),Action.FadeOut(20,true),getLayerUpdate(r1,15,period,phase,-0.019,false),function (self)
+        local layerUpdates={getLayerUpdate(400,r1,period,phase,math.pi/450,DIFF()>=G.HARD),getLayerUpdate(r1,15,period,phase,-0.019,false)}
+        local starUpdates={Action.FadeIn(30,false),layerUpdates[1],function (self)
+            local t=self.frame
+            local sin=math.sin(self.frame/period*math.pi*2+phase)
+            local i=self.any.index
+            local r1_,g1,b1=math.hsvToRgb((i%group1+0.5)/group1-0.5,0.5,1)
+            self.spriteColor={r1_,g1,b1,math.clamp(sin,0,1)^4}
+            if sin>0.5 then
+                self.size=math.lerp(r1/15,1,sin/2+0.5)
+            end
+        end}
+        local bulletUpdate={Action.FadeIn(60,true),Action.FadeOut(20,true),layerUpdates[2],function (self)
             local t=self.frame
             local sin=math.sin(t/period*math.pi*2+phase)
             local i,j=self.any.i,self.any.index
@@ -96,18 +105,19 @@ return BossManager.SpellcardPhase{
             local angle2=math.eval(0,math.pi)
             for i=1,n1 do
                 local anglei1=angle1+math.pi*2/n1*i
-                local sentry1=DanmakuFuncs.sentry(pos)
-                --Bullet{kinematicState={pos=pos,dir=0,speed=0},sprite=BulletSprites.scale.white,lifeFrame=9999}
+                local sentry1=Bullet{kinematicState={pos=pos,dir=0,speed=0},sprite=BulletSprites.bigStar.white,size=2,forceQuad=true,highlight=true,lifeFrame=9999,invincible=true,safe=true,spriteColor={1,1,1,1},extraUpdate=starUpdates}
                 sentry1.any={parent=core,angle=anglei1,r2a=((i%group1+0.5)/group1-0.5)*600,index=i}
-                sentry1.extraUpdate={layerUpdates[1]}
                 for j=1,n2 do
                     local anglei2=angle2+math.pi*2/n2*j
-                    local sentry2=Bullet{kinematicState={pos=pos,dir=0,speed=0},sprite=BulletSprites.round.black,lifeFrame=9999,extraUpdate=bulletUpdate}
+                    local sentry2=Bullet{kinematicState={pos=pos,dir=0,speed=0},sprite=BulletSprites.round.black,lifeFrame=9999,extraUpdate=bulletUpdate,invincible=true}
                     sentry2.any={parent=sentry1,angle=anglei2,r2a=0,index=j,i=i} --(math.pseudoRandom(i)*2-1)*1
                     -- sentry2.extraUpdate=bulletUpdate
                 end
             end
         end
+        local to=geo:to(G.runInfo.player.kinematicState.pos,boss.kinematicState.pos)+math.pi/2
+        G.runInfo.player.viewDirection=math.modClamp(G.runInfo.player.viewDirection,to)
+        Event.EaseEvent{obj=G.runInfo.player,aims={viewDirection=to},duration=30,progressFunc=Event.sineIOProgressFunc}
         wait(60)
         spawn()
     end

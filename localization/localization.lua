@@ -475,15 +475,15 @@ return {
         ['enri-galaxy'] = {
             EASY = {
                 name = {
-                    en_us = 'Celestial Phenomena "The Ring Nebula"',
-                    zh_cn = '天象「环状星云」'
+                    en_us = 'Celestial Phenomena "Nebulous River of Stars"',
+                    zh_cn = '天象「星汉氛氲」'
                 }
             },
             NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
-                    en_us = 'Celestial Phenomena "Eye of the Cold Cosmos"',
-                    zh_cn = '天象「冷酷宇宙之眼目」'
+                    en_us = 'Celestial Phenomena "Revolution of the Blazing Firmament"',
+                    zh_cn = '天象「荧煌霄汉之昭回」'
                 }
             }
         },
@@ -514,6 +514,14 @@ return {
                 name = {
                     en_us = '"Conserted Lethal Power from Heaven and Human"',
                     zh_cn = '「天人合发之杀机」'
+                }
+            }
+        },
+        ['enri-final'] = {
+            __default__ = {
+                name = {
+                    en_us = '"Observe the Cyclical Laws"',
+                    zh_cn = '「察天心而观复」' -- see《嘉遁賦》
                 }
             }
         }

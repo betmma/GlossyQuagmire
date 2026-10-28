@@ -46,10 +46,6 @@ local boss=BossManager.BossSegment{
     -- end,
     rounds={
         BossManager.BossRound{phases={
-            require('stages.stage6.spellcards.kill'),
-            require('stages.stage6.spellcards.final'),
-        }},
-        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{
                 key='6-boss-enri-non-1',
                 time=1800,
@@ -554,6 +550,12 @@ local boss=BossManager.BossSegment{
                 end
             },
             require('stages.stage6.spellcards.yinyang'),
+        }},
+        BossManager.BossRound{phases={
+            require('stages.stage6.spellcards.kill'),
+        }},
+        BossManager.BossRound{phases={
+            require('stages.stage6.spellcards.final'),
         }},
     }
 }
