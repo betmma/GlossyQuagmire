@@ -103,7 +103,7 @@ vec2 sphereUV(vec3 n,float spin) {
     return vec2(atan(n.z,n.x)/TAU+0.5+spin,0.5-asin(clamp(n.y,-1.0,1.0))/PI);
 }
 
-vec3 surfaceColor(vec4 p,vec4 center,bool earth,float phase) {
+vec3 surfaceColor(vec4 p,vec4 center,bool earth,float phase,vec4 towardCamera) {
     float radial=dot(p,center);
     // Inverse exponential-map direction at the body center. Geodesic sphere
     // surfaces have an S^2 of directions, giving ordinary lat/long texture UVs.
@@ -118,6 +118,12 @@ vec3 surfaceColor(vec4 p,vec4 center,bool earth,float phase) {
         vec4 orbitAxis=vec4(0.0,-sin(phase),cos(phase),0.0);
         localDirection=vec3(dot(u,radialAxis),dot(u,EARTH_POLE),dot(u,orbitAxis));
     }
+    // Both the outward normal and light direction live in T_p S^3.
+    vec4 normal=normalize(radial*p-center);
+    vec4 light=normalize(vec4(0.3,-0.5,-0.6,0.55));
+    vec4 towardLight=normalize(light-dot(light,p)*p);
+    float lightFacing=dot(normal,towardLight);
+    float diffuse=max(lightFacing,0.0);
     vec3 albedo;
     if(earth) {
         vec2 uv=sphereUV(localDirection,time*0.012);
@@ -125,16 +131,26 @@ vec3 surfaceColor(vec4 p,vec4 center,bool earth,float phase) {
         // The JPEG cloud map has no alpha: its luminance supplies coverage.
         vec3 clouds=Texel(cloud_texture,sphereUV(localDirection,time*0.014)).rgb;
         float coverage=dot(clouds,vec3(0.299,0.587,0.114));
+        // Look slightly toward the light along the surface for elevated clouds
+        // casting shadows here. Direction-space offsets stay smooth at UV seams.
+        vec4 surfaceLight=towardLight-normal*lightFacing;
+        vec3 localLight=vec3(surfaceLight.y,surfaceLight.z,dot(surfaceLight,EARTH_POLE));
+        vec3 shadowDirection=normalize(localDirection+0.025*localLight);
+        vec3 shadowClouds=Texel(cloud_texture,sphereUV(shadowDirection,time*0.014)).rgb;
+        float shadowCoverage=dot(shadowClouds,vec3(0.299,0.587,0.114));
+        albedo*=1.0-0.28*shadowCoverage*smoothstep(0.0,0.25,lightFacing);
         albedo=mix(albedo,vec3(0.94,0.97,1.0),coverage*0.88);
     } else {
         albedo=Texel(moon_texture,sphereUV(localDirection,0.0)).rgb;
     }
-    // Both the outward normal and light direction live in T_p S^3.
-    vec4 normal=normalize(radial*p-center);
-    vec4 light=normalize(vec4(0.3,-0.5,-0.6,0.55));
-    vec4 towardLight=normalize(light-dot(light,p)*p);
-    float diffuse=max(dot(normal,towardLight),0.0);
-    return albedo*(0.24+0.76*diffuse);
+    vec3 shaded=albedo*(0.24+0.76*diffuse);
+    if(earth) {
+        // A thin atmospheric tint inside the silhouette, strongest in sunlight.
+        float rim=pow(1.0-clamp(dot(normal,towardCamera),0.0,1.0),3.0);
+        float sunlight=smoothstep(-0.15,0.6,lightFacing);
+        shaded=mix(shaded,vec3(0.18,0.48,0.95),rim*sunlight*1.55);
+    }
+    return shaded;
 }
 
 vec4 effect(vec4 color,Image texture,vec2 texture_coords,vec2 screen_coords) {
@@ -174,7 +190,9 @@ vec4 effect(vec4 color,Image texture,vec2 texture_coords,vec2 screen_coords) {
         float nearest=min(earthDistance,moonDistance);
         if(nearest<HIT_EPSILON) {
             bool earth=earthDistance<moonDistance;
-            radiance=surfaceColor(p,earth ? EARTH : moon,earth,phase);
+            // Reverse the ray's tangent at the hit, including far-side images.
+            vec4 towardCamera=normalize(camera*sin(travel)-direction*cos(travel));
+            radiance=surfaceColor(p,earth ? EARTH : moon,earth,phase,towardCamera);
             cloudStop=travel;
             break;
         }

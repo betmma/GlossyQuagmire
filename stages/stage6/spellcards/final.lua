@@ -52,7 +52,7 @@ return BossManager.SpellcardPhase{
             local any=obj.any
             local t0=obj.frame
             local t=obj.lifeFrame-obj.frame*2
-            local args={size=obj.size,sprite=obj.sprite,batch=obj.batch,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=t+t0,extraUpdate=obj.extraUpdate,spriteRotationSpeed=obj.spriteRotationSpeed,spriteColor=obj.spriteColor}
+            local args={size=obj.size,sprite=obj.sprite,batch=obj.batch,spriteTransparency=obj.spriteTransparency,lifeFrame=obj.lifeFrame,frame=t+t0,extraUpdate=obj.extraUpdate,spriteRotationSpeed=obj.spriteRotationSpeed,spriteColor=obj.spriteColor,invincible=obj.invincible}
             obj:remove()
             Event{obj=sentry,action=function ()
                 wait(t)
