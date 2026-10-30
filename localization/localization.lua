@@ -1471,6 +1471,12 @@ return {
                 en_us = 'Continue ({continues} left)',
                 zh_cn = '续关 (剩余{continues}次)'
             },
+            statistics = {
+                __default__= {
+                    en_us = 'Statistics',
+                    zh_cn = '统计数据'
+                },
+            },
             saveReplay = {
                 __default__= {
                     en_us = 'Save Replay',

@@ -273,6 +273,7 @@ G={
         IN_GAME='IN_GAME',
         PAUSE='PAUSE',
         GAME_END='GAME_END',
+        RUN_STATISTICS='RUN_STATISTICS',
         SAVE_REPLAY='SAVE_REPLAY',
         SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
         LOAD_REPLAY='LOAD_REPLAY',
@@ -346,7 +347,19 @@ G={
             LOAD_REPLAY={
                 transitionState='TRANSITION_IMAGE',
             },
+            RUN_STATISTICS={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
+            },
             SAVE_REPLAY={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
+            },
+        },
+        RUN_STATISTICS={
+            GAME_END={
                 transitionState='TRANSITION_FADE',
                 from={duration=10},
                 to={duration=10}

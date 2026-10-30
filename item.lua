@@ -121,23 +121,33 @@ end
 
 local function gainLife(amount)
     local livesBefore=G.runInfo.lives
-    G.runInfo.lives=roundToFifth(G.runInfo.lives+amount)
-    if math.floor(livesBefore)<math.floor(G.runInfo.lives) then
+    local livesAfter=roundToFifth(G.runInfo.lives+amount)
+    if math.floor(livesBefore)<math.floor(livesAfter) then
         SFX:play('extend')
         DynamicUIObjs.showNotice('extend')
-    else
+    elseif amount>0 then
         SFX:play('select')
     end
+    EventManager.post(EM.EVENTS.SET_LIFE,livesAfter)
+end
+
+local function setLife(new)
+    G.runInfo.lives=new
 end
 
 local function gainBomb(amount)
     local bombsBefore=G.runInfo.bombs
-    G.runInfo.bombs=roundToFifth(G.runInfo.bombs+amount)
-    if math.floor(bombsBefore)<math.floor(G.runInfo.bombs) then
+    local bombsAfter=roundToFifth(G.runInfo.bombs+amount)
+    if math.floor(bombsBefore)<math.floor(bombsAfter) then
         SFX:play('extend')
-    else
+    elseif amount>0 then
         SFX:play('select')
     end
+    EventManager.post(EM.EVENTS.SET_BOMB,bombsAfter)
+end
+
+local function setBomb(new)
+    G.runInfo.bombs=new
 end
 
 local function gainScore(amount)
@@ -155,6 +165,10 @@ local function gainScore(amount)
 end
 
 EventManager.listenTo(EventManager.EVENTS.GAIN_SCORE, gainScore)
+EventManager.listenTo(EventManager.EVENTS.GAIN_LIFE, gainLife)
+EventManager.listenTo(EventManager.EVENTS.SET_LIFE, setLife)
+EventManager.listenTo(EventManager.EVENTS.GAIN_BOMB, gainBomb)
+EventManager.listenTo(EventManager.EVENTS.SET_BOMB, setBomb)
 
 function Item:picked()
     if self.type==ItemType.powerSmall then
@@ -169,13 +183,13 @@ function Item:picked()
     elseif self.type==ItemType.pointGolden then
         EventManager.post(EventManager.EVENTS.GAIN_SCORE,1000)
     elseif self.type==ItemType.lifePiece then
-        gainLife(0.2)
+        EventManager.post(EventManager.EVENTS.GAIN_LIFE,0.2)
     elseif self.type==ItemType.bombPiece then
-        gainBomb(0.2)
+        EventManager.post(EventManager.EVENTS.GAIN_BOMB,0.2)
     elseif self.type==ItemType.life then
-        gainLife(1)
+        EventManager.post(EventManager.EVENTS.GAIN_LIFE,1)
     elseif self.type==ItemType.bomb then
-        gainBomb(1)
+        EventManager.post(EventManager.EVENTS.GAIN_BOMB,1)
     end
 end
 

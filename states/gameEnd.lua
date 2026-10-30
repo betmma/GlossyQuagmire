@@ -53,8 +53,8 @@ return {
                 G.runInfo.remainingContinues=G.runInfo.remainingContinues-1
                 G.runInfo.continued=true
                 local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[G.runInfo.gameType]
-                G.runInfo.lives=startResources.lives
-                G.runInfo.bombs=startResources.bombs
+                EM.post(EM.EVENTS.SET_LIFE,startResources.lives)
+                EM.post(EM.EVENTS.SET_BOMB,startResources.bombs)
                 G.runInfo.score=G.runInfo.score%10+1
                 G.runInfo.grazes=0
                 G:switchState(G.STATES.IN_GAME)
@@ -62,6 +62,14 @@ return {
                     BGM:play(previousBGM)
                     BGM.data[BGM.currentAudio]:seek(previousBGMTime,'seconds')
                 end
+            end},
+            {key='statistics',func=function ()
+                if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE then
+                    SFX:play('cancel')
+                    return
+                end
+                SFX:play('select')
+                G:switchState(G.STATES.RUN_STATISTICS)
             end},
             {key='saveReplay',func=function()
                 if playingReplay or G.runInfo.continued then
@@ -111,6 +119,9 @@ return {
                         if option.key=='continue' then
                             self.transparency=G.runInfo.remainingContinues<=0 and 0.5 or 1
                         end
+                        if option.key=='statistics' then
+                            self.transparency=(G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE) and 0.5 or 1
+                        end
                         if option.key=='saveReplay' then
                             self.transparency=(playingReplay or G.runInfo.continued) and 0.5 or 1
                         end
@@ -133,11 +144,13 @@ return {
         -- remakeOptions needs to know most recent playingReplay so cannot swap order
         remakeOptions()
         -- if player dies during a stage, stageManager:update part after stage coroutine ends wont be executed which includes adding current stage keyrecords and things into replay source data.
-        if lastState==G.STATES.IN_GAME and not playingReplay then
-            if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.stageKey then
-                StageManager:addStageData()
+        if lastState==G.STATES.IN_GAME then
+            if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.stageKey then -- means current stage isn't recorded
+                EM.post(EM.EVENTS.STAGE_END)
             end
-            G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
+            if not playingReplay then
+                G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
+            end
         end
         base:updateHierarchy() -- simple way to deal with the one-frame delay due to extraUpdate using base.frame to update positions
     end,

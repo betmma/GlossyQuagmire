@@ -157,7 +157,7 @@ function Player:calculateShoot(dt)
         self.duringDeathbombWindow=false -- exit deathbomb window to prevent death
         self.invincibleFrame=self.shotType.spellcard.duration
         self.transparency=0.5 -- make player semi-transparent during bomb invincibility
-        G.runInfo.bombs=G.runInfo.bombs-1
+        EM.post(EM.EVENTS.SET_BOMB,G.runInfo.bombs-1)
         SFX:play('enemyPowerfulShot')
         self.shotType.spellcard.func(kinematicState, self.keyIsDown(KEYS.SLOW))
         self.duringBomb=true
@@ -334,9 +334,11 @@ EventManager.listenTo(EventManager.EVENTS.PLAYER_GRAZE,Player.grazeEffect)
 function Player:hitEffect(damage)
     damage=damage or 1
     self.hitFrame=self.frame
-    G.runInfo.lives=G.runInfo.lives-damage
+    EventManager.post(EventManager.EVENTS.SET_LIFE,G.runInfo.lives-damage)
     G.runInfo.power=math.max(0,G.runInfo.power-50)
-    G.runInfo.bombs=math.max(3,G.runInfo.bombs)
+    -- todo: change this to keep bomb pieces. currently during implementing statistics, won't change this or it breaks the replay
+    local newBombs=math.max(3,G.runInfo.bombs)
+    EventManager.post(EventManager.EVENTS.SET_BOMB,newBombs)
     ---@type DropItems
     local dropItems={powerSmall=20}
     if G.runInfo.lives<0 then

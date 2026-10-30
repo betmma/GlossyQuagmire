@@ -393,6 +393,7 @@ Fonts={
     zh_cn='assets/Source Han Sans CN Heavy.otf'
 }
 -- set font size. The font changes with language. In menus like replay saving and loading, where character width is important and hardcoded for process, the forcedFont parameter should be set to Fonts.en_us.
+---@return love.Font
 function SetFont(size,forcedFont)
     if forcedFont then
         local font=getFont(forcedFont,size)

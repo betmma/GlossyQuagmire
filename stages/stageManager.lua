@@ -252,6 +252,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                     segment:skip(segmentFuncArgs)
                 end
             else
+                EM.post(EM.EVENTS.ENTER_SEGMENT,segment.key)
                 self:markSegmentReached(stageKey, segment.key)
                 funcRet=segment:func(segmentFuncArgs)
                 if onlyRunOneSegment then
@@ -340,6 +341,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
         G.runInfo.power=G.CONSTANTS.PRACTICE_START_POWER[stageKey]
     end
     if not nextStaging then
+        EM.post(EM.EVENTS.RESET_STATISTICS) -- same as when replay data is reset
         self.previousStagesData={}
     end
 end
@@ -358,6 +360,9 @@ function StageManager:addStageData()
         grazes=G.runInfo.grazes
     }
 end
+EM.listenTo(EM.EVENTS.STAGE_END,function ()
+    StageManager:addStageData()
+end)
 
 function StageManager:update(dt)
     if self.currentCoroutine and coroutine.status(self.currentCoroutine)~='dead' then
@@ -369,7 +374,7 @@ function StageManager:update(dt)
     end
     -- below only runs when self.currentCoroutine ends
     if self.callback=='nextStage' then
-        self:addStageData()
+        EM.post(EM.EVENTS.STAGE_END)
         -- find next stage
         local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty]
         local currentStageIndex=-1
