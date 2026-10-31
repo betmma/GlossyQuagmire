@@ -363,6 +363,11 @@ end
 EM.listenTo(EM.EVENTS.STAGE_END,function ()
     StageManager:addStageData()
 end)
+-- if player dies during a stage, stageManager:update part after stage coroutine ends wont be executed which includes adding current stage keyrecords and things into replay source data.
+-- i know after continue and stage ends, addStageData is called again and there will be duplicate stage data. but cannot save replay after continue so doesn't matter.
+EM.listenTo(EM.EVENTS.LOSE_GAME,function ()
+    StageManager:addStageData()
+end)
 
 function StageManager:update(dt)
     if self.currentCoroutine and coroutine.status(self.currentCoroutine)~='dead' then

@@ -52,6 +52,7 @@ return {
                 SFX:play('select')
                 G.runInfo.remainingContinues=G.runInfo.remainingContinues-1
                 G.runInfo.continued=true
+                EM.post(EM.EVENTS.USE_CONTINUE)
                 local startResources=G.CONSTANTS.START_LIVES_AND_BOMBS[G.runInfo.gameType]
                 EM.post(EM.EVENTS.SET_LIFE,startResources.lives)
                 EM.post(EM.EVENTS.SET_BOMB,startResources.bombs)
@@ -133,20 +134,17 @@ return {
         remakeOptions()
     end,
     enter=function(self,lastState)
-        previousBGM=nil
-        if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and not playingReplay then
-            previousBGM=BGM.currentAudio
-            previousBGMTime=BGM.data[previousBGM]:tell("seconds")
-            BGM:play('score')
-        end
         base.frame=0
         playingReplay=G.runInfo.replay~=nil
         -- remakeOptions needs to know most recent playingReplay so cannot swap order
         remakeOptions()
-        -- if player dies during a stage, stageManager:update part after stage coroutine ends wont be executed which includes adding current stage keyrecords and things into replay source data.
         if lastState==G.STATES.IN_GAME then
-            if #StageManager.previousStagesData==0 or StageManager.previousStagesData[#StageManager.previousStagesData].stageKey~=StageManager.args.stageKey then -- means current stage isn't recorded
-                EM.post(EM.EVENTS.STAGE_END)
+            if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and not playingReplay then
+                previousBGM=BGM.currentAudio
+                previousBGMTime=BGM.data[previousBGM]:tell("seconds")
+                BGM:play('score')
+            else
+                previousBGM=nil
             end
             if not playingReplay then
                 G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)

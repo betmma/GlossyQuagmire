@@ -345,6 +345,7 @@ function Player:hitEffect(damage)
         dropItems={powerFull=3}
         G.runInfo.power=0
         G:switchState(G.STATES.GAME_END)
+        EM.post(EM.EVENTS.LOSE_GAME)
         -- G:lose()
     end
     

@@ -61,6 +61,13 @@ local function addStageData()
     OneStageData=GetOneStageDataTemplate()
 end
 EM.listenTo(EM.EVENTS.STAGE_END,addStageData)
+EM.listenTo(EM.EVENTS.LOSE_GAME,addStageData)
+-- when entering GAME_END by losing, does need to post LOSE_GAME to show current stage statistics. but after using continue, the added stage data needs to be popped and becomes the current stage data written to.
+local function popStageData()
+    OneStageData=Statistics.data[#Statistics.data]
+    Statistics.data[#Statistics.data]=nil
+end
+EM.listenTo(EM.EVENTS.USE_CONTINUE,popStageData)
 
 -- prepare layer, merge stages, calculate y range, return line vertices
 
