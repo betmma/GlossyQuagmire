@@ -3,7 +3,7 @@
 -- record layer
 
 -- currently recorded info: for each stage, when (player frame index, same as replay) did life or bomb change and what's the new value. when did each segment start.
--- the starting lives and bombs cannot be tracked with SET_LIFE event because the code in state.lua doesn't call event and player object hasn't been created. so has to read first segment's recorded life and bomb. also it's ensured there must be a segment at first frame.
+-- the starting lives and bombs cannot be tracked with SET_LIFE event because the code in state.lua doesn't call event and player object hasn't been created. so has to read first segment's recorded life and bomb. also current logic ensures there must be a segment at first frame of a stage.
 ---@alias frame integer
 ---@class valueChangeEvent
 ---@field [1] frame
@@ -274,7 +274,7 @@ function UILineGraph:drawToCanvas()
     end
     local fontHeight=font:getHeight()
     local xTextsMaxHeight=font:getHeight()*2
-    
+
     -- a box
     love.graphics.setColor(0,0,0,1)
     love.graphics.rectangle("fill",0,0,width,height)

@@ -378,8 +378,8 @@ function StageManager:update(dt)
         return
     end
     -- below only runs when self.currentCoroutine ends
+    EM.post(EM.EVENTS.STAGE_END)
     if self.callback=='nextStage' then
-        EM.post(EM.EVENTS.STAGE_END)
         -- find next stage
         local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[G.runInfo.difficulty]
         local currentStageIndex=-1
