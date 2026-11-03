@@ -397,6 +397,7 @@ function makeDynamicUIObjs()
     EventManager.listenTo(EventManager.EVENTS.PICK_ITEM, pickItem,EventManager.EVENTS.RELOAD_UI)
     local function spawnBonus()
         local value=totalValue()
+        G.runInfo.PIV=G.runInfo.PIV+math.floor(value+0.5)
         itemComboData.active=false
         local bonusIndex=0
         for index, bonus in ipairs(bonuses) do

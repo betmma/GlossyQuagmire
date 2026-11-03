@@ -27,7 +27,7 @@ return {
                 return 0
             end
         end
-        local items={'hiScore','score','empty','lives','bombs','power','grazes'}
+        local items={'hiScore','score','empty','lives','bombs','power','grazes','PIV'}
         local function getAlignToForegroundExtraUpdate(offsetX)
             return function(self)
                 local xr,yr=self:getXY()
@@ -50,6 +50,8 @@ return {
         local colors={
             lives={1,0.15,0.7,1},
             bombs={0,0.7,0,1},
+            power={240/255,145/255,162/255},
+            PIV={69/255,107/255,212/255}
         }
         for i,key in ipairs(items) do
             local y=i*30+30
@@ -115,6 +117,9 @@ return {
                             end
                             if key=='power' then
                                 return string.format('%.2f/4.00',G.runInfo[key]/100)
+                            end
+                            if key=='PIV' then
+                                return scoreToString(G.runInfo[key],nil,true)
                             end
                             return tostring(G.runInfo[key])
                         end,

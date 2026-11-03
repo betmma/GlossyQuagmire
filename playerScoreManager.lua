@@ -244,7 +244,8 @@ function PlayerScoreManager:getDisplayLine(index,scoreLine,sortBy)
         scoreStr=string.format("%"..LENGTHS.SCORE.."s",scoreStr)
     end
     local dateStr = scoreLine.time
-    local stageStr= string.format("%"..LENGTHS.STAGE..'s','St '..G.CONSTANTS.STAGE_SHORT_FORMS[scoreLine.stage])
+    local stageStr=scoreLine.stage=='ALL' and 'ALL' or 'St '..G.CONSTANTS.STAGE_SHORT_FORMS[scoreLine.stage]
+    stageStr= string.format("%"..LENGTHS.STAGE..'s',stageStr)
     return string.format("%s %s %s %s %s",indexStr,nameStr,scoreStr,dateStr,stageStr)
 end
 

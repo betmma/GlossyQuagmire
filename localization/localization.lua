@@ -1209,6 +1209,10 @@ return {
                 en_us = 'Grazes',
                 zh_cn = '擦弹',
             },
+            PIV = {
+                en_us = 'PIV',
+                zh_cn = '得点'
+            },
             bgm = {
                 en_us = 'BGM: {bgm}', -- this font doesnt have the eighth note symbol
                 zh_cn = '♪ {bgm}',
@@ -1508,8 +1512,8 @@ return {
         },
         SAVE_SCORE_ENTER_NAME={
             pressC={
-                en_us='Press {key} key to switch between rankings',
-                zh_cn='按{key}键来切换榜单'
+                en_us='Press {key} key to switch between rankings.',
+                zh_cn='按{key}键来切换榜单。'
             },
         },
         SAVE_SCORE={

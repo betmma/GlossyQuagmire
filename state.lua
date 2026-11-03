@@ -494,7 +494,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey, remainingContinues: integer, continued:boolean}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, PIV:integer, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey, remainingContinues: integer, continued:boolean}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
@@ -504,6 +504,7 @@ G={
         shotType=G.CONSTANTS.PLAYER_TO_SHOT_TYPES[G.CONSTANTS.PLAYERS[1]][1],
         hiScore=0,
         score=0,
+        PIV=1000,
         lives=2,
         bombs=3,
         power=0,
@@ -537,6 +538,7 @@ G={
         self.runInfo.bombs=startResources.bombs
         self.runInfo.power=0 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
         self.runInfo.score=0
+        self.runInfo.PIV=1000
         self.runInfo.grazes=0
         self.runInfo.replay=replay
         self.runInfo.remainingContinues=0

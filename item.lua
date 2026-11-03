@@ -178,7 +178,7 @@ function Item:picked()
     elseif self.type==ItemType.powerFull then
         gainPower(400)
     elseif self.type==ItemType.point then
-        local scoreGain=1000*(1-self.frame/self.lifeFrame)
+        local scoreGain=G.runInfo.PIV
         EventManager.post(EventManager.EVENTS.GAIN_SCORE,scoreGain)
     elseif self.type==ItemType.pointGolden then
         EventManager.post(EventManager.EVENTS.GAIN_SCORE,1000)
