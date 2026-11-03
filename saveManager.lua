@@ -181,6 +181,27 @@ SaveManager.defaultSaveData=DefaultRoot{
             addDiffAndShotType(highScores[stagePractice][stageKey], difficulties)
         end
     end),
+    scoreLines=AlwaysFunction(function (otherTable,key)
+        otherTable[key]=otherTable[key] or {}
+        local scoreLines=otherTable[key]
+        for i, shotType in ipairs(G.CONSTANTS.SHOT_TYPES) do
+            scoreLines[shotType]=scoreLines[shotType] or {}
+            local shotTypeLines=scoreLines[shotType]
+            for j, difficulty in ipairs(G.CONSTANTS.DIFFICULTIES) do
+                shotTypeLines[difficulty]=shotTypeLines[difficulty] or {}
+                local difficultyLines=shotTypeLines[difficulty]
+                difficultyLines['ALL']=difficultyLines['ALL'] or {}
+                local stages=G.CONSTANTS.DIFFICULTIES_TO_STAGES[difficulty]
+                if #stages==1 then
+                    goto continue
+                end
+                for k, stageKey in ipairs(stages) do
+                    difficultyLines[stageKey]=difficultyLines[stageKey] or {}
+                end
+                ::continue::
+            end
+        end
+    end),
     reachedSegments=AlwaysFunction(function(otherTable,key)
         otherTable[key]=otherTable[key] or {}
         local reachedSegments=otherTable[key]

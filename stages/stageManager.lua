@@ -341,7 +341,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
         G.runInfo.power=G.CONSTANTS.PRACTICE_START_POWER[stageKey]
     end
     if not nextStaging then
-        EM.post(EM.EVENTS.RESET_STATISTICS) -- same as when replay data is reset
+        EM.post(EM.EVENTS.RUN_START) -- same as when replay data is reset
         self.previousStagesData={}
     end
 end
@@ -402,7 +402,8 @@ function StageManager:update(dt)
         end
     end
     if self.callback=='end' then
-        G:switchState(G.STATES.GAME_END)
+        EM.post(EM.EVENTS.RUN_END)
+        G.toGameEnd()
     end
 end
 

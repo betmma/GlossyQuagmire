@@ -199,11 +199,6 @@ return {
         if DEV_MODE and love.keyboard.isDown('f2') then
             return
         end
-        -- if isPressed('escape') then
-        --     SFX:play('select',false)
-        --     EventManager.post(EventManager.EVENTS.LEAVE_GAME)
-        --     self:switchState(G.runInfo.exitToState)
-        -- end
         base:drawTextHierarchy()
     end
 }

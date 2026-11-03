@@ -512,7 +512,7 @@ return {
             NORMAL = '@ref:EASY',
             __default__ = {
                 name = {
-                    en_us = '"Conserted Lethal Power from Heaven and Human"',
+                    en_us = '"Concerted Lethal Power from Heaven and Human"',
                     zh_cn = '「天人合发之杀机」'
                 }
             }
@@ -634,7 +634,7 @@ return {
             },
             DISCLAIMER = {
                 en_us = 'Due to limitations of web browser, web version performs worse than downloaded versions. Some parts could be very laggy in the web version. Play the downloaded version for the best experience.',
-                zh_cn = '由于网页浏览器的限制，网页版的性能不如下载版。某些地方在网页版可能会非常卡顿。请下载游戏以获得最佳体验。',
+                zh_cn = '由于网页浏览器的限制，网页版的性能不如下载版。某些地方在网页版可能会严重卡顿。请下载游戏以获得最佳体验。',
             },
             GAME_START = {
                 en_us = 'Game Start',
@@ -1504,6 +1504,24 @@ return {
             enterName = {
                 en_us = 'Enter Name',
                 zh_cn = '输入名字'
+            }
+        },
+        SAVE_SCORE_ENTER_NAME={
+            pressC={
+                en_us='Press {key} key to switch between rankings',
+                zh_cn='按{key}键来切换榜单'
+            },
+        },
+        SAVE_SCORE={
+            sortBy={
+                SCORE={
+                    en_us = 'Score Ranking',
+                    zh_cn = '高分榜'
+                },
+                SURVIVAL={
+                    en_us = 'Survival Ranking',
+                    zh_cn = '生存榜'
+                }
             }
         },
 
@@ -2703,6 +2721,40 @@ return {
             imIn = {
                 en_us = 'I\'m in! I\'ll tell you what\'s inside later!',
                 zh_cn = '我进去了！之后会告诉你里面有什么！',
+            }
+        },
+        REIMUS6BossBefore = {
+            amIOnEarthAnymore = {
+                en_us = 'Am I even on Earth anymore?',
+                zh_cn = '我还在地球上吗？'
+            },
+            yesTheBackgroundIsJustForAtmosphere = {
+                en_us = 'Yes. This space background provides an atmosphere that suits me.',
+                zh_cn = '是的。这太空背景提供了适合我的氛围。'
+            },
+            soWhatAreYouPlanning = {
+                en_us = 'So, what about the spatial power leaked from here?',
+                zh_cn = '所以，关于从这里泄露出去的空间力量，你有什么想说的？'
+            },
+            goLearnHairyBallTheorem = {
+                en_us = 'Not my doing. Go learn Hairy ball theorem if you are interested.',
+                zh_cn = '不是我做的。感兴趣的话去学毛球定理吧。'
+            },
+            whatsThat = {
+                en_us = 'What\'s that...',
+                zh_cn = '什么东西……'
+            },
+            fineIfYouWontStopIt = {
+                en_us = 'Fine, if you won\'t stop it...',
+                zh_cn = '行啊，既然你不停止……'
+            },
+            iKnowItWouldBeThat = {
+                en_us = 'I know it would turn out like this.',
+                zh_cn = '果然是这样。'
+            },
+            letsGo = {
+                en_us = 'Then let\'s get it over with!',
+                zh_cn = '那就把事办了吧！'
             }
         }
     },

@@ -40,7 +40,7 @@ local ResetStatistics=function ()
     Statistics.data={}
     OneStageData=GetOneStageDataTemplate()
 end
-EM.listenTo(EM.EVENTS.RESET_STATISTICS,ResetStatistics)
+EM.listenTo(EM.EVENTS.RUN_START,ResetStatistics)
 local function getFrame()
     return G.runInfo.player.frame
 end

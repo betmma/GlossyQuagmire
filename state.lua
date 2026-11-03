@@ -11,6 +11,7 @@ G={
     ---@field REGULAR_DIFFICULTIES DIFFICULTY[]
     ---@field EXTRA_DIFFICULTIES DIFFICULTY[]
     ---@field STAGE_KEYS StageKey[]
+    ---@field STAGE_SHORT_FORMS table<StageKey, string>
     ---@field PLAYERS PLAYER[]
     ---@field PLAYERS_DATA table<PLAYER, {value: string, color: rgbaColor}>
     ---@field SHOT_TYPES SHOT_TYPE[]
@@ -86,6 +87,7 @@ G={
         },
         ---@alias StageKey 'stage1'|'stage2'|'stage3'|'stage4'|'stage5'|'stage6'|'stageEX'
         STAGE_KEYS={'stage1','stage2','stage3','stage4','stage5','stage6','stageEX'},
+        STAGE_SHORT_FORMS={stage1='1',stage2='2',stage3='3',stage4='4',stage5='5',stage6='6',stageEX='EX',},
         ---@type table<DIFFICULTY, StageKey[]> what stages and in which order for a difficulty
         DIFFICULTIES_TO_STAGES={
             EASY=normalStageOrder,
@@ -179,6 +181,7 @@ local geometries=require"geometries.geometryBase"
 ---@field inited? boolean
 ---@field reloaded? boolean
 ---@field TRANSITION? boolean
+---@field any table
 
 ---@class G
 ---@field [DIFFICULTY] integer -- only used for danmaku scripts to compare difficulty. like DIFF()>=G.HARD
@@ -273,6 +276,8 @@ G={
         IN_GAME='IN_GAME',
         PAUSE='PAUSE',
         GAME_END='GAME_END',
+        SAVE_SCORE_ENTER_NAME='SAVE_SCORE_ENTER_NAME',
+        SAVE_SCORE='SAVE_SCORE',
         RUN_STATISTICS='RUN_STATISTICS',
         SAVE_REPLAY='SAVE_REPLAY',
         SAVE_REPLAY_ENTER_NAME='SAVE_REPLAY_ENTER_NAME',
@@ -357,6 +362,20 @@ G={
                 from={duration=10},
                 to={duration=10}
             },
+        },
+        SAVE_SCORE_ENTER_NAME={
+            SAVE_SCORE={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
+            }
+        },
+        SAVE_SCORE={
+            GAME_END={
+                transitionState='TRANSITION_FADE',
+                from={duration=10},
+                to={duration=10}
+            }
         },
         RUN_STATISTICS={
             GAME_END={
@@ -466,6 +485,11 @@ G={
                 from={},
                 to={duration=10,progressFunc=Event.sineOProgressFunc,target='fadeAll'}
             },
+            SAVE_SCORE_ENTER_NAME={
+                transitionState='TRANSITION_FADE',
+                from={},
+                to={duration=10,progressFunc=Event.sineOProgressFunc,target='fade'}
+            }
         }
     },
     geometries=geometries,
@@ -577,6 +601,7 @@ end
 ---@field playTimeTable {playTimeOverall: number, playTimeInLevel: number}
 ---@field spellcardHistory table<string, table<DIFFICULTY, {unlocked:boolean, [SHOT_TYPE]: table<spellcardHistoryKey, {cleared: boolean, passes: integer, tries: integer}>}>>>
 ---@field highScores {FULL_GAME: table<DIFFICULTY, table<SHOT_TYPE, integer>>, STAGE_PRACTICE: table<StageKey,table<DIFFICULTY, table<SHOT_TYPE, integer>>>}
+---@field scoreLines table<SHOT_TYPE,table<DIFFICULTY,table<ALLAndStages,ScoreLine[]>>>
 ---@field reachedSegments table<StageKey, table<SegmentKey, boolean>>
 ---@field extraUnlock {[string]: boolean} -- secret level unlocks, format not decided
 ---@field musicUnlock {[string]: boolean}
@@ -595,6 +620,7 @@ G.save={
         FULL_GAME={},
         STAGE_PRACTICE={}
     },
+    scoreLines={},
     reachedSegments={},
     extraUnlock={
     }, -- secret level unlocks, format not decided
@@ -678,6 +704,36 @@ G.inGameLike=function(includeGameEnd)
         end
     end
     return activate
+end
+
+-- when player loses or stage ends, previously directly switch to GAME_END state. but could possibly go to SAVE_SCORE_ENTER_NAME first, or later to ENDING screen first. so let them call G.toGameEnd and switch to different states instead. also some logic in gameEnd needs to be moved here
+G.toGameEnd=function()
+    -- save current bgm so if continues later can resume
+    local gameEndAny=G.UIDEF.GAME_END.any
+    if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and G.runInfo.replay==nil then
+        gameEndAny.previousBGM=BGM.currentAudio
+        gameEndAny.previousBGMTime=BGM.data[gameEndAny.previousBGM]:tell("seconds")
+        BGM:play('score')
+    else
+        gameEndAny.previousBGM=nil
+    end
+    -- check possible switch to SAVE_SCORE_ENTER_NAME
+    if PlayerScoreManager.pendingScoreLine then
+        local result=PlayerScoreManager:getScoreLineRank(PlayerScoreManager.pendingScoreLine)
+        if result[1].rank<=PlayerScoreManager.MAX then
+            -- remove items with rank>MAX
+            for i=2,#result do
+                if result[i].rank>PlayerScoreManager.MAX then
+                    result[i]=nil
+                end
+            end
+            G.UIDEF.SAVE_SCORE_ENTER_NAME.any.result=result
+            G.UIDEF.SAVE_SCORE_ENTER_NAME.any.chosen=1
+            G:switchState(G.STATES.SAVE_SCORE_ENTER_NAME)
+            return
+        end
+    end
+    G:switchState(G.STATES.GAME_END)
 end
 
 G.update=function(self,dt)

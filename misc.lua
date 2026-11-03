@@ -597,3 +597,9 @@ function scoreToString(value,rjust,addZero)
     end
     return scoreString
 end
+
+-- single source of time string. used for replay and player score
+---@return string
+function getTimeString()
+    return os.date('%Y-%m-%d %H:%M:%S')--[[@as string]]
+end

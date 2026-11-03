@@ -60,7 +60,6 @@ return {
     enter=function(self)
         base.frame=0
     end,
-    chosen=1,
     update=function(self,dt)
         base:updateHierarchy()
         if isPressed('x') or isPressed('escape')then
@@ -68,7 +67,6 @@ return {
             G:switchState(G.STATES.GAME_END)
         end
     end,
-    options={},
     draw=function(self)
         G.CONSTANTS.DRAW(self,'IN_GAME') -- gameplay graphics as background. need to pass IN_GAME or :drawHierarchy() will be called on current state PAUSE instead of IN_GAME, and lives and bombs ui sprites will be missing
         base:drawHierarchy() -- should have nothing to draw, as it would be below half transparent overlay. if needed can change draw order in some way??

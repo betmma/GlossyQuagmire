@@ -840,6 +840,26 @@ local KOTOBAS5BossAfter={
     }
 }
 
+local S6BossAutoForwardTime=60/170*4 -- 4 beats at 170bpm, in seconds
+
+local REIMUS6BossBefore={
+    name='REIMUS6BossBefore',
+    defaultSpeakerPosition={
+        reimu='left',
+        enri='right'
+    },
+    lines={
+        line('reimu','surprised','amIOnEarthAnymore'),
+        line('enri','normal','yesTheBackgroundIsJustForAtmosphere'),
+        line('reimu','normal','soWhatAreYouPlanning'),
+        line('enri','happy','goLearnHairyBallTheorem'),
+        line('reimu','angry','whatsThat'),
+        line('reimu','angry','fineIfYouWontStopIt'),
+        line('enri','cunning','iKnowItWouldBeThat'),
+        line('enri','cunning','letsGo',{playBGM=true,autoForwardTime=S6BossAutoForwardTime}),
+    }
+}
+
 ---@type table<string,Dialogue>
 Dialogue.data={
     REIMUS1BossBefore=REIMUS1BossBefore,
@@ -875,6 +895,7 @@ Dialogue.data={
     MARISAS5BossAfter=MARISAS5BossAfter,
     KOTOBAS5BossBefore=KOTOBAS5BossBefore,
     KOTOBAS5BossAfter=KOTOBAS5BossAfter,
+    REIMUS6BossBefore=REIMUS6BossBefore
 }
 
 

@@ -1,4 +1,4 @@
-VERSION="0.6.11.2"
+VERSION="0.6.12"
 WINDOW_WIDTH,WINDOW_HEIGHT=love.graphics.getDimensions()
 GAME_NAME="Glossy Quagmire"
 IS_WEB=type(jit)~="table"
@@ -54,6 +54,7 @@ function love.load()
     ---@type NoticeManager
     NoticeManager=require"notice"
     ReplayManager=require"replayManager"
+    PlayerScoreManager=require"playerScoreManager"
     -- Nickname=require"nickname"
 
     BGM:play('title')

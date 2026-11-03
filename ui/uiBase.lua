@@ -234,5 +234,7 @@ UI.Options=love.filesystem.load("ui/options.lua")(UI)
 UI.Switcher=love.filesystem.load("ui/switcher.lua")(UI)
 ---@type UICanvas
 UI.Canvas=love.filesystem.load("ui/canvas.lua")(UI)
+---@type UIKeyboard
+UI.Keyboard=love.filesystem.load("ui/keyboard.lua")(UI)
 
 return UI

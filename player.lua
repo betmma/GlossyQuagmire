@@ -344,8 +344,8 @@ function Player:hitEffect(damage)
     if G.runInfo.lives<0 then
         dropItems={powerFull=3}
         G.runInfo.power=0
-        G:switchState(G.STATES.GAME_END)
         EM.post(EM.EVENTS.LOSE_GAME)
+        G.toGameEnd()
         -- G:lose()
     end
     
@@ -388,6 +388,7 @@ function Player:enterDeathbombing(damage)
         wait(deathbombWindow)
         if self.duringDeathbombWindow then
             self.duringDeathbombWindow=false
+            EM.post(EM.EVENTS.PLAYER_MISS)
             self:hitEffect(damage)
         else -- has deathbombed and prevented death
             Asset.mainEffectsByName.death.args.active=false -- stop the effect

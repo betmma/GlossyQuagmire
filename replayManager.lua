@@ -154,7 +154,7 @@ function replayBase:getBasicReplayDataFromCurrentGame()
     return {
         difficulty=G.runInfo.difficulty,
         shotType=G.runInfo.shotType,
-        time=os.date('%Y-%m-%d %H:%M:%S'),
+        time=getTimeString(),
         version=VERSION,
         type=G.runInfo.gameType,
     }
@@ -210,17 +210,6 @@ function replayBase:fromSaveFormat(data)
     data.keyRecord=keyRecord
     return self(data)
 end
-
----@type table<StageKey, string>
-replayBase.STAGE_SHORT_FORMS={
-    stage1='1',
-    stage2='2',
-    stage3='3',
-    stage4='4',
-    stage5='5',
-    stage6='6',
-    stageEX='EX',
-}
 
 ---@class emptyReplay:replayBase
 local emptyReplay=replayBase:extend()
@@ -309,7 +298,7 @@ end
 local stagePracticeReplay=replayBase:extend()
 function stagePracticeReplay:getDisplayLine()
     local leftParts=replayBase.getDisplayLine(self)
-    local identifier=string.format("%-3s",G.CONSTANTS.DIFFICULTIES_DATA[self.data.difficulty].shortForm)..'St '..replayBase.STAGE_SHORT_FORMS[self.data.stage]
+    local identifier=string.format("%-3s",G.CONSTANTS.DIFFICULTIES_DATA[self.data.difficulty].shortForm)..'St '..G.CONSTANTS.STAGE_SHORT_FORMS[self.data.stage]
     return string.format("%s %s", leftParts, identifier)
 end
 
