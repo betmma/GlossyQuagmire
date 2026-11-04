@@ -119,7 +119,7 @@ local compares={
         if aall and not ball then
             return true
         end
-        if not ball and aall then
+        if not aall and ball then
             return false
         end
         if not aall and not ball then
@@ -138,10 +138,10 @@ local compares={
             end
         end
         -- miss, then bomb, then time
-        if not a.missCount==b.missCount then
+        if a.missCount~=b.missCount then
             return a.missCount<b.missCount
         end
-        if not a.bombCount==b.bombCount then
+        if a.bombCount~=b.bombCount then
             return a.bombCount<b.bombCount
         end
         return a.time<b.time

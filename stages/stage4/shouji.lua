@@ -267,7 +267,7 @@ local boss=BossManager.BossSegment{
             require('stages.stage4.spellcards.trick'),
         }},
         BossManager.BossRound{phases={
-            BossManager.NonSpellPhase{SKIP_INCLUDE=true,
+            BossManager.NonSpellPhase{
                 key='4-boss-shouji-non-2',
                 time=1800,
                 hp=3000,

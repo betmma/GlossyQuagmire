@@ -531,7 +531,7 @@ ShotTypes.REIMUB=ShotType{
     optionShot={focused={ShootingPattern{
         sprite=Asset.playerShotSprites.amuletHuge,
         frequency=8,
-        damage=function(self, powerLevel) return 6 end,
+        damage=function(self, powerLevel) return 8 end,
         angle=0,
         size=0.75
     }}, unfocused={ShootingPattern{

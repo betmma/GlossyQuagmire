@@ -56,6 +56,7 @@ return {
                 EM.post(EM.EVENTS.SET_BOMB,startResources.bombs)
                 G.runInfo.score=G.runInfo.score%10+1
                 G.runInfo.grazes=0
+                G.runInfo.PIV=G.CONSTANTS.START_PIV
                 G:switchState(G.STATES.IN_GAME)
                 local gameEndAny=G.UIDEF.GAME_END.any
                 if gameEndAny.previousBGM then

@@ -116,7 +116,7 @@ local addFollow=function(boss)
         event:remove()
     end,EventManager.EVENTS.FINISH_BOSS_PHASE)
 end
-local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
+local finalBoss=BossManager.BossSegment{
     bossName='kotoba',
     spellBackground=BackgroundPattern.KotobaSpell,
     key='1-boss-kotoba',
@@ -205,7 +205,7 @@ local finalBoss=BossManager.BossSegment{SKIP_INCLUDE=true,
             },
             require 'stages.stage1.spellcards.swallow',
         }},
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='1-boss-kotoba-non-2',
                 time=1500,

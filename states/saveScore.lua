@@ -47,9 +47,9 @@ return {
                     local any=G.UIDEF.SAVE_SCORE_ENTER_NAME.any
                     local index=any.result[any.chosen].rank
                     if i==index then
-                        self.color={1,1,0,1}
+                        self.color=math.lerpTable(self.color,{1,1,0,1},0.2)
                     else
-                        self.color={1,1,1,1}
+                        self.color=math.lerpTable(self.color,{1,1,1,1},0.2)
                     end
                 end}
             }
@@ -70,7 +70,10 @@ return {
         end
         if isPressed(KEYS.SPECIAL) then
             SFX:play('select',true)
-            G.UIDEF.SAVE_SCORE_ENTER_NAME.any.chosen=G.UIDEF.SAVE_SCORE_ENTER_NAME.any.chosen%#G.UIDEF.SAVE_SCORE_ENTER_NAME.any.result+1
+            local any=G.UIDEF.SAVE_SCORE_ENTER_NAME.any
+            any.chosen=any.chosen%#any.result+1
+            local sortBy=any.result[any.chosen].sortBy
+            scoreLines=PlayerScoreManager:getSorted(sortBy)
         end
     end,
     draw=function(self)

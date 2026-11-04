@@ -15,7 +15,7 @@ local tooshiBoss=BossManager.BossSegment{
         return pos
     end,
     rounds={
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='2-boss-tooshi-non-1',
                 time=1500,
@@ -61,7 +61,7 @@ local tooshiBoss=BossManager.BossSegment{
             },
             require('stages.stage2.spellcards.dance'),
         }},
-        BossManager.BossRound{SKIP_INCLUDE=true,phases={
+        BossManager.BossRound{phases={
             BossManager.NonSpellPhase{SKIP_INCLUDE=true,
                 key='2-boss-tooshi-non-2',
                 time=1500,

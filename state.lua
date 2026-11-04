@@ -139,10 +139,12 @@ G={
         PRACTICE_START_POWER={
             stage1=0,stage2=200,stage3=400,stage4=400,stage5=400,stage6=400,stageEX=400
         },
+        ---@type integer
+        START_PIV=1000,
         ---@type table<StageKey, string>
         STAGE_TO_DEFAULT_GEOMETRY_NAME={
             stage1='Hyperbolic',stage2='MovingHyperbolic',stage3='Euclidean',stage4='Euclidean',stage5='Cylinder',stage6='Spherical'
-        }
+        },
     },
 }
 ---@type table<StageKey, DIFFICULTY[]>
@@ -538,7 +540,7 @@ G={
         self.runInfo.bombs=startResources.bombs
         self.runInfo.power=0 -- only when making new stages where it directly jumps to later stage would this be non 0 for testing. should be changed back to 0 after its finished
         self.runInfo.score=0
-        self.runInfo.PIV=1000
+        self.runInfo.PIV=G.CONSTANTS.START_PIV
         self.runInfo.grazes=0
         self.runInfo.replay=replay
         self.runInfo.remainingContinues=0
