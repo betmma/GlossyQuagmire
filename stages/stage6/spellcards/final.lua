@@ -69,10 +69,12 @@ return BossManager.SpellcardPhase{
             if self.frame==time then
                 self.safe=true
                 self.any.antipode,self.any.dir=geo:rThetaGo(self.kinematicState.pos,math.pi*radius*((activateLayers-layer)%2),self.kinematicState.dir)
+                self.any.size=self.size
                 layers[layer].func(self)
             elseif self.frame>time and self.frame<=time+fadeFrame then
                 local ratio=1-(self.frame-time)/fadeFrame
                 self.spriteTransparency=ratio
+                self.size=self.any.size*(0.5+ratio*0.5)
             end
             if self.frame==time+fadeFrame and layer>1 then
                 reviveLater(self)
@@ -85,6 +87,7 @@ return BossManager.SpellcardPhase{
                 self.kinematicState.pos,self.kinematicState.dir=copyTable(self.any.antipode),self.any.dir
                 local ratio=(time+fadeFrame-remaining)/fadeFrame
                 self.spriteTransparency=ratio
+                self.size=self.any.size*(0.5+ratio*0.5)
             end
         end}
         local function playSFX(first)
@@ -225,7 +228,7 @@ return BossManager.SpellcardPhase{
                 local angle0d=angle0-(angle0)%div0+div0/2 -- angle0d is div0*(integer+0.5) while angle1d is div1*integer
                 local angle1d=angle1-(angle1+div1/2)%div1+div1/2
                 local center=geo:rThetaGo(pole,angle0d*radius,angle1d)
-                local dc,tc=geo:rThetaTo(center,self.kinematicState.pos)
+                local tc=geo:to(self.kinematicState.pos,center)
                 -- local center=geo:rThetaGo(pos2,angle0d*radius,angle1d)
                 local n=2
                 for i=1,n do
@@ -234,7 +237,7 @@ return BossManager.SpellcardPhase{
                     local distance,angle4=geo:rThetaTo(self.kinematicState.pos,pos3)
                     local speed0=distance/layers[layer].time*60
                     local averageSpeed=radius*math.pi/(layers[layer].time*2)*60
-                    local bullet=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle4,speed=speed0/2},sprite=BulletSprites.knife.purple,size=1.5,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={0.8,1,1,0.8}}
+                    local bullet=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle4,speed=speed0/2},sprite=BulletSprites.knife.purple,size=1.5,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={0.8,1,1,0.8},spriteExtraDirection=tc+math.pi-angle4}
                     bullet.any={layer=layer,speed0=speed0,averageSpeed=averageSpeed,index=index,pole=pole}
                 end
             end,extraUpdate=function (self)

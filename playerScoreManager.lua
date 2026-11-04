@@ -84,7 +84,7 @@ function PlayerScoreManager:setPendingScoreLine()
         self.pendingScoreLine=nil
         return
     end
-    if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE and not (StageManager.args.segmentFuncArgs==StageManager.currentStageData.segments[1] and StageManager.args.onlyRunOneSegment==false) then
+    if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE and not (StageManager.args.skipToSegmentKey==StageManager.currentStageData.segments[1].key and not StageManager.args.onlyRunOneSegment) then
         self.pendingScoreLine=nil
         return
     end
@@ -92,8 +92,8 @@ function PlayerScoreManager:setPendingScoreLine()
     local time=getTimeString()
     ---@type ALLAndStages
     local stage=StageManager.args.stageKey
-    if currentRunTracker.lose==false then
-        stage="ALL"
+    if G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.FULL_GAME and currentRunTracker.lose==false then
+        stage="ALL" -- so stage practice failed and cleared are both "stage x". it's fine because failing a stage practice means 8+ misses
     end
     self.pendingScoreLine={id=id,name=G.save.defaultName,time=time,score=G.runInfo.score,missCount=currentRunTracker.miss,bombCount=currentRunTracker.bomb,stage=stage}
 end
