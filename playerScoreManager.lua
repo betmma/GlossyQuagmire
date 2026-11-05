@@ -4,7 +4,7 @@ replay, statistics and player score.
 replay info collection is mostly managed by stage manager. main events are
 RUN_START -> empty, 
 STAGE_END/LOSE_GAME -> add stage data, 
-RUN_END/LOSE_GAME -> set G.runInfo.pendingReplay to getPendingReplay() (actually written in gameEnd.lua)
+RUN_END/LOSE_GAME -> set G.runInfo.pendingReplay to getPendingReplay() (actually written in G.toGameEnd)
 statistics info collection is in its file. main events are 
 RUN_START -> empty, 
 STAGE_END/LOSE_GAME -> add stage data, 

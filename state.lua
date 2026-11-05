@@ -728,6 +728,10 @@ G.toGameEnd=function()
     else
         gameEndAny.previousBGM=nil
     end
+    -- set pendingReplay
+    if not G.runInfo.replay then
+        G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
+    end
     -- check possible switch to SAVE_SCORE_ENTER_NAME
     if PlayerScoreManager.pendingScoreLine then
         local result=PlayerScoreManager:getScoreLineRank(PlayerScoreManager.pendingScoreLine)

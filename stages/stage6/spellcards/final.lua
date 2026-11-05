@@ -4,7 +4,7 @@ return BossManager.SpellcardPhase{
     bonusScore=100000,
     time=7200,
     hp=10000,
-    -- dropItems={powerSmall=30,point=15}, -- no need for items for final spell
+    dropItems={point=40}, -- some final score for final spell
     func=function(self, boss)
         -- what if a big nuke -> giants -> return to a big nuke, and later phases add more transformations in the middle, like giants -> big stars -> giants, big stars -> rounds -> big stars. each smaller bullet moves a cycle, returns and becomes bigger one
         boss.extraHitRadius=128

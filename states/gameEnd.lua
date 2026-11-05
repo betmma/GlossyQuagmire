@@ -139,11 +139,6 @@ return {
         playingReplay=G.runInfo.replay~=nil
         -- remakeOptions needs to know most recent playingReplay so cannot swap order
         remakeOptions()
-        if lastState==G.STATES.IN_GAME then
-            if not playingReplay then
-                G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
-            end
-        end
         base:updateHierarchy() -- simple way to deal with the one-frame delay due to extraUpdate using base.frame to update positions
     end,
     update=function(self,dt)
