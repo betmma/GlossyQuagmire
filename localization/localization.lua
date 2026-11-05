@@ -699,8 +699,8 @@ return {
                 zh_cn = '美术\n\n子弹、妖精、灵梦自机图像：\nSeija.Real/TyrantSatanachia（在Discord上共享）\n\n立绘和其他自机图像：\nBetmma'
             },
             [3] = {
-                en_us = 'Writing\n\nDialogue:\nヤブサメ, Betmma',
-                zh_cn = '文案\n\n对话：\nヤブサメ、Betmma'
+                en_us = 'Writing\n\nDialogue:\nBetmma, ヤブサメ',
+                zh_cn = '文案\n\n对话：\nBetmma、ヤブサメ'
             }
         },
         OPTIONS={
@@ -1526,6 +1526,16 @@ return {
                     en_us = 'Survival Ranking',
                     zh_cn = '生存榜'
                 }
+            }
+        },
+        PLAYER_DATA={
+            ALL={
+                en_us = 'Full Game',
+                zh_cn = '全关'
+            },
+            practice={
+                en_us = '{stage} Practice',
+                zh_cn = '{stage}练习'
             }
         },
 

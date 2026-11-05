@@ -18,9 +18,9 @@ function UIArranger:update()
     end
 end
 
-function UIArranger:child(child)
-    UIArranger.super.child(self,child)
-    local index=#self.children
+function UIArranger:child(child,index)
+    UIArranger.super.child(self,child,index)
+    index=index or #self.children
     local x,y=self.arrange(self,index)
     child.x=x
     child.y=y

@@ -142,7 +142,7 @@ return BossManager.SpellcardPhase{
             end
             portals[1]:link(portals[2])
             -- add some distraction portals (outer connects to outer) for higher difficulties
-            local distractionPairCount=DSWITCH{0,1,2,3}
+            local distractionPairCount=DSWITCH{0,1,2,3,3}
             -- local firstLayer=math.randomSign()
             for pair=1,distractionPairCount do
                 local layer=1

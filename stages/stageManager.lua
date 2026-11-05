@@ -108,6 +108,9 @@ end
 ---@param difficulty DIFFICULTY
 ---@param player PLAYER|nil
 function StageManager.checkCondition(Condition,difficulty,player)
+    if difficulty=='OVERDRIVE' then
+        difficulty='LUNATIC'
+    end
     for index, value in ipairs(Condition) do
         if value.difficulties[difficulty] and (not player or value.players[player]) then
             return true

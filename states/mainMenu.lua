@@ -33,7 +33,7 @@ return {
                 {value='PRACTICE',state='CHOOSE_DIFFICULTY',gameType=G.CONSTANTS.GAME_TYPES.STAGE_PRACTICE},
                 {value='SPELL_PRACTICE'},
                 {value='REPLAY',state='LOAD_REPLAY'},
-                {value='PLAYER_DATA',disabled=true},
+                {value='PLAYER_DATA'},
                 {value='MUSIC_ROOM'},
                 -- {value='NICKNAMES',disabled=true}, -- decided to put inside player data
                 {value='CREDITS'},

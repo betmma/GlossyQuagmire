@@ -75,7 +75,7 @@ return BossManager.SpellcardPhase{
             DanmakuFuncs.moveToInTime(ball,pos1,120,Event.sineOProgressFunc)
             wait(120)
             SFX:play('enemyCharge')
-            local speed=DSWITCH{2000,3500,3000,3000}
+            local speed=DSWITCH{2000,3500,3000,3000,2800}
             local dir=math.mod2Sign(i)*sign*dangle-math.pi/2
             local time=400
             if DIFF()>=G.HARD then

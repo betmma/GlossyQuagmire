@@ -61,15 +61,15 @@ end
 ---add a child UI element to this element. return the child element for chaining
 ---@generic T:UIBase
 ---@param child T
----@param asFirst boolean|nil whether to add the child as the first child. default false, which means adding as the last child.
+---@param index integer|nil whether to add the child as the ith child. default false, which means adding as the last child.
 ---@return T
-function UIBase:child(child,asFirst)
+function UIBase:child(child,index)
     if not child then
         error("Child cannot be nil")
     end
     child:unchild() -- remove from previous parent if has
-    if asFirst then
-        table.insert(self.children,1,child)
+    if index then
+        table.insert(self.children,index,child)
     else
         table.insert(self.children,child)
     end

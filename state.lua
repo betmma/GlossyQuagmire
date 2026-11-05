@@ -53,8 +53,6 @@ G={
                 G.CONSTANTS.FOREGROUND_SHADERS[key]:send(k,v)
             end
         end,
-        -- ---@enum GEOMETRY
-        -- GEOMETRIES={EUCLIDEAN='EUCLIDEAN',HYPERBOLIC='HYPERBOLIC'},
 
         ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
         ---@type DIFFICULTY[]
@@ -63,7 +61,7 @@ G={
             'NORMAL',
             'HARD',
             'LUNATIC',
-            -- 'OVERDRIVE', -- this is just for fun, not an official difficulty. DSWITCH can guess the value for overdrive, though spells with difficulty condition (like shouji's gate spells) will be skipped. it's quite good, few impossible or broken danmaku and palpable difficulty increase.
+            -- 'OVERDRIVE', -- this is just for fun, not an official difficulty. DSWITCH can guess the value for overdrive. it's quite good, few impossible or broken danmaku and palpable difficulty increase.
             'EXTRA',
         },
         ---@type {DIFFICULTY: {value: string, shortForm: string, color:rgbaColor}}
@@ -271,6 +269,7 @@ G={
         CHOOSE_PLAYER='CHOOSE_PLAYER',
         PRACTICE='PRACTICE',
         SPELL_PRACTICE='SPELL_PRACTICE',
+        PLAYER_DATA='PLAYER_DATA',
         MUSIC_ROOM='MUSIC_ROOM',
         CREDITS='CREDITS',
         -- NICKNAMES='NICKNAMES',
@@ -299,6 +298,9 @@ G={
             SPELL_PRACTICE={
                 slideDirection='left',
             },
+            PLAYER_DATA={
+                slideDirection='down'
+            },
             LOAD_REPLAY={
                 slideDirection='left'
             },
@@ -314,6 +316,11 @@ G={
             NICKNAMES={
                 slideDirection='up'
             },
+        },
+        PLAYER_DATA={
+            MAIN_MENU={
+                slideDirection='up',
+            }
         },
         CREDITS={
             MAIN_MENU={

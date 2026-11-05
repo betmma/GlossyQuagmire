@@ -70,7 +70,9 @@ return BossManager.SpellcardPhase{
                 self.safe=true
                 self.any.antipode,self.any.dir=geo:rThetaGo(self.kinematicState.pos,math.pi*radius*((activateLayers-layer)%2),self.kinematicState.dir)
                 self.any.size=self.size
-                layers[layer].func(self)
+                if not self.any.noSpawn then
+                    layers[layer].func(self)
+                end
             elseif self.frame>time and self.frame<=time+fadeFrame then
                 local ratio=1-(self.frame-time)/fadeFrame
                 self.spriteTransparency=ratio
@@ -131,8 +133,14 @@ return BossManager.SpellcardPhase{
                 for i=1,n do
                     local angle=angle0+math.pi*(3-5^0.5)*i
                     local multi=(i-0.5)/n*4-1
-                    local bullet=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=averageSpeed*multi},sprite=BulletSprites.giant.orange,size=3,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={1,0.8,0.8,1}}
+                    local bullet=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=averageSpeed*multi},sprite=BulletSprites.giant.orange,size=3,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={1,0.8,0.8,DSWITCH{1,1,0.6,0.6}}}
                     bullet.any={layer=layer,averageSpeed=averageSpeed,multi=multi,index=i,ratio=(i-0.5)/n}
+                    -- it lerps speed from multi to 2-multi. so the middle place is (multi+1)/4*math.pi*radius. for harder difficulties, spawn smaller bullets that changes speed from (multi+1) to 0 to (3-multi)
+                    if DIFF()>=G.HARD then
+                        local speed=averageSpeed*(multi+1)
+                        local sub=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed},sprite=BulletSprites.lightRound.orange,size=2,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={1,0.6,0,1}}
+                        sub.any={layer=layer,averageSpeed=averageSpeed,speed0=speed,index=i,noSpawn=true}
+                    end
                 end
             end,extraUpdate=function (self)
                 -- restore frame and lifeFrame. it won't disppear
@@ -158,7 +166,13 @@ return BossManager.SpellcardPhase{
                 local t=shift(self.frame,self.any.layer,self.lifeFrame)
                 if t~=-1 then
                     local ratio=t/layers[self.any.layer].time
-                    self.kinematicState.speed=self.any.averageSpeed*math.lerp(self.any.multi,2-self.any.multi,ratio/2)
+                    if self.any.noSpawn then
+                        local t2=math.min(ratio,2-ratio)
+                        local speed=ratio<=1 and self.any.speed0 or self.any.averageSpeed*4-self.any.speed0
+                        self.kinematicState.speed=speed*(1-t2)
+                    else
+                        self.kinematicState.speed=self.any.averageSpeed*math.lerp(self.any.multi,2-self.any.multi,ratio/2)
+                    end
                 end
             end},
             -- stars that move simply, just with speed up and slow down
@@ -176,8 +190,15 @@ return BossManager.SpellcardPhase{
             end,extraUpdate=function (self)
                 local t=shift(self.frame,self.any.layer,self.lifeFrame)
                 if t~=-1 then
-                    t=math.min(t,layers[self.any.layer].time*2-t)
-                    self.kinematicState.speed=self.any.averageSpeed*math.min(t/fadeFrame,1)
+                    local time=layers[self.any.layer].time
+                    local t1=math.min(t,time*2-t)
+                    local t2=1+math.cos(t/(time*2)*math.pi)*.8*math.mod2Sign(self.any.index)
+                    if DIFF()<=G.NORMAL then
+                        t2=1
+                    else
+                        self.spriteColor=math.lerpTable({0.9,0.85,0.75,0.7},{0.95,0.7,0.3,0.85},t2/2)
+                    end
+                    self.kinematicState.speed=self.any.averageSpeed*math.min(t1/fadeFrame,1)*t2
                 end
             end},
             -- flames scattered in small range. 

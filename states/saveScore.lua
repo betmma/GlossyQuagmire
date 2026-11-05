@@ -27,7 +27,7 @@ return {
                 end
                 return ''
             end,
-            fontSize=18,color={1,1,1,1},
+            fontSize=24,color={1,1,1,1},
             x=100,y=100,parent=transBase
         }
         local scoreLinesUI=UI.Options{x=(WINDOW_WIDTH-charWidth*PlayerScoreManager.OVERALL_WIDTH)/2,y=200,

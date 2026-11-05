@@ -59,6 +59,14 @@ function UIOptions:addOption(option)
     end
 end
 
+function UIOptions:replaceOption(index,option)
+    self.container.children[index]:remove()
+    self.container:child(option,index)
+    if self.cursor.parent==nil then
+        self:switchOption(option,true,true)
+    end
+end
+
 function UIOptions:update()
     UIOptions.super.update(self)
     if self.cursor.parent and self.focused then
@@ -124,7 +132,7 @@ function UIOptions:switchOption(option,snap,init)
         self.cursor:unchild()
     end
     local asFirst=self.cursor.drawStyle==UI.Cursor.DRAW_STYLE.Face -- face style cursor should be under the option, line style cursor should be above the option
-    option:child(self.cursor,asFirst)
+    option:child(self.cursor,asFirst and 1 or nil)
     option:emit(UI.EVENTS.FOCUS,{init=init})
     if not init then
         SFX:play('select',false)
