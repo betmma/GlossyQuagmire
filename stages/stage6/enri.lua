@@ -33,6 +33,7 @@ local boss=BossManager.BossSegment{
     bossName='enri',
     key='6-boss',
     BGM='level6b',
+    spellBackground=BackgroundPattern.EnriSpell,
     getBossSpawnPos=getBossSpawnPos,
     bossSpawnCallback=function (self, boss)
         -- easier to hit. surprisingly, it's more difficult to hit the stage 6 boss though the space converges

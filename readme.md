@@ -45,6 +45,8 @@ Bullet sprites and Reimu sprites (bullets.png and player.png) used in this proje
 
 Title image (title.png) is drawn by myself.
 
+Stage 6 spell background is from [Nebula HDRI 4K by Ammar Khan / CGHEVEN](https://cgheven.com/assets/nebula-hdri-4k)
+
 #### Audio
 
 Music is made by myself.

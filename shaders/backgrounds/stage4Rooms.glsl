@@ -210,7 +210,81 @@ float lineMask(float coordinate, float spacing, float halfWidth) {
     return 1.0 - smoothstep(halfWidth, halfWidth + 0.018, localCoordinate);
 }
 
-vec3 shojiColor(vec3 point, float frontOpen, float backOpen) {
+float contactMask(float distance, float reach) {
+    // A broad soft falloff with a tighter core reads at gameplay resolution.
+    float d = max(distance, 0.0);
+    return 0.65 * (1.0 - smoothstep(0.0, reach, d))
+        + 0.35 * (1.0 - smoothstep(0.0, reach * 0.25, d));
+}
+
+// Shallow relief on the paper and a narrow lit edge on the wooden lattice.
+// Coordinates stay attached to each sliding panel, including its shading.
+vec3 latticeColor(vec2 uv, vec2 spacing, vec2 widths, vec3 paper, vec3 wood) {
+    float bars = max(lineMask(uv.x, spacing.x, widths.x), lineMask(uv.y, spacing.y, widths.y));
+    float shadow = max(lineMask(uv.x - 0.018, spacing.x, widths.x + 0.025),
+                       lineMask(uv.y + 0.018, spacing.y, widths.y + 0.025));
+    float inset = max(lineMask(uv.x - 0.012, spacing.x, widths.x),
+                      lineMask(uv.y + 0.012, spacing.y, widths.y));
+    float edge = max(bars - inset, 0.0);
+    return mix(paper * (1.0 - 0.22 * shadow), wood, bars)
+        + vec3(0.045, 0.032, 0.018) * edge;
+}
+
+// Evaluate only at surface hits; no extra marching or normal samples.
+float surfaceContact(vec3 point, float material, bool hallSurface, float frontOpen, float backOpen) {
+    float contact = 0.0;
+    if(!hallSurface) {
+        if(material > 1.5) {
+            contact = max(contact, contactMask(ROOM_HALF_WIDTH - abs(point.x), 0.80));
+        }
+        if(material < 1.5 || material > 3.5) {
+            contact = max(contact, contactMask(ROOM_HALF_HEIGHT - abs(point.y), 0.65));
+        }
+        if(material < 3.5) {
+            // Distance to the actual panels keeps the floor shadow moving as doors open.
+            float panels = min(
+                min(shojiPanelDistance(point, ROOM_HALF_LENGTH, -1.0, frontOpen),
+                    shojiPanelDistance(point, ROOM_HALF_LENGTH, 1.0, frontOpen)),
+                min(shojiPanelDistance(point, -ROOM_HALF_LENGTH, -1.0, backOpen),
+                    shojiPanelDistance(point, -ROOM_HALF_LENGTH, 1.0, backOpen)));
+            contact = max(contact, contactMask(panels, 0.70));
+            // The fixed frame remains when the sliding panels have moved away.
+            float frameDistance = length(vec2(
+                max(abs(abs(point.z) - ROOM_HALF_LENGTH) - DOOR_THICKNESS * 1.8, 0.0),
+                max(min(ROOM_HALF_WIDTH - abs(point.x), ROOM_HALF_HEIGHT - abs(point.y)) - 0.18, 0.0)));
+            contact = max(contact, contactMask(frameDistance, 0.55));
+        }else if(material < 4.5) {
+            contact = max(contact, contactMask(ROOM_HALF_WIDTH - 0.18 - abs(point.x), 0.42));
+            contact = max(contact, contactMask(ROOM_HALF_HEIGHT - 0.18 - abs(point.y), 0.42));
+        }
+    }else{
+        if(material > 3.5) {
+            contact = max(contact, contactMask(HALL_FLOOR_Y - point.y, 1.60));
+            contact = max(contact, contactMask(point.y - HALL_DOME_BASE_Y, 1.20));
+        }
+        if(material < 3.5 || (material > 5.5 && material < 6.5)) {
+            float vertexRadius = HALL_APOTHEM / cos(HALL_WALL_ANGLE * 0.5);
+            for(int sideIndex=0; sideIndex<8; sideIndex++) {
+                float angle = float(sideIndex) * HALL_WALL_ANGLE;
+                if(material > 1.5 && material < 2.5) {
+                    float wallDistance = HALL_APOTHEM - dot(point.xz, vec2(cos(angle), sin(angle)));
+                    contact = max(contact, contactMask(wallDistance, 1.50));
+                }
+                float cornerAngle = angle + HALL_WALL_ANGLE * 0.5;
+                vec3 center = vec3(cos(cornerAngle) * vertexRadius, 0.0, sin(cornerAngle) * vertexRadius);
+                float postDistance = boxDistance(point - center, vec3(0.315, HALL_WALL_HALF_HEIGHT, 0.315));
+                contact = max(contact, contactMask(postDistance, 1.35));
+            }
+        }
+        if(material > 2.5 && material < 3.5) {
+            float rimDistance = length(vec2(length(point.xz) - HALL_OCULUS_RADIUS, point.y - HALL_OCULUS_Y)) - 0.315;
+            contact = max(contact, contactMask(rimDistance, 1.05));
+        }
+    }
+    return 1.0 - 0.60 * contact;
+}
+
+vec2 shojiCoordinates(vec3 point, float frontOpen, float backOpen) {
     float openness = backOpen;
     if(point.z > 0.0) {
         openness = frontOpen;
@@ -221,14 +295,38 @@ vec3 shojiColor(vec3 point, float frontOpen, float backOpen) {
     }
     float panelHalfWidth = ROOM_HALF_WIDTH * 0.5;
     float panelCenterX = side * (panelHalfWidth + openness * panelHalfWidth);
-    float panelX = point.x - panelCenterX;
-    float verticalBar = lineMask(panelX, 0.53, 0.032);
-    float horizontalBar = lineMask(point.y, 0.46, 0.026);
-    float frame = max(verticalBar, horizontalBar);
+    return vec2(point.x - panelCenterX, point.y);
+}
+
+vec3 shojiColor(vec3 point, float frontOpen, float backOpen) {
+    float panelX = shojiCoordinates(point, frontOpen, backOpen).x;
     float paperVariation = 0.025 * sin(panelX * 13.0 + point.y * 9.0 + time * 0.03);
     vec3 paper = vec3(0.82, 0.76, 0.61) + vec3(paperVariation);
     vec3 wood = vec3(0.12, 0.065, 0.033);
-    return mix(paper, wood, frame);
+    return latticeColor(vec2(panelX, point.y), vec2(0.53, 0.46), vec2(0.032, 0.026), paper, wood);
+}
+
+// Two broad samples per panel approximate diffuse area lighting at surface hits.
+// Only the exposed paper emits into the room; light follows the sliding doors.
+float shojiWallLight(vec3 point, vec3 normal, float wallZ, float openness) {
+    float innerEdge = openness * ROOM_HALF_WIDTH * 0.5;
+    float outerEdge = ROOM_HALF_WIDTH - 0.18;
+    float exposedWidth = max(outerEdge - innerEdge, 0.0);
+    float centerX = (innerEdge + outerEdge) * 0.5;
+    float illumination = 0.0;
+    for(int sideIndex=0; sideIndex<2; sideIndex++) {
+        float side = sideIndex == 0 ? -1.0 : 1.0;
+        for(int heightIndex=0; heightIndex<2; heightIndex++) {
+            float height = heightIndex == 0 ? -0.95 : 0.95;
+            vec3 toLight = vec3(side * centerX, height, wallZ) - point;
+            float distanceSquared = max(dot(toLight, toLight), 0.001);
+            vec3 direction = toLight * inversesqrt(distanceSquared);
+            float receiver = max(dot(normal, direction), 0.0);
+            float emitter = abs(direction.z);
+            illumination += receiver * emitter / (1.0 + 0.16 * distanceSquared);
+        }
+    }
+    return illumination * exposedWidth / ROOM_HALF_WIDTH;
 }
 
 vec3 hallWallColor(vec3 point) {
@@ -236,13 +334,12 @@ vec3 hallWallColor(vec3 point) {
     float wallAngle = floor(theta / HALL_WALL_ANGLE + 0.5) * HALL_WALL_ANGLE;
     vec2 wallTangent = vec2(-sin(wallAngle), cos(wallAngle));
     float alongWall = dot(point.xz, wallTangent);
-    float verticalBar = lineMask(alongWall, 0.57, 0.034);
-    float horizontalBar = lineMask(point.y, 0.52, 0.029);
     float outerFrame = smoothstep(HALL_WALL_HALF_HEIGHT - 0.72, HALL_WALL_HALF_HEIGHT - 0.30, abs(point.y));
-    float frame = max(max(verticalBar, horizontalBar), outerFrame);
     vec3 paper = vec3(0.73, 0.67, 0.53);
     vec3 wood = vec3(0.105, 0.052, 0.025);
-    return mix(paper, wood, frame);
+    vec3 lattice = latticeColor(vec2(alongWall, point.y), vec2(0.57, 0.52), vec2(0.034, 0.029), paper, wood);
+    float frameShadow = smoothstep(HALL_WALL_HALF_HEIGHT - 0.88, HALL_WALL_HALF_HEIGHT - 0.60, abs(point.y));
+    return mix(lattice * (1.0 - 0.18 * frameShadow), wood, outerFrame);
 }
 
 vec4 surfaceColor(vec3 point, vec3 normal, vec3 rayDirection, float material, float travel, float frontOpen, float backOpen, float projectedMode) {
@@ -265,6 +362,7 @@ vec4 surfaceColor(vec3 point, vec3 normal, vec3 rayDirection, float material, fl
         float beam = lineMask(point.z, 1.0, 0.055);
         vec3 plaster = vec3(0.42, 0.37, 0.28);
         vec3 wood = vec3(0.10, 0.052, 0.027);
+        plaster *= 1.0 - 0.20 * lineMask(point.z, 1.0, 0.095);
         baseColor = mix(plaster, wood, beam);
     }else if(material < 2.5) {
         float matEdgeX = lineMask(point.x, 1.58, 0.035);
@@ -280,7 +378,12 @@ vec4 surfaceColor(vec3 point, vec3 normal, vec3 rayDirection, float material, fl
             float ringBeam = lineMask(length(point.xz), 1.15, 0.055);
             ceilingBeam = max(radialBeam, ringBeam);
         }
-        baseColor = mix(vec3(0.25, 0.20, 0.14), vec3(0.085, 0.045, 0.025), ceilingBeam);
+        float beamShadow = lineMask(point.z, 1.15, 0.11);
+        if(hallSurface) {
+            beamShadow = max(lineMask(atan(point.z, point.x), HALL_WALL_ANGLE, 0.032),
+                             lineMask(length(point.xz), 1.15, 0.10));
+        }
+        baseColor = mix(vec3(0.25, 0.20, 0.14) * (1.0 - 0.18 * beamShadow), vec3(0.085, 0.045, 0.025), ceilingBeam);
     }else if(material < 4.5) {
         baseColor = shojiColor(point, frontOpen, backOpen);
     }else if(material < 5.5) {
@@ -295,14 +398,27 @@ vec4 surfaceColor(vec3 point, vec3 normal, vec3 rayDirection, float material, fl
         baseColor = vec3(0.23, 0.13, 0.055);
     }
 
-    vec3 lightDirection = normalize(vec3(-0.35, 0.72, -0.46));
-    float diffuse = 0.52 + 0.48 * max(dot(normal, lightDirection), 0.0);
-    float facing = 0.72 + 0.28 * abs(dot(normal, -rayDirection));
-    vec3 shaded = baseColor * diffuse * facing;
-
-    if(material >= 3.5 && material < 4.5) {
-        shaded = shaded + baseColor * 0.22;
+    vec3 shaded;
+    if(hallSurface) {
+        vec3 lightDirection = normalize(vec3(-0.35, 0.72, -0.46));
+        float diffuse = 0.52 + 0.48 * max(dot(normal, lightDirection), 0.0);
+        float facing = 0.72 + 0.28 * abs(dot(normal, -rayDirection));
+        shaded = baseColor * diffuse * facing;
+    }else{
+        float windowLight = shojiWallLight(point, normal, ROOM_HALF_LENGTH, frontOpen)
+            + shojiWallLight(point, normal, -ROOM_HALF_LENGTH, backOpen);
+        vec3 warmLight = vec3(1.0, 0.82, 0.59);
+        shaded = baseColor * (vec3(0.34, 0.35, 0.37) + warmLight * windowLight * 1.65);
+        if(material >= 3.5 && material < 4.5) {
+            vec2 panel = shojiCoordinates(point, frontOpen, backOpen);
+            float lattice = max(lineMask(panel.x, 0.53, 0.032), lineMask(panel.y, 0.46, 0.026));
+            float panelGlow = 0.76 + 0.22 * exp(-dot(panel * vec2(0.65, 0.40), panel * vec2(0.65, 0.40)));
+            // Paper transmits warm light; opaque lattice retains its shaded wood.
+            shaded = mix(shaded, baseColor * vec3(1.0, 0.92, 0.76) * panelGlow, 1.0 - lattice);
+        }
     }
+
+    shaded *= surfaceContact(point, material, hallSurface, frontOpen, backOpen);
 
     float fog = 1.0 - exp(-travel * 0.045);
     return vec4(mix(shaded, vec3(0.055, 0.045, 0.040), fog * 0.62), 0.0);

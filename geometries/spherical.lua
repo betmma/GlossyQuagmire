@@ -47,6 +47,13 @@ Spherical.viewConfig = {
 -- with latitude, longitude, and view direction all zero (following disabled).
 local camera = { 0, 1, 0, 0, 0, 1, 1, 0, 0 }
 
+-- Share the exact gameplay camera with sphere-mapped backgrounds.
+function Spherical:sendCameraBasis(shader)
+    shader:send('cameraEast', {camera[1], camera[2], camera[3]})
+    shader:send('cameraNorth', {camera[4], camera[5], camera[6]})
+    shader:send('cameraForward', {camera[7], camera[8], camera[9]})
+end
+
 local function world_to_camera(x, y, z)
     return
         camera[1] * x + camera[2] * y + camera[3] * z,

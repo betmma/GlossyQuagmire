@@ -336,8 +336,7 @@ function Player:hitEffect(damage)
     self.hitFrame=self.frame
     EventManager.post(EventManager.EVENTS.SET_LIFE,G.runInfo.lives-damage)
     G.runInfo.power=math.max(0,G.runInfo.power-50)
-    -- todo: change this to keep bomb pieces. currently during implementing statistics, won't change this or it breaks the replay
-    local newBombs=math.max(3,G.runInfo.bombs)
+    local newBombs=math.max(3+G.runInfo.bombs%1,G.runInfo.bombs)
     EventManager.post(EventManager.EVENTS.SET_BOMB,newBombs)
     ---@type DropItems
     local dropItems={powerSmall=20}

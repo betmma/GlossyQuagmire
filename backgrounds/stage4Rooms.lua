@@ -57,7 +57,8 @@ function Stage4Rooms:new(args)
     self.lightColor={0.82,0.82,0.82}
     self.darkColor={0.42,0.42,0.42}
 
-    self.cam_translation={0,0,-2.0}
+    -- Offset room crossings from the 20-second transition into 4-2.
+    self.cam_translation={0,0,0}
     self.camMoveRange={3.2,2.2}
     self.baseCamMoveSpeed=0.5
     self.camMoveSpeed=self.baseCamMoveSpeed
@@ -239,11 +240,6 @@ function Stage4Rooms:setProjectionMode(enabled)
     self.projectionState=enabled and 'normal' or 'disabled'
     self.capturePending=false
     self.forwardSpeed=self.cameraSpeed
-    if enabled then
-        self.cam_roll=0
-        self.cam_yaw=0
-        self.cam_pitch=0
-    end
 end
 
 function Stage4Rooms:beginTurn()

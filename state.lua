@@ -731,21 +731,21 @@ G.toGameEnd=function()
     -- set pendingReplay
     if not G.runInfo.replay then
         G.runInfo.pendingReplay=ReplayManager:getPendingReplay(G.save.defaultName)
-    end
-    -- check possible switch to SAVE_SCORE_ENTER_NAME
-    if PlayerScoreManager.pendingScoreLine then
-        local result=PlayerScoreManager:getScoreLineRank(PlayerScoreManager.pendingScoreLine)
-        if result[1].rank<=PlayerScoreManager.MAX then
-            -- remove items with rank>MAX
-            for i=2,#result do
-                if result[i].rank>PlayerScoreManager.MAX then
-                    result[i]=nil
+        -- check possible switch to SAVE_SCORE_ENTER_NAME
+        if PlayerScoreManager.pendingScoreLine then
+            local result=PlayerScoreManager:getScoreLineRank(PlayerScoreManager.pendingScoreLine)
+            if result[1].rank<=PlayerScoreManager.MAX then
+                -- remove items with rank>MAX
+                for i=2,#result do
+                    if result[i].rank>PlayerScoreManager.MAX then
+                        result[i]=nil
+                    end
                 end
+                G.UIDEF.SAVE_SCORE_ENTER_NAME.any.result=result
+                G.UIDEF.SAVE_SCORE_ENTER_NAME.any.chosen=1
+                G:switchState(G.STATES.SAVE_SCORE_ENTER_NAME)
+                return
             end
-            G.UIDEF.SAVE_SCORE_ENTER_NAME.any.result=result
-            G.UIDEF.SAVE_SCORE_ENTER_NAME.any.chosen=1
-            G:switchState(G.STATES.SAVE_SCORE_ENTER_NAME)
-            return
         end
     end
     G:switchState(G.STATES.GAME_END)
