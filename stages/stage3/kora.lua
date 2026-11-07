@@ -84,6 +84,7 @@ local midboss=BossManager.BossSegment{
 }
 
 local boss=BossManager.BossSegment{
+    spellBackground=BackgroundPattern.KoraSpell,
     bossName='cora',
     key='3-boss',
     BGM='level3b',

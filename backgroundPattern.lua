@@ -277,6 +277,8 @@ BackgroundPattern.SphericalGrid=love.filesystem.load("backgrounds/sphericalGrid.
 
 local WalkerShader=love.filesystem.load("backgrounds/walkerShader.lua")(Shader)
 
+BackgroundPattern.KoraSpell=love.filesystem.load("backgrounds/koraSpell.lua")(WalkerShader)
+
 BackgroundPattern.Honeycomb=love.filesystem.load("backgrounds/honeycomb.lua")(WalkerShader)
 
 BackgroundPattern.Planes=love.filesystem.load("backgrounds/planes.lua")(WalkerShader)
