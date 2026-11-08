@@ -59,7 +59,7 @@ return BossManager.SpellcardPhase{
             pos=player.kinematicState.pos
             SFX:play('enemyCharge')
             wait(time-followTime)
-            SFX:play('enemyPowerfulShot')
+            SFX:play('coraMirror')
             local pos1=geo:rThetaGo(pos,-600,dir)
             local pos2=geo:rThetaGo(pos,600,dir)
             local mirror=Mirror(pos1,pos2,copyTable(player.kinematicState.pos), {lifeFrame=479,extraUpdate={function(self)

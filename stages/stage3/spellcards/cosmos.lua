@@ -76,6 +76,7 @@ return BossManager.SpellcardPhase{
                 Mirror(posmi,posm2,posmin,{extraUpdate={Action.FadeIn(t1,false,1),Action.FadeOut(30,false)},lifeFrame=t1+60})
             end
             wait(t1)
+            SFX:play('coraMirror')
             mirrorSignal=true
             wait(1)
             mirrorSignal=false

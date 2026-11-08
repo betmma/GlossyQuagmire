@@ -18,6 +18,7 @@ return BossManager.SpellcardPhase{
         end}
         SFX:play('enemyCharge')
         wait(60)
+        SFX:play('coraMirror')
         Mirror.setHSV({0,0,1},0)
         local mirrorn=4
         local r0=600

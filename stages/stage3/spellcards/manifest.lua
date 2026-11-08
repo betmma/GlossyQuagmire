@@ -30,7 +30,8 @@ return BossManager.SpellcardPhase{
             local side=math.mod2Sign(i)
             local pos,dir=sidepos(side)
             DanmakuFuncs.moveToInTime(boss,pos,60,Event.sineOProgressFunc)
-            SFX:play('enemyCharge')
+            -- SFX:play('enemyCharge')
+            SFX:play('coraMirror')
             local mirror=Mirror(posm,posm2,pos, {lifeFrame=350,extraUpdate={Action.FadeIn(20,false,1),Action.FadeOut(20,false),function(self)
                 if sentry.removed and not self.flag then
                     self.flag=true

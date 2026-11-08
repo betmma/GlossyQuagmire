@@ -1,12 +1,12 @@
 local WalkerShader=...
-local shader=ShaderScan:load_shader('shaders/backgrounds/koraSpell.glsl')
-local KoraSpell=WalkerShader:extend()
+local shader=ShaderScan:load_shader('shaders/backgrounds/coraSpell.glsl')
+local CoraSpell=WalkerShader:extend()
 
 local initialYaw=-math.atan(0.5)
 local initialPitch=-math.atan(1/math.sqrt(5))
 
-function KoraSpell:new(args)
-    KoraSpell.super.new(self,args)
+function CoraSpell:new(args)
+    CoraSpell.super.new(self,args)
     self.lightColor={0.5,0.5,0.5}
     self.shader=shader
     self.cam_translation={0,0,0}
@@ -41,10 +41,10 @@ function KoraSpell:new(args)
     end
 end
 
-function KoraSpell:update(dt)
-    KoraSpell.super.update(self,dt)
+function CoraSpell:update(dt)
+    CoraSpell.super.update(self,dt)
     -- Advancing sqrt(6) repeats the lattice by the integer vector (1,1,2).
     self.travel=(self.travel+self.cameraSpeed*dt)%math.sqrt(6)
 end
 
-return KoraSpell
+return CoraSpell

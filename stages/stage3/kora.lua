@@ -1,4 +1,5 @@
 local midboss=BossManager.BossSegment{
+    spellBackground=BackgroundPattern.CoraSpell,
     bossName='cora',
     key='3-mid',
     getBossSpawnPos=function(self)
@@ -62,6 +63,9 @@ local midboss=BossManager.BossSegment{
                         end
                         local p10,p20,pin=getPoses(0)
                         local mirror=Mirror(p10,p20,pin,{extraUpdate={Action.FadeIn(52,false,0.7),Action.FadeOut(30,false),function (self)
+                            if self.frame==52 then
+                                SFX:play('coraMirror')
+                            end
                             local t=math.clamp(self.frame-52,0,51)/51
                             self.pos1,self.pos2,self.posIn=getPoses(t)
                             if t>0 and t<1 then
@@ -84,7 +88,7 @@ local midboss=BossManager.BossSegment{
 }
 
 local boss=BossManager.BossSegment{
-    spellBackground=BackgroundPattern.KoraSpell,
+    spellBackground=BackgroundPattern.CoraSpell,
     bossName='cora',
     key='3-boss',
     BGM='level3b',
@@ -166,6 +170,9 @@ local boss=BossManager.BossSegment{
                             Mirror.setHSV({math.mod2Sign(i-1)/4,0.5,1},0.3)
                             local mirror=Mirror(p10,p20,pin,{extraUpdate={Action.FadeIn(52,false,0.3),Action.FadeOut(30,false),function (self)
                                 local t=math.clamp(self.frame-52,0,51)/51
+                                if self.frame==52 then
+                                    SFX:play('coraMirror')
+                                end
                                 -- self.pos1,self.pos2,self.posIn=getPoses(t)
                                 if t>0 and t<1 then
                                     if sentry.removed or self.frame%3~=0 or j~=0 then
@@ -259,6 +266,9 @@ local boss=BossManager.BossSegment{
                             local mirror=Mirror(p10,p20,pin,{extraUpdate={Action.FadeIn(62,false,0.7),Action.FadeOut(30,false),function (self)
                                 local t=math.clamp(self.frame-62,0,81)/81
                                 -- self.pos1,self.pos2,self.posIn=getPoses(t)
+                                if self.frame==62 then
+                                    SFX:play('coraMirror')
+                                end
                                 if t>0 and t<1 then
                                     if sentry.removed or self.frame%1~=0 or j~=0 then
                                         return
@@ -348,6 +358,9 @@ local boss=BossManager.BossSegment{
                             Mirror.setHSV({math.mod2Sign(i-1)/4,0.5,1},0.3)
                             local mirror=Mirror(p10,p20,pin,{extraUpdate={Action.FadeIn(62,false,0.7),Action.FadeOut(30,false),function (self)
                                 local t=math.clamp(self.frame-62,0,81)/81
+                                if self.frame==62 then
+                                    SFX:play('coraMirror')
+                                end
                                 self.pos1,self.pos2,self.posIn=getPoses(t,j)
                                 if t>0 and t<1 then
                                     if sentry.removed or self.frame%2~=0 or j~=0 then

@@ -167,7 +167,7 @@ return BossManager.SpellcardPhase{
                 end
             end}
             wait(tm+60)
-            SFX:play('enemyPowerfulShot')
+            SFX:play('coraMirror')
             bulletMove=true
             wait(t-tm-60)
             bulletMove=false
