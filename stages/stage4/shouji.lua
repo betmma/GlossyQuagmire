@@ -1,4 +1,5 @@
 local midboss=BossManager.BossSegment{
+    spellBackground=BackgroundPattern.ShoujiSpell,
     bossName='shouji',
     key='4-mid',
     getBossSpawnPos=function(self)
@@ -146,6 +147,7 @@ local function loadGateSpell(name)
     return phase
 end
 local boss=BossManager.BossSegment{
+    spellBackground=BackgroundPattern.ShoujiSpell,
     bossName='shouji',
     key='4-boss',
     BGM='level4b',

@@ -97,6 +97,12 @@ return {
                     zh_cn = '星符「雹神星」',
                 }
             },
+            OVERDRIVE = {
+                name = {
+                    en_us = 'Star Sign "Phaëton"',
+                    zh_cn = '星符「法厄同星」',
+                }
+            }
         },
         ['marisa-light'] = {
             EASY = {

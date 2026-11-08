@@ -231,7 +231,7 @@ function Portal:draw()
     -- end
 end
 
-local function positionToShaderScreen(position,viewer,geo,zoom)
+function Portal.positionToShaderScreen(position,viewer,geo,zoom)
     local viewPosition=viewer.kinematicState.pos
     local dx=position.x-viewPosition.x
     local dy=position.y-viewPosition.y
@@ -279,8 +279,8 @@ function Portal.applyPixelShader(geo,viewer)
     local pos1s,pos2s,signs,linkeds,ranges={},{},{},{},{}
     for i=1,numSegments do
         local portal=portals[i]
-        pos1s[i]=positionToShaderScreen(portal.pos1,viewer,geo,zoom)
-        pos2s[i]=positionToShaderScreen(portal.pos2,viewer,geo,zoom)
+        pos1s[i]=Portal.positionToShaderScreen(portal.pos1,viewer,geo,zoom)
+        pos2s[i]=Portal.positionToShaderScreen(portal.pos2,viewer,geo,zoom)
         signs[i]=portal.sign
         linkeds[i]=indexes[portal.linked] or i
         ranges[i]=portal.range*zoom

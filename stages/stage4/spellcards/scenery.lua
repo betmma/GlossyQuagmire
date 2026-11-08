@@ -76,6 +76,25 @@ return BossManager.SpellcardPhase{
         end
         portals[1]:link(portals[3])
         portals[2]:link(portals[4])
+        if self.spellBackgroundObj then
+            -- Both linked pairs share the fixed point of z -> a*z+b.
+            -- Use the original endpoints: growing each segment about its
+            -- midpoint leaves this similarity (and its limit point) unchanged.
+            local p1,p2=vertexPoses[1],vertexPoses[2]
+            local q1,q2=vertexPoses[4],vertexPoses[3]
+            local dx,dy=p2.x-p1.x,p2.y-p1.y
+            local ex,ey=q2.x-q1.x,q2.y-q1.y
+            local lengthSquared=dx*dx+dy*dy
+            local ar=(ex*dx+ey*dy)/lengthSquared
+            local ai=(ey*dx-ex*dy)/lengthSquared
+            local bx=q1.x-ar*p1.x+ai*p1.y
+            local by=q1.y-ai*p1.x-ar*p1.y
+            local denominator=(1-ar)^2+ai^2
+            self.spellBackgroundObj.limitPosition={
+                x=(bx*(1-ar)-by*ai)/denominator,
+                y=(by*(1-ar)+bx*ai)/denominator,
+            }
+        end
         -- spawn the fairy
         local fairyPos=geo:rThetaGo(posp,35,math.pi/3)
         local warning=Bullet{kinematicState={pos=fairyPos,dir=0,speed=0},sprite=BulletSprites.giant.white,lifeFrame=120,invincible=true,safe=true,size=1,extraUpdate={Action.ZoomIn(30,0.5,2),Action.FadeIn(30,false),Action.FadeOut(30,false)},spriteColor={1,0,0,0.9},highlight=false}

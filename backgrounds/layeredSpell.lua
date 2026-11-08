@@ -16,6 +16,7 @@ local LayeredSpell=Shader:extend()
 function LayeredSpell:new(args)
     LayeredSpell.super.new(self,args)
     self.shader=shader
+    self.lightColor={0.8,0.8,0.8}
     self.autoDark=false
     self.baseTexture=loadTexture(args.base)
     self.overlayTexture=loadTexture(args.overlay)

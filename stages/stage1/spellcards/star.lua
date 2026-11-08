@@ -42,7 +42,7 @@ return BossManager.SpellcardPhase{
             end
         end
         if DIFF()>=G.HARD then
-            local spawner=BulletSpawner{lifeFrame=1800,kinematicState={pos=copyTable(boss.kinematicState.pos),speed=0,dir=0},period=6,firstPeriod=20,bulletNumber=12,bulletSpeed=180,angle=0,bulletSprite=BulletSprites.starDark.red,bulletSize=2,bulletLifeFrame=300,visible=true,bulletEvents={function(cir,args,self)
+            local spawner=BulletSpawner{lifeFrame=1800,kinematicState={pos=copyTable(boss.kinematicState.pos),speed=0,dir=0},period=6,firstPeriod=20,bulletNumber=DSWITCH{'>','>',10,12},bulletSpeed=180,angle=0,bulletSprite=BulletSprites.starDark.red,bulletSize=2,bulletLifeFrame=300,visible=true,bulletEvents={function(cir,args,self)
                 local period=120
                 cir:changeSpriteColor()
                 cir.spriteRotationSpeed=0.05*math.mod2Sign(args.index)

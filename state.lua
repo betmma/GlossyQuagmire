@@ -54,7 +54,7 @@ G={
             end
         end,
 
-        ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'
+        ---@alias DIFFICULTY 'EASY'|'NORMAL'|'HARD'|'LUNATIC'|'EXTRA'|'OVERDRIVE'
         ---@type DIFFICULTY[]
         DIFFICULTIES={
             'EASY',

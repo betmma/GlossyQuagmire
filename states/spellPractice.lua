@@ -195,11 +195,13 @@ return {
                         end
                     end
                 end
+                local difficultyCount=#G.CONSTANTS.STAGE_TO_DIFFICULTIES[stageKey]
+                local height=70
                 difficultyOptions=UI.Options{
-                    x=140,y=40,width=500,height=250,transparency=0,
+                    x=140,y=40-height/2*(difficultyCount-4),width=500,height=250+height*(difficultyCount-4),transparency=0,
                     container=UI.Arranger{
                         arrange=function(self,index)
-                            return 0,(index-1)*70
+                            return 0,(index-1)*height
                         end
                     },extraUpdates={function(self)
                         local horizontalOptions=self.parent.parent -- difficulty options -> container -> horizontal options
