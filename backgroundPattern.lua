@@ -271,6 +271,7 @@ local Shader=BackgroundPattern.Shader
 BackgroundPattern.KotobaSpell=love.filesystem.load('backgrounds/kotobaSpell.lua')(Shader)
 BackgroundPattern.EnriSpell=love.filesystem.load('backgrounds/enriSpell.lua')(Shader)
 BackgroundPattern.ShoujiSpell=love.filesystem.load('backgrounds/shoujiSpell.lua')(Shader)
+BackgroundPattern.TatsuSpell=love.filesystem.load('backgrounds/tatsuSpell.lua')(Shader)
 local layeredSpells=love.filesystem.load('backgrounds/layeredSpell.lua')(Shader)
 BackgroundPattern.MarisaSpell=layeredSpells.Marisa
 BackgroundPattern.ReimuSpell=layeredSpells.Reimu

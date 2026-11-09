@@ -58,6 +58,7 @@ local function getBossSpawnPos(self)
     return {x=pos.x,y=200}
 end
 local boss=BossManager.BossSegment{
+    spellBackground=BackgroundPattern.TatsuSpell,
     bossName='tatsu',
     key='5-boss',
     BGM='level5b',
