@@ -1,4 +1,5 @@
 local tooshiBoss=BossManager.BossSegment{
+    spellBackground=BackgroundPattern.TooshiSpell,
     bossName='tooshi',
     key='2-boss',
     BGM='level2b',

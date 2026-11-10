@@ -3,7 +3,7 @@
 ---@type Hyperbolic
 local Hyperbolic=...
 
----@class MovingHyperbolic
+---@class MovingHyperbolic:Hyperbolic
 local MovingHyperbolic=Hyperbolic:extend()
 
 ---@class MovingHyperbolicViewConfig:HyperbolicViewConfig
