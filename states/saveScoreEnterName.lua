@@ -37,6 +37,8 @@ return {
         end,endCallBack=function ()
             PlayerScoreManager:addAndEvictScoreLine(PlayerScoreManager.pendingScoreLine)
             G.save.defaultName=PlayerScoreManager.pendingScoreLine.name
+            -- Update the name while preserving the replay captured at game end.
+            G.runInfo.pendingReplay.data.name=G.save.defaultName
             G:saveData()
             G:switchState(G.STATES.SAVE_SCORE)
         end}

@@ -22,6 +22,9 @@ return BossManager.SpellcardPhase{
                 return
             end
             local slowDown=math.clamp(-(self.frame-self.any.stopTime)/20,0,1)
+            if self.any.decorative then
+                self.spriteColor={1,1,1,1-slowDown*0.5}
+            end
             self.any.angle=self.any.angle+self.any.omega*slowDown
             self.any.ovalAngle=self.any.ovalAngle-self.any.omega*0.3
             local r=self.any.r
@@ -88,10 +91,10 @@ return BossManager.SpellcardPhase{
                 local bullet=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites[isMid and 'bigRound' or 'round'][color],lifeFrame=stopTime+30,extraUpdate=bulletExtraUpdate,invincible=true}
                 bullet.any={r=r,angle=angle,ovalAngle=ovalAngle,center=playerPos,stopTime=stopTime,omega=omega*sign}
                 -- decorative safe bullets to add colors inside the mirror
-                local decorative=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.explosion[color],lifeFrame=stopTime+30,extraUpdate=bulletExtraUpdate,invincible=true,safe=true,forceQuad=true,highlight=true,spriteTransparency=DSWITCH{0.15,'<',0.1,'<'},size=1.2}
+                local decorative=Bullet{kinematicState={pos=pos,dir=dir,speed=0},sprite=BulletSprites.explosion[color],lifeFrame=stopTime+30,extraUpdate=bulletExtraUpdate,invincible=true,safe=true,forceQuad=true,highlight=true,spriteTransparency=DSWITCH{0.15,'<',0.1,'<'},spriteColor={1,1,1,0.3},size=1.2}
                 local ratio=(i*0.707*sign)%1
                 decorative.spriteRotationSpeed=0.03*sign
-                decorative.any={r=r*(1-ratio^2),angle=angle,ovalAngle=ovalAngle,center=playerPos,stopTime=stopTime,omega=omega*sign}
+                decorative.any={r=r*(1-ratio^2),angle=angle,ovalAngle=ovalAngle,center=playerPos,stopTime=stopTime,omega=omega*sign,decorative=true}
                 -- laser warnings (mimicked with sticks)
                 if isMid then
                     midBullets[groupIndex]=bullet

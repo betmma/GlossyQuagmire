@@ -13,7 +13,7 @@ function EnriSpell:new(args)
     end
     self.shader=shader
     self.autoDark=false
-    self.lightColor={0.6,0.6,0.6}
+    self.lightColor={0.5,0.5,0.5}
     self.rotation=0
     local pos=G.runInfo.player.kinematicState.pos
     local length=math.sqrt(pos.x*pos.x+pos.y*pos.y+pos.z*pos.z)

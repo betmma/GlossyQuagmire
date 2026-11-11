@@ -138,7 +138,7 @@ return BossManager.SpellcardPhase{
                     -- it lerps speed from multi to 2-multi. so the middle place is (multi+1)/4*math.pi*radius. for harder difficulties, spawn smaller bullets that changes speed from (multi+1) to 0 to (3-multi)
                     if DIFF()>=G.HARD then
                         local speed=averageSpeed*(multi+1)
-                        local sub=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed},sprite=BulletSprites.lightRound.orange,size=2,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={1,0.6,0,1}}
+                        local sub=Bullet{kinematicState={pos=copyTable(self.kinematicState.pos),dir=angle,speed=speed},sprite=BulletSprites.bigRound.orange,size=3,forceQuad=true,highlight=true,invincible=true,lifeFrame=getLifeFrame(layer),extraUpdate=layerExtraUpdates[layer],spriteColor={1,0.6,0,1}}
                         sub.any={layer=layer,averageSpeed=averageSpeed,speed0=speed,index=i,noSpawn=true}
                     end
                 end

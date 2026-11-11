@@ -185,8 +185,10 @@ function PlayerScoreManager:getScoreLineRank(scoreLine,shotType,difficulty,allOr
     for _,sortBy in ipairs(self.SORT_BY) do
         local compare=compares[sortBy]
         local rank=1
-        while rank<=#lines and compare(lines[rank],scoreLine) do
-            rank=rank+1
+        for _,line in ipairs(lines) do
+            if compare(line,scoreLine) then
+                rank=rank+1
+            end
         end
         table.insert(results,{sortBy=sortBy,rank=rank})
     end
