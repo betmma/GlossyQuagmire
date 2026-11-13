@@ -48,7 +48,7 @@ local function injectGeometry()
         if length==0 then
             return copyTable(position),direction
         end
-        local segment=math.ceil(math.abs(length)/Portal.getMinimumRange())
+        local segment=math.min(40,math.ceil(math.abs(length)/Portal.getMinimumRange()))
         local stepLength=length/segment
         for i=1,segment do
             position, direction=rThetaGoRef(self,position,stepLength,direction)
