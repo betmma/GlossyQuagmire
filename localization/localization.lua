@@ -2748,33 +2748,169 @@ return {
                 en_us = 'Am I even on Earth anymore?',
                 zh_cn = '我还在地球上吗？'
             },
-            yesTheBackgroundIsJustForAtmosphere = {
-                en_us = 'Yes. This space background provides an atmosphere that suits me.',
-                zh_cn = '是的。这太空背景提供了适合我的氛围。'
+            couldItBeAnotherTrap = {
+                en_us = 'Could it be another trap...',
+                zh_cn = '难道又是个陷阱……'
             },
-            soWhatAreYouPlanning = {
-                en_us = 'So, what about the spatial power leaked from here?',
-                zh_cn = '所以，关于从这里泄露出去的空间力量，你有什么想说的？'
+            whoIsThere = {
+                en_us = 'Who is there?',
+                zh_cn = '是谁？'
             },
-            goLearnHairyBallTheorem = {
-                en_us = 'Not my doing. Go learn Hairy ball theorem if you are interested.',
-                zh_cn = '不是我做的。感兴趣的话去学毛球定理吧。'
+            ringleaderAppearedImshrineMaiden = {
+                en_us = 'Ringleader appeared! I\'m Reimu Hakurei, coming here to solve the incident!',
+                zh_cn = '黑幕出现了！我是博丽灵梦，到这解决异变的！'
             },
-            whatsThat = {
-                en_us = 'What\'s that...',
-                zh_cn = '什么东西……'
+            ringleaderForWhat = {
+                en_us = '... What ringleader, and what incident?',
+                zh_cn = '……什么黑幕，什么异变啊？'
             },
-            fineIfYouWontStopIt = {
-                en_us = 'Fine, if you won\'t stop it...',
-                zh_cn = '行啊，既然你不停止……'
+            yourSendYourSpatialPowerDownwards = {
+                en_us = 'You sent your spatial power downwards, didn\'t you?',
+                zh_cn = '你在向下发送空间力量，不是吗？'
             },
-            iKnowItWouldBeThat = {
-                en_us = 'I know it would turn out like this.',
-                zh_cn = '果然是这样。'
+            oh = {
+                en_us = 'Oh? Well...',
+                zh_cn = '哦？这样……',
             },
-            letsGo = {
-                en_us = 'Then let\'s get it over with!',
-                zh_cn = '那就把事办了吧！'
+            ahNoImagineAHairyBall = {
+                en_us = 'Ah, no. Imagine a hairy ball, it\'s impossible to comb it flat.',
+                zh_cn = '啊，不是的。想象一个毛球，把所有的毛梳平是不可能的。'
+            },
+            thisIsExactlyHowIDoMyWorkHere = {
+                en_us = 'The leaked spatial power communicates with the outside, so the duty can be done. Talking about the duty—',
+                zh_cn = '逸出的空间力量和外界交流感应，从而完成这里的职责。说到职责——'
+            },
+            whateverCanYouJustLeave = {
+                en_us = 'Whatever, can\'t you just leave?',
+                zh_cn = '我不管，你直接离开这里不行吗？'
+            },
+            ummYouNotSeemPatientForExplanation = {
+                en_us = 'Since you are impatient for the explanation...',
+                zh_cn = '既然你没耐心听解释……'
+            },
+            ahSureSoFight = {
+                en_us = 'Ah sure. So fight.',
+                zh_cn = '啊对。所以打一架呗。'
+            },
+            whyNot = {
+                en_us = 'Why not?',
+                zh_cn = '何乐不为？'
+            }
+        },
+        MARISAS6BossBefore = {
+            thisPlaceIsCursedMyBulletsAlmostHitMyBack = {
+                en_us = 'This place is cursed! My bullets almost hit my back.',
+                zh_cn = '这地方很诡异啊，我的子弹几乎打到我后背了。'
+            },
+            stillNotAbleToCastMasterSpark = {
+                en_us = 'So, I still cannot cast master spark...',
+                zh_cn = '所以还是不能放魔炮……'
+            },
+            yeahThatDefinitelyKillsYou = {
+                en_us = 'No, that definitely kills you.',
+                zh_cn = '对，你会死的。'
+            },
+            notIfSomeoneElseIsOnThePath = {
+                en_us = 'Not if someone else is on the path.',
+                zh_cn = '如果有别人挡在中间就不一定了吧。'
+            },
+            soWhyDoYouComeHere = {
+                en_us = 'Ugh, why do you come here?',
+                zh_cn = '呃，你为什么到这里来？'
+            },
+            iActuallyHaveNoWayToGo = {
+                en_us = 'I actually have no way to go.',
+                zh_cn = '我是没别的路可走了。'
+            },
+            aTubeThingIsConnectedToThisPlace = {
+                en_us = 'The space below was curved like a tube and connected here.',
+                zh_cn = '下面的空间弯曲成管道似的形状，通到这里来。'
+            },
+            huhItsConnectedToTheGround = {
+                en_us = 'Huh... It\'s connected to the ground? What\'s there?',
+                zh_cn = '嗯……联通到地面了吗？地面上有什么？'
+            },
+            yeahToABuildingCalled = {
+                en_us = 'Yeah, to an art museum called Pavilion of Visual Splendor.',
+                zh_cn = '联通到一座叫“观艳馆”的美术馆。'
+            },
+            itsASignalForMeIsntIt = {
+                en_us = 'It\'s a signal for me. Isn\'t it a great design?',
+                zh_cn = '这是给我的信号啊。设计得真好。'
+            },
+            thisPlaceBecomesNormalPeopleCame = {
+                en_us = 'When my duty here is nearly done, this area would appear normal and people would come.',
+                zh_cn = '我的职责接近完成时，这片地区就会显得正常，人们会过来活动。'
+            },
+            spiltPowerIsDiscoveredAndFinally = {
+                en_us = 'The leaked power would be discovered, and finally someone would find me.',
+                zh_cn = '逸出的空间力量被发现，最终就会有人找到我。'
+            },
+            soAreYouASealedDemonSuchThing = {
+                en_us = 'I didn\'t follow... It sounds like you are a sealed demon thing?',
+                zh_cn = '我没跟上……反正你就是个被封印的恶魔什么的吧？'
+            },
+            nah = {
+                en_us = 'Nah... You don\'t need to understand.',
+                zh_cn = '不是……不明白就算了。'
+            },
+            letsSee = {
+                en_us = 'Face the power I got!',
+                zh_cn = '面对我的力量吧！'
+            }
+        },
+        KOTOBAS6BossBefore = {
+            whyThisPlaceLooksLikeSpaceButActuallySmall = {
+                en_us = 'Why here looks like space but so narrow?',
+                zh_cn = '这里看上去像宇宙，空间为什么却很狭小呢？'
+            },
+            isThisAPrison = {
+                en_us = 'Is this a prison?',
+                zh_cn = '难道是个监狱？'
+            },
+            hahaItSurelyFeelsLikeOne = {
+                en_us = 'Haha, it surely feels like one.',
+                zh_cn = '哈哈，是挺像的。'
+            },
+            theSpaceBackgroundIsAVisualEffect = {
+                en_us = 'Though, the space is just a visual effect.',
+                zh_cn = '不过，这宇宙只是视觉效果而已。'
+            },
+            andItsMeDecidedToStayHere = {
+                en_us = 'And it\'s me decided to stay here.',
+                zh_cn = '并且是我要待在这里的。'
+            },
+            ohWhatHappened = {
+                en_us = 'Oh? What happened?',
+                zh_cn = '哦？到底发生了什么呢？'
+            },
+            inAncientTimesABattleHappenedHere = {
+                en_us = 'In ancient times a battle happened here, that tore the sky, which got patched later.',
+                zh_cn = '很久以前这里有过一场战斗，撕裂了天空。天空虽然得到修补，'
+            },
+            butTheTopologicalSeamStillExisted = {
+                en_us = 'But the topological seam still existed, and made this area\'s space chaotic.',
+                zh_cn = '但拓扑上的裂缝还存在，让这片区域的空间变得混乱。'
+            },
+            soIStayedHereToStablizeTheGeometry = {
+                en_us = 'So I stayed here to stablize the geometry, and it took time.',
+                zh_cn = '所以我在这修复几何关系，这需要很长的时间。'
+            },
+            youSeemToEnjoyThisState = {
+                en_us = 'You seem to enjoy this job... What else do you do here?',
+                zh_cn = '你好像很享受这样的工作……你在这还做些什么？'
+            },
+            hmmIPracticeOccultALot = {
+                en_us = 'Hmm, I practice occult techniques a lot.',
+                zh_cn = '我经常练习神秘的技术。'
+            },
+            yeahNowIsAGoodChanceToTryThem = {
+                en_us = 'Yeah, it is a good chance to try them right now.',
+                zh_cn = '是啊，现在是个实际应用的好机会。'
+            },
+            onYou = {
+                en_us = 'On you!',
+                zh_cn = '用在你身上！'
             }
         }
     },

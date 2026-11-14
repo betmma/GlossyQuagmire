@@ -154,17 +154,21 @@ end
 --- number to text (keep decimal places same as gapValue's magnitude, and when gap)
 local function numberToText(number,gapValue)
     if gapValue<1000 and gapValue>=1 then
-        return tostring(math.ceil(number-0.5))
+        local rounded=math.ceil(number-0.5)
+        return rounded==0 and "0" or tostring(rounded)
     end
     local magnitude=math.floor(math.log10(gapValue))
     if magnitude<0 and magnitude>=-2 then
-        return string.format("%."..math.abs(magnitude).."f",number)
+        local text=string.format("%."..math.abs(magnitude).."f",number)
+        -- Rounding can leave a minus sign on zero; keep the decimal places.
+        return tonumber(text)==0 and text:gsub("^-","") or text
     end
     local number2=number/10^magnitude
-    local string=tostring(math.ceil(number2-0.5))
-    if string=="0" then
+    local rounded=math.ceil(number2-0.5)
+    if rounded==0 then
         return "0"
     end
+    local string=tostring(rounded)
     local e=magnitude+(#string-1)
     if #string>1 then
         string=string:sub(1,1)..'.'..string:sub(2)

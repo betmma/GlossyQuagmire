@@ -39,9 +39,9 @@ local boss=BossManager.BossSegment{
         -- easier to hit. surprisingly, it's more difficult to hit the stage 6 boss though the space converges
         boss.extraHitRadius=64
     end,
-    -- beforeDialogueKey=function ()
-    --     return G.runInfo.playerType..'S6BossBefore'
-    -- end,
+    beforeDialogueKey=function ()
+        return G.runInfo.playerType..'S6BossBefore'
+    end,
     -- afterDialogueKey=function ()
     --     return G.runInfo.playerType..'S6BossAfter'
     -- end,

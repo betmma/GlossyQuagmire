@@ -842,6 +842,7 @@ local KOTOBAS5BossAfter={
 
 local S6BossAutoForwardTime=60/170*4 -- 4 beats at 170bpm, in seconds
 
+-- enri's cunning key is a closed eye thinking expression
 local REIMUS6BossBefore={
     name='REIMUS6BossBefore',
     defaultSpeakerPosition={
@@ -850,13 +851,66 @@ local REIMUS6BossBefore={
     },
     lines={
         line('reimu','surprised','amIOnEarthAnymore'),
-        line('enri','normal','yesTheBackgroundIsJustForAtmosphere'),
-        line('reimu','normal','soWhatAreYouPlanning'),
-        line('enri','happy','goLearnHairyBallTheorem'),
-        line('reimu','angry','whatsThat'),
-        line('reimu','angry','fineIfYouWontStopIt'),
-        line('enri','cunning','iKnowItWouldBeThat'),
-        line('enri','cunning','letsGo',{playBGM=true,autoForwardTime=S6BossAutoForwardTime}),
+        line('reimu','surprised','couldItBeAnotherTrap'),
+        line('enri','surprised','whoIsThere'),
+        line('reimu','happy','ringleaderAppearedImshrineMaiden'),
+        line('enri','normal','ringleaderForWhat'),
+        line('reimu','angry','yourSendYourSpatialPowerDownwards'),
+        line('enri','surprised','oh'),
+        line('enri','happy','ahNoImagineAHairyBall'),
+        line('enri','happy','thisIsExactlyHowIDoMyWorkHere'),
+        line('reimu','angry','whateverCanYouJustLeave'),
+        line('enri','cunning','ummYouNotSeemPatientForExplanation'),
+        line('reimu','normal','ahSureSoFight'),
+        line('enri','cunning','whyNot',{playBGM=true,autoForwardTime=S6BossAutoForwardTime}),
+    }
+}
+
+local MARISAS6BossBefore={
+    name='MARISAS6BossBefore',
+    defaultSpeakerPosition={
+        marisa='left',
+        enri='right'
+    },
+    lines={
+        line('marisa','surprised','thisPlaceIsCursedMyBulletsAlmostHitMyBack'),
+        line('marisa','frustrated','stillNotAbleToCastMasterSpark'),
+        line('enri','cunning','yeahThatDefinitelyKillsYou'),
+        line('marisa','happy','notIfSomeoneElseIsOnThePath'),
+        line('enri','normal','soWhyDoYouComeHere'),
+        line('marisa','sad','iActuallyHaveNoWayToGo'),
+        line('marisa','sad','aTubeThingIsConnectedToThisPlace'),
+        line('enri','surprised','huhItsConnectedToTheGround'),
+        line('marisa','normal','yeahToABuildingCalled'),
+        line('enri','cunning','itsASignalForMeIsntIt'),
+        line('enri','cunning','thisPlaceBecomesNormalPeopleCame'),
+        line('enri','cunning','spiltPowerIsDiscoveredAndFinally'),
+        line('marisa','normal','soAreYouASealedDemonSuchThing'),
+        line('enri','frustrated','nah'),
+        line('enri','cunning','letsSee',{playBGM=true,autoForwardTime=S6BossAutoForwardTime}),
+    }
+}
+
+local KOTOBAS6BossBefore={
+    name='KOTOBAS6BossBefore',
+    defaultSpeakerPosition={
+        kotoba='left',
+        enri='right'
+    },
+    lines={
+        line('kotoba','surprised','whyThisPlaceLooksLikeSpaceButActuallySmall'),
+        line('kotoba','surprised','isThisAPrison'),
+        line('enri','happy','hahaItSurelyFeelsLikeOne'),
+        line('enri','happy','theSpaceBackgroundIsAVisualEffect'),
+        line('enri','normal','andItsMeDecidedToStayHere'),
+        line('kotoba','normal','ohWhatHappened'),
+        line('enri','normal','inAncientTimesABattleHappenedHere'),
+        line('enri','normal','butTheTopologicalSeamStillExisted'),
+        line('enri','normal','soIStayedHereToStablizeTheGeometry'),
+        line('kotoba','happy','youSeemToEnjoyThisState'),
+        line('enri','normal','hmmIPracticeOccultALot'),
+        line('enri','normal','yeahNowIsAGoodChanceToTryThem'),
+        line('enri','cunning','onYou',{playBGM=true,autoForwardTime=S6BossAutoForwardTime}),
     }
 }
 
@@ -895,7 +949,9 @@ Dialogue.data={
     MARISAS5BossAfter=MARISAS5BossAfter,
     KOTOBAS5BossBefore=KOTOBAS5BossBefore,
     KOTOBAS5BossAfter=KOTOBAS5BossAfter,
-    REIMUS6BossBefore=REIMUS6BossBefore
+    REIMUS6BossBefore=REIMUS6BossBefore,
+    MARISAS6BossBefore=MARISAS6BossBefore,
+    KOTOBAS6BossBefore=KOTOBAS6BossBefore,
 }
 
 
