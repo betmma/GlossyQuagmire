@@ -238,12 +238,13 @@ return BossManager.SpellcardPhase{
             end,
             -- boss directly moves forward. two small black circles are static while the middle part rotates. can be fast
             function ()
-                local pos=geo:rThetaGo(boss.kinematicState.pos,math.pi/2*radius*math.min(2,multi),boss.kinematicState.dir)
+                -- be cautious that exactly move radius*pi can cause problem
+                local pos=geo:rThetaGo(boss.kinematicState.pos,math.pi/2*radius*math.min(1.99,multi),boss.kinematicState.dir)
                 DanmakuFuncs.moveToInTime(boss,pos,t,Event.sineIOProgressFunc,true,sentry)
             end,
             -- boss moves perpendicularly to its direction. the middle part of black area is static. can be fast
             function()
-                local pos=geo:rThetaGo(boss.kinematicState.pos,math.pi/2*radius*math.min(2,multi),boss.kinematicState.dir+math.randomSign()*math.pi/2)
+                local pos=geo:rThetaGo(boss.kinematicState.pos,math.pi/2*radius*math.min(1.99,multi),boss.kinematicState.dir+math.randomSign()*math.pi/2)
                 DanmakuFuncs.moveToInTime(boss,pos,t,Event.sineIOProgressFunc,true,sentry)
             end,
             -- boss moves in circle with a diameter of centers of two small circles. so it rotates like regular taichi. cannot be too fast
