@@ -200,11 +200,17 @@ return BossManager.SpellcardPhase{
             end
             for j=1,n do
                 local angle=math.pi*2/n*j
+                local skip=false
                 for _,pathAngle in ipairs(pathAngles) do
                     pathAngle=math.modClamp(pathAngle,angle)
                     if angle>pathAngle-pathHalfAngle and angle<pathAngle+pathHalfAngle then
-                        goto continue
+                        skip=true
+                        break
+                        -- goto continue -- considering web version needs to rewrite goto continue, don't jump two loops here
                     end
+                end
+                if skip then
+                    goto continue
                 end
                 local posj=geo:rThetaGo(pos,size,angle)
                 Bullet{kinematicState={pos=posj,dir=0,speed=0},sprite=BulletSprites.bigRound.black,lifeFrame=9999,invincible=true,extraUpdate=wallExtraUpdate,highlight=true,size=1.2}

@@ -10,7 +10,7 @@ extern float viewRotation;
 extern float viewZoom;
 const float N=8.0;
 const float PI = 3.141592653589793;
-const float WEDGE = PI*2/N;
+const float WEDGE = PI*2.0/N;
 
 vec3 hsv2rgb(vec3 c) {
     vec3 p = abs(fract(c.xxx + vec3(0,2,1)/3.0)*6.0 - 3.0);
