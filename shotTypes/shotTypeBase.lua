@@ -701,13 +701,15 @@ ShotTypes.MARISAB=ShotType{
 ---@type PlayerSpellcardFunc
 local function kotobaSpellcardFunc(playerState, isFocused)
     Event{obj=G.runInfo.player,action=function()
-        local beachBall=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0, skipZoom=true},sprite=Asset.playerShotSprites.beachBall,size=0,damage=0,safe=true,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
+        local beachBall=PlayerShot{kinematicState={pos=copyTable(playerState.pos), speed=0, dir=0, skipZoom=true},sprite=Asset.playerShotSprites.beachBall,size=0,damage=5,safe=false,lifeFrame=300,batch=Asset.playerBulletBatch,meshBatch=Asset.playerBulletMeshes,extraUpdate={Action.FadeIn(10,false),Action.ZoomIn(30,5),function(self)
             self.kinematicState.pos=G.runInfo.player.kinematicState.pos -- follow player. not using bindState is because its dir will be changed by player's moving direction
             if self.frame>265 then
                 self.sprite:countDown() -- start fade out animation when about to end
                 self.spriteTransparency=self.spriteTransparency-0.01
             end
         end},forceMesh=true}
+        beachBall.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. it will keep damaging
+        end
         local reflectShockwave=Effect.Shockwave{kinematicState=copyTable(beachBall.kinematicState),animationFrame=300,size=0,growSpeed=0.09,spriteTransparency=0.5,color='red',canRemove={bullet=true,invincible=false,safe=true,bulletSpawner=false},effectFunc=function(self,bullet)
             -- cannot actually reflect and make it damage enemy. create a new PlayerShot bullet instead.
             if bullet.reflectedFlag then
@@ -725,8 +727,6 @@ local function kotobaSpellcardFunc(playerState, isFocused)
             end
         end}
         reflectShockwave:bindState(G.runInfo.player)
-        beachBall.hitEffect=function(self, enemy) -- override hit effect to prevent it from disappearing. though safe=true means this wont be called
-        end
         for i=1,180 do
             wait()
             beachBall.spriteRotationSpeed=math.pi/3600*i

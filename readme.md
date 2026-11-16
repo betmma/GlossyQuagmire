@@ -1,8 +1,15 @@
-This game is a touhou fan-game.
-It's in early stage now.
+東方勘艶陥　～ Glossy Quagmire is a Touhou fangame with different geometries in each stage.
+
+Currently 6 stages are playable. The ending screen is not implemented, though.
+
+You can set "Reduce Visuals" to yes in options to disable high cost visual effects, like 3d backgrounds and the shatter effect when a spell ends.
+
+**Warning: The game contains bright and flashy colors (mainly in stage 3). The non-Euclidean geometries may cause disorientation and motion sickness.**
 
 ### Game System
 Collect items consecutively to keep combo. Combo count × (1 + Combo duration / 30) is the Combo score and decides what bonus you get.
+
+There's an intuitive UI in game so don't worry about the formula!
 
 ### How to play
 
@@ -23,17 +30,10 @@ It's a love2d game so you can follow [love2d tutorial](https://love2d.org/wiki/G
 #### Code
 Full Game replay should not always display "All". need to check how official games record this.
 Add func to calculate the orientation to make a sprite face upward in final rendering.
-Background
 
 #### System
-Dialogue
-Player Score
-Spellcard Background
-Many remaining menus
+Alternate music
 
-#### Resource
-player and player shot sprites
-enemy sprites
 
 
 ### Acknowledgements
