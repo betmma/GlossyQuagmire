@@ -223,6 +223,7 @@ end
 ---@field keyRecord integer[] The key record of the replay.
 ---@field seed number The seed used for RNG.
 ---@field score integer The score at the end of the stage.
+---@field PIV integer The point item value at the end of the stage.
 ---@field lives integer The number of lives remaining at the end of the stage.
 ---@field bombs integer The number of bombs remaining at the end of the stage.
 ---@field power integer The power level at the end of the stage.
@@ -278,6 +279,8 @@ function fullGameReplay:fromSaveFormat(data)
             return nil
         end
         stageData.keyRecord=keyRecord
+        -- before v0.7.0.2 PIV isn't saved in replay. to prevent loading a nil value on old replays it's set to default value
+        stageData.PIV=stageData.PIV or G.CONSTANTS.START_PIV
     end
     return fullGameReplay(data--[[@as fullGameReplayData]])
 end

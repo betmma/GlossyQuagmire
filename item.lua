@@ -153,15 +153,18 @@ end
 local function gainScore(amount)
     amount=math.floor(amount)*10
     local newScore=G.runInfo.score+amount
-    if G.runInfo.score<G.runInfo.hiScore and G.runInfo.hiScore<newScore then -- new hiscore
+    local inReplay=G.runInfo.replay~=nil
+    if G.runInfo.score<G.runInfo.hiScore and G.runInfo.hiScore<newScore and not inReplay then -- new hiscore
         DynamicUIObjs.showNotice('hiscore')
         SFX:play('extend')
     end
     SFX:play('select')
     G.runInfo.score=newScore
-    G.runInfo.hiScore=math.max(G.runInfo.hiScore,G.runInfo.score)
-    local highScoreTable,key=G:getHighScoreTableAndKey()
-    highScoreTable[key]=math.max(highScoreTable[key], G.runInfo.score)
+    if not inReplay then
+        G.runInfo.hiScore=math.max(G.runInfo.hiScore,G.runInfo.score)
+        local highScoreTable,key=G:getHighScoreTableAndKey()
+        highScoreTable[key]=math.max(highScoreTable[key], G.runInfo.score)
+    end
 end
 
 EventManager.listenTo(EventManager.EVENTS.GAIN_SCORE, gainScore)

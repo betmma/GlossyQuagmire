@@ -319,6 +319,7 @@ function StageManager:load(stageKey, skipToSegmentKey, onlyRunOneSegment, callba
                     if i>1 then -- get data from previous stage
                         local lastStageData=stagesData[i-1]
                         G.runInfo.score=lastStageData.score
+                        G.runInfo.PIV=lastStageData.PIV
                         G.runInfo.lives=lastStageData.lives
                         G.runInfo.bombs=lastStageData.bombs
                         G.runInfo.power=lastStageData.power
@@ -357,6 +358,7 @@ function StageManager:addStageData()
         keyRecord=G.runInfo.player.keyRecord,
         seed=G.runInfo.seed,
         score=G.runInfo.score,
+        PIV=G.runInfo.PIV,
         lives=G.runInfo.lives,
         bombs=G.runInfo.bombs,
         power=G.runInfo.power,
