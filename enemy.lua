@@ -3,7 +3,8 @@
 ---@field hp number
 ---@field damageResistance number a factor that reduces damage taken.
 ---@field invincible boolean
----@field dropItems DropItems
+---@field dropItems DropItems what items will it drop at die()
+---@field spawnItems fun(self:Enemy) the function that spawns items. boss needs to override it to let items shoot towards player at higher speed
 ---@field extraDieEffects function[]
 ---@field extraOrientation number?
 ---@field extraHitRadius number extra hit radius added to hitboxRadius. default 32
@@ -136,6 +137,10 @@ function Enemy:dieEffect()
     local spriteColor=self.sprite and self.sprite.data and self.sprite.data.color or 'gray'
     local shockwaveColor=Asset.spectrum1MapSpectrum2[spriteColor] or 'gray'
     Effect.Larger{kinematicState=self.kinematicState,sprite=BulletSprites.shockwave[shockwaveColor],size=0,growSpeed=self.size*0.2,animationFrame=10,spriteTransparency=0.8}
+    self:spawnItems()
+end
+
+function Enemy:spawnItems()
     for _,itemType in ipairs(Item.ItemTypes) do
         local num=self.dropItems[itemType] or 0
         for i=1,num do
@@ -146,7 +151,6 @@ function Enemy:dieEffect()
         end
     end
 end
-
 
 function Enemy:calculateMovingTransitionSprite()
     if not self.sprite then
@@ -219,12 +223,14 @@ function Enemy:drawSprite()
 end
 
 ---@class Boss:Enemy
+---@field revivable boolean managed in stages/bossManager.lua. if true, on :die() wont remove itself but set invincible=true instead
 local Boss=Enemy:extend()
 
 -- parameters: [maxhp], [hp] (defaulted as maxhp), [mainEnemy] if true, killing it wins the scene. [hpSegments] a table of hp levels that triggers special effects. [hpSegmentsFunc] a function that triggers special effects when hp reaches a certain level. note that the hpLevel parameter passed to hpSegmentsFunc is 1-based. (hplevel 1->2 sends 1)
 ---@class BossArgs:EnemyArgs
 ---@field hpSegments number[]|nil
 ---@field hpSegmentsFunc function|nil
+---@field revivable boolean
 ---@param args BossArgs
 function Boss:new(args)
     args.lifeFrame=99999999
@@ -233,7 +239,6 @@ function Boss:new(args)
     self.hitboxRadius=32
     self.mainEnemy=true--args.mainEnemy
     self.showHexagram=self.mainEnemy
-    -- managed in stages/bossManager.lua. if true, on :die() wont remove itself but set invincible=true instead
     self.revivable=args.revivable
     -- safe means enemy's body (circle) won't hit player, similar to circle.safe
     self.safe=false
@@ -316,6 +321,10 @@ function Boss:dieEffect()
     SFX:play('kill')
     local final=not self.revivable -- final shockwave need to be more juicy
     Effect.Shockwave{kinematicState=self.kinematicState,lifeFrame=25,radius=20,growSpeed=1.7,spriteTransparency=(final and 1 or 0.5),color='yellow',sprite=final and BulletSprites.explosion.yellow,canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
+    -- doesn't call self:spawnItems(). managed by bossManager now.
+end
+
+function Boss:spawnItems()
     for _,itemType in ipairs(Item.ItemTypes) do
         if self.dropItems[itemType] then
             local num=self.dropItems[itemType]

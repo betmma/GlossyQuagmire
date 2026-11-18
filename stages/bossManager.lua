@@ -8,6 +8,7 @@
 ---@field getBossSpawnPos fun(self):Position
 ---@field bossSpawnCallback? fun(self,boss:Boss):nil
 ---@field rounds BossRound[]
+---@field lastRounds? BossRound[]
 ---@field beforeDialogueKey? fun():string
 ---@field afterDialogueKey? fun():string
 ---@field init? fun(self):nil
@@ -20,7 +21,10 @@
 ---@field spellBackground? ShaderBackground only called in spellPhase
 ---@field getBossSpawnPos fun(self):Position
 ---@field bossSpawnCallback? fun(self,boss:Boss):nil
----@field rounds BossRound[]
+---@field private spawnBoss fun(self):Boss
+---@field private rounds BossRound[] regular rounds
+---@field lastRounds BossRound[] last spell rounds. they don't add star and are called in their individual code after rounds finished.
+---@field public getAllRounds fun(self:BossSegment):BossRound[] for stage manager to loop through all rounds in a bossSegment easily
 ---@field beforeDialogueKey? fun():string it's a function so can route to different dialogue based on shot type or difficulty
 ---@field afterDialogueKey? fun():string
 ---@field init? fun(self):nil
@@ -38,11 +42,39 @@ function BossSegment:new(args)
     self.getBossSpawnPos=args.getBossSpawnPos
     self.bossSpawnCallback=args.bossSpawnCallback
     self.rounds=args.rounds
+    self.lastRounds=args.lastRounds or {}
     self.beforeDialogueKey=args.beforeDialogueKey
     self.afterDialogueKey=args.afterDialogueKey
     self.init=args.init
     self.condition=args.condition
 end
+
+function BossSegment:getAllRounds()
+    local ret={}
+    for index, value in ipairs(self.rounds) do
+        table.insert(ret,value)
+    end
+    for index, value in ipairs(self.lastRounds) do
+        table.insert(ret,value)
+    end
+    return ret
+end
+
+function BossSegment:spawnBoss()
+    local pos=self.getBossSpawnPos(self)
+    Effect.Shockwave{kinematicState={pos=copyTable(pos),dir=0,speed=0},lifeFrame=20,radius=20,growSpeed=1.2,spriteTransparency=1,color='yellow',canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
+    Effect.Charge{obj={kinematicState={pos=copyTable(pos),dir=0,speed=0}}}
+    wait(60)
+    local boss=Boss{
+        kinematicState={pos=pos,dir=0,speed=0},
+        sprite=Asset.boss[self.bossName],maxhp=999999,revivable=true
+    }
+    if self.bossSpawnCallback then
+        self:bossSpawnCallback(boss)
+    end
+    return boss
+end
+
 
 local BossRound -- forward declare for BossSegment func
 
@@ -68,17 +100,7 @@ function BossSegment:func(args)
             DynamicUIObjs.showSoundtrack()
         end
     end
-    local pos=self.getBossSpawnPos(self)
-    Effect.Shockwave{kinematicState={pos=copyTable(pos),dir=0,speed=0},lifeFrame=20,radius=20,growSpeed=1.2,spriteTransparency=1,color='yellow',canRemove={bullet=true,invincible=true,safe=true,bulletSpawner=true}}
-    Effect.Charge{obj={kinematicState={pos=copyTable(pos),dir=0,speed=0}}}
-    wait(60)
-    local boss=Boss{
-        kinematicState={pos=pos,dir=0,speed=0},
-        sprite=Asset.boss[self.bossName],maxhp=999999,revivable=true
-    }
-    if self.bossSpawnCallback then
-        self:bossSpawnCallback(boss)
-    end
+    local boss=self:spawnBoss()
     DynamicUIObjs.bossNameText:setText(Localize{'characters',self.bossName,'name'})
     DynamicUIObjs.bossStars:clearStars()
     Event.Event{obj=boss,action=function()
@@ -89,7 +111,7 @@ function BossSegment:func(args)
     end
     }
     
-    -- after dialogues are implemented, could add something before the rounds
+    -- dialogue before battle
     if self.beforeDialogueKey and not args.practicePhase then
         DialogueController{key=self.beforeDialogueKey(), BGM=self.BGM}:block()
         wait(30)
@@ -111,8 +133,20 @@ function BossSegment:func(args)
     end
     boss.revivable=false
     boss.invincible=false
-    boss.dropItems={}
     boss:die()
+    -- last spells. same as touhou 8 where no stars are shown even for kaguya with 5 last spells. boss would need to die and respawn for each round. won't start last spells for EASY. last spell has two extra logics: nullify life and bomb, and end spell when hit. create a spellcardPhase subclass to execute them. thing should be managed by boss segment, not specific spell phase, or in spell practice the behaviour is different. add nullify functionalities for NORMAL to LUNATIC, possibly not adding nullify for OVERDRIVE so it's more difficult
+    if not args.practicePhase and DIFF()>=G.EASY then
+        for i,round in ipairs(self.lastRounds) do
+            boss=self:spawnBoss()
+            round.bossSegment=self
+            round:func(boss)
+            boss.revivable=false
+            boss.invincible=false
+            boss:die()
+        end
+    end
+
+
     DynamicUIObjs.bossNameText:setText('')
     wait(60)
     -- after battle dialogue could be added here
@@ -228,6 +262,17 @@ end
 
 ---@alias BossPhaseType 'nonspell'|'spellcard'
 
+---@alias PhaseResult 'PERFECT'|'KILLED'|'TIMEOUT'
+--[[
+result/policy   ALWAYS  KILLED  PERFECT
+PERFECT         Y       Y       Y
+KILLED          Y       Y       N
+TIMEOUT         Y       N       N
+
+default policy is ALWAYS. last spells use PERFECT.
+]]
+---@alias DropItemsPolicy 'ALWAYS'|'KILLED'|'PERFECT'
+
 ---@class BossPhase:Object should not create a BossPhase directly; only use NonSpellPhase and SpellcardPhase.
 ---@field bossRound BossRound reference to the upper layer. it's dynamically assigned in the upper layer's func before calling this object's func
 ---@field SKIP_INCLUDE boolean|nil if true, when SKIP_MODE is on, stage practice will still include this phase. for testing middle phases.
@@ -239,6 +284,9 @@ end
 ---@field func fun(self, boss:Boss) the concrete content of the boss phase. like spawn bullets
 ---@field run fun(self, boss:Boss) create a coroutine for self.func and run until it ends.
 ---@field isFinished fun(self, boss:Boss):boolean check if the phase is finished. for timeout type, check if time runs out. for hp type, check if hp<=0. this is used to determine when to end the phase and move on to the next one.
+---@field phaseResult PhaseResult starts as PERFECT and changes to KILLED if missed or bombed, and changes to TIMEOUT if timeouted nontimeout phase.
+---@field dropItemsPolicy DropItemsPolicy
+---@field reduceHPto0 boolean whether have an animation that reduces boss hp to 0 if timeout
 ---@field update fun(self, boss:Boss) extra update logic to be executed every frame during the phase. like counting down remaining frames, and for spellcard subclass, counting down bonus score.
 --- this does not need overload because raw BossPhase is never used. use NonSpellPhase and SpellcardPhase only.
 local BossPhase=Object:extend()
@@ -263,6 +311,8 @@ function BossPhase:new(args)
     self.isTimeout=args.isTimeout
     self.hp=args.hp
     self.dropItems=args.dropItems or {}
+    self.dropItemsPolicy='ALWAYS'
+    self.reduceHPto0=true
     if self.isTimeout then
         self.hp=99999999
     end
@@ -289,7 +339,19 @@ function BossPhase:isFinished(boss)
     end
 end
 
+---@type BossPhase
+local currentBossPhase
+local cancelBonus=function()
+    if not currentBossPhase then return end
+    currentBossPhase.phaseResult='KILLED'
+end
+
+EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
+EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
+
 function BossPhase:run(boss)
+    self.phaseResult='PERFECT'
+    currentBossPhase=self
     self.remainingFrames=self.time
     DynamicUIObjs.setRemainingTimeText(self.time/60)
     boss.maxhp=self.hp
@@ -310,13 +372,27 @@ function BossPhase:run(boss)
     end
     EventManager.post(EventManager.EVENTS.FINISH_BOSS_PHASE)
     DynamicUIObjs.setRemainingTimeText(nil)
-    if self.isTimeout or boss.hp>0 then -- reduce boss hp to 0 gradually
-        while boss.hp>0 do
-            boss.hp=math.max(0, boss.hp - boss.maxhp/30)
-            DynamicUIObjs.hpBar:updatePhaseHP(boss.hp/boss.maxhp) -- update hp bar
-            coroutine.yield()
+    if not self.isTimeout and boss.hp>0 then
+        self.phaseResult='TIMEOUT'
+    end
+    -- calculate whether to drop items
+    local doSpawn=self.phaseResult=='PERFECT' or self.dropItemsPolicy=='ALWAYS' or (self.phaseResult=='KILLED' and self.dropItemsPolicy=='KILLED')
+    if self.isTimeout or boss.hp>0 then -- reduce boss hp to 0 gradually, then let boss die
+        if self.reduceHPto0 then
+            while boss.hp>0 do
+                boss.hp=math.max(0, boss.hp - boss.maxhp/30)
+                DynamicUIObjs.hpBar:updatePhaseHP(boss.hp/boss.maxhp) -- update hp bar
+                coroutine.yield()
+            end
         end
         boss:die()
+        if doSpawn then
+            boss:spawnItems()
+        end
+    else -- boss is killed, spawn items now (the above spawn is after gradual reduce hp)
+        if doSpawn then
+            boss:spawnItems()
+        end
     end
     DynamicUIObjs.hpBar:increasePhase() -- move to next phase in hp bar
 end
@@ -342,7 +418,6 @@ end
 ---@field type 'spellcard'
 ---@field bonusScore integer score player gets after clearing the spellcard.
 ---@field currentBonus integer current bonus score, which counts down every frame.
----@field failedBonus boolean whether the player has failed the spellcard and lost the bonus score. failed means getting hit or using bomb or time runs out.
 ---@field spellBackgroundObj ShaderBackground created in run
 ---@overload fun(args:SpellcardPhaseArgs):SpellcardPhase
 local SpellcardPhase=BossPhase:extend()
@@ -352,13 +427,12 @@ function SpellcardPhase:new(args)
     self.type='spellcard'
     self.bonusScore=args.bonusScore
     self.currentBonus=self.bonusScore
-    self.failedBonus=false
 end
 
 function SpellcardPhase:getBonusHistoryText()
     local historyType=G.runInfo.gameType==G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE and 'practice' or 'ingame'
     local historyTable=G.save.spellcardHistory[self.key][G.runInfo.difficulty][G.runInfo.shotType][historyType]
-    local bonusText=self.failedBonus and 'FAILED' or scoreToString(self.currentBonus,6,true)
+    local bonusText=self.phaseResult~='PERFECT' and 'FAILED' or scoreToString(self.currentBonus,6,true)
     return string.format('HISTORY %d/%d  BONUS %s', historyTable.passes, historyTable.tries, bonusText)
 end
 
@@ -369,15 +443,6 @@ function SpellcardPhase:update(boss)
     end
     DynamicUIObjs.spellcardBonusHistoryText:setText(self:getBonusHistoryText(),true)
 end
-
-local currentSpellcardPhase
-local cancelBonus=function()
-    if not currentSpellcardPhase then return end
-    currentSpellcardPhase.failedBonus=true
-end
-
-EventManager.listenTo(EventManager.EVENTS.PLAYER_HIT, cancelBonus)
-EventManager.listenTo(EventManager.EVENTS.PLAYER_BOMB, cancelBonus)
 
 local currentSpellBackgroundObj
 
@@ -393,8 +458,6 @@ end
 
 function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
-    self.failedBonus=false
-    currentSpellcardPhase=self
     local spellBackground=self.bossRound.bossSegment.spellBackground
     local spellBackgroundEaseEvent
     if not spellBackground then
@@ -418,14 +481,11 @@ function SpellcardPhase:run(boss)
         historyTable.tries=historyTable.tries+1
     end
     BossPhase.run(self, boss)
-    -- add draw call to spell background. where?
     -- after clearing the spellcard, add bonus score and clear spellcard name text and bonus history text.
-    if self.remainingFrames==0 and not self.isTimeout then
-        self.failedBonus=true
-    else -- excluding timing out normal spellcard, which is either timeout spell and time runs out, or hp<=0 and cleared the spellcard. show glassBroken effect
+    if self.phaseResult~='TIMEOUT' then -- show glassBroken effect
         Asset.mainEffectsByName.glassBroken:run()
     end
-    if not self.failedBonus then
+    if self.phaseResult=='PERFECT' then
         EventManager.post(EventManager.EVENTS.GAIN_SCORE, self.currentBonus)
         EventManager.post(EventManager.EVENTS.SPELLCARD_BONUS, self.key, true)
         DynamicUIObjs.showNotice("getSpellCardBonus")
@@ -460,11 +520,35 @@ local function spellcardBonusCallbackAddToHistory(key, success)
 end
 EventManager.listenTo(EventManager.EVENTS.SPELLCARD_BONUS, spellcardBonusCallbackAddToHistory)
 
+---@class LastSpellcardPhase:SpellcardPhase
+---@overload fun(args:SpellcardPhaseArgs):LastSpellcardPhase
+local LastSpellcardPhase=SpellcardPhase:extend()
+
+function LastSpellcardPhase:new(args)
+    SpellcardPhase.new(self, args)
+    self.dropItemsPolicy='PERFECT'
+    self.reduceHPto0=false
+end
+
+function LastSpellcardPhase:isFinished(boss)
+    if self.phaseResult~='PERFECT' then
+        return true
+    end
+    return SpellcardPhase.isFinished(self,boss)
+end
+
+function LastSpellcardPhase:run(boss)
+    G.runInfo.nullified=true
+    SpellcardPhase.run(self,boss)
+    G.runInfo.nullified=false -- does not need to consider game end, as new game sets it to false
+end
+
 BossManager={
     BossSegment=BossSegment,
     BossRound=BossRound,
     BossPhase=BossPhase,
     NonSpellPhase=NonSpellPhase,
     SpellcardPhase=SpellcardPhase,
+    LastSpellcardPhase=LastSpellcardPhase,
     drawSpellBackground=drawSpellBackground
 }

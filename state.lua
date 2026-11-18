@@ -503,7 +503,7 @@ G={
     },
     geometries=geometries,
     ---@alias decimal2Places integer using integer to represent decimal with 2 places, to avoid precision issues. used for power. for example, 1.23 will be represented as 123.
-    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, PIV:integer, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey, remainingContinues: integer, continued:boolean}
+    ---@alias runInfo {gameType:GAME_TYPE, seed:integer, difficulty: DIFFICULTY, playerType: PLAYER, shotType: SHOT_TYPE, hiScore:number, score: number, PIV:integer, lives: integer, bombs: integer, power:decimal2Places, grazes: integer, geometry: GeometryBase, player:Player, exitToState: STATE|nil, replay:replayBase|nil, pendingReplay:replayBase|nil, startStageKey: StageKey, remainingContinues: integer, continued:boolean, nullified:boolean}
     ---@type runInfo
     runInfo={ -- things that can be changed and accessed during the run should be put there
         gameType=G.CONSTANTS.GAME_TYPES.FULL_GAME,
@@ -526,6 +526,7 @@ G={
         startStageKey=normalStageOrder[1],
         remainingContinues=0,
         continued=false,
+        nullified=false -- last spell effect
     },
     ---called before entering a run. like, from full game (choosePlayer state), stage practice (not implemented yet), spell practice and their replays. it only handles things that persist between stages. things that only matter in a single stage should be initialized in StageManager:load.
     ---@param self G
@@ -555,6 +556,7 @@ G={
             self.runInfo.remainingContinues=G.CONSTANTS.DIFFICULTIES_TO_CONTINUES[difficulty]
         end
         self.runInfo.continued=false
+        self.runInfo.nullified=false
     end,
     ---@param self G
     restart=function(self)

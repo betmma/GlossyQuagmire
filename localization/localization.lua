@@ -1195,6 +1195,10 @@ return {
                 en_us = 'Score',
                 zh_cn = '得分',
             },
+            nullified = {
+                en_us = 'NULLIFIED',
+                zh_cn = '无效',
+            },
             lives = {
                 en_us = 'Lives',
                 zh_cn = '残机',

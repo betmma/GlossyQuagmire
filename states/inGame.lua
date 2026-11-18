@@ -1,3 +1,4 @@
+---@type G
 local G=...
 local base=UI.Base()
 return {
@@ -70,10 +71,21 @@ return {
                 if key=='lives' or key=='bombs' then -- draw item icons
                     ---@cast key 'lives'|'bombs'
                     local rightBase=rightSide:child(UI.Base{x=120,y=y,height=16,extraUpdates={getAlignToForegroundExtraUpdate(120)}})
+                    local nullifiedBase=UI.Base{parent=rightBase,extraUpdates={function (self)
+                        self.transparency=math.lerpCondition(self.transparency,G.runInfo.nullified,1,0,0.1)
+                    end}}
+                    local nullifiedText=UI.Text{
+                        parent=nullifiedBase,text=Localize{'ui','IN_GAME','nullified'},
+                        fontSize=24,color=color,autoSize=true,
+                        x=0,y=0,width=200,
+                    }
+                    local normalBase=UI.Base{parent=rightBase,extraUpdates={function (self)
+                        self.transparency=math.lerpCondition(self.transparency,G.runInfo.nullified,0,1,0.1)
+                    end}}
                     local maxCount=8
                     local dx=16
                     for idx=1,maxCount do -- display up to 8 lives/bombs
-                        local icon=rightBase:child(UI.Image{
+                        local icon=normalBase:child(UI.Image{
                             batch=Asset.itemUIBatch,quad=getLifeOrBombMeterSprite(key,idx).quad,
                             x=(idx-1)*dx,y=8,sx=0.5,sy=0.5,
                             extraUpdates={function(self)
@@ -83,7 +95,7 @@ return {
                         })
                     end
                     -- moving text showing pieces
-                    local pieceText=rightBase:child(UI.Text{
+                    local pieceText=normalBase:child(UI.Text{
                         text='',updateText=function(self)
                             local currentValue=G.runInfo[key]
                             local piece=math.ceil((currentValue%1)*5-0.5) -- 0 to 4
@@ -98,7 +110,7 @@ return {
                         end}
                     })
                     -- +n text when exceeding maxCount
-                    local plusText=rightBase:child(UI.Text{
+                    local plusText=normalBase:child(UI.Text{
                         text='',updateText=function(self)
                             local currentValue=G.runInfo[key]
                             local exceedAmount=currentValue-currentValue%1-maxCount

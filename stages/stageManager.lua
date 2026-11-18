@@ -446,7 +446,8 @@ function StageManager:buildSpellcardCollection()
         for _, segment in ipairs(data.segments) do
             if segment.type ~= 'boss' then goto continue_segment end
             ---@cast segment BossSegment
-            for _, round in ipairs(segment.rounds) do
+            local rounds=segment:getAllRounds()
+            for _, round in ipairs(rounds) do
                 if not round.phases then goto continue_round end
                 for _, phase in ipairs(round.phases) do
                     if phase.type ~= 'spellcard' then goto continue_phase end

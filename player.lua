@@ -153,6 +153,12 @@ function Player:calculateShoot(dt)
     local shooting=self.keyIsDown(KEYS.SELECT) and not immobile and (not self.duringBomb or self.shotType.spellcard.canShoot)
     self.shotType:update(kinematicState, self.keyIsDown(KEYS.SLOW), shooting, powerLevel, self.frame, dt, self.options, self.transparency)
     if not self.duringBomb and not immobile and self.keyIsDown(KEYS.CANCEL) and G.runInfo.bombs>=1 then
+        if G.runInfo.nullified then
+            if self.keyIsPressed(KEYS.CANCEL) then
+                SFX:play('cancel',true)
+            end
+            return
+        end
         EventManager.post(EventManager.EVENTS.PLAYER_BOMB)
         self.duringDeathbombWindow=false -- exit deathbomb window to prevent death
         self.invincibleFrame=self.shotType.spellcard.duration
@@ -378,11 +384,15 @@ function Player:enterDeathbombing(damage)
     if self.invincibleFrame>0 or self.duringDeathbombWindow or (DEV_MODE and love.keyboard.isDown('f10')) then
         return
     end
-    local deathbombWindow=8
     SFX:play('playerHit',true,3)
+    if G.runInfo.nullified then
+        self.invincibleFrame=self.invincibleFrame+60 -- prevent immediately die again from bullets after the final spell ends and nullified is set to false, but before the shockwave clears bullets. if player dies because of colliding with boss, this won't prevent it from happening again before boss disappears. 
+        return -- doesn't actually die
+    end
     self.duringDeathbombWindow=true
     -- should have some visual effect here
     Asset.mainEffectsByName.death:run()
+    local deathbombWindow=8
     Event{obj=self,action=function()
         wait(deathbombWindow)
         if self.duringDeathbombWindow then

@@ -3,8 +3,9 @@ local EventManager = {}
 EventManager.EVENTS={
     SWITCH_STATE='switchState',
     PLAY_AUDIO='playAudio',
-    PLAYER_HIT='playerHit', -- player enters deathbomb window
+    PLAYER_HIT='playerHit', -- when bullet overlaps player. player enters deathbomb window. it can happen many times during the deathbomb window, so it should not be used to track miss times
     PLAYER_MISS='playerMiss', -- player actually loses life
+    PLAYER_BOMB='playerBomb', -- when player uses bomb
     GAIN_SCORE='gainScore',
     GAIN_LIFE='gainLife', -- called by collecting items and has a listener that may play extend or select sfx based on value, then call setLife with calculated new value
     SET_LIFE='setLife', -- called by GAIN_LIFE listener and other code that changes life. sets new value and records the event for statistics
@@ -23,8 +24,6 @@ EventManager.EVENTS={
     PLAYER_HOLD_DIALOGUE_SKIP='playerHoldDialogueSkip',
     SPELLCARD_BONUS='spellcardBonus',
     FINISH_BOSS_PHASE='finishBossPhase',
-    -- when player uses bomb
-    PLAYER_BOMB='playerBomb',
     -- when leaving a run and will never return, like returning to main menu but not including pausing
     LEAVE_GAME='leaveGame',
     -- below are from previous game
