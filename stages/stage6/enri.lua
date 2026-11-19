@@ -558,6 +558,11 @@ local boss=BossManager.BossSegment{
         BossManager.BossRound{phases={
             require('stages.stage6.spellcards.final'),
         }},
+    },
+    lastRounds={
+        BossManager.BossRound{phases={
+            require('stages.stage6.spellcards.rotate'),
+        }},
     }
 }
 

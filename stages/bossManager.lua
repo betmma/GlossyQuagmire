@@ -87,7 +87,7 @@ function BossSegment:func(args)
     local roundsToRun=self.rounds
     if args.practicePhase then -- build a temporary round
         -- find the bossPhase with the key matching args.practicePhase
-        for _, round in pairs(self.rounds) do
+        for _, round in pairs(self:getAllRounds()) do
             for _, phase in pairs(round.phases) do
                 if phase.key==args.practicePhase then
                     roundsToRun={BossRound{phases={phase},ignorePlayerCondition=true}}
@@ -525,6 +525,7 @@ EventManager.listenTo(EventManager.EVENTS.SPELLCARD_BONUS, spellcardBonusCallbac
 local LastSpellcardPhase=SpellcardPhase:extend()
 
 function LastSpellcardPhase:new(args)
+    args.condition=args.condition or {difficulties={NORMAL=true,HARD=true,LUNATIC=true},}
     SpellcardPhase.new(self, args)
     self.dropItemsPolicy='PERFECT'
     self.reduceHPto0=false
@@ -538,7 +539,9 @@ function LastSpellcardPhase:isFinished(boss)
 end
 
 function LastSpellcardPhase:run(boss)
-    G.runInfo.nullified=true
+    if G.runInfo.gameType~=G.CONSTANTS.GAME_TYPES.SPELL_PRACTICE then -- in spell practice, enabling nullified will cause long wait (spell failed, boss disappear) before practice end menu. so not enabling it
+        G.runInfo.nullified=true
+    end
     SpellcardPhase.run(self,boss)
     G.runInfo.nullified=false -- does not need to consider game end, as new game sets it to false
 end

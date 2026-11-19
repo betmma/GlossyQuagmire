@@ -530,6 +530,14 @@ return {
                     zh_cn = '「察天心而观复」' -- see《嘉遁賦》
                 }
             }
+        },
+        ['enri-rotate'] = {
+            __default__ = {
+                name = {
+                    en_us = '"Course of the Celestial Way"',
+                    zh_cn = '「天道斡运」'
+                }
+            }
         }
     },
     levelData = {
