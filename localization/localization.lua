@@ -380,6 +380,14 @@ return {
                 }
             }
         },
+        ['shouji-slide'] = {
+            __default__ = {
+                name = {
+                    en_us = '"Heaven-Earth Transposition"',
+                    zh_cn = '「乾坤挪移阵」'
+                }
+            }
+        },
         ['tatsu-ball'] = {
             EASY = {
                 name = {

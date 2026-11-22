@@ -177,6 +177,8 @@ local boss=BossManager.BossSegment{
     end,
     bossSpawnCallback=function (self, boss)
         boss.showHexagram=false
+        Portal.canvasOffset.x=0
+        Portal.canvasOffset.y=0
     end,
     rounds={
         BossManager.BossRound{phases={
@@ -371,6 +373,11 @@ local boss=BossManager.BossSegment{
             loadGateSpell('fear'),
             loadGateSpell('open'),
         }}
+    },
+    lastRounds={
+        BossManager.BossRound{phases={
+            require('stages.stage4.spellcards.slide'),
+        }},
     }
 }
 return {midboss=midboss, boss=boss}
