@@ -433,6 +433,14 @@ return {
                 }
             }
         },
+        ['tatsu-particle'] = {
+            __default__ = {
+                name = {
+                    en_us = '"Fickle Gathering and Dispersal of Clouds"',
+                    zh_cn = '「聚散无常的云海」'
+                }
+            },
+        },
         ['enri-military'] = {
             EASY = {
                 name = {
