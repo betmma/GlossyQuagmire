@@ -307,6 +307,34 @@ function math.hsvToRgb(h, s, v)
     end
 end
 
+---@param r number
+---@param g number
+---@param b number
+---@return number h
+---@return number s
+---@return number b
+function math.rgbToHSV(r, g, b)
+  local max = math.max(r, g, b)
+  local min = math.min(r, g, b)
+  local delta = max - min
+
+  local h = 0
+  if delta > 0 then
+    if max == r then
+      h = (((g - b) / delta) % 6)/6
+    elseif max == g then
+      h = (((b - r) / delta) + 2)/6
+    elseif max == b then
+      h = (((r - g) / delta) + 4)/6
+    end
+  end
+
+  local s = (max == 0) and 0 or (delta / max)
+  local v = max
+
+  return h, s, v
+end
+
 function indexOf(tbl, value)
     for k, v in pairs(tbl) do
         if v == value then

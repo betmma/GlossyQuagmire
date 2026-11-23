@@ -236,6 +236,21 @@ return {
                 }
             },
         },
+        ['kora-spotlight'] = {
+            EASY = '@ref:NORMAL',
+            NORMAL = {
+                name = {
+                    en_us = 'Spotlight "Dazzling Stage Effect"',
+                    zh_cn = '聚光「耀眼的舞台效果」',
+                }
+            },
+            __default__ = {
+                name = {
+                    en_us = 'Spotlight "Dazzling Special Effect"',
+                    zh_cn = '聚光「耀眼的舞台特效」',
+                }
+            },
+        },
         ['shouji-bridge'] = {
             EASY = {
                 name = {
