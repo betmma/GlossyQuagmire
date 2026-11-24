@@ -168,6 +168,14 @@ return {
                 }
             }
         },
+        ['tooshi-scroll'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Lost Sign "Path of Advance and Retreat"',
+                    zh_cn = '迷符「进退维谷的小径」',
+                }
+            }
+        },
         ['kora-cosmos'] = {
             EASY = {
                 name = {

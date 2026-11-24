@@ -135,6 +135,11 @@ local tooshiBoss=BossManager.BossSegment{
         BossManager.BossRound{phases={
             require('stages.stage2.spellcards.flower')
         }},
+    },
+    lastRounds={
+        BossManager.BossRound{phases={
+            require('stages.stage2.spellcards.scroll'),
+        }},
     }
 }
 return tooshiBoss

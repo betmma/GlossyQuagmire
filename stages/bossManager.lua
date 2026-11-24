@@ -24,6 +24,7 @@
 ---@field private spawnBoss fun(self):Boss
 ---@field private rounds BossRound[] regular rounds
 ---@field lastRounds BossRound[] last spell rounds. they don't add star and are called in their individual code after rounds finished.
+---@field runLastRounds boolean set to false in the beginning of func(), listen to SPELLCARD_BONUS to set to true. 
 ---@field public getAllRounds fun(self:BossSegment):BossRound[] for stage manager to loop through all rounds in a bossSegment easily
 ---@field beforeDialogueKey? fun():string it's a function so can route to different dialogue based on shot type or difficulty
 ---@field afterDialogueKey? fun():string
@@ -78,11 +79,20 @@ end
 
 local BossRound -- forward declare for BossSegment func
 
+local currentBossSegment
+EventManager.listenTo(EM.EVENTS.SPELLCARD_BONUS,function (key,success)
+    if success and currentBossSegment then
+        currentBossSegment.runLastRounds=true
+    end
+end)
+
 ---@class BossSegmentFuncArgs
 ---@field practicePhase string|nil if not nil, will build a temporary func with only one round which only includes this phase
 
 ---@param args BossSegmentFuncArgs
 function BossSegment:func(args)
+    currentBossSegment=self
+    self.runLastRounds=false
     ---@type BossRound[]
     local roundsToRun=self.rounds
     if args.practicePhase then -- build a temporary round
@@ -135,7 +145,7 @@ function BossSegment:func(args)
     boss.invincible=false
     boss:die()
     -- last spells. same as touhou 8 where no stars are shown even for kaguya with 5 last spells. boss would need to die and respawn for each round. won't start last spells for EASY. last spell has two extra logics: nullify life and bomb, and end spell when hit. create a spellcardPhase subclass to execute them. thing should be managed by boss segment, not specific spell phase, or in spell practice the behaviour is different. add nullify functionalities for NORMAL to LUNATIC, possibly not adding nullify for OVERDRIVE so it's more difficult
-    if not args.practicePhase and DIFF()>=G.EASY then
+    if not args.practicePhase and DIFF()>=G.EASY and self.runLastRounds then
         for i,round in ipairs(self.lastRounds) do
             boss=self:spawnBoss()
             round.bossSegment=self
