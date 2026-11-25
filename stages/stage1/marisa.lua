@@ -170,6 +170,11 @@ local marisaBoss=BossManager.BossSegment{
             },
             require'stages.stage1.spellcards.light',
         }},
+    },
+    lastRounds={
+        BossManager.BossRound{phases={
+            require('stages.stage1.spellcards.spark'),
+        }},
     }
 }
 

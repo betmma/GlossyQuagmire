@@ -119,6 +119,14 @@ return {
                 }
             }
         },
+        ['marisa-spark'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Love Sign "Recoil Spark"',
+                    zh_cn = '恋符「后坐力火花」',
+                }
+            }
+        },
         ['tooshi-dance'] = {
             EASY = {
                 name = {
