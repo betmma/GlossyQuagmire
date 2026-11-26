@@ -64,6 +64,14 @@ return {
                 },
             }
         },
+        ['kotoba-round'] = {
+            __default__ = {
+                name = {
+                    en_us = 'Extra Round "Talking in Circles"',
+                    zh_cn = '圆满「自圆其说」',
+                },
+            }
+        },
         ['reimu-dream-seal'] = {
             __default__ = {
                 name = {

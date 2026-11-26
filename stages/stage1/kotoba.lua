@@ -271,6 +271,11 @@ local finalBoss=BossManager.BossSegment{
             require 'stages.stage1.spellcards.pupil',
             require 'stages.stage1.spellcards.lead',
         }},
+    },
+    lastRounds={
+        BossManager.BossRound{phases={
+            require('stages.stage1.spellcards.round'),
+        }},
     }
 }
 ---@type BossSegment[]

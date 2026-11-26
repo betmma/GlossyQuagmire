@@ -25,6 +25,9 @@ return BossManager.LastSpellcardPhase{
                     self.kinematicState.dir=self.kinematicState.dir+math.pi
                     self.t0=self.frame
                 end
+                if self.frame==300 then
+                    SFX:play('enemyPowerfulShot')
+                end
                 if self.frame>=300 and self.frame<400 then
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,120,0.02)
                 end
@@ -43,6 +46,9 @@ return BossManager.LastSpellcardPhase{
                     s=s+0.2
                     self.spriteColor[1],self.spriteColor[2],self.spriteColor[3]=math.hsvToRgb(h,s,v)
                     self.t0=self.frame
+                end
+                if self.frame==420 then
+                    SFX:play('enemyPowerfulShot')
                 end
                 if self.frame>=420 and self.frame<520 then
                     self.kinematicState.speed=math.lerp(self.kinematicState.speed,240,0.02)
@@ -115,6 +121,7 @@ return BossManager.LastSpellcardPhase{
             for i,bulleti in ipairs(bullets) do
                 Event.LoopEvent{obj=bulleti,period=5,times=48,executeFunc=function ()
                     Mirror.spawnReflections(bulleti,12)
+                    SFX:play('enemyShot3')
                 end}
             end
             wait(360)
