@@ -12,7 +12,7 @@ return BossManager.LastSpellcardPhase{
         local geo=G.runInfo.geometry
         ---@cast geo PortalGeometryBase
         local posp=copyTable(G.runInfo.player.kinematicState.pos)
-        local dir0=G.runInfo.player.viewDirection
+        local dir0=0
         local outerPortals=Portal.setOuterPortals(posp)
         for i=1,#outerPortals do
             outerPortals[i]:remove()
@@ -21,6 +21,8 @@ return BossManager.LastSpellcardPhase{
         local posb=geo:rThetaGoRef(posp,500,dir0-math.pi/2)
         Effect.Charge{obj=G.runInfo.player,size=2}
         boss.safe=true
+        G.runInfo.player.viewDirection=math.modClamp(G.runInfo.player.viewDirection)
+        Event.EaseEvent{obj=G.runInfo.player,aims={viewDirection=0},duration=30,progressFunc=Event.sineIOProgressFunc}
         wait(30)
         boss.kinematicState.pos=posb
         local sentry=DanmakuFuncs.sentry(posb)
