@@ -1324,6 +1324,28 @@ return {
                     en_us = 'Press Buttons Around You\nto Defend Yourself!',
                     zh_cn = '用周围的按钮来防御！'
                 }
+            },
+            spellcardAttack = {
+                normal = {
+                    normal = {
+                        en_us = 'Spell Card Attack!!!',
+                        zh_cn = '符卡攻击！！'
+                    },
+                    timeout = {
+                        en_us = 'SURVIVAL Spell Card Attack!!!',
+                        zh_cn = '时符攻击！！'
+                    },
+                },
+                last = {
+                    normal = {
+                        en_us = 'LAST Spell Card Attack!!!',
+                        zh_cn = '最终符卡攻击！！'
+                    },
+                    timeout = {
+                        en_us = 'LAST SURVIVAL Spell Card Attack!!!',
+                        zh_cn = '最终时符攻击！！'
+                    },
+                }
             }
         },
         PRACTICE = {

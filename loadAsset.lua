@@ -500,7 +500,7 @@ local SimpleCallableShoveEffect=Object:extend()
 ---@field shader love.Shader
 ---@field shaderArgs table
 ---@field args table
----@field run fun(self:SimpleCallableShoveEffect):nil
+---@field run fun(self:SimpleCallableShoveEffect,...):nil
 function SimpleCallableShoveEffect:new(args)
     self.name=args.name
     self.args=args.args or {}
@@ -558,11 +558,57 @@ local deathEffect=SimpleCallableShoveEffect{
         end}
     end
 }
+
+local spellcardAttackEffect=SimpleCallableShoveEffect{
+    name='spellcardAttack',
+    shader=ShaderScan:load_shader('shaders/effects/spellcardAttack.glsl'),
+    args={active=false,lastText='',lastFont='',lastColor=nil},
+    shaderArgs={canvas=nil,progress=0,canvasSize=nil},
+    run=function(self,text,color)
+        color=color or {1,1,1,1}
+        local fontSize=36
+        local font=SetFont(fontSize)
+        local canvas=self.shaderArgs.canvas --[[@as love.Canvas]]
+        if font~=self.args.lastFont or text~=self.args.lastText or color~=self.args.lastColor then
+            local padX, padY = 20, 16
+            local cw = font:getWidth(text) + padX
+            local ch = font:getHeight() + padY
+            canvas = love.graphics.newCanvas(cw, ch)
+            canvas:setWrap("repeat", "repeat")
+            local canvasRef=love.graphics.getCanvas()
+            local colorRef={love.graphics.getColor()}
+            love.graphics.setCanvas(canvas)
+            love.graphics.clear(0,0,0,0)
+            -- simple bold again
+            local offset=0.05*fontSize
+            love.graphics.setColor(0,0,0,1)
+            love.graphics.print(text,padX/2-offset,padY/2)
+            love.graphics.print(text,padX/2+offset,padY/2)
+            love.graphics.print(text,padX/2,padY/2-offset)
+            love.graphics.print(text,padX/2,padY/2+offset)
+            love.graphics.setColor(color)
+            love.graphics.print(text,padX/2,padY/2)
+            love.graphics.setCanvas(canvasRef)
+            love.graphics.setColor(colorRef)
+            self.shaderArgs.canvas=canvas
+            self.shaderArgs.canvasSize={canvas:getDimensions()}
+            self.args.lastFont=font
+            self.args.lastText=text
+            self.args.lastColor=color
+        end
+        self.args.active=true
+        self.shaderArgs.progress=0
+        Event.EaseEvent{easeObj=self.shaderArgs,aims={progress=1},duration=60,afterFunc=function()
+            self.args.active=false
+        end}
+    end
+}
 ---@type shoveEffect[]
 Asset.mainEffects={
     Mirror.mainEffect,
     glassBrokenEffect,
-    deathEffect
+    deathEffect,
+    spellcardAttackEffect
 }
 
 Asset.mainEffectsByName={}

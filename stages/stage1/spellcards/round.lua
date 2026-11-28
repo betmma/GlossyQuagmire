@@ -109,7 +109,7 @@ return BossManager.LastSpellcardPhase{
             if DIFF()<=G.HARD or i%2==0 then
                 wait(300)
             else
-                wait(DSWITCH{60,60,60,60,30})
+                wait(DSWITCH{120,120,120,120,30})
             end
         end
     end

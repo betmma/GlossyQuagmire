@@ -429,6 +429,7 @@ end
 ---@field bonusScore integer score player gets after clearing the spellcard.
 ---@field currentBonus integer current bonus score, which counts down every frame.
 ---@field spellBackgroundObj ShaderBackground created in run
+---@field runSpellcardAttackEffect fun(self:SpellcardPhase):nil run spellcardAttackEffect in loadAsset.lua, the effect where lines of text appear when spell begins
 ---@overload fun(args:SpellcardPhaseArgs):SpellcardPhase
 local SpellcardPhase=BossPhase:extend()
 
@@ -466,6 +467,9 @@ local function drawSpellBackground()
     end
 end
 
+function SpellcardPhase:runSpellcardAttackEffect()
+    Asset.mainEffectsByName.spellcardAttack:run(Localize{'ui','IN_GAME','spellcardAttack','normal',self.isTimeout and 'timeout' or 'normal'},{1,self.isTimeout and 0.5 or 1,1,1})
+end
 function SpellcardPhase:run(boss)
     self.currentBonus=self.bonusScore
     local spellBackground=self.bossRound.bossSegment.spellBackground
@@ -478,6 +482,7 @@ function SpellcardPhase:run(boss)
         self.spellBackgroundObj.transparency=0
         spellBackgroundEaseEvent=Event.EaseEvent{obj=self.spellBackgroundObj,aims={transparency=1},duration=60}
     end
+    self:runSpellcardAttackEffect()
     DynamicUIObjs.slideSpellcardInfo()
     DynamicUIObjs.spellcardNameText:setText(Localize{'spellcards', self.key, G.runInfo.difficulty, 'name'})
     Event.Event{obj=boss,action=function()
@@ -539,6 +544,10 @@ function LastSpellcardPhase:new(args)
     SpellcardPhase.new(self, args)
     self.dropItemsPolicy='PERFECT'
     self.reduceHPto0=false
+end
+
+function LastSpellcardPhase:runSpellcardAttackEffect()
+    Asset.mainEffectsByName.spellcardAttack:run(Localize{'ui','IN_GAME','spellcardAttack','last',self.isTimeout and 'timeout' or 'normal'},{1,1,0,1})
 end
 
 function LastSpellcardPhase:isFinished(boss)
